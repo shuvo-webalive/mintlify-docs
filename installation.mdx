@@ -1,0 +1,243 @@
+---
+title: "Installation"
+description: "Install the Python SDK from PyPI, or clone the SDK for your language and point your project at it."
+---
+
+The Python SDK is on PyPI. The other six SDKs are not published to a package registry yet: each one
+lives in its own Bitbucket repository, and you install it by cloning that repository and pointing
+your project at the clone.
+
+<Note>
+  For the six cloned SDKs you need read access to the repositories on Bitbucket. Clone the
+  `development` branch: it is the main branch, and the repository's default branch does not hold
+  the SDK.
+</Note>
+
+Keep each clone next to your project, because the paths below are relative:
+
+```text
+projects/
+├── exsited-sdk-<language>/   the clone
+└── my-app/                   your project
+```
+
+## Install the SDK
+
+<Tabs>
+  <Tab title="Python">
+    Requires Python 3.10 or newer. The package and the import are both `exsited`. Pin the major
+    version:
+
+    <Steps>
+      <Step title="Install">
+        ```bash
+        pip install "exsited>=4,<5"
+        ```
+      </Step>
+      <Step title="Import it">
+        ```python
+        from exsited import build_client
+        ```
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="JavaScript">
+    Requires Node.js 18.17 or newer. The SDK has no runtime dependencies.
+
+    <Steps>
+      <Step title="Clone and install">
+        ```bash
+        git clone --branch development git@bitbucket.org:webalive/exsited-sdk-js.git
+        cd exsited-sdk-js
+        npm install
+        ```
+
+        `npm install` also builds the SDK into `dist/`.
+      </Step>
+      <Step title="Add it to your project">
+        In `my-app/package.json`:
+
+        ```json
+        {
+          "name": "my-app",
+          "type": "module",
+          "dependencies": {
+            "@exsited/sdk": "file:../exsited-sdk-js"
+          }
+        }
+        ```
+
+        Then run `npm install` in `my-app`.
+      </Step>
+      <Step title="Import it">
+        ```js
+        import {buildClient} from '@exsited/sdk';
+        ```
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="PHP">
+    Requires PHP 8.2 or newer with the `ctype`, `curl`, `filter`, `json` and `mbstring` extensions,
+    and Composer 2.
+
+    <Steps>
+      <Step title="Clone and install">
+        ```bash
+        git clone --branch development git@bitbucket.org:webalive/exsited-sdk-php.git
+        cd exsited-sdk-php
+        composer install
+        ```
+      </Step>
+      <Step title="Add it to your project">
+        From inside `my-app` (run `composer init` first if it has no `composer.json`):
+
+        ```bash
+        composer config repositories.exsitedsdk path ../exsited-sdk-php
+        composer require exsited/sdk:@dev
+        ```
+      </Step>
+      <Step title="Import it">
+        ```php
+        use Exsited\Sdk\Client\ClientRegistry;
+        ```
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="Java">
+    Requires JDK 21 and Maven 3.9 or newer. The SDK has no dependencies.
+
+    <Steps>
+      <Step title="Clone and install">
+        ```bash
+        git clone --branch development git@bitbucket.org:webalive/exsited-sdk-java.git
+        cd exsited-sdk-java
+        mvn install -DskipTests
+        ```
+
+        This puts the jar in your local Maven repository, so your project needs no path to it.
+      </Step>
+      <Step title="Add it to your project">
+        In `my-app/pom.xml`:
+
+        ```xml
+        <dependency>
+            <groupId>com.exsited</groupId>
+            <artifactId>exsited-sdk</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+        ```
+      </Step>
+      <Step title="Import it">
+        ```java
+        import com.exsited.sdk.client.ExsitedClient;
+        ```
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title=".NET">
+    Requires the .NET SDK 8.0.100 or newer.
+
+    <Steps>
+      <Step title="Clone and pack">
+        ```bash
+        git clone --branch development git@bitbucket.org:webalive/exsited-sdk-dotnet.git
+        cd exsited-sdk-dotnet
+        dotnet pack src/Exsited.Sdk -c Release -o ./artifacts
+        ```
+      </Step>
+      <Step title="Add it to your project">
+        From inside `my-app`:
+
+        ```bash
+        dotnet nuget add source ../exsited-sdk-dotnet/artifacts --name exsited-local
+        dotnet add package Exsited.Sdk
+        ```
+      </Step>
+      <Step title="Import it">
+        ```csharp
+        using Exsited.Sdk.Client;
+        ```
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="Dart">
+    Requires Dart 3.5 or newer. The Flutter SDK includes Dart.
+
+    <Steps>
+      <Step title="Clone and get packages">
+        ```bash
+        git clone --branch development git@bitbucket.org:webalive/exsited-sdk-dart.git
+        cd exsited-sdk-dart
+        dart pub get
+        ```
+      </Step>
+      <Step title="Add it to your project">
+        In `my-app/pubspec.yaml`:
+
+        ```yaml
+        name: my_app
+
+        environment:
+          sdk: ^3.5.0
+
+        dependencies:
+          exsited_sdk:
+            path: ../exsited-sdk-dart
+        ```
+
+        Then run `dart pub get` in `my-app`.
+      </Step>
+      <Step title="Import it">
+        ```dart
+        import 'package:exsited_sdk/exsited_sdk.dart';
+        ```
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="Go">
+    Requires Go 1.24 or newer.
+
+    <Steps>
+      <Step title="Clone and build">
+        ```bash
+        git clone --branch development git@bitbucket.org:webalive/exsited-sdk-go.git
+        cd exsited-sdk-go
+        go build ./...
+        ```
+      </Step>
+      <Step title="Add it to your project">
+        In `my-app/go.mod`:
+
+        ```text
+        module example.com/my-app
+
+        go 1.24
+
+        require bitbucket.org/webalive/exsited-sdk-go v1.5.0
+
+        replace bitbucket.org/webalive/exsited-sdk-go => ../exsited-sdk-go
+        ```
+
+        Both lines are needed: `require` adds the module to your build, and `replace` points it at
+        the clone.
+      </Step>
+      <Step title="Import it">
+        ```go
+        import exsited "bitbucket.org/webalive/exsited-sdk-go"
+        ```
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+## Updating
+
+For Python, run `pip install -U "exsited>=4,<5"`. For the others, run `git pull` in the clone.
+JavaScript, PHP, Dart and Go read the clone directly, so your project uses the new code straight
+away (for JavaScript, `npm install` in the clone rebuilds `dist/`). Java and .NET use a built copy,
+so rebuild after pulling:
+
+- **Java:** run `mvn install -DskipTests` in the clone again.
+- **.NET:** run `dotnet pack` in the clone again. NuGet caches a package by its version number, so
+  if the version did not change, clear the cache with `dotnet nuget locals global-packages --clear`
+  before you restore `my-app`.

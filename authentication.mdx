@@ -1,0 +1,132 @@
+---
+title: "Authentication"
+description: "Give the client your API credentials once; it gets, caches and renews the access token."
+---
+
+import ClientSetup from '/snippets/client-setup.mdx';
+import ClientBuild from '/snippets/client-build.mdx';
+
+Every call to the API must include an access token. The SDKs get that token for you from your API
+credentials, cache it and renew it before it expires. With cURL, or any HTTP client, you request the
+token yourself and send it with each call.
+
+## Your credentials
+
+| Credential | What it is |
+| --- | --- |
+| Base URL | Your Exsited API address, including `https://`. |
+| Client ID | Identifies your integration. |
+| Client secret | The secret paired with the client ID. |
+| Redirect URI | The redirect URI registered for your integration, sent with the token request. |
+
+<Warning>
+  The client secret gives access to your Exsited data. Keep it in an environment variable or a
+  secrets manager, never in source code.
+</Warning>
+
+## Set up a client
+
+Register your API credentials once, when your app starts. These samples read them from environment
+variables named `EXSITED_BASE_URL`, `EXSITED_CLIENT_ID`, `EXSITED_CLIENT_SECRET` and
+`EXSITED_REDIRECT_URI`.
+
+<ClientSetup />
+
+Then get a client wherever you make calls. Every SDK sample in the API reference starts this way:
+
+<ClientBuild />
+
+The registration turns on the raise-on-error option (`raise_on_error=True` in Python) for every
+client you build, so a failed call raises an exception or throws an error instead of going
+unnoticed. Without it, a failed call returns a response that holds the API's error body. A `2xx`
+response whose body is an error also counts as a failure.
+
+## What the SDKs handle
+
+<CardGroup cols={2}>
+  <Card title="Getting the token" icon="key">
+    On the first call, the SDK exchanges your credentials for an access token.
+  </Card>
+  <Card title="Caching and renewal" icon="rotate">
+    The SDK caches the token and renews it shortly before it expires, trying the refresh token first
+    and then your credentials.
+  </Card>
+  <Card title="An expired token" icon="clock-rotate-left">
+    If a call returns `401` because the token has expired, the SDK renews the token once and sends
+    the call again.
+  </Card>
+  <Card title="A real refusal" icon="ban">
+    A `401` that refuses the request itself, rather than the token, is returned to you and not
+    retried, so a write is never sent twice.
+  </Card>
+</CardGroup>
+
+<Note>
+  A new token for the same credentials ends the previous one. Two apps, or two copies of one app,
+  that each request their own token with the same credentials keep signing each other out. Share
+  one set of credentials only with one running app, or give each app its own.
+</Note>
+
+## Calling the API directly
+
+Request a token from `POST /api/v4/oauth2/token` with a JSON body of `grant_type`
+(`client_credentials`), `client_id`, `client_secret` and `redirect_uri`. The cURL tab under
+[Set up a client](#set-up-a-client) shows the full request. A successful request returns `200` with
+these fields:
+
+| Field | Meaning |
+| --- | --- |
+| `access_token` | The token to send with each call. |
+| `expires_in` | Seconds until the token expires, for example `3600`. |
+| `refresh_token` | Exchanged for a new access token when this one expires. |
+
+Send the access token in the `Authorization` header on every call:
+
+```bash
+curl "$EXSITED_BASE_URL/api/v4/accounts?limit=20" \
+  -H "Authorization: Bearer $ACCESS_TOKEN"
+```
+
+To renew a token, send `grant_type` `refresh_token` with `client_id`, `client_secret` and the
+`refresh_token` from the earlier response.
+
+## Errors
+
+Every failed call returns the same JSON body:
+
+```json
+{
+  "object": "error",
+  "request_id": "req_23019cc8-cdce-42db-ae8f-b3fdb1e15493",
+  "status": 400,
+  "code": "validation_error",
+  "message": "One or more fields failed validation",
+  "errors": [
+    {"field": "effective_date", "code": "invalid", "message": "Invalid format for effective_date"}
+  ]
+}
+```
+
+Branch on `code`, and quote `request_id` when you contact support. `errors` has one entry per field
+that failed.
+
+## Try it in the docs
+
+Every endpoint page has a **Try it** button that calls the API from this site.
+
+<Steps>
+  <Step title="Get a token">
+    Open [Get an access token](/api-reference/authentication/get-an-access-token), click **Try it**,
+    set `host` to your Exsited API host name (without `https://`), choose `client_credentials` for
+    `grant_type`, fill in your credentials and click **Send**. Copy `access_token` from the response.
+  </Step>
+  <Step title="Call an endpoint">
+    Open any endpoint, click **Try it**, set the same `host`, paste the token into
+    **Authorization**, and click **Send**.
+  </Step>
+</Steps>
+
+<Warning>
+  These calls run against your real data: creating, changing and deleting records is real. Requests
+  are sent through Mintlify's servers. Use test data, and never share your credentials.
+</Warning>
