@@ -1,7 +1,7 @@
 ---
-title: "Webhooks: Receive Real-Time Event Notifications"
+title: "Webhooks: Receive Real-Time Exsited Event Notifications"
 sidebarTitle: "Webhooks"
-description: "Subscribe to real-time Exsited event notifications with webhooks. Trigger workflows instantly when orders, invoices, or payments change."
+description: "Subscribe to real-time Exsited event notifications with webhooks. Trigger workflows instantly when orders, invoices, or payments change state."
 ---
 
 Webhooks let your application react to changes in Exsited the moment they happen, without polling the API. When a subscribed event occurs — such as a new order being created or a payment being received — Exsited sends an HTTP `POST` request to a URL you specify, with a JSON payload describing the event. This makes webhooks ideal for triggering downstream workflows, syncing data to external systems, or notifying customers in real time.
@@ -10,9 +10,20 @@ Webhooks let your application react to changes in Exsited the moment they happen
 
 When you register a webhook endpoint, Exsited stores your URL alongside the event types you want to receive. Whenever one of those events fires, Exsited constructs a signed JSON payload and delivers it to your URL via HTTP `POST`. Your endpoint must respond with a `200 OK` status within the timeout window to acknowledge receipt.
 
+## Webhook Management Endpoints
+
+Webhook subscriptions are managed through the Integrations API. The following endpoints are available:
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/v3/integrations` | List all registered integrations and webhook endpoints. |
+| `POST` | `/api/v3/integrations` | Register a new webhook endpoint. |
+| `PATCH` | `/api/v3/integrations` | Update an existing integration or webhook subscription. |
+| `DELETE` | `/api/v3/integrations` | Remove a registered webhook endpoint. |
+
 ## Register a Webhook Endpoint
 
-You register webhook endpoints through the Integrations API. Send a `POST` request to `/api/v3/integrations` with your endpoint URL and the list of event types you want to subscribe to.
+Send a `POST` request to `/api/v3/integrations` with your endpoint URL and the list of event types you want to subscribe to.
 
 ```bash
 curl -X POST https://example.exsited.com/api/v3/integrations \
@@ -32,9 +43,71 @@ curl -X POST https://example.exsited.com/api/v3/integrations \
   }'
 ```
 
+**Example response:**
+
+```json
+{
+  "id": "int_01HXYZ999",
+  "type": "webhook",
+  "url": "https://yourapp.com/webhooks/exsited",
+  "events": [
+    "order.created",
+    "order.updated",
+    "invoice.created",
+    "payment.received",
+    "stock.updated",
+    "portal.submitted"
+  ],
+  "signing_secret": "whsec_abc123...",
+  "created_on": "2025-02-14T09:00:00Z"
+}
+```
+
+<Warning>
+  The `signing_secret` is only returned once, at registration time. Store it immediately in a secure environment variable. You cannot retrieve it again — if lost, delete the integration and register a new one.
+</Warning>
+
 <Tip>
   You can register multiple webhook endpoints — for example, one for order events sent to your fulfilment system and another for payment events sent to your accounting system.
 </Tip>
+
+## List Registered Integrations
+
+Retrieve all registered webhook endpoints and integration subscriptions for your account.
+
+```bash
+curl https://example.exsited.com/api/v3/integrations \
+  -H "Authorization: Bearer <token>"
+```
+
+## Update a Webhook Subscription
+
+Use `PATCH` to add or remove event types, or to change the destination URL for an existing webhook registration.
+
+```bash
+curl -X PATCH https://example.exsited.com/api/v3/integrations \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "int_01HXYZ999",
+    "events": [
+      "order.created",
+      "order.updated",
+      "payment.received"
+    ]
+  }'
+```
+
+## Delete a Webhook Endpoint
+
+```bash
+curl -X DELETE https://example.exsited.com/api/v3/integrations \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ids": ["int_01HXYZ999"]
+  }'
+```
 
 ## Available Event Types
 
@@ -103,7 +176,7 @@ Every webhook delivery is a JSON object with a consistent top-level structure:
 
 ## Verifying Webhook Signatures
 
-Exsited signs every webhook payload so you can verify it originated from Exsited and was not tampered with in transit. The signature is included in the `X-Exsited-Signature` request header as an HMAC-SHA256 hash of the raw request body, using a shared secret assigned when you register the integration.
+Exsited signs every webhook payload so you can verify it originated from Exsited and was not tampered with in transit. The signature is included in the `X-Exsited-Signature` request header as an HMAC-SHA256 hash of the raw request body, using the signing secret returned when you registered the integration.
 
 <Steps>
   <Step title="Retrieve your signing secret">

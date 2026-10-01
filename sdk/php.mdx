@@ -1,5 +1,5 @@
 ---
-title: "Exsited PHP SDK: Installation and Usage Guide"
+title: "Exsited PHP SDK: Installation and Usage Guide (PHP 8.0+)"
 sidebarTitle: "PHP SDK"
 description: "Install and configure the Exsited PHP SDK to authenticate, manage resources, and automate operations directly from your PHP application."
 ---
@@ -95,6 +95,20 @@ foreach ($accounts as $account) {
 }
 ```
 
+### Create an Item
+
+Build an associative array with the item's attributes and pass it to `$sdk->item->create()`. The method returns the newly created item object.
+
+```php
+$newItem = $sdk->item->create([
+    'sku'   => 'WIDGET-001',
+    'name'  => 'Blue Widget',
+    'price' => 29.99,
+]);
+
+echo 'Created item: ' . $newItem->sku . ' — ' . $newItem->name . PHP_EOL;
+```
+
 ### Create an Order
 
 Build an associative array with the required order fields and pass it to `$sdk->order->create()`. The method returns the newly created order object.
@@ -113,6 +127,22 @@ $newOrder = $sdk->order->create([
 ]);
 
 echo 'Order created: ' . $newOrder->id . PHP_EOL;
+```
+
+### Get Invoices
+
+List all invoices or filter by status using an optional parameters array.
+
+```php
+// List all invoices
+$invoices = $sdk->invoice->list();
+
+// List only unpaid invoices
+$unpaidInvoices = $sdk->invoice->list(['status' => 'unpaid']);
+
+foreach ($unpaidInvoices as $invoice) {
+    echo $invoice->id . ': ' . $invoice->totalAmount . ' due ' . $invoice->dueDate . PHP_EOL;
+}
 ```
 
 ### Handle Errors

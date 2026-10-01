@@ -1,5 +1,5 @@
 ---
-title: "Orders API: Create and Track Sales Orders"
+title: "Orders API: Create and Track Sales Orders in Exsited"
 sidebarTitle: "Orders"
 description: "Create sales orders, update their status, and track every order through its full fulfilment lifecycle using the Exsited Orders API."
 ---
@@ -51,6 +51,32 @@ curl https://example.exsited.com/api/v3/orders/ord_01HXYZ789 \
   -H "Authorization: Bearer <token>"
 ```
 
+**Example response:**
+
+```json
+{
+  "id": "ord_01HXYZ789",
+  "account_id": "acc_01HXYZ123",
+  "status": "confirmed",
+  "items": [
+    {
+      "item_id": "itm_01HXYZ456",
+      "quantity": 2,
+      "unit_price": 49.99,
+      "line_total": 99.98
+    },
+    {
+      "item_id": "itm_01HXYZ457",
+      "quantity": 1,
+      "unit_price": 19.99,
+      "line_total": 19.99
+    }
+  ],
+  "total": 119.97,
+  "created_on": "2025-02-14T09:29:55Z"
+}
+```
+
 ## Create an Order
 
 Send a `POST` request with the account ID and a list of items. You can create the order in `draft` status and confirm it later, or set `status` to `confirmed` immediately.
@@ -79,7 +105,33 @@ curl -X POST https://example.exsited.com/api/v3/orders \
 
 ## Update an Order
 
-Use `PATCH` to update the status or other fields on an existing order.
+Use `PUT` to replace all fields on an existing order, or `PATCH` to update only specific fields such as status.
+
+**Full update with PUT:**
+
+```bash
+curl -X PUT https://example.exsited.com/api/v3/orders/ord_01HXYZ789 \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "account_id": "acc_01HXYZ123",
+    "status": "processing",
+    "items": [
+      {
+        "item_id": "itm_01HXYZ456",
+        "quantity": 2,
+        "unit_price": 49.99
+      },
+      {
+        "item_id": "itm_01HXYZ457",
+        "quantity": 1,
+        "unit_price": 19.99
+      }
+    ]
+  }'
+```
+
+**Partial update with PATCH:**
 
 ```bash
 curl -X PATCH https://example.exsited.com/api/v3/orders \
@@ -94,6 +146,17 @@ curl -X PATCH https://example.exsited.com/api/v3/orders \
 <Note>
   When an order is fulfilled, Exsited can automatically generate a corresponding invoice. See [Invoices](/api/invoices) for details on how auto-generation works.
 </Note>
+
+## Delete an Order
+
+```bash
+curl -X DELETE https://example.exsited.com/api/v3/orders \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ids": ["ord_01HXYZ789"]
+  }'
+```
 
 ## Request Fields
 

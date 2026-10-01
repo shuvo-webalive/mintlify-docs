@@ -1,5 +1,5 @@
 ---
-title: "Purchase Orders API: Manage Supplier Orders"
+title: "Purchase Orders API: Manage Supplier Orders in Exsited"
 sidebarTitle: "Purchase Orders"
 description: "Create and track supplier purchase orders in Exsited. Manage stock replenishment and sync PO data with your accounting or ERP system."
 ---
@@ -12,6 +12,7 @@ The Purchase Orders API lets you create and manage the orders you place with you
 |--------|----------|-------------|
 | `GET` | `/api/v3/purchase-orders` | List all purchase orders. |
 | `POST` | `/api/v3/purchase-orders` | Create a new purchase order. |
+| `GET` | `/api/v3/purchase-orders/{id}` | Retrieve a single purchase order. |
 | `PATCH` | `/api/v3/purchase-orders` | Partially update one or more purchase orders. |
 | `DELETE` | `/api/v3/purchase-orders` | Delete one or more purchase orders. |
 
@@ -42,8 +43,35 @@ curl https://example.exsited.com/api/v3/purchase-orders/po_01HXYZ987 \
   -H "Authorization: Bearer <token>"
 ```
 
+**Example response:**
+
+```json
+{
+  "id": "po_01HXYZ987",
+  "supplier_id": "sup_01HXYZ111",
+  "status": "draft",
+  "expected_date": "2025-03-15",
+  "items": [
+    {
+      "item_id": "itm_01HXYZ456",
+      "quantity": 100,
+      "unit_cost": 22.50,
+      "line_total": 2250.00
+    },
+    {
+      "item_id": "itm_01HXYZ457",
+      "quantity": 50,
+      "unit_cost": 10.00,
+      "line_total": 500.00
+    }
+  ],
+  "total": 2750.00,
+  "created_on": "2025-02-10T08:00:00Z"
+}
+```
+
 <Note>
-  The single-record retrieve endpoint follows the pattern `/api/v3/purchase-orders/{id}`. Use `GET /api/v3/purchase-orders` with query parameters to filter by `supplier_id` or `status`.
+  Use `GET /api/v3/purchase-orders` with query parameters such as `supplier_id` or `status` to filter the list without fetching individual records.
 </Note>
 
 ## Create a Purchase Order

@@ -1,5 +1,5 @@
 ---
-title: "Payments API: Record and Manage Transactions"
+title: "Payments API: Record and Reconcile Customer Payments"
 sidebarTitle: "Payments"
 description: "Record customer payments, manage refunds and credit notes, and reconcile transactions against invoices using the Exsited Payments API."
 ---
@@ -12,6 +12,7 @@ The Payments API lets you record and manage financial transactions against invoi
 |--------|----------|-------------|
 | `GET` | `/api/v3/payments` | List all payment records. |
 | `POST` | `/api/v3/payments` | Record a new payment. |
+| `GET` | `/api/v3/payments/{id}` | Retrieve a single payment record. |
 | `PATCH` | `/api/v3/payments` | Partially update one or more payment records. |
 | `DELETE` | `/api/v3/payments` | Delete one or more payment records. |
 
@@ -22,6 +23,29 @@ Retrieve a paginated list of all payment records.
 ```bash
 curl https://example.exsited.com/api/v3/payments?limit=20&offset=0&order_by=created_on&direction=desc \
   -H "Authorization: Bearer <token>"
+```
+
+## Retrieve a Payment
+
+Fetch the full details of a single payment record by its unique ID.
+
+```bash
+curl https://example.exsited.com/api/v3/payments/pay_01HXYZ654 \
+  -H "Authorization: Bearer <token>"
+```
+
+**Example response:**
+
+```json
+{
+  "id": "pay_01HXYZ654",
+  "invoice_id": "inv_01HXYZ321",
+  "amount": 131.96,
+  "method": "bank_transfer",
+  "status": "completed",
+  "processed_at": "2025-02-14T09:30:00Z",
+  "created_on": "2025-02-14T09:30:05Z"
+}
 ```
 
 ## Record a Payment
@@ -143,4 +167,8 @@ curl -X POST https://example.exsited.com/api/v3/payments \
 
 <ResponseField name="processed_at" type="string">
   ISO 8601 timestamp of when the payment was processed.
+</ResponseField>
+
+<ResponseField name="created_on" type="string">
+  ISO 8601 timestamp of when the payment record was created in Exsited.
 </ResponseField>
