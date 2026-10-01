@@ -249,7 +249,7 @@ def token_operation():
         "description": "Exchanges your API credentials for an access token. Send the token as `Authorization: Bearer ACCESS_TOKEN` on every other call. The SDKs make this call for you and renew the token before it expires.",
         "security": [],
         "requestBody": {"required": True, "content": {"application/json": {
-            "schema": {"type": "object", "required": ["grant_type", "client_id", "client_secret"], "properties": {
+            "schema": {"type": "object", "required": ["grant_type", "client_id", "client_secret", "redirect_uri"], "properties": {
                 "grant_type": {"type": "string", "enum": ["client_credentials", "refresh_token"], "description": "`client_credentials` for a new token, or `refresh_token` to renew one."},
                 "client_id": {"type": "string", "description": "Your integration's client ID."},
                 "client_secret": {"type": "string", "description": "The secret paired with the client ID."},
@@ -264,7 +264,7 @@ def token_operation():
                 "expires_in": {"type": "integer", "description": "Seconds until the token expires, for example `3600`."},
                 "refresh_token": {"type": "string", "description": "Exchanged for a new access token when this one expires."},
             }}}}},
-            "401": {"description": "The credentials were not accepted.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+            "302": {"description": "The credentials were not accepted. The API redirects to its sign-in page instead of returning an error body, so this page shows `redirect to unsafe URL blocked`."},
         },
         "x-codeSamples": [{"lang": "bash", "label": "cURL", "source": TOKEN_CURL}],
     }
@@ -309,6 +309,12 @@ cURL, another HTTP client, or to try the API on this site. A token lasts `expire
     **Authorization**.
   </Step>
 </Steps>
+
+<Note>
+  If the credentials are wrong, the API returns a redirect to its sign-in page rather than an
+  error, and this page shows `redirect to unsafe URL blocked`. Check the client ID, client secret
+  and redirect URI, and send again.
+</Note>
 
 <Warning>
   A new token for the same credentials ends the previous one, so an app already running with those
