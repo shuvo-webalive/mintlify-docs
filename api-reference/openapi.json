@@ -1,0 +1,193 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Exsited API",
+    "version": "v4"
+  },
+  "servers": [
+    {
+      "url": "https://{host}/api/v4",
+      "variables": {
+        "host": {
+          "default": "your-api-host.example.com",
+          "description": "Your Exsited API host name, without https://."
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication"
+    }
+  ],
+  "paths": {
+    "/oauth2/token": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Get an access token",
+        "operationId": "get_access_token",
+        "description": "Exchanges your API credentials for an access token. Send the token as `Authorization: Bearer ACCESS_TOKEN` on every other call. The SDKs make this call for you and renew the token before it expires.",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "grant_type",
+                  "client_id",
+                  "client_secret"
+                ],
+                "properties": {
+                  "grant_type": {
+                    "type": "string",
+                    "enum": [
+                      "client_credentials",
+                      "refresh_token"
+                    ],
+                    "description": "`client_credentials` for a new token, or `refresh_token` to renew one."
+                  },
+                  "client_id": {
+                    "type": "string",
+                    "description": "Your integration's client ID."
+                  },
+                  "client_secret": {
+                    "type": "string",
+                    "description": "The secret paired with the client ID."
+                  },
+                  "redirect_uri": {
+                    "type": "string",
+                    "description": "The redirect URI registered for your integration. Required with `client_credentials`; not sent with `refresh_token`."
+                  },
+                  "refresh_token": {
+                    "type": "string",
+                    "description": "With `refresh_token` only: the `refresh_token` from an earlier token response."
+                  }
+                }
+              },
+              "example": {
+                "grant_type": "client_credentials",
+                "client_id": "YOUR_CLIENT_ID",
+                "client_secret": "YOUR_CLIENT_SECRET",
+                "redirect_uri": "YOUR_REDIRECT_URI"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string",
+                      "description": "Send this as `Authorization: Bearer ACCESS_TOKEN`."
+                    },
+                    "expires_in": {
+                      "type": "integer",
+                      "description": "Seconds until the token expires, for example `3600`."
+                    },
+                    "refresh_token": {
+                      "type": "string",
+                      "description": "Exchanged for a new access token when this one expires."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The credentials were not accepted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/oauth2/token\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"grant_type\": \"client_credentials\",\n    \"client_id\": \"YOUR_CLIENT_ID\",\n    \"client_secret\": \"YOUR_CLIENT_SECRET\",\n    \"redirect_uri\": \"YOUR_REDIRECT_URI\"\n  }'"
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "An access token from `POST /api/v4/oauth2/token`. The SDKs get and renew it for you."
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "description": "Every failed call returns this body.",
+        "properties": {
+          "object": {
+            "type": "string",
+            "description": "Always `error`."
+          },
+          "request_id": {
+            "type": "string",
+            "description": "Quote this to support."
+          },
+          "status": {
+            "type": "integer",
+            "description": "The HTTP status."
+          },
+          "code": {
+            "type": "string",
+            "description": "What went wrong, such as `validation_error`."
+          },
+          "message": {
+            "type": "string",
+            "description": "A short description of the problem."
+          },
+          "doc_url": {
+            "type": "string",
+            "description": "A link to more about this error."
+          },
+          "errors": {
+            "type": "array",
+            "description": "One entry per field that failed.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "doc_url": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

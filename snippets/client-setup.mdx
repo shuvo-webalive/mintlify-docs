@@ -1,0 +1,159 @@
+<CodeGroup>
+```bash cURL
+curl -X POST "$EXSITED_BASE_URL/api/v4/oauth2/token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "grant_type": "client_credentials",
+    "client_id": "'"$EXSITED_CLIENT_ID"'",
+    "client_secret": "'"$EXSITED_CLIENT_SECRET"'",
+    "redirect_uri": "'"$EXSITED_REDIRECT_URI"'"
+  }'
+```
+
+```python Python
+import os
+
+from exsited import AuthConfig, SdkConfig, register_instances
+
+register_instances([
+    SdkConfig(
+        AuthConfig(
+            client_name="default",
+            base_url=os.environ["EXSITED_BASE_URL"],
+            client_id=os.environ["EXSITED_CLIENT_ID"],
+            client_secret=os.environ["EXSITED_CLIENT_SECRET"],
+            redirect_uri=os.environ["EXSITED_REDIRECT_URI"],
+        ),
+        raise_on_error=True,
+    ),
+])
+```
+
+```javascript JavaScript
+import {AuthConfig, SdkConfig, registerInstances} from '@exsited/sdk';
+
+registerInstances([
+    new SdkConfig(
+        new AuthConfig({
+            clientName: 'default',
+            baseUrl: process.env.EXSITED_BASE_URL,
+            clientId: process.env.EXSITED_CLIENT_ID,
+            clientSecret: process.env.EXSITED_CLIENT_SECRET,
+            redirectUri: process.env.EXSITED_REDIRECT_URI,
+        }),
+        {raiseOnError: true},
+    ),
+]);
+```
+
+```php PHP
+<?php
+
+require __DIR__ . '/vendor/autoload.php';
+
+use Exsited\Sdk\Client\ClientRegistry;
+use Exsited\Sdk\Config\AuthConfig;
+use Exsited\Sdk\Config\SdkConfig;
+
+ClientRegistry::registerInstances([
+    new SdkConfig(
+        new AuthConfig(
+            clientName: 'default',
+            baseUrl: getenv('EXSITED_BASE_URL'),
+            clientId: getenv('EXSITED_CLIENT_ID'),
+            clientSecret: getenv('EXSITED_CLIENT_SECRET'),
+            redirectUri: getenv('EXSITED_REDIRECT_URI'),
+        ),
+        raiseOnError: true,
+    ),
+]);
+```
+
+```java Java
+import com.exsited.sdk.client.ClientRegistry;
+import com.exsited.sdk.config.AuthConfig;
+import com.exsited.sdk.config.SdkConfig;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        ClientRegistry.registerInstances(List.of(
+                SdkConfig.builder(AuthConfig.builder()
+                        .clientName("default")
+                        .baseUrl(System.getenv("EXSITED_BASE_URL"))
+                        .clientId(System.getenv("EXSITED_CLIENT_ID"))
+                        .clientSecret(System.getenv("EXSITED_CLIENT_SECRET"))
+                        .redirectUri(System.getenv("EXSITED_REDIRECT_URI"))
+                        .build())
+                        .raiseOnError(true)
+                        .build()));
+    }
+}
+```
+
+```csharp .NET
+using Exsited.Sdk.Client;
+using Exsited.Sdk.Config;
+
+ClientRegistry.RegisterInstances(new object[]
+{
+    new SdkConfig(
+        new AuthConfig(
+            clientName: "default",
+            baseUrl: Environment.GetEnvironmentVariable("EXSITED_BASE_URL") ?? "",
+            clientId: Environment.GetEnvironmentVariable("EXSITED_CLIENT_ID") ?? "",
+            clientSecret: Environment.GetEnvironmentVariable("EXSITED_CLIENT_SECRET") ?? "",
+            redirectUri: Environment.GetEnvironmentVariable("EXSITED_REDIRECT_URI") ?? ""),
+        raiseOnError: true),
+});
+```
+
+```dart Dart
+import 'dart:io';
+
+import 'package:exsited_sdk/exsited_sdk.dart';
+
+Future<void> main() async {
+  registerInstances([
+    SdkConfig(
+      AuthConfig(
+        clientName: 'default',
+        baseUrl: Platform.environment['EXSITED_BASE_URL']!,
+        clientId: Platform.environment['EXSITED_CLIENT_ID']!,
+        clientSecret: Platform.environment['EXSITED_CLIENT_SECRET']!,
+        redirectUri: Platform.environment['EXSITED_REDIRECT_URI']!,
+      ),
+      raiseOnError: true,
+    ),
+  ]);
+}
+```
+
+```go Go
+package main
+
+import (
+	"log"
+	"os"
+
+	exsited "bitbucket.org/webalive/exsited-sdk-go"
+)
+
+func main() {
+	err := exsited.RegisterInstances(exsited.SdkConfig{
+		Auth: exsited.AuthConfig{
+			ClientName:   "default",
+			BaseURL:      os.Getenv("EXSITED_BASE_URL"),
+			ClientID:     os.Getenv("EXSITED_CLIENT_ID"),
+			ClientSecret: os.Getenv("EXSITED_CLIENT_SECRET"),
+			RedirectURI:  os.Getenv("EXSITED_REDIRECT_URI"),
+		},
+		RaiseOnError: true,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+```
+
+</CodeGroup>
