@@ -1,0 +1,106 @@
+---
+title: "Sync Customer Data Between Exsited and HubSpot"
+sidebarTitle: "HubSpot"
+description: "Connect Exsited to HubSpot to share contacts, companies, orders, and invoice history — and keep your CRM current automatically."
+---
+
+Connecting Exsited to HubSpot closes the gap between your operations data and your sales and marketing teams. When your CRM has a complete view of each contact's order history, invoice status, and account value, your team can have better conversations, identify upsell opportunities, and act faster on at-risk accounts. The Exsited–HubSpot integration syncs contacts, companies, orders, and invoices in the direction that makes sense for your workflow — whether you manage customers primarily in Exsited, in HubSpot, or both.
+
+## Prerequisites
+
+Before setting up the integration, confirm you have:
+
+- A **HubSpot** account on any paid plan, or a free account with CRM access. Certain features (such as custom properties and deal sync) require HubSpot Starter or above.
+- An Exsited account with the **Admin** role.
+- The HubSpot user authorising the integration must have **Super Admin** or **App Marketplace** permissions in HubSpot.
+
+## Connecting HubSpot to Exsited
+
+<Steps>
+  <Step title="Navigate to the HubSpot integration">
+    In your Exsited dashboard, go to **Integrations → CRM → HubSpot**. Click **Connect HubSpot** to begin.
+  </Step>
+  <Step title="Authorise via OAuth">
+    Exsited will redirect you to the HubSpot authorisation screen. Log in with your HubSpot credentials and select the HubSpot account (portal) you want to connect. Review the requested permissions and click **Connect app** to authorise. You will be redirected back to Exsited once the connection is established.
+
+    <Note>
+      Exsited requests access to HubSpot contacts, companies, deals, and timeline events. No marketing email, ads, or billing data is accessed.
+    </Note>
+  </Step>
+  <Step title="Map contacts and companies">
+    Once connected, use the visual field mapping screen to link Exsited customer fields to HubSpot contact and company properties. Key mappings to configure:
+
+    - **Email address** — the primary match key used to link Exsited customers to HubSpot contacts. Ensure email addresses are consistent in both systems.
+    - **Company name** — map Exsited account or company name to the HubSpot company record name.
+    - **Phone number** — map the relevant Exsited contact phone field to the HubSpot contact phone property.
+    - **Custom properties** — if you have created custom contact or company properties in HubSpot (for example, customer tier, account manager), map the corresponding Exsited fields here.
+
+    <Tip>
+      Create HubSpot custom properties for Exsited-specific data — such as **Last Order Date**, **Total Lifetime Value**, and **Outstanding Invoice Count** — before mapping. This keeps your standard HubSpot properties clean and gives your sales team dedicated fields to filter and report on.
+    </Tip>
+  </Step>
+  <Step title="Configure sync direction">
+    Choose a sync direction for each data type:
+
+    - **Exsited → HubSpot** — operational data (orders, invoices, payment status) flows from Exsited into HubSpot. Use this when HubSpot is your CRM of record and Exsited is the operational source of truth.
+    - **HubSpot → Exsited** — contact and company updates made by your sales team in HubSpot flow back into Exsited. Use this when your team manages contact data primarily in HubSpot.
+    - **Bidirectional** — changes in either system are reflected in the other. Set a conflict resolution rule (Exsited-first or HubSpot-first) for fields that may be updated in both systems.
+  </Step>
+  <Step title="Save and activate">
+    Click **Save Settings** and then **Activate** to enable live syncing. Exsited will perform an initial sync of existing contacts and companies. Depending on the size of your database, the initial sync may take a few minutes. You can monitor progress under **Integrations → CRM → HubSpot → Logs**.
+  </Step>
+</Steps>
+
+## What Syncs
+
+| Data Type | Direction | Notes |
+|---|---|---|
+| Contacts | Bidirectional | Matched by email address |
+| Companies | Bidirectional | Matched by company name and domain |
+| Orders | Exsited → HubSpot | Synced as HubSpot deals or timeline events |
+| Invoices | Exsited → HubSpot | Invoice status and value synced to contact/company timeline |
+| Deal status | HubSpot → Exsited | Closed-won deals can trigger customer creation in Exsited |
+| Payment status | Exsited → HubSpot | Outstanding and overdue invoice status visible on the contact record |
+
+## Sync Direction Options
+
+The sync direction can be configured independently for each data type. Common configurations include:
+
+- **Contacts bidirectional, orders Exsited → HubSpot** — your sales team manages contacts in HubSpot, and Exsited pushes order and invoice data into the CRM for context.
+- **HubSpot → Exsited for contacts, Exsited → HubSpot for invoices** — HubSpot is the master for contact data; Exsited is the master for financial records.
+- **Fully bidirectional** — suitable for teams where both sales and operations regularly update customer records. Requires a clear conflict resolution rule.
+
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="Keeping your CRM updated with order history">
+    When a customer places an order in Exsited, the integration automatically logs the order as a timeline event on their HubSpot contact record. Your sales team can see every purchase, along with the order value, date, and status — without leaving HubSpot. This is particularly useful for identifying repeat purchase patterns or following up after a large order.
+  </Accordion>
+  <Accordion title="Flagging overdue invoices in the CRM">
+    Exsited can push invoice payment status to a custom HubSpot contact property (for example, **Outstanding Balance** or **Days Overdue**). Your sales or accounts team can then create HubSpot views and workflows that alert them when a contact has an overdue invoice — triggering a follow-up task automatically.
+  </Accordion>
+  <Accordion title="Converting HubSpot deals into Exsited customers">
+    When a deal reaches **Closed Won** in HubSpot, Exsited can automatically create or update the corresponding customer record and trigger onboarding workflows. This removes the manual step of re-entering a new customer's details after a deal is closed.
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Contacts creating duplicates in HubSpot">
+    Exsited matches contacts by email address. If a contact in Exsited has no email address, or the email differs from HubSpot, a new contact will be created rather than matched. Ensure all customer records in Exsited have a valid, consistent email address. You can also use HubSpot's duplicate management tool (**Contacts → Actions → Manage duplicates**) to merge any duplicates created during the initial sync.
+  </Accordion>
+  <Accordion title="OAuth token expired">
+    HubSpot OAuth tokens expire if unused or if the authorised user's HubSpot permissions change. If sync fails with an authorisation error, navigate to **Integrations → CRM → HubSpot** and click **Reconnect**. Complete the OAuth flow to refresh the token. No settings or mappings are lost.
+  </Accordion>
+  <Accordion title="Orders not appearing on the HubSpot contact timeline">
+    Confirm that the HubSpot contact's email address matches the customer email in Exsited exactly (including case). If the email fields are mismatched, the timeline event will be created but will not associate with the expected contact. Update the email in either system to match, then click **Retry Failed Records** in the sync log.
+  </Accordion>
+  <Accordion title="Deal sync not triggering customer creation in Exsited">
+    If closed-won HubSpot deals are not creating customers in Exsited, check that the **Deal sync** toggle is enabled under **Integrations → CRM → HubSpot → Sync Settings** and that the trigger is set to **Closed Won**. Also confirm that the deal record includes a valid contact email — deals without an associated contact cannot be matched to an Exsited customer.
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  For further help, check the sync log under **Integrations → CRM → HubSpot → Logs** and contact [support@exsited.com](mailto:support@exsited.com) with the relevant log entry reference.
+</Note>

@@ -1,0 +1,113 @@
+---
+title: "Approval Profiles: Configure Multi-Step Workflows"
+sidebarTitle: "Approval Profiles"
+description: "Define who approves what in Exsited with multi-step approval profiles, escalation rules, and threshold-based routing."
+---
+
+Approval profiles give you precise control over how records move through your organisation before they are actioned. Rather than relying on informal sign-offs, approval profiles enforce structured routing rules — ensuring the right person reviews the right record at the right time. You can build profiles with a single approver or chain multiple approval steps together, each with its own conditions and escalation behaviour.
+
+## What Are Approval Profiles?
+
+An approval profile is a set of routing rules that determines **who** must approve a record, **in what order**, and **under what conditions**. Once a profile is assigned to a module (such as Orders or Purchase Orders), every new record created in that module is automatically routed through the configured workflow before it can be fulfilled, posted, or acted upon.
+
+Profiles support:
+
+- **Sequential approval** — approvers are notified one at a time, in order.
+- **Threshold-based conditions** — only trigger the profile when a record meets a certain value or criteria (e.g., total over $5,000).
+- **Escalation rules** — automatically reassign or escalate if an approver does not respond within a set time.
+
+## Creating an Approval Profile
+
+<Steps>
+  <Step title="Navigate to Approval Profiles">
+    Go to **Configuration → Approval Profiles** and click **New**.
+  </Step>
+  <Step title="Name the profile">
+    Give the profile a clear, descriptive name — for example, *High-Value PO Approval* or *Customer Portal Order Review*.
+  </Step>
+  <Step title="Add approvers in sequence">
+    Click **Add Approver Step** for each stage in the workflow. For each step, select the approver (a specific user or a role group) and set their approval action: **Approve**, **Review Only**, or **Approve or Reject**.
+  </Step>
+  <Step title="Set conditions and thresholds">
+    Under **Trigger Conditions**, define when this profile applies. You can combine multiple conditions using AND/OR logic. Common conditions include:
+    - Record total exceeds a dollar threshold
+    - Record belongs to a specific customer or supplier
+    - A specific field value matches a predefined option
+  </Step>
+  <Step title="Configure notifications">
+    Choose how each approver is notified: **Email**, **In-app notification**, or both. Set a reminder frequency if the approver has not acted within a specified number of hours.
+  </Step>
+  <Step title="Save and assign">
+    Click **Save Profile**. Then assign the profile to one or more modules (see [Assigning a Profile to a Module](#assigning-a-profile-to-a-module)).
+  </Step>
+</Steps>
+
+## Assigning a Profile to a Module
+
+Once saved, an approval profile must be linked to the module where it should apply.
+
+<Steps>
+  <Step title="Open module settings">
+    Navigate to **Configuration → Modules** and select the module you want to configure (e.g., Purchase Orders).
+  </Step>
+  <Step title="Select an approval profile">
+    Under the **Approval** section, click the **Approval Profile** dropdown and select the profile you created.
+  </Step>
+  <Step title="Save">
+    Click **Save Settings**. The profile is now active for all new records created in that module.
+  </Step>
+</Steps>
+
+<Note>
+  Approval profiles apply to new records only. Existing records already in progress will not be re-routed to the new profile.
+</Note>
+
+Approval profiles can be assigned to the following modules:
+
+- **Orders** — customer sales orders
+- **Purchase Orders** — supplier purchase orders
+- **Portal Submissions** — forms submitted through customer or supplier portals
+
+## Escalation Rules
+
+Escalation rules prevent approval workflows from stalling when an approver is unavailable. You can configure escalation at the individual step level.
+
+To add an escalation rule to an approver step:
+
+1. Open the approval profile and select the step you want to edit.
+2. Toggle on **Enable Escalation**.
+3. Set the **Escalation Delay** — the number of hours before escalation triggers.
+4. Choose the **Escalation Target**: a specific user, a role group, or the step's original approver's manager.
+5. Optionally, enable **Auto-Approve on Escalation** if the record should be approved automatically after escalation is unanswered for a second period.
+
+<Warning>
+  Enabling **Auto-Approve on Escalation** means records can be approved without any human intervention if escalation is not acted upon. Use this setting only when the business risk of delay outweighs the risk of unapproved records moving forward.
+</Warning>
+
+## Notification Settings
+
+For each approval profile, you can control the notifications sent to approvers and submitters:
+
+| Notification | Trigger |
+|---|---|
+| **Pending Approval** | Sent to the next approver when a record enters their step. |
+| **Approved** | Sent to the record's creator when all steps are approved. |
+| **Rejected** | Sent to the record's creator when any step is rejected. |
+| **Escalation Alert** | Sent to the escalation target when a deadline is missed. |
+| **Reminder** | Sent to the current approver at a configured interval if no action is taken. |
+
+You can customise the content and recipients of each notification type under **Configuration → Notifications**.
+
+## Example Use Case
+
+<Note>
+  **Scenario:** Your organisation wants Finance Manager approval for any purchase order over $5,000.
+
+  - **Profile name:** High-Value PO Approval
+  - **Trigger condition:** Purchase Order total ≥ $5,000
+  - **Step 1:** Finance Manager (role group) — Approve or Reject
+  - **Escalation:** After 24 hours, escalate to the CFO
+  - **Notifications:** Email on pending approval, email on decision
+
+  Assign this profile to the **Purchase Orders** module. Any PO under $5,000 bypasses the profile and is processed immediately. Any PO at or above $5,000 is held pending Finance Manager approval.
+</Note>

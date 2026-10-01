@@ -1,0 +1,147 @@
+---
+title: "Invoices API: Generate and Manage Billing Records"
+sidebarTitle: "Invoices"
+description: "Create, retrieve, update, and manage invoices for your customers. Auto-generate billing records from orders using the Invoices API."
+---
+
+The Invoices API lets you generate and manage billing records that you send to customers. An invoice records the amount owed, the associated order or services, tax, and due date. Use this API to create invoices programmatically from your own billing workflows, update payment terms, or pull invoice data into an external accounting system for reconciliation.
+
+## Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/v3/invoices` | List all invoices. |
+| `POST` | `/api/v3/invoices` | Create a new invoice. |
+| `PATCH` | `/api/v3/invoices` | Partially update one or more invoices. |
+| `DELETE` | `/api/v3/invoices` | Delete one or more invoices. |
+
+## Invoice Statuses
+
+| Status | Description |
+|--------|-------------|
+| `draft` | The invoice has been created but not yet sent to the customer. |
+| `sent` | The invoice has been delivered to the customer and payment is pending. |
+| `paid` | The invoice has been fully paid. |
+| `overdue` | The due date has passed and the invoice remains unpaid. |
+| `void` | The invoice has been cancelled and no payment is expected. |
+
+<Note>
+  Only invoices in `draft` status can be deleted. To cancel a sent invoice, update its status to `void` using `PATCH`.
+</Note>
+
+## List Invoices
+
+Retrieve a paginated list of all invoices.
+
+```bash
+curl https://example.exsited.com/api/v3/invoices?limit=20&offset=0&order_by=created_on&direction=desc \
+  -H "Authorization: Bearer <token>"
+```
+
+## Create an Invoice
+
+Send a `POST` request with the customer account, the linked order (if applicable), the amount, tax, and due date.
+
+```bash
+curl -X POST https://example.exsited.com/api/v3/invoices \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "account_id": "acc_01HXYZ123",
+    "order_id": "ord_01HXYZ789",
+    "amount": 119.97,
+    "tax": 11.99,
+    "status": "draft",
+    "due_date": "2025-03-01"
+  }'
+```
+
+## Update an Invoice
+
+Use `PATCH` to update invoice fields — for example, to change the `due_date` or mark the invoice as `sent` after delivery.
+
+```bash
+curl -X PATCH https://example.exsited.com/api/v3/invoices \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "inv_01HXYZ321",
+    "status": "sent",
+    "due_date": "2025-03-15"
+  }'
+```
+
+## Delete an Invoice
+
+```bash
+curl -X DELETE https://example.exsited.com/api/v3/invoices \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ids": ["inv_01HXYZ321"]
+  }'
+```
+
+<Info>
+  Exsited can automatically generate an invoice when an order reaches `fulfilled` status. If you use auto-generation, you do not need to call `POST /api/v3/invoices` manually for those orders. You can still use `PATCH` to update the generated invoice's due date or status.
+</Info>
+
+## Request Fields
+
+<ParamField body="account_id" type="string" required>
+  The ID of the customer account being invoiced.
+</ParamField>
+
+<ParamField body="order_id" type="string">
+  The ID of the order this invoice relates to. Omit for invoices not tied to a specific order.
+</ParamField>
+
+<ParamField body="amount" type="number" required>
+  The invoice subtotal before tax, expressed as a decimal (e.g. `119.97`).
+</ParamField>
+
+<ParamField body="tax" type="number">
+  The tax amount to apply to the invoice. Defaults to `0` if not provided.
+</ParamField>
+
+<ParamField body="status" type="string">
+  Initial invoice status. Accepted values: `draft`, `sent`. Defaults to `draft`.
+</ParamField>
+
+<ParamField body="due_date" type="string">
+  The payment due date in `YYYY-MM-DD` format.
+</ParamField>
+
+## Response Fields
+
+<ResponseField name="id" type="string">
+  The unique identifier for the invoice, assigned by Exsited.
+</ResponseField>
+
+<ResponseField name="account_id" type="string">
+  The ID of the customer account being invoiced.
+</ResponseField>
+
+<ResponseField name="order_id" type="string">
+  The ID of the linked order, if applicable.
+</ResponseField>
+
+<ResponseField name="amount" type="number">
+  The invoice subtotal before tax.
+</ResponseField>
+
+<ResponseField name="tax" type="number">
+  The tax amount on the invoice.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current status of the invoice: `draft`, `sent`, `paid`, `overdue`, or `void`.
+</ResponseField>
+
+<ResponseField name="due_date" type="string">
+  The payment due date in `YYYY-MM-DD` format.
+</ResponseField>
+
+<ResponseField name="created_on" type="string">
+  ISO 8601 timestamp of when the invoice was created.
+</ResponseField>

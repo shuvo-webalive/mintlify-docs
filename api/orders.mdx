@@ -1,0 +1,148 @@
+---
+title: "Orders API: Create and Track Sales Orders"
+sidebarTitle: "Orders"
+description: "Create sales orders, update their status, and track every order through its full fulfilment lifecycle using the Exsited Orders API."
+---
+
+The Orders API lets you create and manage sales orders within Exsited. Orders tie together a customer account, one or more line items, pricing, and fulfilment status into a single record. Use this API to push orders from an e-commerce platform or point-of-sale system into Exsited, update order status as items are picked and dispatched, or pull order data into a reporting or analytics tool.
+
+## Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/v3/orders` | List all orders. |
+| `POST` | `/api/v3/orders` | Create a new order. |
+| `GET` | `/api/v3/orders/{id}` | Retrieve a single order. |
+| `PUT` | `/api/v3/orders/{id}` | Replace an order (full update). |
+| `PATCH` | `/api/v3/orders` | Partially update one or more orders. |
+| `DELETE` | `/api/v3/orders` | Delete one or more orders. |
+
+## Order Lifecycle
+
+Orders move through the following statuses as they progress from creation to completion:
+
+| Status | Description |
+|--------|-------------|
+| `draft` | The order has been created but not yet confirmed. |
+| `confirmed` | The order has been confirmed and is awaiting processing. |
+| `processing` | The order is being picked, packed, or prepared. |
+| `fulfilled` | The order has been dispatched or delivered to the customer. |
+| `cancelled` | The order was cancelled before fulfilment. |
+
+<Note>
+  Only orders in `draft` status can be deleted. Once an order is `confirmed` or beyond, use `PATCH` to update the status to `cancelled` instead.
+</Note>
+
+## List Orders
+
+Retrieve a paginated list of all orders, sorted by creation date descending by default.
+
+```bash
+curl https://example.exsited.com/api/v3/orders?limit=20&offset=0&order_by=created_on&direction=desc \
+  -H "Authorization: Bearer <token>"
+```
+
+## Retrieve an Order
+
+Fetch full details for a single order by its unique ID.
+
+```bash
+curl https://example.exsited.com/api/v3/orders/ord_01HXYZ789 \
+  -H "Authorization: Bearer <token>"
+```
+
+## Create an Order
+
+Send a `POST` request with the account ID and a list of items. You can create the order in `draft` status and confirm it later, or set `status` to `confirmed` immediately.
+
+```bash
+curl -X POST https://example.exsited.com/api/v3/orders \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "account_id": "acc_01HXYZ123",
+    "status": "confirmed",
+    "items": [
+      {
+        "item_id": "itm_01HXYZ456",
+        "quantity": 2,
+        "unit_price": 49.99
+      },
+      {
+        "item_id": "itm_01HXYZ457",
+        "quantity": 1,
+        "unit_price": 19.99
+      }
+    ]
+  }'
+```
+
+## Update an Order
+
+Use `PATCH` to update the status or other fields on an existing order.
+
+```bash
+curl -X PATCH https://example.exsited.com/api/v3/orders \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "ord_01HXYZ789",
+    "status": "fulfilled"
+  }'
+```
+
+<Note>
+  When an order is fulfilled, Exsited can automatically generate a corresponding invoice. See [Invoices](/api/invoices) for details on how auto-generation works.
+</Note>
+
+## Request Fields
+
+<ParamField body="account_id" type="string" required>
+  The ID of the customer account this order belongs to.
+</ParamField>
+
+<ParamField body="status" type="string">
+  Initial order status. Accepted values: `draft`, `confirmed`. Defaults to `draft`.
+</ParamField>
+
+<ParamField body="items" type="array" required>
+  An array of line items included in the order.
+
+  <Expandable title="items fields">
+    <ParamField body="items[].item_id" type="string" required>
+      The ID of the catalogue item to include on the order.
+    </ParamField>
+    <ParamField body="items[].quantity" type="integer" required>
+      The number of units ordered.
+    </ParamField>
+    <ParamField body="items[].unit_price" type="number">
+      Override the catalogue unit price for this line. If omitted, the current catalogue price is used.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Response Fields
+
+<ResponseField name="id" type="string">
+  The unique identifier assigned to the order by Exsited.
+</ResponseField>
+
+<ResponseField name="account_id" type="string">
+  The ID of the customer account associated with this order.
+</ResponseField>
+
+<ResponseField name="items" type="array">
+  The list of line items on the order, each including `item_id`, `quantity`, `unit_price`, and `line_total`.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current lifecycle status of the order.
+</ResponseField>
+
+<ResponseField name="total" type="number">
+  The total order value including all line items.
+</ResponseField>
+
+<ResponseField name="created_on" type="string">
+  ISO 8601 timestamp of when the order was created.
+</ResponseField>

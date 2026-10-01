@@ -1,0 +1,172 @@
+---
+title: "Order Management: Track Every Order End to End"
+sidebarTitle: "Orders"
+description: "Manage the full order lifecycle from draft to fulfilment — split orders, partial fulfilment, PDF confirmations, and automatic sync to your accounting system."
+---
+
+Order Management in Exsited gives you complete visibility and control over every sale, from the moment a draft is created to the point it is fully delivered and accounted for. Whether orders arrive from a connected storefront, are entered manually by your team, or are generated programmatically via the API, they all flow through the same unified lifecycle — with every status change, edit, and user action logged automatically.
+
+## Order Lifecycle
+
+Each order moves through a defined set of statuses. You can progress orders manually or let automations advance them based on fulfilment events.
+
+<Steps>
+  <Step title="Draft">
+    An order is saved but not yet confirmed. Line items, pricing, and shipping details can still be edited freely. Draft orders do not affect stock on hand.
+  </Step>
+  <Step title="Confirmed">
+    The order has been reviewed and accepted. Stock is reserved against the order. A PDF order confirmation can be generated and sent to the customer at this stage.
+  </Step>
+  <Step title="In Fulfilment">
+    Picking, packing, or shipment preparation is underway. Partial fulfilment is supported — see below.
+  </Step>
+  <Step title="Completed">
+    All line items have been fulfilled and dispatched. The order is closed and synced to your accounting system.
+  </Step>
+  <Step title="Cancelled">
+    The order was voided before completion. Reserved stock is released. A cancellation reason is recorded in the activity log.
+  </Step>
+</Steps>
+
+<Note>
+  You can reopen a completed order to raise a credit note or process a return. See [Invoices & Payments](/modules/invoices-payments) for details on credits and refunds.
+</Note>
+
+---
+
+## Creating an Order
+
+<Steps>
+  <Step title="Navigate to Orders">
+    Go to **Orders → All Orders** and click **New Order**.
+  </Step>
+  <Step title="Select a customer">
+    Search for an existing customer account or create a new one inline. Billing and shipping addresses pre-fill from the customer record.
+  </Step>
+  <Step title="Add line items">
+    Search for products or SKUs and add them to the order. Exsited shows real-time stock availability next to each item. Adjust quantities, unit prices, and discounts per line.
+  </Step>
+  <Step title="Apply shipping and taxes">
+    Enter shipping details and select the applicable tax class. Exsited calculates GST/VAT automatically based on your tax settings.
+  </Step>
+  <Step title="Confirm the order">
+    Review the order summary and click **Confirm Order**. Stock is reserved and the order moves to the Confirmed status.
+  </Step>
+</Steps>
+
+<Tip>
+  Use the **Quick Order** shortcut (keyboard shortcut `N` on the Orders list) to create an order without leaving your current view.
+</Tip>
+
+---
+
+## Split Orders
+
+When different line items need to ship from different locations — or at different times — you can split a single order into two or more fulfilment orders without losing the parent order record.
+
+<Steps>
+  <Step title="Open the order">
+    Navigate to the confirmed order and click **Actions → Split Order**.
+  </Step>
+  <Step title="Assign lines to splits">
+    Drag line items into the split groups, or use the checkbox selectors to assign lines. Each split can have its own shipping address, carrier, and fulfilment location.
+  </Step>
+  <Step title="Confirm the split">
+    Click **Confirm Split**. Exsited creates child fulfilment orders linked back to the parent. The parent order reflects the combined status of all children.
+  </Step>
+</Steps>
+
+<Info>
+  Customers receive a single order reference regardless of how many splits are created. Tracking information for each shipment is appended to the same order record.
+</Info>
+
+---
+
+## Partial Fulfilment
+
+You do not need to wait for all items to be available before dispatching what you have. Exsited supports partial fulfilment at the line-item level.
+
+- Open an order in **In Fulfilment** status.
+- Click **Fulfil Items** and enter the quantities you are dispatching now. Leave remaining quantities for a later fulfilment run.
+- Exsited records the partial fulfilment event with a timestamp and user stamp, and updates the outstanding quantity on each line.
+- Repeat the process when the remaining stock is ready to ship.
+
+<Warning>
+  Marking all lines as fully fulfilled moves the order to **Completed** and triggers the accounting sync. Ensure all details are correct before completing the final fulfilment.
+</Warning>
+
+---
+
+## PDF Order Confirmations
+
+Generate a branded PDF confirmation for any confirmed or in-fulfilment order.
+
+- Open the order and click **Actions → Generate PDF Confirmation**.
+- Exsited uses your account's PDF template (logo, colours, footer) to produce the document.
+- Download it directly or send it to the customer's email address from within the order screen.
+
+<Tip>
+  Customise your PDF template under **Settings → Documents → Order Confirmation**. You can add custom fields, adjust column layout, and include your terms and conditions.
+</Tip>
+
+---
+
+## Custom Fields on Orders
+
+Capture business-specific data on every order using custom fields — for example, a purchase order number provided by the customer, a project code, a sales rep name, or a delivery instruction flag.
+
+<Steps>
+  <Step title="Define order custom fields">
+    Go to **Settings → Custom Fields → Orders** and add the fields you need.
+  </Step>
+  <Step title="Fill values on each order">
+    The fields appear on the order edit screen under **Custom Fields**. They are also available as columns in the Orders list view and as filter criteria in reports.
+  </Step>
+</Steps>
+
+---
+
+## Syncing Orders to Accounting
+
+Exsited connects to Xero, MYOB, and QuickBooks. When an order reaches **Completed** status, Exsited automatically creates the corresponding invoice in your accounting system.
+
+<CardGroup cols={3}>
+  <Card title="Xero" icon="file-invoice-dollar">
+    Orders sync as approved invoices in Xero, including line items, tax, and customer mapping.
+  </Card>
+  <Card title="MYOB" icon="file-invoice-dollar">
+    Completed orders create sales invoices in MYOB AccountRight or Essentials, with full line-item detail.
+  </Card>
+  <Card title="QuickBooks" icon="file-invoice-dollar">
+    Orders map to QuickBooks invoices, respecting your account mappings for income and tax codes.
+  </Card>
+</CardGroup>
+
+<Note>
+  If a customer does not yet exist in your accounting system, Exsited creates the contact record automatically on first sync. You can review and merge duplicates from **Settings → Integrations → Accounting**.
+</Note>
+
+---
+
+## Status Timestamps and User Logs
+
+Every status change and edit on an order is recorded in the **Activity Log**, visible at the bottom of each order record. The log captures:
+
+- The previous and new status
+- The timestamp (in your account timezone)
+- The user who made the change
+- Any note or reason attached to the action
+
+<Accordion title="What the activity log records">
+  | Event | Detail captured |
+  |---|---|
+  | Order created | User, channel source, creation time |
+  | Status change | From → To status, user, timestamp |
+  | Line item edit | Field changed, old value, new value |
+  | Fulfilment event | Items dispatched, quantities, carrier |
+  | PDF generated | Document type, user, timestamp |
+  | Accounting sync | Target system, sync result, timestamp |
+  | Cancellation | Reason, user, timestamp |
+</Accordion>
+
+The activity log is read-only and cannot be edited or deleted, providing a reliable audit trail for every order in your account.

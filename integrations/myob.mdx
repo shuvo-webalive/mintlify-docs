@@ -1,0 +1,105 @@
+---
+title: "Connect Exsited to MYOB for Financial Workflows"
+sidebarTitle: "MYOB"
+description: "Streamline your financial workflows by syncing invoices, payments, supplier bills, and contacts between Exsited and MYOB."
+---
+
+Connecting Exsited to MYOB keeps your financial records accurate without manual data entry. Once the integration is active, Exsited pushes customer invoices and supplier bills into MYOB, records payments against the correct accounts, and syncs contact records in both directions. Whether you use MYOB AccountRight or MYOB Essentials, Exsited supports the API-based connection that lets your operations and accounting data stay aligned.
+
+## Prerequisites
+
+Before you begin, confirm you have the following in place:
+
+- An active **MYOB AccountRight** or **MYOB Essentials** subscription.
+- An Exsited account with the **Admin** role. Operators cannot add or modify integrations.
+- Your MYOB API credentials — specifically your **Client ID** and **Client Secret** from the MYOB Developer Portal, or the API key generated in your MYOB account settings.
+- Your MYOB chart of accounts set up with the account codes you intend to map.
+
+## Connecting MYOB to Exsited
+
+<Steps>
+  <Step title="Navigate to the MYOB integration">
+    In your Exsited dashboard, go to **Integrations → Accounting → MYOB**. Click **Connect MYOB** to open the configuration panel.
+  </Step>
+  <Step title="Enter your API credentials">
+    Enter your MYOB **Client ID** and **Client Secret** in the fields provided. If you are using MYOB AccountRight, also select your company file from the dropdown — Exsited will retrieve the list of available company files once your credentials are validated.
+
+    <Warning>
+      Keep your Client ID and Client Secret secure. Do not share them or store them in plain text. If your credentials are compromised, regenerate them immediately in the MYOB Developer Portal and update them in Exsited under **Integrations → Accounting → MYOB → Settings**.
+    </Warning>
+  </Step>
+  <Step title="Map accounts and tax codes">
+    After your credentials are validated, Exsited retrieves your MYOB chart of accounts. Use the visual field mapping screen to connect your Exsited categories to MYOB account codes. At minimum, configure:
+
+    - **Trade debtors account** — the MYOB asset account used for customer receivables.
+    - **Sales income account** — the revenue account for customer invoices.
+    - **Trade creditors account** — the MYOB liability account for supplier payables.
+    - **Tax codes** — map each Exsited tax code to the corresponding MYOB tax code (for example, GST, FRE, N-T).
+
+    <Tip>
+      If you have multiple product categories with different GST treatments, create a separate mapping rule for each category to ensure MYOB applies the correct tax code per line item.
+    </Tip>
+  </Step>
+  <Step title="Enable sync and set frequency">
+    Choose your sync preferences:
+
+    - **Sync frequency** — select real-time or a scheduled interval (15 minutes, hourly, or daily).
+    - **Invoice trigger** — choose which Exsited invoice status initiates a push to MYOB (for example, **Approved**).
+    - **Purchase order sync** — enable or disable syncing of purchase orders and supplier invoices from Exsited to MYOB.
+
+    Click **Save Settings** once your preferences are configured.
+  </Step>
+  <Step title="Test and activate">
+    Click **Test Connection** to verify that Exsited can read from and write to your MYOB file. Exsited will create a test transaction in MYOB in draft state. Confirm it appears correctly in MYOB, then delete the test record and click **Activate** in Exsited.
+  </Step>
+</Steps>
+
+## What Syncs
+
+| Data Type | Direction | Notes |
+|---|---|---|
+| Customer invoices | Exsited → MYOB | Pushed at the configured trigger status |
+| Customer payments | Exsited → MYOB | Applied against the matching MYOB invoice |
+| Purchase invoices (supplier bills) | Exsited → MYOB | Generated from approved Exsited purchase orders |
+| Supplier payments | Exsited → MYOB | Applied against supplier bills in MYOB |
+| Contacts (customers & suppliers) | Bidirectional | Matched by email; new records created if no match found |
+
+## Field Mapping Guidance
+
+Use the visual field mapper to connect Exsited fields to their MYOB equivalents. Key mappings to review:
+
+- **Invoice number** — map Exsited invoice number to MYOB customer PO number or memo field to maintain a cross-reference between systems.
+- **Due date** — Exsited calculates the due date based on payment terms; confirm this maps correctly to MYOB's due date field.
+- **Line item description** — choose between the Exsited product name, SKU, or a merged field.
+- **Tax inclusive vs exclusive** — confirm whether your MYOB company file is set up for tax-inclusive or tax-exclusive pricing, and match the Exsited line item setting accordingly.
+
+<Tip>
+  After saving mappings, use the **Preview** button to review how a sample invoice from Exsited will appear in MYOB before going live.
+</Tip>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Invalid credentials or authentication failure">
+    If Exsited reports an authentication error after entering your credentials, confirm that:
+
+    - The Client ID and Client Secret are copied exactly, with no leading or trailing spaces.
+    - The MYOB Developer Portal application has the correct redirect URI registered (provided on the Exsited MYOB setup screen).
+    - Your MYOB subscription is active and the company file is not locked by another session.
+
+    If the issue persists, regenerate your API credentials in MYOB and re-enter them in Exsited.
+  </Accordion>
+  <Accordion title="Sync conflict — record updated in both systems">
+    When a contact or invoice is updated in both Exsited and MYOB before a sync runs, a conflict is raised. Navigate to **Integrations → Accounting → MYOB → Logs**, find the conflicted record, and choose a resolution: keep the Exsited version, keep the MYOB version, or review and merge manually. You can also set a default conflict resolution rule under **Integrations → Accounting → MYOB → Settings → Conflict Handling**.
+  </Accordion>
+  <Accordion title="Tax code mismatch causing sync failure">
+    If MYOB returns a tax code error, go to **Integrations → Accounting → MYOB → Field Mappings → Tax Codes** and confirm every Exsited tax code is mapped to a valid MYOB tax code. Unmapped codes prevent the record from syncing. After updating the mappings, click **Retry Failed Records**.
+  </Accordion>
+  <Accordion title="Company file not appearing in the dropdown">
+    If your MYOB AccountRight company file does not appear after credential validation, ensure the company file is open and accessible in AccountRight Live. Files that are stored locally and not synced to MYOB's cloud cannot be reached via the API. Contact MYOB support to migrate your file to AccountRight Live if needed.
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  For further assistance, contact the Exsited support team at [support@exsited.com](mailto:support@exsited.com) and include the relevant sync log entry reference from **Integrations → Accounting → MYOB → Logs**.
+</Note>

@@ -1,0 +1,146 @@
+---
+title: "Webhooks: Receive Real-Time Event Notifications"
+sidebarTitle: "Webhooks"
+description: "Subscribe to real-time Exsited event notifications with webhooks. Trigger workflows instantly when orders, invoices, or payments change."
+---
+
+Webhooks let your application react to changes in Exsited the moment they happen, without polling the API. When a subscribed event occurs — such as a new order being created or a payment being received — Exsited sends an HTTP `POST` request to a URL you specify, with a JSON payload describing the event. This makes webhooks ideal for triggering downstream workflows, syncing data to external systems, or notifying customers in real time.
+
+## How Webhooks Work
+
+When you register a webhook endpoint, Exsited stores your URL alongside the event types you want to receive. Whenever one of those events fires, Exsited constructs a signed JSON payload and delivers it to your URL via HTTP `POST`. Your endpoint must respond with a `200 OK` status within the timeout window to acknowledge receipt.
+
+## Register a Webhook Endpoint
+
+You register webhook endpoints through the Integrations API. Send a `POST` request to `/api/v3/integrations` with your endpoint URL and the list of event types you want to subscribe to.
+
+```bash
+curl -X POST https://example.exsited.com/api/v3/integrations \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "webhook",
+    "url": "https://yourapp.com/webhooks/exsited",
+    "events": [
+      "order.created",
+      "order.updated",
+      "invoice.created",
+      "payment.received",
+      "stock.updated",
+      "portal.submitted"
+    ]
+  }'
+```
+
+<Tip>
+  You can register multiple webhook endpoints — for example, one for order events sent to your fulfilment system and another for payment events sent to your accounting system.
+</Tip>
+
+## Available Event Types
+
+| Event | Triggered When |
+|-------|---------------|
+| `order.created` | A new order is created in Exsited. |
+| `order.updated` | An existing order's status or fields are updated. |
+| `invoice.created` | A new invoice is generated (manually or automatically). |
+| `payment.received` | A payment record is created and the payment is marked `completed`. |
+| `stock.updated` | The `stock_quantity` of an item changes. |
+| `portal.submitted` | A customer submits a form or action through an Exsited portal. |
+
+## Webhook Payload Format
+
+Every webhook delivery is a JSON object with a consistent top-level structure:
+
+```json
+{
+  "event": "order.created",
+  "timestamp": "2025-02-14T09:30:00Z",
+  "data": {
+    "id": "ord_01HXYZ789",
+    "account_id": "acc_01HXYZ123",
+    "status": "confirmed",
+    "total": 119.97,
+    "created_on": "2025-02-14T09:29:55Z"
+  }
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `event` | string | The event type that triggered this delivery. |
+| `timestamp` | string | ISO 8601 timestamp of when the event was fired by Exsited. |
+| `data` | object | The full resource object at the time the event occurred. |
+
+## Example: order.created Payload
+
+```json
+{
+  "event": "order.created",
+  "timestamp": "2025-02-14T09:30:00Z",
+  "data": {
+    "id": "ord_01HXYZ789",
+    "account_id": "acc_01HXYZ123",
+    "status": "confirmed",
+    "items": [
+      {
+        "item_id": "itm_01HXYZ456",
+        "quantity": 2,
+        "unit_price": 49.99,
+        "line_total": 99.98
+      },
+      {
+        "item_id": "itm_01HXYZ457",
+        "quantity": 1,
+        "unit_price": 19.99,
+        "line_total": 19.99
+      }
+    ],
+    "total": 119.97,
+    "created_on": "2025-02-14T09:29:55Z"
+  }
+}
+```
+
+## Verifying Webhook Signatures
+
+Exsited signs every webhook payload so you can verify it originated from Exsited and was not tampered with in transit. The signature is included in the `X-Exsited-Signature` request header as an HMAC-SHA256 hash of the raw request body, using a shared secret assigned when you register the integration.
+
+<Steps>
+  <Step title="Retrieve your signing secret">
+    Your signing secret is returned in the response when you register a webhook integration via `POST /api/v3/integrations`. Store it securely in an environment variable.
+  </Step>
+  <Step title="Compute the expected signature">
+    Using your signing secret, compute an HMAC-SHA256 hash of the raw request body exactly as received — before any parsing.
+  </Step>
+  <Step title="Compare signatures">
+    Compare your computed hash against the value in the `X-Exsited-Signature` header using a constant-time string comparison to prevent timing attacks. If they do not match, discard the request and return a `400` response.
+  </Step>
+</Steps>
+
+<Warning>
+  Always verify the webhook signature before processing the payload. Skipping this step could allow a malicious actor to forge webhook events and trigger unintended actions in your system.
+</Warning>
+
+## Retry Behaviour
+
+If your endpoint does not respond with a `200 OK` within the timeout window, or returns a non-`2xx` status code, Exsited treats the delivery as failed and retries automatically:
+
+| Attempt | Delay |
+|---------|-------|
+| Retry 1 | 1 minute after first failure |
+| Retry 2 | 5 minutes after retry 1 |
+| Retry 3 | 30 minutes after retry 2 |
+
+After three failed retries, the delivery is marked as undelivered. Check your integration logs in the Exsited dashboard to inspect failed deliveries and trigger a manual resend if needed.
+
+<Note>
+  Exsited delivers webhooks at least once. In rare cases, your endpoint may receive the same event more than once. Use the `data.id` field to deduplicate events idempotently in your application.
+</Note>
+
+## Best Practices
+
+- **Respond with `200` immediately.** Return a `200 OK` as soon as you receive the webhook, before doing any processing. This prevents unnecessary retries caused by slow downstream operations.
+- **Process payloads asynchronously.** Enqueue the event in a job queue and return `200` straight away. Handle the actual business logic in a background worker.
+- **Deduplicate using the resource ID.** Store the `data.id` of processed events and skip duplicates to make your handler idempotent.
+- **Validate the signature on every request.** Never process a webhook payload without first verifying the `X-Exsited-Signature` header.
+- **Use HTTPS endpoints only.** Exsited will only deliver webhooks to endpoints served over HTTPS. Plaintext HTTP endpoints are rejected at registration.

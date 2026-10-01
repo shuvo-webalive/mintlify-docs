@@ -1,0 +1,155 @@
+---
+title: "Exsited PHP SDK: Installation and Usage Guide"
+sidebarTitle: "PHP SDK"
+description: "Install and configure the Exsited PHP SDK to authenticate, manage resources, and automate operations directly from your PHP application."
+---
+
+The Exsited PHP SDK gives you a clean, object-oriented interface to the entire Exsited API. You focus on your application logic; the SDK handles OAuth 2.0 authentication, token refresh, request retries, and structured error responses. This guide walks you through installing the SDK, wiring up your credentials, and running your first API calls.
+
+## Prerequisites
+
+Before you install the SDK, confirm your environment meets the following requirements.
+
+- **PHP 8.0 or later** — the SDK uses constructor property promotion and named arguments available from PHP 8.0+
+- **Composer** — the standard PHP dependency manager ([getcomposer.org](https://getcomposer.org))
+- **Exsited API credentials** — a `client_id`, `client_secret`, and `redirect_uri` from your Exsited account manager
+
+## Installation
+
+You can install the SDK via Composer (recommended) or by cloning the repository directly from GitHub.
+
+<CodeGroup>
+
+```bash Composer
+composer require exsited/exsited-php-sdk
+```
+
+```bash GitHub
+# Clone the repository
+git clone https://github.com/exsited/exsited-php-sdk.git
+
+# Move into the project directory
+cd exsited-php-sdk
+
+# Install dependencies
+composer install
+```
+
+</CodeGroup>
+
+After installation, make sure your application includes Composer's autoloader.
+
+```php
+<?php
+require 'vendor/autoload.php';
+```
+
+## Configuration
+
+Store your credentials in a `.env` file and load them into your application using a library such as [vlucas/phpdotenv](https://github.com/vlucas/phpdotenv). Pass the values to the SDK when you create the client.
+
+```php .env
+EXSITED_CLIENT_ID=your_client_id
+EXSITED_CLIENT_SECRET=your_client_secret
+EXSITED_REDIRECT_URI=your_redirect_uri
+EXSITED_URL=https://your-exsited-instance.com
+```
+
+<Tip>
+  Add `.env` to your `.gitignore` file so credentials are never committed to version control. Use `.env.example` with placeholder values to document the required keys for your team.
+</Tip>
+
+## Using the SDK
+
+The examples below cover the most common operations. Each one starts by initialising the SDK client with your configuration.
+
+### Authenticate
+
+Import the SDK namespace and create a new `ExsitedSDK` instance, passing your credentials as a configuration array. The SDK fetches an access token automatically and refreshes it whenever it expires.
+
+```php
+<?php
+require 'vendor/autoload.php';
+
+use Exsited\ExsitedSDK;
+
+$sdk = new ExsitedSDK([
+    'clientId'     => getenv('EXSITED_CLIENT_ID'),
+    'clientSecret' => getenv('EXSITED_CLIENT_SECRET'),
+    'redirectUri'  => getenv('EXSITED_REDIRECT_URI'),
+    'exsitedUrl'   => getenv('EXSITED_URL'),
+]);
+```
+
+You only need to create the client once. Reuse the `$sdk` instance throughout your request lifecycle.
+
+### List Accounts
+
+Call `$sdk->account->list()` to retrieve all accounts and loop over the results.
+
+```php
+$accounts = $sdk->account->list();
+
+foreach ($accounts as $account) {
+    echo $account->name . PHP_EOL;
+}
+```
+
+### Create an Order
+
+Build an associative array with the required order fields and pass it to `$sdk->order->create()`. The method returns the newly created order object.
+
+```php
+$newOrder = $sdk->order->create([
+    'accountId' => 'ACC-1234',
+    'lines'     => [
+        [
+            'itemSku'   => 'WIDGET-001',
+            'quantity'  => 3,
+            'unitPrice' => 29.99,
+        ],
+    ],
+    'status' => 'draft',
+]);
+
+echo 'Order created: ' . $newOrder->id . PHP_EOL;
+```
+
+### Handle Errors
+
+Wrap SDK calls in a `try/catch` block to handle errors without crashing your application. The SDK throws exceptions with a descriptive message that includes the HTTP status code and a plain-English explanation.
+
+```php
+try {
+    $account = $sdk->account->get('ACC-NONEXISTENT');
+} catch (\Exception $e) {
+    echo 'Error: ' . $e->getMessage() . PHP_EOL;
+    // Example output:
+    // Error: 404 Not Found — Account 'ACC-NONEXISTENT' does not exist.
+}
+```
+
+<Note>
+  The SDK automatically retries requests that fail because of transient network errors or server-side rate limiting. An exception is only thrown when the error is permanent or the retry limit is exhausted.
+</Note>
+
+## Switching Environments
+
+Change the `exsitedUrl` value in your configuration (or the corresponding environment variable) to target a different Exsited instance. Your application code stays identical across environments.
+
+```php
+// Development
+'exsitedUrl' => 'https://dev.your-exsited-instance.com',
+
+// Staging
+'exsitedUrl' => 'https://staging.your-exsited-instance.com',
+
+// Production
+'exsitedUrl' => 'https://your-exsited-instance.com',
+```
+
+Set the `EXSITED_URL` environment variable in your hosting platform or deployment pipeline and the SDK picks it up automatically through `getenv()`.
+
+## Getting Help
+
+If you run into issues or have questions about the PHP SDK, contact the Exsited support team at **support@exsited.com**. Include your SDK version (check `composer.lock` or run `composer show exsited/exsited-php-sdk`), the operation you were attempting, and any error messages you received.

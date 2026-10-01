@@ -1,0 +1,172 @@
+---
+title: "Accounts API: Manage Customer Records"
+sidebarTitle: "Accounts"
+description: "Create, retrieve, update, and delete customer account records in Exsited. Sync contacts and billing details from any CRM or data source."
+---
+
+The Accounts API lets you manage the customer records at the heart of your Exsited operations. Accounts represent the businesses or individuals you trade with — they link to orders, invoices, and payments throughout the platform. Use this API to sync customers from an external CRM, create accounts programmatically during onboarding, or keep contact details up to date from a master data source.
+
+## Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/v3/accounts` | List all accounts. |
+| `POST` | `/api/v3/accounts` | Create a new account. |
+| `GET` | `/api/v3/accounts/{id}` | Retrieve a single account. |
+| `PUT` | `/api/v3/accounts/{id}` | Replace an account (full update). |
+| `PATCH` | `/api/v3/accounts` | Partially update one or more accounts. |
+| `DELETE` | `/api/v3/accounts` | Delete one or more accounts. |
+
+## List Accounts
+
+Retrieve a paginated list of all accounts in your Exsited organisation.
+
+```bash
+curl https://example.exsited.com/api/v3/accounts?limit=20&offset=0&order_by=created_on&direction=desc \
+  -H "Authorization: Bearer <token>"
+```
+
+## Retrieve an Account
+
+Fetch the full details of a single account by its unique ID.
+
+```bash
+curl https://example.exsited.com/api/v3/accounts/acc_01HXYZ123 \
+  -H "Authorization: Bearer <token>"
+```
+
+## Create an Account
+
+Send a `POST` request with the account details in the request body. At minimum, provide a `name` and `email`.
+
+```bash
+curl -X POST https://example.exsited.com/api/v3/accounts \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Acme Corporation",
+    "email": "billing@acme.com",
+    "phone": "+1-555-0100",
+    "address": {
+      "line1": "123 Main Street",
+      "city": "Springfield",
+      "state": "IL",
+      "postcode": "62701",
+      "country": "US"
+    },
+    "status": "active"
+  }'
+```
+
+## Update an Account
+
+Use `PUT` to replace all fields on an existing account, or `PATCH` to update only the fields you supply.
+
+```bash
+curl -X PUT https://example.exsited.com/api/v3/accounts/acc_01HXYZ123 \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Acme Corporation",
+    "email": "accounts@acme.com",
+    "phone": "+1-555-0101",
+    "address": {
+      "line1": "456 New Street",
+      "city": "Springfield",
+      "state": "IL",
+      "postcode": "62701",
+      "country": "US"
+    },
+    "status": "active"
+  }'
+```
+
+## Delete an Account
+
+```bash
+curl -X DELETE https://example.exsited.com/api/v3/accounts \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ids": ["acc_01HXYZ123"]
+  }'
+```
+
+<Warning>
+  Deleting an account is irreversible. Ensure the account has no outstanding orders or unpaid invoices before removing it.
+</Warning>
+
+## Request Fields
+
+Use these fields when creating or updating an account:
+
+<ParamField body="name" type="string" required>
+  The full name of the customer or business.
+</ParamField>
+
+<ParamField body="email" type="string" required>
+  The primary email address for the account. Used for invoice delivery and portal access.
+</ParamField>
+
+<ParamField body="phone" type="string">
+  A contact phone number for the account.
+</ParamField>
+
+<ParamField body="address" type="object">
+  The primary billing or postal address for the account.
+
+  <Expandable title="address fields">
+    <ParamField body="address.line1" type="string">
+      Street address, line 1.
+    </ParamField>
+    <ParamField body="address.line2" type="string">
+      Street address, line 2 (optional).
+    </ParamField>
+    <ParamField body="address.city" type="string">
+      City or suburb.
+    </ParamField>
+    <ParamField body="address.state" type="string">
+      State, province, or region.
+    </ParamField>
+    <ParamField body="address.postcode" type="string">
+      Postal or ZIP code.
+    </ParamField>
+    <ParamField body="address.country" type="string">
+      ISO 3166-1 alpha-2 country code (e.g. `US`, `GB`, `AU`).
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="status" type="string">
+  Account status. Accepted values: `active`, `inactive`. Defaults to `active`.
+</ParamField>
+
+## Response Fields
+
+<ResponseField name="id" type="string">
+  The unique identifier for the account, assigned by Exsited on creation.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  The name of the customer or business.
+</ResponseField>
+
+<ResponseField name="email" type="string">
+  The primary email address.
+</ResponseField>
+
+<ResponseField name="phone" type="string">
+  The contact phone number.
+</ResponseField>
+
+<ResponseField name="address" type="object">
+  The account's primary address.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current status of the account: `active` or `inactive`.
+</ResponseField>
+
+<ResponseField name="created_on" type="string">
+  ISO 8601 timestamp of when the account was created.
+</ResponseField>

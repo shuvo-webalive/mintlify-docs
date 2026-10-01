@@ -1,0 +1,99 @@
+---
+title: "Connect Exsited to QuickBooks Online"
+sidebarTitle: "QuickBooks"
+description: "Push invoices, payments, credit notes, and contacts from Exsited to QuickBooks Online and keep your accounts automatically updated."
+---
+
+Connecting Exsited to QuickBooks Online means your accounting records stay current without manual exports or data entry. Exsited pushes approved invoices, records customer payments, and syncs credit notes directly into QuickBooks Online — and pulls your chart of accounts and tax codes to power the field mapping. The integration authenticates via OAuth 2.0, so Exsited never stores your QuickBooks credentials.
+
+## Prerequisites
+
+Before setting up the integration, ensure you have:
+
+- An active **QuickBooks Online** subscription (Simple Start, Essentials, Plus, or Advanced).
+- An Exsited account with the **Admin** role.
+- Your QuickBooks Online chart of accounts configured with the account codes you want to map to Exsited.
+- If you operate in multiple currencies, confirm that **Multi-currency** is enabled in your QuickBooks Online company settings before connecting.
+
+## Connecting QuickBooks Online to Exsited
+
+<Steps>
+  <Step title="Navigate to the QuickBooks integration">
+    In your Exsited dashboard, go to **Integrations → Accounting → QuickBooks**. Click **Connect QuickBooks Online** to begin.
+  </Step>
+  <Step title="Authorise via OAuth">
+    Exsited will redirect you to the Intuit (QuickBooks) sign-in page. Log in with your QuickBooks Online credentials and select the company you want to connect. Click **Connect** to grant Exsited the required permissions. You will be redirected back to Exsited once authorisation is complete.
+
+    <Note>
+      Exsited requests access to your QuickBooks accounting data — including invoices, payments, accounts, and contacts. No payroll data is accessed.
+    </Note>
+  </Step>
+  <Step title="Map your accounts">
+    Once connected, Exsited imports your QuickBooks chart of accounts and tax codes. Use the visual field mapping screen to link your Exsited categories and tax codes to the corresponding QuickBooks accounts. Key mappings include:
+
+    - **Accounts receivable** — the QuickBooks A/R account for customer invoices.
+    - **Sales income account** — the revenue account applied to invoice line items.
+    - **Bank/clearing account** — the account where customer payments are deposited in QuickBooks.
+    - **Tax codes** — map each Exsited tax rate to the equivalent QuickBooks tax code.
+
+    <Tip>
+      If your QuickBooks Online account uses **Products and Services** items, map each Exsited product category to the corresponding QuickBooks service or product item for accurate P&L tracking.
+    </Tip>
+  </Step>
+  <Step title="Configure sync settings">
+    Set your sync preferences:
+
+    - **Invoice trigger** — choose the Exsited invoice status that triggers a push to QuickBooks (for example, **Approved** or **Sent**).
+    - **Sync frequency** — real-time (recommended) or scheduled.
+    - **Payment sync** — choose whether to sync payments automatically when an invoice is marked paid in Exsited.
+    - **Multi-currency** — if enabled, choose whether to post transactions in their original currency or convert to your QuickBooks home currency.
+  </Step>
+  <Step title="Test the connection">
+    Click **Test Connection** to push a sample invoice to QuickBooks Online in draft status. Log in to QuickBooks and confirm the invoice appears with the correct customer, line items, amounts, and tax codes. Delete the test invoice from QuickBooks and click **Activate** in Exsited to begin live syncing.
+  </Step>
+</Steps>
+
+## What Syncs
+
+| Data Type | Direction | Notes |
+|---|---|---|
+| Customer invoices | Exsited → QuickBooks | Pushed at the configured trigger status |
+| Customer payments | Exsited → QuickBooks | Applied against the matching QuickBooks invoice |
+| Credit notes | Exsited → QuickBooks | Created as QuickBooks credit memos; linked to original invoice |
+| Contacts (customers) | Bidirectional | Matched by email address |
+| Tax codes | QuickBooks → Exsited | Pulled during setup; refreshed on demand |
+
+## Field Mapping Guidance
+
+The visual mapper displays Exsited fields on the left and QuickBooks fields on the right. Key mappings to review:
+
+- **Invoice number** — map Exsited invoice number to QuickBooks invoice number to maintain a consistent reference across systems.
+- **Due date** — Exsited calculates the due date from payment terms; ensure this maps to the QuickBooks **Due date** field rather than the invoice date.
+- **Line item description** — choose whether to sync the Exsited product name, SKU, or a custom description.
+- **Tax-inclusive vs tax-exclusive pricing** — confirm your Exsited pricing setting matches QuickBooks' tax treatment to avoid incorrect GST/VAT calculations.
+- **Class and location tracking** — if you use QuickBooks Plus or Advanced with class tracking, you can map Exsited cost centres or departments to QuickBooks classes.
+
+<Tip>
+  Click **Preview** in the field mapper to see exactly how a sample Exsited record will appear in QuickBooks before you activate the integration.
+</Tip>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="OAuth token expired or revoked">
+    Intuit OAuth tokens expire after 101 days. If syncing stops, navigate to **Integrations → Accounting → QuickBooks** and click **Reconnect**. Complete the OAuth flow to refresh the token. Your existing field mappings and sync settings are retained.
+  </Accordion>
+  <Accordion title="Duplicate customer or invoice detected">
+    QuickBooks Online rejects invoices that reference a customer name or invoice number already in use in a conflicting way. Check **Integrations → Accounting → QuickBooks → Logs** for the specific error. To resolve duplicate customer records, merge them in QuickBooks before re-running the sync. To resolve invoice number conflicts, update your Exsited invoice numbering prefix under **Settings → Invoicing → Numbering**.
+  </Accordion>
+  <Accordion title="Tax code not found">
+    If QuickBooks returns a "tax code not found" error, go to **Integrations → Accounting → QuickBooks → Field Mappings → Tax Codes** and ensure every Exsited tax code is assigned to a valid QuickBooks tax code. After updating, click **Retry Failed Records** to re-push the affected invoices.
+  </Accordion>
+  <Accordion title="Multi-currency conversion errors">
+    If you are using multi-currency and see conversion errors, confirm that the currency used on the Exsited invoice exists as an active currency in your QuickBooks Online company settings. QuickBooks must have the currency enabled before Exsited can post transactions in that currency.
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  If you need help resolving a sync issue, check the **Sync Log** under **Integrations → Accounting → QuickBooks → Logs** and contact [support@exsited.com](mailto:support@exsited.com) with the relevant log entry reference.
+</Note>
