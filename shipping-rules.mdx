@@ -1,0 +1,31 @@
+---
+title: "Shipping rules"
+sidebarTitle: "Overview"
+description: "List, read, create, update and delete shipping rules, and set the zones and rate each rule charges."
+---
+
+A shipping rule sets how shipping is charged: the zones it applies to and the rate it charges there. These endpoints list, read, create, update and delete rules, and set a rule's configuration. This area has 6 endpoints, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List shipping rules](/api-reference/shipping-rules/list-shipping-rules) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_rules` | Returns a page of shipping rules. |
+| [Create a shipping rule](/api-reference/shipping-rules/create-a-shipping-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/shipping_rules` | Creates a shipping rule and returns it under `shipping_rule`. |
+| [Retrieve a shipping rule](/api-reference/shipping-rules/retrieve-a-shipping-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_rules/{shipping_rule_id}` | Returns one shipping rule by its `id`, with its configuration. |
+| [Delete a shipping rule](/api-reference/shipping-rules/delete-a-shipping-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/shipping_rules/{shipping_rule_id}` | Deletes a shipping rule. A successful call returns `204` with no body. |
+| [Update a shipping rule](/api-reference/shipping-rules/update-a-shipping-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/shipping_rules/{shipping_rule_id}` | Changes a shipping rule's name or description and returns the rule. |
+| [Set a shipping rule's configuration](/api-reference/shipping-rules/set-a-shipping-rules-configuration) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/shipping_rules/{shipping_rule_id}/configuration` | Sets the zones, rate and tiers of a shipping rule and returns the rule. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Writes are wrapped in `shipping_rule`, and one rule comes back under `shipping_rule`.** A create can send just a `name`.
+- **A rule's zones and rate are set through the configuration endpoint.** That body sits under `configuration`, not `shipping_rule`.
+- **The configuration names each zone by its dashed uuid.** Take the 32 hex digits after `zn_` in the zone's `id` and group them 8-4-4-4-12; the prefixed `id` itself is refused.
+- **The listing pages by cursor.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor` until `has_more` is `false`.
