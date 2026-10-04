@@ -5,10 +5,10 @@
   "icon": "truck",
   "base": "/item_fulfillments",
   "overview_description": "Record items sent against a sale invoice's lines, then list, read, update and delete fulfillments and manage their notes.",
-  "intro": "An item fulfillment records items sent against the lines of a sale invoice. These endpoints create, list, read, update and delete fulfillments, and add, list, read and delete their notes. This area has 9 endpoints, and all seven SDKs call every one.",
+  "intro": "An item fulfillment records items sent against the lines of a sale invoice. These endpoints create, list, read, update and delete fulfillments, and add, list, read and delete their notes. This area has 9 endpoints, each available in all seven SDKs.",
   "warning": "**A fulfillment cannot be deleted once any of its stock has been sent.** The delete is refused with `400` `stock_committed`.",
   "notes": [
-    "**Writes are wrapped in `item_fulfillment`.** A create names the sale invoice in `invoice_id` and lists `fulfillments`, each with an `invoice_line` id and a `fulfillment_quantity`.",
+    "**Fulfillment creates and updates are wrapped in `item_fulfillment`.** A create names the sale invoice in `invoice_id` and lists `fulfillments`, each with an `invoice_line` id and a `fulfillment_quantity`.",
     "**Fulfillment ids start with `ifm_`, and note ids with `note_`.** Pass them in the paths as they are.",
     "**Notes are stored on the fulfillment's sale invoice.** The notes listing returns the invoice's notes, and a single note read comes back under `item_fulfillment.note`.",
     "**Deleting a note looks on the fulfillment itself.** A note added through the create note endpoint is stored on the invoice, so that delete does not find it.",
@@ -23,7 +23,7 @@
       "slug": "list-item-fulfillments",
       "title": "List item fulfillments",
       "summary": "Returns a page of item fulfillments.",
-      "description": "Returns fulfillments under `data`, each with its account, invoice, `fulfillment_status`, `tracking_number` and `fulfillments` lines. Set the page size with `limit` and fetch the next page with `cursor`. Other fields filter as `filter_<field>`.",
+      "description": "Returns fulfillments under `data`, each with its account, invoice, `fulfillment_status`, `tracking_number` and `fulfillments` lines. Set the page size with `limit` and fetch the next page with `cursor`. Filter with `filter_<field>`, or `filter_<field>_<operator>` for other comparisons.",
       "parameters": [
         {
           "name": "limit",
@@ -42,6 +42,16 @@
           "description": "The `next_cursor` from the previous page, to fetch the page after it.",
           "schema": {
             "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` to sort descending, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
           }
         }
       ],
@@ -311,7 +321,8 @@
       "slug": "delete-an-item-fulfillment",
       "title": "Delete an item fulfillment",
       "summary": "Deletes an item fulfillment. A successful call returns `204` with no body.",
-      "description": "Deletes the fulfillment with that `ifm_` id. Once any of its stock has been sent the delete is refused.",
+      "description": "Deletes the fulfillment with that `ifm_` id. Once any of its stock has been sent the delete is refused. Every fulfillment created through this API is marked `shipped` at once, so this delete returns `400` `stock_committed` for it.",
+      "warning": "**A fulfillment created through the API cannot be deleted.** A new fulfillment comes back `shipped`, with its stock sent, so this call refuses it with `400` `stock_committed`.",
       "parameters": [
         {
           "name": "fulfillment_id",
@@ -346,8 +357,9 @@
       "path": "/item_fulfillments/{fulfillment_id}/notes/{note_id}",
       "slug": "delete-an-item-fulfillment-note",
       "title": "Delete an item fulfillment note",
-      "summary": "Deletes a note held on the fulfillment itself. A successful call returns `204` with no body.",
+      "summary": "Deletes a note stored on the fulfillment itself. A successful call returns `204` with no body.",
       "description": "Pass the fulfillment's `ifm_` id and the note's `note_` id. The delete looks for the note on the fulfillment, not on its sale invoice, where the create note endpoint stores notes.",
+      "warning": "**No endpoint stores a note where this call looks.** [Create an item fulfillment note](/api-reference/item-fulfillments/create-an-item-fulfillment-note) stores the note on the sale invoice, so this call does not find it.",
       "parameters": [
         {
           "name": "fulfillment_id",
@@ -529,9 +541,6 @@
         "custom_attributes": {
           "type": "object"
         },
-        "date": {
-          "type": "string"
-        },
         "delivery_status": {},
         "fulfillment_completed": {
           "type": "boolean"
@@ -561,32 +570,20 @@
         "invoice": {
           "$ref": "#/components/schemas/ItemFulfillmentInvoice"
         },
-        "invoice_id": {
-          "type": "string"
-        },
         "last_updated_by": {
           "$ref": "#/components/schemas/ItemFulfillmentLastUpdatedBy"
         },
         "last_updated_on": {
           "type": "string"
         },
-        "note": {
-          "type": "string"
-        },
         "object": {
           "type": "string"
         },
         "order": {},
-        "order_id": {
-          "type": "string"
-        },
         "status": {
           "type": "string"
         },
         "tracking_number": {
-          "type": "string"
-        },
-        "uuid": {
           "type": "string"
         },
         "version": {
@@ -743,9 +740,6 @@
     "ItemFulfillments": {
       "type": "object",
       "properties": {
-        "activity_logs": {
-          "type": "array"
-        },
         "item_fulfillment": {
           "$ref": "#/components/schemas/ItemFulfillmentsItemFulfillment"
         }
@@ -763,7 +757,9 @@
         "fulfillment_date": {
           "type": "string"
         },
-        "fulfillment_note": {},
+        "fulfillment_note": {
+          "type": "string"
+        },
         "fulfillment_status": {
           "type": "string",
           "description": "Such as `shipped`."
@@ -982,12 +978,6 @@
       "properties": {
         "item_fulfillment": {
           "$ref": "#/components/schemas/ItemFulfillmentUpdatedDetail"
-        },
-        "note": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
         }
       }
     },
