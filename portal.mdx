@@ -30,8 +30,8 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 
 ## Things to know
 
-- **Every request body sits under a `portal` key.** A login, for example, sends `{"portal": {"email": "jane@example.com", "password": "..."}}`.
+- **Every request body sits under a `portal` key.** A login, for example, sends `{"portal": {"email": "jane@example.com", "password": "current-password"}}`.
 - **A portal user is an account with portal access.** Create the account with `grant_portal_access` set to `true` and a `grant_portal_password`, then log in with its `email_address` and that password.
 - **A wrong password returns `400`.** After a password change, a login with the old password is refused.
 - **A reset link request for an unknown email returns `202`.** The call does not fail when no portal user has that email.
-- **Setting a password by email returns `202`.** `POST /portal/change` takes `email` and `password` only.
+- **Setting a password by email returns `202`.** `POST /portal/change` sends `email` and `password` under `portal`.
