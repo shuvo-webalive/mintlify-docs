@@ -1,0 +1,335 @@
+{
+  "family": "alert_responsibilities",
+  "tag": "Alert responsibility settings",
+  "slug": "alert-responsibility-settings",
+  "icon": "user-gear",
+  "base": "/settings/alert_responsibilities",
+  "overview_description": "Create, read, update and delete alert responsibilities from the settings area.",
+  "intro": "Alert responsibility settings manage who is responsible for alerts, from the settings area. They are the same records the Alert responsibilities area serves. This area has 5 endpoints, and all seven Exsited SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**These are the same records as the Alert responsibilities area.** `/settings/alert_responsibilities` and `/alert_responsibility` serve the same alert responsibilities.",
+    "**Writes need the `MANAGE_ALERT_RESPONSIBILITY` permission.** Without it, a create, update or delete returns `403`.",
+    "**Alert responsibility ids start with `ar_`.** One record comes back under `alert_responsibility`, and `name` is required to create one.",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_alert_responsibilities",
+      "method": "GET",
+      "path": "/settings/alert_responsibilities",
+      "slug": "list-alert-responsibility-settings",
+      "title": "List alert responsibility settings",
+      "summary": "Lists the alert responsibilities from the settings area, one page at a time.",
+      "description": "Returns a page of alert responsibilities under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of alert responsibilities.",
+          "schema": {
+            "$ref": "#/components/schemas/SettingsAlertResponsibilityList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_alert_responsibility",
+      "method": "POST",
+      "path": "/settings/alert_responsibilities",
+      "slug": "create-an-alert-responsibility-setting",
+      "title": "Create an alert responsibility setting",
+      "summary": "Creates an alert responsibility from the settings area.",
+      "description": "`name` is required. Your API client needs the `MANAGE_ALERT_RESPONSIBILITY` permission.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "alert_responsibility": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The responsibility's name."
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          },
+          "required": [
+            "alert_responsibility"
+          ]
+        },
+        "example": {
+          "alert_responsibility": {
+            "name": "Billing alerts"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new alert responsibility."
+        },
+        "403": {
+          "description": "Your API client lacks the `MANAGE_ALERT_RESPONSIBILITY` permission."
+        }
+      },
+      "example_call": {
+        "body": {
+          "alert_responsibility": {
+            "name": "Billing alerts"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_alert_responsibility",
+      "method": "GET",
+      "path": "/settings/alert_responsibilities/{alert_responsibility_id}",
+      "slug": "retrieve-an-alert-responsibility-setting",
+      "title": "Retrieve an alert responsibility setting",
+      "summary": "Retrieves one alert responsibility from the settings area by its `ar_` id.",
+      "description": "Returns the alert responsibility under `alert_responsibility`.",
+      "parameters": [
+        {
+          "name": "alert_responsibility_id",
+          "in": "path",
+          "required": true,
+          "description": "The alert responsibility's `ar_` id.",
+          "schema": {
+            "type": "string",
+            "example": "ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The alert responsibility, under `alert_responsibility`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "alert_responsibility_id": "ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_alert_responsibility",
+      "method": "DELETE",
+      "path": "/settings/alert_responsibilities/{alert_responsibility_id}",
+      "slug": "delete-an-alert-responsibility-setting",
+      "title": "Delete an alert responsibility setting",
+      "summary": "Deletes an alert responsibility from the settings area. Nothing comes back.",
+      "description": "Returns `204` with no body. Your API client needs the `MANAGE_ALERT_RESPONSIBILITY` permission.",
+      "parameters": [
+        {
+          "name": "alert_responsibility_id",
+          "in": "path",
+          "required": true,
+          "description": "The alert responsibility's `ar_` id.",
+          "schema": {
+            "type": "string",
+            "example": "ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The alert responsibility is deleted."
+        },
+        "403": {
+          "description": "Your API client lacks the `MANAGE_ALERT_RESPONSIBILITY` permission."
+        }
+      },
+      "example_call": {
+        "path": {
+          "alert_responsibility_id": "ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b"
+        }
+      }
+    },
+    {
+      "key": "update_settings_alert_responsibility",
+      "method": "PATCH",
+      "path": "/settings/alert_responsibilities/{alert_responsibility_id}",
+      "slug": "update-an-alert-responsibility-setting",
+      "title": "Update an alert responsibility setting",
+      "summary": "Changes an alert responsibility's fields or its status from the settings area.",
+      "description": "Send the fields to change. Your API client needs the `MANAGE_ALERT_RESPONSIBILITY` permission.",
+      "parameters": [
+        {
+          "name": "alert_responsibility_id",
+          "in": "path",
+          "required": true,
+          "description": "The alert responsibility's `ar_` id.",
+          "schema": {
+            "type": "string",
+            "example": "ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "alert_responsibility": {
+              "type": "object",
+              "properties": {
+                "display_name": {
+                  "type": "string",
+                  "description": "The name shown for the responsibility."
+                },
+                "status": {
+                  "type": "string",
+                  "description": "The responsibility's status."
+                }
+              },
+              "description": "The fields to change."
+            }
+          },
+          "required": [
+            "alert_responsibility"
+          ]
+        },
+        "example": {
+          "alert_responsibility": {
+            "display_name": "Billing alerts team"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated alert responsibility."
+        },
+        "403": {
+          "description": "Your API client lacks the `MANAGE_ALERT_RESPONSIBILITY` permission."
+        }
+      },
+      "example_call": {
+        "path": {
+          "alert_responsibility_id": "ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b"
+        },
+        "body": {
+          "alert_responsibility": {
+            "display_name": "Billing alerts team"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "SettingsAlertResponsibilityList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "description": "Always `list`."
+        },
+        "url": {
+          "type": "string",
+          "description": "The path this page was read from."
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "The alert responsibilities."
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/SettingsAlertResponsibilityPagination"
+        }
+      }
+    },
+    "SettingsAlertResponsibilityPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Pass as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "links": {
+          "$ref": "#/components/schemas/SettingsAlertResponsibilityPaginationLinks"
+        }
+      }
+    },
+    "SettingsAlertResponsibilityPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}
