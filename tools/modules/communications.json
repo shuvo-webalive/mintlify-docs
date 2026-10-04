@@ -1,0 +1,97 @@
+{
+  "family": "communications",
+  "tag": "Communications",
+  "slug": "communications",
+  "icon": "paper-plane",
+  "base": "/communications",
+  "overview_description": "Email an invoice, purchase invoice, account statement or payment to the recipients you name.",
+  "intro": "Communications send documents by email. This area emails one invoice, purchase invoice, account statement or payment to the recipients you name. It has 1 endpoint, and all seven SDKs call it.",
+  "warning": "**Every call sends real email to the recipients you name.**",
+  "notes": [
+    "**The body names one document.** Send one of `invoice`, `purchase_invoice`, `account_statement` or `payment`, holding that document's `id`.",
+    "**Recipients and content sit beside the document key.** The body also takes `to`, `cc`, `bcc`, `subject`, `body` and `template`.",
+    "**Each call sends real mail.** Use addresses you control when you try it."
+  ],
+  "endpoints": [
+    {
+      "key": "send_email",
+      "method": "POST",
+      "path": "/communications/send_email",
+      "slug": "email-a-document",
+      "title": "Email a document",
+      "summary": "Emails one invoice, purchase invoice, account statement or payment.",
+      "description": "The body names one of `invoice`, `purchase_invoice`, `account_statement` or `payment`, holding that document's `id`, beside `to`, `cc`, `bcc`, `subject`, `body` and `template`. This sends real mail to the recipients.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "description": "Name one document to email, beside the recipients and content.",
+          "properties": {
+            "invoice": {
+              "type": "string",
+              "description": "The `id` of the invoice to email, such as `INV-0001`. Send one of `invoice`, `purchase_invoice`, `account_statement` or `payment`."
+            },
+            "purchase_invoice": {
+              "type": "string",
+              "description": "The `id` of the purchase invoice to email."
+            },
+            "account_statement": {
+              "type": "string",
+              "description": "The `id` of the account statement to email."
+            },
+            "payment": {
+              "type": "string",
+              "description": "The `id` of the payment to email."
+            },
+            "to": {
+              "description": "The recipients."
+            },
+            "cc": {
+              "description": "Copy recipients."
+            },
+            "bcc": {
+              "description": "Blind copy recipients."
+            },
+            "subject": {
+              "type": "string",
+              "description": "The email's subject."
+            },
+            "body": {
+              "type": "string",
+              "description": "The email's body."
+            },
+            "template": {
+              "description": "The email template to use."
+            }
+          }
+        },
+        "example": {
+          "invoice": "INV-0001",
+          "to": [
+            "jane@example.com"
+          ],
+          "subject": "Your invoice",
+          "body": "Hello Jane, your invoice is attached."
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The email is sent."
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "invoice": "INV-0001",
+          "to": [
+            "jane@example.com"
+          ],
+          "subject": "Your invoice",
+          "body": "Hello Jane, your invoice is attached."
+        }
+      }
+    }
+  ],
+  "schemas": {}
+}
