@@ -74,6 +74,9 @@
     },
     {
       "name": "Credit note applications"
+    },
+    {
+      "name": "Reconciliations"
     }
   ],
   "paths": {
@@ -24824,6 +24827,182 @@
             "lang": "go",
             "label": "Go",
             "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CreditNoteApplications().GetInvoiceCreditNoteApplications(context.Background(), \"INV-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/reconciliations/{reconciliation_id}/sale_payments": {
+      "get": {
+        "tags": [
+          "Reconciliations"
+        ],
+        "summary": "List a reconciliation's payments",
+        "operationId": "reconciliations_get_reconciliation_sale_payments",
+        "description": "Lists the payments in one reconciliation, under `data`. An unknown reconciliation returns `404` with the code `resource_not_found`. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+        "parameters": [
+          {
+            "name": "reconciliation_id",
+            "in": "path",
+            "required": true,
+            "description": "The reconciliation's uuid or its numeric id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The reconciliation's payments, under `data`."
+          },
+          "404": {
+            "description": "No reconciliation has that id (`resource_not_found`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/reconciliations/3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f/sale_payments?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.reconciliations.get_reconciliation_sale_payments(\n    \"3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.reconciliations.getReconciliationSalePayments('3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f', {\n    limit: 20,\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->reconciliations->getReconciliationSalePayments(\n    '3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f',\n    ['limit' => 20],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.reconciliations().getReconciliationSalePayments(\n        \"3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Reconciliations.GetReconciliationSalePaymentsAsync(\n    \"3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.reconciliations.getReconciliationSalePayments(\n  '3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Reconciliations().GetReconciliationSalePayments(context.Background(), \"3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/reconciliations/{reconciliation_id}/sale_refunds": {
+      "get": {
+        "tags": [
+          "Reconciliations"
+        ],
+        "summary": "List a reconciliation's refunds",
+        "operationId": "reconciliations_get_reconciliation_sale_refunds",
+        "description": "Lists the refunds in one reconciliation, under `data`. An unknown reconciliation returns `404` with the code `resource_not_found`. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+        "parameters": [
+          {
+            "name": "reconciliation_id",
+            "in": "path",
+            "required": true,
+            "description": "The reconciliation's uuid or its numeric id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The reconciliation's refunds, under `data`."
+          },
+          "404": {
+            "description": "No reconciliation has that id (`resource_not_found`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/reconciliations/3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f/sale_refunds?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.reconciliations.get_reconciliation_sale_refunds(\n    \"3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.reconciliations.getReconciliationSaleRefunds('3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f', {\n    limit: 20,\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->reconciliations->getReconciliationSaleRefunds(\n    '3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f',\n    ['limit' => 20],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.reconciliations().getReconciliationSaleRefunds(\n        \"3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Reconciliations.GetReconciliationSaleRefundsAsync(\n    \"3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.reconciliations.getReconciliationSaleRefunds(\n  '3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Reconciliations().GetReconciliationSaleRefunds(context.Background(), \"3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
           }
         ]
       }

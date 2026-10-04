@@ -1,0 +1,117 @@
+{
+  "family": "reconciliations",
+  "tag": "Reconciliations",
+  "slug": "reconciliations",
+  "icon": "scale-balanced",
+  "base": "/reconciliations",
+  "overview_description": "List the payments and refunds included in a bank reconciliation.",
+  "intro": "A reconciliation matches payments and refunds against a bank statement. This area has 2 endpoints, which list the payments and the refunds in one reconciliation. All seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**There is no endpoint for the reconciliation itself.** Only the two lists of its payments and refunds are available.",
+    "**Name the reconciliation by its uuid or its numeric id.** Both forms are accepted in `{reconciliation_id}`.",
+    "**An unknown reconciliation returns `404`.** The error code is `resource_not_found`.",
+    "**Records are under `data`.** Both lists put their records under `data`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_reconciliation_sale_payments",
+      "method": "GET",
+      "path": "/reconciliations/{reconciliation_id}/sale_payments",
+      "slug": "list-a-reconciliations-payments",
+      "title": "List a reconciliation's payments",
+      "summary": "Returns the payments included in a reconciliation.",
+      "description": "Lists the payments in one reconciliation, under `data`. An unknown reconciliation returns `404` with the code `resource_not_found`. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+      "parameters": [
+        {
+          "name": "reconciliation_id",
+          "in": "path",
+          "required": true,
+          "description": "The reconciliation's uuid or its numeric id.",
+          "schema": {
+            "type": "string",
+            "example": "3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The reconciliation's payments, under `data`."
+        },
+        "404": {
+          "description": "No reconciliation has that id (`resource_not_found`)."
+        }
+      },
+      "example_call": {
+        "path": {
+          "reconciliation_id": "3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_reconciliation_sale_refunds",
+      "method": "GET",
+      "path": "/reconciliations/{reconciliation_id}/sale_refunds",
+      "slug": "list-a-reconciliations-refunds",
+      "title": "List a reconciliation's refunds",
+      "summary": "Returns the refunds included in a reconciliation.",
+      "description": "Lists the refunds in one reconciliation, under `data`. An unknown reconciliation returns `404` with the code `resource_not_found`. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+      "parameters": [
+        {
+          "name": "reconciliation_id",
+          "in": "path",
+          "required": true,
+          "description": "The reconciliation's uuid or its numeric id.",
+          "schema": {
+            "type": "string",
+            "example": "3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The reconciliation's refunds, under `data`."
+        },
+        "404": {
+          "description": "No reconciliation has that id (`resource_not_found`)."
+        }
+      },
+      "example_call": {
+        "path": {
+          "reconciliation_id": "3c9d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e6f"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    }
+  ],
+  "schemas": {}
+}
