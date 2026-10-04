@@ -1,0 +1,285 @@
+{
+  "family": "alerts",
+  "tag": "Alerts",
+  "slug": "alerts",
+  "icon": "bell",
+  "base": "/alerts",
+  "overview_description": "List alerts for the instance or for one account, employee or labour, and retrieve one alert.",
+  "intro": "Alerts flag records that need attention. You can list every alert, list the alerts of one account, employee or labour, and retrieve a single alert. This area has 5 endpoints, and all seven Exsited SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**Alerts are read only.** You can list them for the instance or for one account, employee or labour, and read one by id.",
+    "**Employees and labours are named by `code`.** An account is named by its `id`, such as `W13ZGY`.",
+    "**Every list has the same shape.** Alerts sit under `data` beside `object`, `url` and `pagination`, and an empty `data` means no alerts.",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_alerts",
+      "method": "GET",
+      "path": "/alerts",
+      "slug": "list-alerts",
+      "title": "List alerts",
+      "summary": "Lists the alerts on your instance, one page at a time.",
+      "description": "Returns a page of alerts under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of alerts.",
+          "schema": {
+            "$ref": "#/components/schemas/AlertList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_alert",
+      "method": "GET",
+      "path": "/alerts/{alert_id}",
+      "slug": "retrieve-an-alert",
+      "title": "Retrieve an alert",
+      "summary": "Retrieves one alert by its id.",
+      "description": "Name the alert by the `id` a listed alert carries.",
+      "parameters": [
+        {
+          "name": "alert_id",
+          "in": "path",
+          "required": true,
+          "description": "The alert's `id`, as the listing shows it.",
+          "schema": {
+            "type": "string",
+            "example": "alt_2a4c6e8b0d1f4a3c5e7b9d1f3a5c7e9b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The alert."
+        }
+      },
+      "example_call": {
+        "path": {
+          "alert_id": "alt_2a4c6e8b0d1f4a3c5e7b9d1f3a5c7e9b"
+        }
+      }
+    },
+    {
+      "key": "get_alerts_account_by_id",
+      "method": "GET",
+      "path": "/alerts/account/{account_id}",
+      "slug": "list-an-accounts-alerts",
+      "title": "List an account's alerts",
+      "summary": "Lists the alerts raised for one account.",
+      "description": "Returns the account's alerts under `data`, with cursor `pagination`. An account with no alerts returns an empty `data`.",
+      "parameters": [
+        {
+          "name": "account_id",
+          "in": "path",
+          "required": true,
+          "description": "The account's `id`, such as `W13ZGY`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "W13ZGY"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The account's alerts.",
+          "schema": {
+            "$ref": "#/components/schemas/AlertList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "account_id": "W13ZGY"
+        }
+      }
+    },
+    {
+      "key": "get_alerts_employee_by_id",
+      "method": "GET",
+      "path": "/alerts/employee/{employee_id}",
+      "slug": "list-an-employees-alerts",
+      "title": "List an employee's alerts",
+      "summary": "Lists the alerts raised for one employee.",
+      "description": "Name the employee by its `code`. Returns the employee's alerts under `data`, with cursor `pagination`; an employee with no alerts returns an empty `data`.",
+      "parameters": [
+        {
+          "name": "employee_id",
+          "in": "path",
+          "required": true,
+          "description": "The employee's `code`.",
+          "schema": {
+            "type": "string",
+            "example": "EMP-1001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The employee's alerts.",
+          "schema": {
+            "$ref": "#/components/schemas/AlertList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "employee_id": "EMP-1001"
+        }
+      }
+    },
+    {
+      "key": "get_alerts_labour_by_id",
+      "method": "GET",
+      "path": "/alerts/labour/{labour_id}",
+      "slug": "list-a-labours-alerts",
+      "title": "List a labour's alerts",
+      "summary": "Lists the alerts raised for one labour.",
+      "description": "Name the labour by its `code`. Returns the labour's alerts under `data`, with cursor `pagination`; a labour with no alerts returns an empty `data`.",
+      "parameters": [
+        {
+          "name": "labour_id",
+          "in": "path",
+          "required": true,
+          "description": "The labour's `code`.",
+          "schema": {
+            "type": "string",
+            "example": "LAB-1001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The labour's alerts.",
+          "schema": {
+            "$ref": "#/components/schemas/AlertList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "labour_id": "LAB-1001"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "AlertList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "description": "Always `list`."
+        },
+        "url": {
+          "type": "string",
+          "description": "The path this page was read from."
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "The alerts."
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/AlertPagination"
+        }
+      }
+    },
+    "AlertPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Pass as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "links": {
+          "$ref": "#/components/schemas/AlertPaginationLinks"
+        }
+      }
+    },
+    "AlertPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}
