@@ -50,6 +50,9 @@
     },
     {
       "name": "Usages"
+    },
+    {
+      "name": "Sales reps"
     }
   ],
   "paths": {
@@ -15977,6 +15980,448 @@
           }
         }
       }
+    },
+    "/settings/sales_reps": {
+      "get": {
+        "tags": [
+          "Sales reps"
+        ],
+        "summary": "List sales reps",
+        "operationId": "sales_reps_get_settings_sales_reps",
+        "description": "The records are under `data`, and `pagination` holds the cursor for the next page. Other fields filter as `filter_<field>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` to sort in descending order.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of sales reps, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesRepList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/sales_reps?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.sales_reps.get_settings_sales_reps({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.salesReps.getSettingsSalesReps({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->salesReps->getSettingsSalesReps(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.sales_reps.sales_reps_dto.SalesRepsDto.SettingsSalesRepList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsSalesRepList> response = client.salesReps().getSettingsSalesReps(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.SalesReps.GetSettingsSalesRepsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.salesReps.getSettingsSalesReps(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.SalesReps().GetSettingsSalesReps(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Sales reps"
+        ],
+        "summary": "Create a sales rep",
+        "operationId": "sales_reps_create_settings_sales_rep",
+        "description": "Send the new rep under `sales_rep`. On the current instance this call returns `400` with `validation_error` and no field named, for every valid body tried.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The sales rep is created."
+          },
+          "400": {
+            "description": "`validation_error` with no field named, returned for every valid body tried.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/sales_reps\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"sales_rep\": {\n      \"first_name\": \"Jane\",\n      \"last_name\": \"Citizen\",\n      \"email_address\": \"jane@example.com\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.sales_reps.create_settings_sales_rep(\n    {\n        \"sales_rep\": {\n            \"first_name\": \"Jane\",\n            \"last_name\": \"Citizen\",\n            \"email_address\": \"jane@example.com\",\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.salesReps.createSettingsSalesRep({\n    sales_rep: {first_name: 'Jane', last_name: 'Citizen', email_address: 'jane@example.com'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->salesReps->createSettingsSalesRep([\n    'sales_rep' => [\n        'first_name' => 'Jane',\n        'last_name' => 'Citizen',\n        'email_address' => 'jane@example.com',\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.salesReps().createSettingsSalesRep(\n        Map.of(\n                \"sales_rep\", Map.of(\n                        \"first_name\", \"Jane\",\n                        \"last_name\", \"Citizen\",\n                        \"email_address\", \"jane@example.com\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.SalesReps.CreateSettingsSalesRepAsync(new Dictionary<string, object?>\n{\n    [\"sales_rep\"] = new Dictionary<string, object?>\n    {\n        [\"first_name\"] = \"Jane\",\n        [\"last_name\"] = \"Citizen\",\n        [\"email_address\"] = \"jane@example.com\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.salesReps.createSettingsSalesRep({\n  'sales_rep': {\n    'first_name': 'Jane',\n    'last_name': 'Citizen',\n    'email_address': 'jane@example.com',\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.SalesReps().CreateSettingsSalesRep(context.Background(), map[string]any{\n\t\"sales_rep\": map[string]any{\n\t\t\"first_name\":    \"Jane\",\n\t\t\"last_name\":     \"Citizen\",\n\t\t\"email_address\": \"jane@example.com\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sales_rep": {
+                    "type": "object",
+                    "properties": {
+                      "first_name": {
+                        "type": "string"
+                      },
+                      "last_name": {
+                        "type": "string"
+                      },
+                      "email_address": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "sales_rep"
+                ]
+              },
+              "example": {
+                "sales_rep": {
+                  "first_name": "Jane",
+                  "last_name": "Citizen",
+                  "email_address": "jane@example.com"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/sales_reps/{sales_rep_id}": {
+      "get": {
+        "tags": [
+          "Sales reps"
+        ],
+        "summary": "Retrieve a sales rep",
+        "operationId": "sales_reps_get_settings_sales_rep",
+        "description": "Pass the rep's `id`, which starts with `sr_`. The response holds the rep's name, email address and `status`.",
+        "parameters": [
+          {
+            "name": "sales_rep_id",
+            "in": "path",
+            "required": true,
+            "description": "The sales rep's `id`, which starts with `sr_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The sales rep, under `sales_rep`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesRepResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/sales_reps/sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.sales_reps.get_settings_sales_rep(\n    \"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.salesReps.getSettingsSalesRep('sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->salesReps->getSettingsSalesRep('sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.sales_reps.sales_reps_dto.SalesRepsDto.SettingsSalesRep;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsSalesRep> response = client.salesReps().getSettingsSalesRep(\"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.SalesReps.GetSettingsSalesRepAsync(\"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.salesReps.getSettingsSalesRep(\n  'sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.SalesReps().GetSettingsSalesRep(context.Background(), \"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Sales reps"
+        ],
+        "summary": "Delete a sales rep",
+        "operationId": "sales_reps_delete_settings_sales_rep",
+        "description": "Pass the rep's `id`. A successful delete returns `204` with an empty body.",
+        "parameters": [
+          {
+            "name": "sales_rep_id",
+            "in": "path",
+            "required": true,
+            "description": "The sales rep's `id`, which starts with `sr_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The sales rep is deleted. The body is empty."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/sales_reps/sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.sales_reps.delete_settings_sales_rep(\n    \"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.salesReps.deleteSettingsSalesRep('sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->salesReps->deleteSettingsSalesRep('sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.salesReps().deleteSettingsSalesRep(\"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.SalesReps.DeleteSettingsSalesRepAsync(\"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.salesReps.deleteSettingsSalesRep(\n  'sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.SalesReps().DeleteSettingsSalesRep(context.Background(), \"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Sales reps"
+        ],
+        "summary": "Update a sales rep",
+        "operationId": "sales_reps_update_settings_sales_rep",
+        "description": "Send only the fields to change under `sales_rep`. Set `status` to `active` or `inactive` to enable or disable the rep.",
+        "parameters": [
+          {
+            "name": "sales_rep_id",
+            "in": "path",
+            "required": true,
+            "description": "The sales rep's `id`, which starts with `sr_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The sales rep is updated."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/sales_reps/sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"sales_rep\": {\n      \"last_name\": \"Citizen-Smith\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.sales_reps.update_settings_sales_rep(\n    \"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\", {\"sales_rep\": {\"last_name\": \"Citizen-Smith\"}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.salesReps.updateSettingsSalesRep('sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c', {\n    sales_rep: {last_name: 'Citizen-Smith'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->salesReps->updateSettingsSalesRep('sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c', [\n    'sales_rep' => ['last_name' => 'Citizen-Smith'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.salesReps().updateSettingsSalesRep(\n        \"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\",\n        Map.of(\"sales_rep\", Map.of(\"last_name\", \"Citizen-Smith\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.SalesReps.UpdateSettingsSalesRepAsync(\n    \"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\",\n    new Dictionary<string, object?>\n    {\n        [\"sales_rep\"] = new Dictionary<string, object?>\n        {\n            [\"last_name\"] = \"Citizen-Smith\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.salesReps.updateSettingsSalesRep(\n  'sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c',\n  {\n    'sales_rep': {'last_name': 'Citizen-Smith'},\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.SalesReps().UpdateSettingsSalesRep(context.Background(), \"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\", map[string]any{\n\t\"sales_rep\": map[string]any{\"last_name\": \"Citizen-Smith\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sales_rep": {
+                    "type": "object",
+                    "properties": {
+                      "first_name": {
+                        "type": "string"
+                      },
+                      "last_name": {
+                        "type": "string"
+                      },
+                      "email_address": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "description": "`active` or `inactive`."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "sales_rep"
+                ]
+              },
+              "example": {
+                "sales_rep": {
+                  "last_name": "Citizen-Smith"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -24657,6 +25102,106 @@
         }
       },
       "UsagePagination": {
+        "type": "object",
+        "description": "Cursor paging for the listing.",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size the API applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. `false` ends the listing even when `next_cursor` is present."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Send as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "next": {
+                "type": "string"
+              },
+              "prev": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "SalesRepList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SalesRep"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/SalesRepPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "SalesRep": {
+        "type": "object",
+        "properties": {
+          "created_by": {},
+          "created_on": {
+            "type": "string"
+          },
+          "email_address": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "SalesRepResponse": {
+        "type": "object",
+        "properties": {
+          "sales_rep": {
+            "$ref": "#/components/schemas/SalesRep"
+          }
+        }
+      },
+      "SalesRepPagination": {
         "type": "object",
         "description": "Cursor paging for the listing.",
         "properties": {
