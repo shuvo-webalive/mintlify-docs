@@ -5,13 +5,13 @@
   "icon": "rotate-left",
   "base": "/refunds",
   "overview_description": "Create refunds from credit notes, read, update and delete them, and manage the notes and files on them.",
-  "intro": "A refund pays money back to an account out of a credit note. This area has 12 endpoints: create a refund from a credit note, read, update and delete refunds, and manage their notes and files. All seven SDKs call every one.",
+  "intro": "A refund pays money back to an account out of a credit note. This area has 12 endpoints: create a refund from a credit note, read, update and delete refunds, and manage their notes and files. Every SDK supports all of them.",
   "warning": null,
   "notes": [
-    "**A refund is named by its code.** `{refund_id}` is the code the refunds listing returns as `id`.",
-    "**A refund comes from a credit note.** Create one under the credit note, named by its `code`, with `amount` and `payment_method` under `refund`.",
+    "**Identify a refund by its code.** `{refund_id}` is the code the refunds listing returns as `id`.",
+    "**A refund comes from a credit note.** Create one under the credit note, identified by its `code`, with `amount` and `payment_method` under `refund`.",
     "**Amounts are strings.** A refund's `amount` reads like `\"2.00\"`.",
-    "**Note deletes check the create permission.** Deleting a refund note or its file needs `CREATE_REFUND_NOTE`.",
+    "**Note deletes check the create permission.** Deleting a refund note or its file needs `CREATE_REFUND_NOTE`; without it the call returns `403`.",
     "**Listings page by cursor.** Records are under `data`. Pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is `true`."
   ],
   "endpoints": [
@@ -22,7 +22,7 @@
       "slug": "list-refunds",
       "title": "List refunds",
       "summary": "Returns one page of refunds.",
-      "description": "Lists every refund, one page at a time, under `data`. Each record carries its `amount` as a string, the `payment_method`, the `reconcile_status`, and the account and credit note it belongs to. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+      "description": "Lists every refund, one page at a time, under `data`. Each record carries its `amount` as a string, the `payment_method`, the `reconcile_status`, and the account and credit note it belongs to. To filter, add `filter_<field>=<value>`, or `filter_<field>_<operator>=<value>` with an operator such as `gte` or `contains`.",
       "parameters": [
         {
           "name": "limit",
@@ -195,7 +195,7 @@
         "200": {
           "description": "The updated refund, under `refund`.",
           "schema": {
-            "$ref": "#/components/schemas/RefundUpdatedResponse"
+            "$ref": "#/components/schemas/RefundWriteResponse"
           }
         }
       },
@@ -244,7 +244,7 @@
                 },
                 "payment_method": {
                   "type": "string",
-                  "description": "The payment method to refund through, as the original payment's `payment_applied` entry names it in `method`."
+                  "description": "The payment method, such as the value in the original payment's `payment_applied[].method`."
                 }
               }
             }
@@ -265,7 +265,7 @@
         "201": {
           "description": "The new refund, under `refund`.",
           "schema": {
-            "$ref": "#/components/schemas/RefundUpdatedResponse"
+            "$ref": "#/components/schemas/RefundWriteResponse"
           }
         }
       },
@@ -356,7 +356,7 @@
       "slug": "retrieve-a-refund-note",
       "title": "Retrieve a refund note",
       "summary": "Returns one note on a refund.",
-      "description": "Fetches a single note by its `note_` id.",
+      "description": "Fetches a single note by its `id`, which starts with `note_`.",
       "parameters": [
         {
           "name": "refund_id",
@@ -394,7 +394,8 @@
           "refund_id": "REF-0001",
           "note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.**"
     },
     {
       "key": "create_refund_note",
@@ -492,7 +493,7 @@
           "description": "The note is deleted. The response has no body."
         },
         "403": {
-          "description": "Your API client does not have the `CREATE_REFUND_NOTE` permission."
+          "description": "The API client lacks the `CREATE_REFUND_NOTE` permission, which this delete checks."
         }
       },
       "example_call": {
@@ -500,7 +501,8 @@
           "refund_id": "REF-0001",
           "note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** No successful delete has been confirmed. Deleting a payment note takes the note's `id` as a dashed uuid rather than its `note_` id, and this call may do the same."
     },
     {
       "key": "get_refund_note_files",
@@ -547,7 +549,8 @@
           "refund_id": "REF-0001",
           "note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.**"
     },
     {
       "key": "get_refund_note_file",
@@ -556,7 +559,7 @@
       "slug": "retrieve-a-refund-note-file",
       "title": "Retrieve a refund note file",
       "summary": "Returns the details of one file attached to a refund note, not the file's contents.",
-      "description": "Fetches a JSON description of the attachment, named by its `uuid`, under `file`.",
+      "description": "Fetches a JSON description of the attachment, identified by its `uuid`, under `file`.",
       "parameters": [
         {
           "name": "refund_id",
@@ -605,7 +608,8 @@
           "note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d",
           "file_id": "6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f"
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.**"
     },
     {
       "key": "delete_refund_note_file",
@@ -614,7 +618,7 @@
       "slug": "delete-a-refund-note-file",
       "title": "Delete a refund note file",
       "summary": "Deletes one file from a note on a refund.",
-      "description": "Deletes the attachment, named by its `uuid`. The server checks the `CREATE_REFUND_NOTE` permission.",
+      "description": "Deletes the attachment by its `uuid`. The server checks the `CREATE_REFUND_NOTE` permission.",
       "parameters": [
         {
           "name": "refund_id",
@@ -654,7 +658,7 @@
           "description": "The file is deleted. The response has no body."
         },
         "403": {
-          "description": "Your API client does not have the `CREATE_REFUND_NOTE` permission."
+          "description": "The API client lacks the `CREATE_REFUND_NOTE` permission, which this delete checks."
         }
       },
       "example_call": {
@@ -663,7 +667,8 @@
           "note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d",
           "file_id": "6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f"
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** No successful delete has been confirmed. Deleting a payment note takes the note's `id` as a dashed uuid rather than its `note_` id, and this call may do the same."
     }
   ],
   "schemas": {
@@ -802,29 +807,6 @@
         },
         "links": {
           "$ref": "#/components/schemas/RefundPaginationLinks"
-        },
-        "records": {
-          "type": "integer",
-          "description": "The total number of matching records, not the length of this page."
-        },
-        "offset": {
-          "type": "integer"
-        },
-        "next_page": {
-          "type": "string",
-          "description": "On the last page this is the string `NULL`, not JSON null."
-        },
-        "previous_page": {
-          "type": "string"
-        },
-        "has_next": {
-          "type": "boolean"
-        },
-        "has_prev": {
-          "type": "boolean"
-        },
-        "per_page": {
-          "type": "integer"
         }
       }
     },
@@ -847,11 +829,11 @@
         }
       }
     },
-    "RefundUpdated": {
+    "RefundWrite": {
       "type": "object",
       "properties": {
         "account": {
-          "$ref": "#/components/schemas/RefundUpdatedAccount"
+          "$ref": "#/components/schemas/RefundWriteAccount"
         },
         "amount": {
           "type": "string"
@@ -863,7 +845,7 @@
           "type": "string"
         },
         "credit_note": {
-          "$ref": "#/components/schemas/RefundUpdatedCreditNote"
+          "$ref": "#/components/schemas/RefundWriteCreditNote"
         },
         "credit_note_id": {
           "type": "string"
@@ -916,7 +898,7 @@
         }
       }
     },
-    "RefundUpdatedAccount": {
+    "RefundWriteAccount": {
       "type": "object",
       "properties": {
         "href": {
@@ -933,7 +915,7 @@
         }
       }
     },
-    "RefundUpdatedCreditNote": {
+    "RefundWriteCreditNote": {
       "type": "object",
       "properties": {
         "href": {
@@ -950,11 +932,11 @@
         }
       }
     },
-    "RefundUpdatedResponse": {
+    "RefundWriteResponse": {
       "type": "object",
       "properties": {
         "refund": {
-          "$ref": "#/components/schemas/RefundUpdated"
+          "$ref": "#/components/schemas/RefundWrite"
         }
       }
     },

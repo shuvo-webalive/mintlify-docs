@@ -22618,7 +22618,7 @@
         ],
         "summary": "List refunds",
         "operationId": "refunds_get_refunds",
-        "description": "Lists every refund, one page at a time, under `data`. Each record carries its `amount` as a string, the `payment_method`, the `reconcile_status`, and the account and credit note it belongs to. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+        "description": "Lists every refund, one page at a time, under `data`. Each record carries its `amount` as a string, the `payment_method`, the `reconcile_status`, and the account and credit note it belongs to. To filter, add `filter_<field>=<value>`, or `filter_<field>_<operator>=<value>` with an operator such as `gte` or `contains`.",
         "parameters": [
           {
             "name": "limit",
@@ -22880,7 +22880,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RefundUpdatedResponse"
+                  "$ref": "#/components/schemas/RefundWriteResponse"
                 }
               }
             }
@@ -22987,7 +22987,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RefundUpdatedResponse"
+                  "$ref": "#/components/schemas/RefundWriteResponse"
                 }
               }
             }
@@ -23051,7 +23051,7 @@
                       },
                       "payment_method": {
                         "type": "string",
-                        "description": "The payment method to refund through, as the original payment's `payment_applied` entry names it in `method`."
+                        "description": "The payment method, such as the value in the original payment's `payment_applied[].method`."
                       }
                     }
                   }
@@ -23279,7 +23279,7 @@
         ],
         "summary": "Retrieve a refund note",
         "operationId": "refunds_get_refund_note",
-        "description": "Fetches a single note by its `note_` id.",
+        "description": "Fetches a single note by its `id`, which starts with `note_`.",
         "parameters": [
           {
             "name": "refund_id",
@@ -23387,7 +23387,7 @@
             "description": "The note is deleted. The response has no body."
           },
           "403": {
-            "description": "Your API client does not have the `CREATE_REFUND_NOTE` permission.",
+            "description": "The API client lacks the `CREATE_REFUND_NOTE` permission, which this delete checks.",
             "content": {
               "application/json": {
                 "schema": {
@@ -23532,7 +23532,7 @@
         ],
         "summary": "Retrieve a refund note file",
         "operationId": "refunds_get_refund_note_file",
-        "description": "Fetches a JSON description of the attachment, named by its `uuid`, under `file`.",
+        "description": "Fetches a JSON description of the attachment, identified by its `uuid`, under `file`.",
         "parameters": [
           {
             "name": "refund_id",
@@ -23623,7 +23623,7 @@
         ],
         "summary": "Delete a refund note file",
         "operationId": "refunds_delete_refund_note_file",
-        "description": "Deletes the attachment, named by its `uuid`. The server checks the `CREATE_REFUND_NOTE` permission.",
+        "description": "Deletes the attachment by its `uuid`. The server checks the `CREATE_REFUND_NOTE` permission.",
         "parameters": [
           {
             "name": "refund_id",
@@ -23658,7 +23658,7 @@
             "description": "The file is deleted. The response has no body."
           },
           "403": {
-            "description": "Your API client does not have the `CREATE_REFUND_NOTE` permission.",
+            "description": "The API client lacks the `CREATE_REFUND_NOTE` permission, which this delete checks.",
             "content": {
               "application/json": {
                 "schema": {
@@ -96748,29 +96748,6 @@
           },
           "links": {
             "$ref": "#/components/schemas/RefundPaginationLinks"
-          },
-          "records": {
-            "type": "integer",
-            "description": "The total number of matching records, not the length of this page."
-          },
-          "offset": {
-            "type": "integer"
-          },
-          "next_page": {
-            "type": "string",
-            "description": "On the last page this is the string `NULL`, not JSON null."
-          },
-          "previous_page": {
-            "type": "string"
-          },
-          "has_next": {
-            "type": "boolean"
-          },
-          "has_prev": {
-            "type": "boolean"
-          },
-          "per_page": {
-            "type": "integer"
           }
         }
       },
@@ -96793,11 +96770,11 @@
           }
         }
       },
-      "RefundUpdated": {
+      "RefundWrite": {
         "type": "object",
         "properties": {
           "account": {
-            "$ref": "#/components/schemas/RefundUpdatedAccount"
+            "$ref": "#/components/schemas/RefundWriteAccount"
           },
           "amount": {
             "type": "string"
@@ -96809,7 +96786,7 @@
             "type": "string"
           },
           "credit_note": {
-            "$ref": "#/components/schemas/RefundUpdatedCreditNote"
+            "$ref": "#/components/schemas/RefundWriteCreditNote"
           },
           "credit_note_id": {
             "type": "string"
@@ -96862,7 +96839,7 @@
           }
         }
       },
-      "RefundUpdatedAccount": {
+      "RefundWriteAccount": {
         "type": "object",
         "properties": {
           "href": {
@@ -96879,7 +96856,7 @@
           }
         }
       },
-      "RefundUpdatedCreditNote": {
+      "RefundWriteCreditNote": {
         "type": "object",
         "properties": {
           "href": {
@@ -96896,11 +96873,11 @@
           }
         }
       },
-      "RefundUpdatedResponse": {
+      "RefundWriteResponse": {
         "type": "object",
         "properties": {
           "refund": {
-            "$ref": "#/components/schemas/RefundUpdated"
+            "$ref": "#/components/schemas/RefundWrite"
           }
         }
       },
