@@ -5,11 +5,11 @@
   "icon": "user-tie",
   "base": "/settings/designations",
   "overview_description": "Manage designations in Exsited: list, create, retrieve, update and delete the job titles you assign.",
-  "intro": "Designations are the job titles configured in your Exsited settings. You can list, create, retrieve, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.",
-  "warning": "**Deleting a designation cannot be undone.** After a delete, reading the designation returns `404`.",
+  "intro": "Designations are the job titles configured in your Exsited settings. You can list, create, retrieve, update and delete them. This area has 5 endpoints, each available in all seven SDKs.",
+  "warning": "**Creating a designation currently fails.** `POST /settings/designations` returns `404` for the designation it has just saved and leaves no record, so the create, update and delete calls have not been confirmed to work. Deleting a designation cannot be undone.",
   "notes": [
     "**Request bodies go under `designation`.** Both the create and the update wrap their fields in a `designation` object, and the response returns the record under the same key.",
-    "**`name` is required to create a designation.** `display_name` and `description` are optional.",
+    "**`name` is required to create a designation.**",
     "**Designation ids start with `des_`.** Pass that `id` as `designation_id`.",
     "**The list pages by cursor.** Records are under `data`; pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`."
   ],
@@ -78,6 +78,7 @@
       "title": "Create a designation",
       "summary": "Creates a designation and returns it under `designation`.",
       "description": "Send the new designation under `designation`. `name` is required. The new designation comes back under `designation`, with its `des_` id.",
+      "warning": "**This call currently returns `404`.** The create reports the designation it has just saved as not found and leaves no designation, so the `201` response below has not been confirmed.",
       "parameters": [],
       "body": {
         "schema": {
@@ -119,6 +120,9 @@
           "schema": {
             "$ref": "#/components/schemas/DesignationResponse"
           }
+        },
+        "404": {
+          "description": "Creating a designation currently fails: the call reports the designation it has just saved as not found, and no designation is left."
         }
       },
       "example_call": {
@@ -177,6 +181,7 @@
       "title": "Delete a designation",
       "summary": "Deletes a designation; the response has no body.",
       "description": "Deletes the designation with this `id`. A successful delete returns `204` with no body, and reading the designation afterwards returns `404`.",
+      "warning": "**This call has not been confirmed to work.** It needs an existing designation, and creating a designation currently fails.",
       "parameters": [
         {
           "name": "designation_id",
@@ -210,6 +215,7 @@
       "title": "Update a designation",
       "summary": "Changes a designation's name, display name or description.",
       "description": "Send the fields to change under `designation`: `name`, `display_name` or `description`. The updated designation comes back under `designation`.",
+      "warning": "**This call has not been confirmed to work.** It needs an existing designation, and creating a designation currently fails.",
       "parameters": [
         {
           "name": "designation_id",

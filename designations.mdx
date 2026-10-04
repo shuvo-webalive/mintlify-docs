@@ -4,10 +4,10 @@ sidebarTitle: "Overview"
 description: "Manage designations in Exsited: list, create, retrieve, update and delete the job titles you assign."
 ---
 
-Designations are the job titles configured in your Exsited settings. You can list, create, retrieve, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.
+Designations are the job titles configured in your Exsited settings. You can list, create, retrieve, update and delete them. This area has 5 endpoints, each available in all seven SDKs.
 
 <Warning>
-  **Deleting a designation cannot be undone.** After a delete, reading the designation returns `404`.
+  **Creating a designation currently fails.** `POST /settings/designations` returns `404` for the designation it has just saved and leaves no record, so the create, update and delete calls have not been confirmed to work. Deleting a designation cannot be undone.
 </Warning>
 
 ## At a glance
@@ -29,6 +29,6 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 ## Things to know
 
 - **Request bodies go under `designation`.** Both the create and the update wrap their fields in a `designation` object, and the response returns the record under the same key.
-- **`name` is required to create a designation.** `display_name` and `description` are optional.
+- **`name` is required to create a designation.**
 - **Designation ids start with `des_`.** Pass that `id` as `designation_id`.
 - **The list pages by cursor.** Records are under `data`; pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`.
