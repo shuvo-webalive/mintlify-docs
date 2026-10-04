@@ -92,6 +92,9 @@
     },
     {
       "name": "Shipping packages"
+    },
+    {
+      "name": "Shipping rules"
     }
   ],
   "paths": {
@@ -31436,6 +31439,604 @@
           }
         }
       }
+    },
+    "/settings/shipping_rules": {
+      "get": {
+        "tags": [
+          "Shipping rules"
+        ],
+        "summary": "List shipping rules",
+        "operationId": "shipping_rules_get_settings_shipping_rules",
+        "description": "Returns rules under `data`, each with its `name`, `description`, `status` and `configuration`. Set the page size with `limit` and fetch the next page with `cursor`. Other fields filter as `filter_<field>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` to sort descending, as in `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of shipping rules, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingRuleList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/shipping_rules?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.shipping_rules.get_settings_shipping_rules({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingRules.getSettingsShippingRules({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->shippingRules->getSettingsShippingRules(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.shipping_rules.shipping_rules_dto.ShippingRulesDto.SettingsShippingRuleList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsShippingRuleList> response = client.shippingRules().getSettingsShippingRules(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ShippingRules.GetSettingsShippingRulesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingRules.getSettingsShippingRules(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ShippingRules().GetSettingsShippingRules(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Shipping rules"
+        ],
+        "summary": "Create a shipping rule",
+        "operationId": "shipping_rules_create_settings_shipping_rule",
+        "description": "Send the rule under `shipping_rule` with its `name`. Set its zones and rate afterwards with the configuration endpoint.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new shipping rule, under `shipping_rule`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingRuleResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/shipping_rules\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"shipping_rule\": {\n      \"name\": \"Standard shipping\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.shipping_rules.create_settings_shipping_rule(\n    {\"shipping_rule\": {\"name\": \"Standard shipping\"}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingRules.createSettingsShippingRule({shipping_rule: {name: 'Standard shipping'}});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->shippingRules->createSettingsShippingRule([\n    'shipping_rule' => ['name' => 'Standard shipping'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.shipping_rules.shipping_rules_dto.ShippingRulesDto.SettingsShippingRule;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsShippingRule> response = client.shippingRules().createSettingsShippingRule(\n        Map.of(\"shipping_rule\", Map.of(\"name\", \"Standard shipping\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ShippingRules.CreateSettingsShippingRuleAsync(new Dictionary<string, object?>\n{\n    [\"shipping_rule\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Standard shipping\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingRules.createSettingsShippingRule({\n  'shipping_rule': {'name': 'Standard shipping'},\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ShippingRules().CreateSettingsShippingRule(context.Background(), map[string]any{\n\t\"shipping_rule\": map[string]any{\"name\": \"Standard shipping\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "shipping_rule": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "shipping_rule"
+                ]
+              },
+              "example": {
+                "shipping_rule": {
+                  "name": "Standard shipping"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/shipping_rules/{shipping_rule_id}": {
+      "get": {
+        "tags": [
+          "Shipping rules"
+        ],
+        "summary": "Retrieve a shipping rule",
+        "operationId": "shipping_rules_get_settings_shipping_rule",
+        "description": "Returns the rule under `shipping_rule`, with its `name`, `description`, `status`, `version` and `configuration`.",
+        "parameters": [
+          {
+            "name": "shipping_rule_id",
+            "in": "path",
+            "required": true,
+            "description": "The shipping rule's `id`, from the listing.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The shipping rule, under `shipping_rule`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingRuleResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No shipping rule has that `id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/shipping_rules/sr_7f8091a2b3c4d5e6f708192a3b4c5d6e\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.shipping_rules.get_settings_shipping_rule(\n    \"sr_7f8091a2b3c4d5e6f708192a3b4c5d6e\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingRules.getSettingsShippingRule('sr_7f8091a2b3c4d5e6f708192a3b4c5d6e');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->shippingRules->getSettingsShippingRule('sr_7f8091a2b3c4d5e6f708192a3b4c5d6e');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.shipping_rules.shipping_rules_dto.ShippingRulesDto.SettingsShippingRule;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsShippingRule> response = client.shippingRules().getSettingsShippingRule(\n        \"sr_7f8091a2b3c4d5e6f708192a3b4c5d6e\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ShippingRules.GetSettingsShippingRuleAsync(\"sr_7f8091a2b3c4d5e6f708192a3b4c5d6e\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingRules.getSettingsShippingRule(\n  'sr_7f8091a2b3c4d5e6f708192a3b4c5d6e',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ShippingRules().GetSettingsShippingRule(context.Background(), \"sr_7f8091a2b3c4d5e6f708192a3b4c5d6e\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Shipping rules"
+        ],
+        "summary": "Delete a shipping rule",
+        "operationId": "shipping_rules_delete_settings_shipping_rule",
+        "description": "Deletes the rule with that `id`; a later read of it returns `404`.",
+        "parameters": [
+          {
+            "name": "shipping_rule_id",
+            "in": "path",
+            "required": true,
+            "description": "The shipping rule's `id`, from the listing.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The shipping rule is deleted. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/shipping_rules/sr_7f8091a2b3c4d5e6f708192a3b4c5d6e\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.shipping_rules.delete_settings_shipping_rule(\n    \"sr_7f8091a2b3c4d5e6f708192a3b4c5d6e\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingRules.deleteSettingsShippingRule('sr_7f8091a2b3c4d5e6f708192a3b4c5d6e');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->shippingRules->deleteSettingsShippingRule(\n    'sr_7f8091a2b3c4d5e6f708192a3b4c5d6e',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.shippingRules().deleteSettingsShippingRule(\"sr_7f8091a2b3c4d5e6f708192a3b4c5d6e\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ShippingRules.DeleteSettingsShippingRuleAsync(\"sr_7f8091a2b3c4d5e6f708192a3b4c5d6e\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingRules.deleteSettingsShippingRule(\n  'sr_7f8091a2b3c4d5e6f708192a3b4c5d6e',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ShippingRules().DeleteSettingsShippingRule(context.Background(), \"sr_7f8091a2b3c4d5e6f708192a3b4c5d6e\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Shipping rules"
+        ],
+        "summary": "Update a shipping rule",
+        "operationId": "shipping_rules_update_settings_shipping_rule",
+        "description": "Send the changes under `shipping_rule`, such as a new `name` or `description`.",
+        "parameters": [
+          {
+            "name": "shipping_rule_id",
+            "in": "path",
+            "required": true,
+            "description": "The shipping rule's `id`, from the listing.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated shipping rule, under `shipping_rule`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingRuleResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/shipping_rules/sr_7f8091a2b3c4d5e6f708192a3b4c5d6e\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"shipping_rule\": {\n      \"name\": \"Standard shipping\",\n      \"description\": \"Flat rate within Australia\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.shipping_rules.update_settings_shipping_rule(\n    \"sr_7f8091a2b3c4d5e6f708192a3b4c5d6e\",\n    {\n        \"shipping_rule\": {\n            \"name\": \"Standard shipping\",\n            \"description\": \"Flat rate within Australia\",\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingRules.updateSettingsShippingRule('sr_7f8091a2b3c4d5e6f708192a3b4c5d6e', {\n    shipping_rule: {name: 'Standard shipping', description: 'Flat rate within Australia'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->shippingRules->updateSettingsShippingRule(\n    'sr_7f8091a2b3c4d5e6f708192a3b4c5d6e',\n    [\n        'shipping_rule' => [\n            'name' => 'Standard shipping',\n            'description' => 'Flat rate within Australia',\n        ],\n    ],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.shipping_rules.shipping_rules_dto.ShippingRulesDto.SettingsShippingRule;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsShippingRule> response = client.shippingRules().updateSettingsShippingRule(\n        \"sr_7f8091a2b3c4d5e6f708192a3b4c5d6e\",\n        Map.of(\n                \"shipping_rule\", Map.of(\n                        \"name\", \"Standard shipping\",\n                        \"description\", \"Flat rate within Australia\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ShippingRules.UpdateSettingsShippingRuleAsync(\n    \"sr_7f8091a2b3c4d5e6f708192a3b4c5d6e\",\n    new Dictionary<string, object?>\n    {\n        [\"shipping_rule\"] = new Dictionary<string, object?>\n        {\n            [\"name\"] = \"Standard shipping\",\n            [\"description\"] = \"Flat rate within Australia\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingRules.updateSettingsShippingRule(\n  'sr_7f8091a2b3c4d5e6f708192a3b4c5d6e',\n  {\n    'shipping_rule': {\n      'name': 'Standard shipping',\n      'description': 'Flat rate within Australia',\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ShippingRules().UpdateSettingsShippingRule(context.Background(), \"sr_7f8091a2b3c4d5e6f708192a3b4c5d6e\", map[string]any{\n\t\"shipping_rule\": map[string]any{\n\t\t\"name\":        \"Standard shipping\",\n\t\t\"description\": \"Flat rate within Australia\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "shipping_rule": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "shipping_rule"
+                ]
+              },
+              "example": {
+                "shipping_rule": {
+                  "name": "Standard shipping",
+                  "description": "Flat rate within Australia"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/shipping_rules/{shipping_rule_id}/configuration": {
+      "post": {
+        "tags": [
+          "Shipping rules"
+        ],
+        "summary": "Set a shipping rule's configuration",
+        "operationId": "shipping_rules_create_settings_shipping_rule_configuration",
+        "description": "Send the configuration under `configuration`: `zones` lists each zone by its dashed uuid in `zone`, and `rate` gives the rate's `name`, `method` such as `FLAT_RATE`, `handling_cost` and `shipping_cost`.",
+        "parameters": [
+          {
+            "name": "shipping_rule_id",
+            "in": "path",
+            "required": true,
+            "description": "The shipping rule's `id`, from the listing.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The shipping rule with its configuration, under `shipping_rule`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingRuleResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A zone is given by its `zn_` id or as bare hex: `zone not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/shipping_rules/sr_7f8091a2b3c4d5e6f708192a3b4c5d6e/configuration\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"configuration\": {\n      \"zones\": [\n        {\n          \"zone\": \"0a1b2c3d-4e5f-6071-8293-a4b5c6d7e8f9\"\n        }\n      ],\n      \"rate\": {\n        \"name\": \"Flat rate\",\n        \"method\": \"FLAT_RATE\",\n        \"handling_cost\": 1,\n        \"shipping_cost\": 5\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.shipping_rules.create_settings_shipping_rule_configuration(\n    \"sr_7f8091a2b3c4d5e6f708192a3b4c5d6e\",\n    {\n        \"configuration\": {\n            \"zones\": [{\"zone\": \"0a1b2c3d-4e5f-6071-8293-a4b5c6d7e8f9\"}],\n            \"rate\": {\n                \"name\": \"Flat rate\",\n                \"method\": \"FLAT_RATE\",\n                \"handling_cost\": 1,\n                \"shipping_cost\": 5,\n            },\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingRules.createSettingsShippingRuleConfiguration(\n    'sr_7f8091a2b3c4d5e6f708192a3b4c5d6e',\n    {\n        configuration: {\n            zones: [{zone: '0a1b2c3d-4e5f-6071-8293-a4b5c6d7e8f9'}],\n            rate: {name: 'Flat rate', method: 'FLAT_RATE', handling_cost: 1, shipping_cost: 5},\n        },\n    },\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->shippingRules->createSettingsShippingRuleConfiguration(\n    'sr_7f8091a2b3c4d5e6f708192a3b4c5d6e',\n    [\n        'configuration' => [\n            'zones' => [['zone' => '0a1b2c3d-4e5f-6071-8293-a4b5c6d7e8f9']],\n            'rate' => [\n                'name' => 'Flat rate',\n                'method' => 'FLAT_RATE',\n                'handling_cost' => 1,\n                'shipping_cost' => 5,\n            ],\n        ],\n    ],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.shipping_rules.shipping_rules_dto.ShippingRulesDto.SettingsShippingRule;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsShippingRule> response = client.shippingRules().createSettingsShippingRuleConfiguration(\n        \"sr_7f8091a2b3c4d5e6f708192a3b4c5d6e\",\n        Map.of(\n                \"configuration\", Map.of(\n                        \"zones\", List.of(Map.of(\"zone\", \"0a1b2c3d-4e5f-6071-8293-a4b5c6d7e8f9\")),\n                        \"rate\", Map.of(\n                                \"name\", \"Flat rate\",\n                                \"method\", \"FLAT_RATE\",\n                                \"handling_cost\", 1,\n                                \"shipping_cost\", 5))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ShippingRules.CreateSettingsShippingRuleConfigurationAsync(\n    \"sr_7f8091a2b3c4d5e6f708192a3b4c5d6e\",\n    new Dictionary<string, object?>\n    {\n        [\"configuration\"] = new Dictionary<string, object?>\n        {\n            [\"zones\"] = new List<object?>\n            {\n                new Dictionary<string, object?>\n                {\n                    [\"zone\"] = \"0a1b2c3d-4e5f-6071-8293-a4b5c6d7e8f9\",\n                },\n            },\n            [\"rate\"] = new Dictionary<string, object?>\n            {\n                [\"name\"] = \"Flat rate\",\n                [\"method\"] = \"FLAT_RATE\",\n                [\"handling_cost\"] = 1,\n                [\"shipping_cost\"] = 5,\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingRules\n    .createSettingsShippingRuleConfiguration(\n      'sr_7f8091a2b3c4d5e6f708192a3b4c5d6e',\n      {\n        'configuration': {\n          'zones': [\n            {'zone': '0a1b2c3d-4e5f-6071-8293-a4b5c6d7e8f9'},\n          ],\n          'rate': {\n            'name': 'Flat rate',\n            'method': 'FLAT_RATE',\n            'handling_cost': 1,\n            'shipping_cost': 5,\n          },\n        },\n      },\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ShippingRules().CreateSettingsShippingRuleConfiguration(context.Background(), \"sr_7f8091a2b3c4d5e6f708192a3b4c5d6e\", map[string]any{\n\t\"configuration\": map[string]any{\n\t\t\"zones\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"zone\": \"0a1b2c3d-4e5f-6071-8293-a4b5c6d7e8f9\",\n\t\t\t},\n\t\t},\n\t\t\"rate\": map[string]any{\n\t\t\t\"name\":          \"Flat rate\",\n\t\t\t\"method\":        \"FLAT_RATE\",\n\t\t\t\"handling_cost\": 1,\n\t\t\t\"shipping_cost\": 5,\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "configuration": {
+                    "type": "object",
+                    "properties": {
+                      "zones": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "zone": {
+                              "type": "string",
+                              "description": "The zone's dashed uuid, not its `zn_` id."
+                            }
+                          },
+                          "required": [
+                            "zone"
+                          ]
+                        }
+                      },
+                      "rate": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "method": {
+                            "type": "string",
+                            "description": "Such as `FLAT_RATE`."
+                          },
+                          "handling_cost": {
+                            "type": "number"
+                          },
+                          "shipping_cost": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "configuration"
+                ]
+              },
+              "example": {
+                "configuration": {
+                  "zones": [
+                    {
+                      "zone": "0a1b2c3d-4e5f-6071-8293-a4b5c6d7e8f9"
+                    }
+                  ],
+                  "rate": {
+                    "name": "Flat rate",
+                    "method": "FLAT_RATE",
+                    "handling_cost": 1,
+                    "shipping_cost": 5
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -46411,6 +47012,115 @@
         "properties": {
           "shipping_package": {
             "$ref": "#/components/schemas/ShippingPackage"
+          }
+        }
+      },
+      "ShippingRuleList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShippingRule"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/ShippingRulePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "ShippingRule": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/ShippingRuleConfiguration"
+          },
+          "created_by": {},
+          "created_on": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "shipping_class": {},
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "ShippingRuleConfiguration": {
+        "type": "object",
+        "properties": {
+          "rate": {
+            "description": "The rate the rule charges."
+          },
+          "zones": {
+            "type": "array",
+            "description": "The zones the rule applies to."
+          }
+        }
+      },
+      "ShippingRulePagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size the API applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "next": {
+                "type": "string"
+              },
+              "prev": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "ShippingRuleResponse": {
+        "type": "object",
+        "properties": {
+          "shipping_rule": {
+            "$ref": "#/components/schemas/ShippingRule"
           }
         }
       },
