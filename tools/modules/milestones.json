@@ -5,12 +5,12 @@
   "icon": "flag",
   "base": "/milestones",
   "overview_description": "Read milestones in Exsited: list them all, list them by account, labour or employee, or retrieve one.",
-  "intro": "Milestones mark progress points in Exsited work. You can list every milestone, list the milestones of one account, labour or employee, and retrieve one milestone. This area has 5 endpoints, and all seven SDKs call every one.",
+  "intro": "Milestones mark progress points in Exsited work. You can list every milestone, list the milestones of one account, labour or employee, and retrieve one milestone. This area has 5 endpoints, each available in all seven SDKs.",
   "warning": null,
   "notes": [
     "**The milestone calls only read.** This area has no create, update or delete call.",
     "**The employee route takes the employee's `code`.** Passing the `emp_` id returns `404`.",
-    "**A single milestone is read by its `wfm_` id or raw uuid.** A workflow's milestone definition is a different record and returns `404`.",
+    "**A single milestone is read by its `wfm_` id or its UUID.** A workflow's milestone definition is a different record and returns `404`.",
     "**The listings return `data` and `pagination`.** An account, labour or employee with no milestones returns an empty `data` list."
   ],
   "endpoints": [
@@ -119,7 +119,7 @@
           "name": "labour_id",
           "in": "path",
           "required": true,
-          "description": "The labour's `code`.",
+          "description": "The labour's `code`, such as `LAB-00003`. Despite the parameter name, this route takes the code.",
           "schema": {
             "type": "string",
             "example": "LAB-00003"
@@ -219,14 +219,15 @@
       "path": "/milestones/{milestone_uuid}",
       "slug": "retrieve-a-milestone",
       "title": "Retrieve a milestone",
-      "summary": "Retrieves one milestone by its `wfm_` id or raw uuid.",
+      "summary": "Retrieves one milestone by its `wfm_` id or its UUID.",
       "description": "Returns the milestone under `milestone`. A workflow's milestone definition is a different record and returns `404` here.",
+      "warning": "**This call has not been confirmed to work.** The fields of the `milestone` object are not documented yet.",
       "parameters": [
         {
           "name": "milestone_uuid",
           "in": "path",
           "required": true,
-          "description": "The milestone's `id`, which starts with `wfm_`, or its raw uuid.",
+          "description": "The milestone's `id`, which starts with `wfm_`, or its UUID.",
           "schema": {
             "type": "string",
             "example": "wfm_9f8e7d6c5b4a43219f8e7d6c5b4a3210"
