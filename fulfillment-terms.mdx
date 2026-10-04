@@ -1,0 +1,31 @@
+---
+title: "Fulfillment terms"
+sidebarTitle: "Overview"
+description: "List, read, create, update and delete fulfillment terms, each a named period and duration."
+---
+
+A fulfillment term is a named length of time, given as a `period` such as monthly and a `duration` counting those periods. These endpoints list, read, create, update and delete terms. This area has 5 endpoints, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List fulfillment terms](/api-reference/fulfillment-terms/list-fulfillment-terms) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/fulfillment_terms` | Returns a page of fulfillment terms. |
+| [Create a fulfillment term](/api-reference/fulfillment-terms/create-a-fulfillment-term) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/fulfillment_terms` | Creates a fulfillment term and returns it under `fulfillment_term`. |
+| [Retrieve a fulfillment term](/api-reference/fulfillment-terms/retrieve-a-fulfillment-term) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/fulfillment_terms/{fulfillment_term_id}` | Returns one fulfillment term by its `id`. |
+| [Delete a fulfillment term](/api-reference/fulfillment-terms/delete-a-fulfillment-term) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/fulfillment_terms/{fulfillment_term_id}` | Deletes a fulfillment term. A successful call returns `204` with no body. |
+| [Update a fulfillment term](/api-reference/fulfillment-terms/update-a-fulfillment-term) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/fulfillment_terms/{fulfillment_term_id}` | Changes a fulfillment term, or turns it on or off, and returns it. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **`period` is sent in upper case and returned in lower case.** Send `MONTHLY`; the term comes back with `monthly`.
+- **`duration` is an integer.** It counts the periods, so `period: MONTHLY` with `duration: 1` is one month.
+- **`status` takes `active` or `inactive`.** Send it on the update to turn a term on or off.
+- **Writes are wrapped in `fulfillment_term`, and one term comes back under `fulfillment_term`.**
+- **The listing pages by cursor.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor` until `has_more` is `false`.
