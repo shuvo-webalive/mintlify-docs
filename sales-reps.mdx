@@ -4,7 +4,11 @@ sidebarTitle: "Overview"
 description: "List, create, read, update and delete the sales reps set up in your Exsited organisation settings."
 ---
 
-Sales reps are the people you can name as the sales rep on an account or order. This area lists, creates, reads, updates and deletes them under settings. It has 5 endpoints, and all seven SDKs call every one.
+Sales reps are the people you can name as the sales rep on an account or order. This area lists, creates, reads, updates and deletes them under settings. It has 5 endpoints, and every SDK supports all of them.
+
+<Warning>
+  **Creating a sales rep currently fails.** `POST /settings/sales_reps` returns `400` `validation_error`, naming no field, even for a valid body, so you can update and delete only reps that already exist.
+</Warning>
 
 ## At a glance
 
@@ -13,8 +17,8 @@ Sales reps are the people you can name as the sales rep on an account or order. 
 | [List sales reps](/api-reference/sales-reps/list-sales-reps) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/settings/sales_reps` | Lists the sales reps set up in your organisation, one page at a time. |
 | [Create a sales rep](/api-reference/sales-reps/create-a-sales-rep) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/settings/sales_reps` | Creates a sales rep from a first name, last name and email address. |
 | [Retrieve a sales rep](/api-reference/sales-reps/retrieve-a-sales-rep) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/settings/sales_reps/{sales_rep_id}` | Returns one sales rep, under `sales_rep`. |
-| [Delete a sales rep](/api-reference/sales-reps/delete-a-sales-rep) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `/settings/sales_reps/{sales_rep_id}` | Deletes a sales rep and returns no content. |
 | [Update a sales rep](/api-reference/sales-reps/update-a-sales-rep) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `/settings/sales_reps/{sales_rep_id}` | Changes a sales rep's details, or enables or disables the rep. |
+| [Delete a sales rep](/api-reference/sales-reps/delete-a-sales-rep) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `/settings/sales_reps/{sales_rep_id}` | Deletes a sales rep and returns no content. |
 
 ## Before you call
 
@@ -24,8 +28,7 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 
 ## Things to know
 
-- **Creating a sales rep fails on the current instance.** `POST /settings/sales_reps` returns `400` with `validation_error` and no field named for every valid body tried, so the update and delete calls have no new rep to work on.
-- **Bodies sit under `sales_rep`.** A new rep takes `first_name`, `last_name` and `email_address`.
+- **Send the body under `sales_rep`.** A new rep takes `first_name`, `last_name` and `email_address`.
 - **`status` is `active` or `inactive`.** Send it in an update to enable or disable a rep.
 - **A sales rep id starts with `sr_`.** Shipping rules use the same `sr_` prefix, so check which kind of record an id names.
 - **The listing pages by cursor.** Send `limit`, then pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`.

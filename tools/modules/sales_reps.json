@@ -5,11 +5,10 @@
   "icon": "user-tie",
   "base": "/settings/sales_reps",
   "overview_description": "List, create, read, update and delete the sales reps set up in your Exsited organisation settings.",
-  "intro": "Sales reps are the people you can name as the sales rep on an account or order. This area lists, creates, reads, updates and deletes them under settings. It has 5 endpoints, and all seven SDKs call every one.",
-  "warning": null,
+  "intro": "Sales reps are the people you can name as the sales rep on an account or order. This area lists, creates, reads, updates and deletes them under settings. It has 5 endpoints, and every SDK supports all of them.",
+  "warning": "**Creating a sales rep currently fails.** `POST /settings/sales_reps` returns `400` `validation_error`, naming no field, even for a valid body, so you can update and delete only reps that already exist.",
   "notes": [
-    "**Creating a sales rep fails on the current instance.** `POST /settings/sales_reps` returns `400` with `validation_error` and no field named for every valid body tried, so the update and delete calls have no new rep to work on.",
-    "**Bodies sit under `sales_rep`.** A new rep takes `first_name`, `last_name` and `email_address`.",
+    "**Send the body under `sales_rep`.** A new rep takes `first_name`, `last_name` and `email_address`.",
     "**`status` is `active` or `inactive`.** Send it in an update to enable or disable a rep.",
     "**A sales rep id starts with `sr_`.** Shipping rules use the same `sr_` prefix, so check which kind of record an id names.",
     "**The listing pages by cursor.** Send `limit`, then pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`."
@@ -22,7 +21,7 @@
       "slug": "list-sales-reps",
       "title": "List sales reps",
       "summary": "Lists the sales reps set up in your organisation, one page at a time.",
-      "description": "The records are under `data`, and `pagination` holds the cursor for the next page. Other fields filter as `filter_<field>`.",
+      "description": "The records are under `data`, and `pagination` holds the cursor for the next page. To filter, add `filter_<field>=<value>`.",
       "parameters": [
         {
           "name": "limit",
@@ -77,7 +76,7 @@
       "slug": "create-a-sales-rep",
       "title": "Create a sales rep",
       "summary": "Creates a sales rep from a first name, last name and email address.",
-      "description": "Send the new rep under `sales_rep`. On the current instance this call returns `400` with `validation_error` and no field named, for every valid body tried.",
+      "description": "Send the new rep under `sales_rep`, with `first_name`, `last_name` and `email_address`.",
       "parameters": [],
       "body": {
         "schema": {
@@ -116,7 +115,7 @@
           "description": "The sales rep is created."
         },
         "400": {
-          "description": "`validation_error` with no field named, returned for every valid body tried."
+          "description": "`validation_error`, naming no field, returned even for a valid body."
         }
       },
       "example_call": {
@@ -127,7 +126,8 @@
             "email_address": "jane@example.com"
           }
         }
-      }
+      },
+      "warning": "**This call currently returns `400`.** The error is `validation_error`, naming no field, even for a valid body."
     },
     {
       "key": "get_settings_sales_rep",
@@ -157,39 +157,6 @@
           "schema": {
             "$ref": "#/components/schemas/SalesRepResponse"
           }
-        }
-      },
-      "example_call": {
-        "path": {
-          "sales_rep_id": "sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c"
-        }
-      }
-    },
-    {
-      "key": "delete_settings_sales_rep",
-      "method": "DELETE",
-      "path": "/settings/sales_reps/{sales_rep_id}",
-      "slug": "delete-a-sales-rep",
-      "title": "Delete a sales rep",
-      "summary": "Deletes a sales rep and returns no content.",
-      "description": "Pass the rep's `id`. A successful delete returns `204` with an empty body.",
-      "parameters": [
-        {
-          "name": "sales_rep_id",
-          "in": "path",
-          "required": true,
-          "description": "The sales rep's `id`, which starts with `sr_`.",
-          "schema": {
-            "type": "string",
-            "example": "sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c"
-          }
-        }
-      ],
-      "body": null,
-      "multipart": false,
-      "responses": {
-        "204": {
-          "description": "The sales rep is deleted. The body is empty."
         }
       },
       "example_call": {
@@ -265,6 +232,39 @@
           "sales_rep": {
             "last_name": "Citizen-Smith"
           }
+        }
+      }
+    },
+    {
+      "key": "delete_settings_sales_rep",
+      "method": "DELETE",
+      "path": "/settings/sales_reps/{sales_rep_id}",
+      "slug": "delete-a-sales-rep",
+      "title": "Delete a sales rep",
+      "summary": "Deletes a sales rep and returns no content.",
+      "description": "Pass the rep's `id`. A successful delete returns `204` with an empty body.",
+      "parameters": [
+        {
+          "name": "sales_rep_id",
+          "in": "path",
+          "required": true,
+          "description": "The sales rep's `id`, which starts with `sr_`.",
+          "schema": {
+            "type": "string",
+            "example": "sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The sales rep is deleted. The body is empty."
+        }
+      },
+      "example_call": {
+        "path": {
+          "sales_rep_id": "sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c"
         }
       }
     }
