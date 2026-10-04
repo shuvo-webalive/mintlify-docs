@@ -1,29 +1,29 @@
 {
   "family": "settings",
-  "tag": "Settings",
-  "slug": "settings",
+  "tag": "Instance settings",
+  "slug": "instance-settings",
   "icon": "gear",
   "base": "/settings",
   "overview_description": "Read and change instance settings: currencies, taxes, warehouses, payment terms, field settings, general settings and more.",
-  "intro": "Settings hold the configuration of an Exsited instance: currencies, taxes, time zones, warehouses, item groups, variations, discount, shipping and payment set up, custom objects, field settings and the general settings groups. You can read every area and create, change or delete most of its records. This area has 86 endpoints, and all seven SDKs call every one.",
+  "intro": "Settings hold the configuration of an Exsited instance: currencies, taxes, time zones, warehouses, item groups, variations, discount, shipping and payment setup, custom objects, field settings and the general settings groups. You can read every area and create, change or delete most of its records. This area has 86 endpoints, and all seven SDKs call every one.",
   "warning": "**Updating the `general` group of general settings sets eight other instance settings, such as `accountingPeriod` and `fiscalYear`, to null, and no API call can set them back.**",
   "notes": [
-    "**Records travel under a wrapper key.** A currency is under `currency`, a warehouse under `warehouse`, general settings under `general_settings`, and writes use the same key.",
-    "**General settings are read and written one group at a time.** `group` is one of `account`, `item`, `date_and_time`, `order`, `purchase`, `labour`, `transaction`, `security`, `dashboard`, `portal`, `display` or `general`; the `item` and `order` groups also carry `product`.",
-    "**Some flags are stored as `\"1\"` and `\"0\"`.** The dashboard and security groups store flags that way, and a `\"true\"` sent to the security group is stored as false.",
+    "**Each record sits under its own key.** A currency is under `currency`, a warehouse under `warehouse` and general settings under `general_settings`, and writes use the same key.",
+    "**General settings are read and written one group at a time.** `group` is one of `account`, `item`, `date_and_time`, `order`, `purchase`, `labour`, `transaction`, `security`, `dashboard`, `portal`, `display` or `general`; the `item` and `order` groups also carry `product`. The dashboard and security groups store flags as `\"1\"` and `\"0\"`.",
     "**Currencies and taxes cannot be deleted.** There is no delete call for either, so a currency or tax you create stays on the instance.",
     "**Some writes return a different shape from the read.** A payment term create returns a flat `period` and `duration`, and a payment processor write returns `gateway_name` and `credentials` where a read has `provider`.",
-    "**Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true."
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.",
+    "**Custom objects have two paths.** `/custom_objects` and `/settings/custom_objects` serve the same records; the settings listing shows enabled ones only."
   ],
   "endpoints": [
     {
       "key": "get_custom_objects",
       "method": "GET",
       "path": "/custom_objects",
-      "slug": "list-custom-object-schemas",
-      "title": "List custom object schemas",
-      "summary": "Returns a page of custom object schemas under `data`, with paging details under `pagination`.",
-      "description": "Lists the custom object schemas on the instance. Each schema says where it is used (`use_in`) and its `relation`. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results.",
+      "slug": "list-custom-objects",
+      "title": "List custom objects",
+      "summary": "Returns a page of custom objects under `data`, with paging details under `pagination`.",
+      "description": "Lists the custom objects on the instance. Each custom object says where it is used (`use_in`) and its `relation`. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results.",
       "parameters": [
         {
           "name": "limit",
@@ -59,7 +59,7 @@
       "multipart": false,
       "responses": {
         "200": {
-          "description": "A page of custom object schemas, under `data`.",
+          "description": "A page of custom objects, under `data`.",
           "schema": {
             "$ref": "#/components/schemas/SettingsCustomObjectSchemaList"
           }
@@ -99,10 +99,10 @@
       "key": "get_custom_object",
       "method": "GET",
       "path": "/custom_objects/{custom_object_id}",
-      "slug": "retrieve-a-custom-object-schema",
-      "title": "Retrieve a custom object schema",
-      "summary": "Returns one custom object schema by its `id`, under `custom_object`.",
-      "description": "Reads the custom object schema with this `id`. The `id` is the one a listing or a create returns. A definition created through `/settings/custom_objects` can be read here with its `id` as well.",
+      "slug": "retrieve-a-custom-object",
+      "title": "Retrieve a custom object",
+      "summary": "Returns one custom object by its `id`, under `custom_object`.",
+      "description": "Reads the custom object with this `id`. A custom object created through `/settings/custom_objects` can be read here with its `id` as well.",
       "parameters": [
         {
           "name": "custom_object_id",
@@ -119,13 +119,13 @@
       "multipart": false,
       "responses": {
         "200": {
-          "description": "The custom object schema, under `custom_object`.",
+          "description": "The custom object, under `custom_object`.",
           "schema": {
             "$ref": "#/components/schemas/SettingsCustomObjectsResponse"
           }
         },
         "404": {
-          "description": "No custom object schema has that `id`."
+          "description": "No custom object has that `id`."
         }
       },
       "example_call": {
@@ -250,10 +250,10 @@
       "key": "create_settings_custom_object",
       "method": "POST",
       "path": "/settings/custom_objects",
-      "slug": "create-a-custom-object-definition",
-      "title": "Create a custom object definition",
-      "summary": "Creates a custom object definition and returns it under `custom_object`.",
-      "description": "Send the new definition under `custom_object`, with a `name` written as an identifier such as `service_contract`, and where it is used (`use_in`) and its `relation`. The new `id` can also be read with Retrieve a custom object schema.",
+      "slug": "create-a-custom-object-in-settings",
+      "title": "Create a custom object in settings",
+      "summary": "Creates a custom object and returns it under `custom_object`.",
+      "description": "Send the new custom object under `custom_object`, with a `name` written as an identifier such as `service_contract`, and where it is used (`use_in`) and its `relation`. Read the new custom object with [Retrieve a custom object](/api-reference/instance-settings/retrieve-a-custom-object).",
       "parameters": [],
       "body": {
         "schema": {
@@ -264,7 +264,7 @@
               "properties": {
                 "name": {
                   "type": "string",
-                  "description": "The schema's name, an identifier such as `service_contract`."
+                  "description": "The custom object's name, an identifier such as `service_contract`."
                 },
                 "use_in": {
                   "type": "string",
@@ -292,7 +292,7 @@
       "multipart": false,
       "responses": {
         "201": {
-          "description": "The new custom object definition, under `custom_object`.",
+          "description": "The new custom object, under `custom_object`.",
           "schema": {
             "$ref": "#/components/schemas/SettingsCustomObjectsResponse"
           }
@@ -1000,7 +1000,7 @@
       "slug": "retrieve-a-currency",
       "title": "Retrieve a currency",
       "summary": "Returns one currency by its `id`, under `currency`.",
-      "description": "Reads the currency with this `id`, the record the listing returns. The `id` is the one the listing returns.",
+      "description": "Reads the currency with this `id`, as the listing returns it.",
       "parameters": [
         {
           "name": "currency_id",
@@ -1036,7 +1036,7 @@
       "slug": "retrieve-a-custom-logic-script",
       "title": "Retrieve a custom logic script",
       "summary": "Returns one custom logic script by its `id`, under `custom_logic_script`.",
-      "description": "Reads the custom logic script with this `id`. The `id` is the one a listing or a create returns.",
+      "description": "Reads the custom logic script with this `id`.",
       "parameters": [
         {
           "name": "custom_logic_script_id",
@@ -1072,10 +1072,10 @@
       "key": "delete_settings_custom_object",
       "method": "DELETE",
       "path": "/settings/custom_objects/{custom_object_id}",
-      "slug": "delete-a-custom-object-definition",
-      "title": "Delete a custom object definition",
-      "summary": "Deletes a custom object definition. The response has no body.",
-      "description": "Deletes the custom object definition with this `id`. Reading the same `id` with Retrieve a custom object schema afterwards returns `404`.",
+      "slug": "delete-a-custom-object-in-settings",
+      "title": "Delete a custom object in settings",
+      "summary": "Deletes a custom object. The response has no body.",
+      "description": "Deletes the custom object with this `id`. Reading the same `id` with [Retrieve a custom object](/api-reference/instance-settings/retrieve-a-custom-object) afterwards returns `404`.",
       "parameters": [
         {
           "name": "custom_object_id",
@@ -1092,7 +1092,7 @@
       "multipart": false,
       "responses": {
         "204": {
-          "description": "The definition is deleted. The response has no body."
+          "description": "The custom object is deleted. The response has no body."
         }
       },
       "example_call": {
@@ -1105,9 +1105,9 @@
       "key": "update_settings_custom_object",
       "method": "PATCH",
       "path": "/settings/custom_objects/{custom_object_id}",
-      "slug": "update-a-custom-object-definition",
-      "title": "Update a custom object definition",
-      "summary": "Changes the fields you send on a custom object definition and returns it under `custom_object`.",
+      "slug": "update-a-custom-object-in-settings",
+      "title": "Update a custom object in settings",
+      "summary": "Changes the fields you send on a custom object and returns it under `custom_object`.",
       "description": "Send the fields to change under `custom_object`, such as `display_name` and `description`.",
       "parameters": [
         {
@@ -1151,7 +1151,7 @@
       "multipart": false,
       "responses": {
         "200": {
-          "description": "The updated definition, under `custom_object`.",
+          "description": "The updated custom object, under `custom_object`.",
           "schema": {
             "$ref": "#/components/schemas/SettingsCustomObjectsResponse"
           }
@@ -1532,6 +1532,9 @@
       "responses": {
         "200": {
           "description": "The item group is deleted."
+        },
+        "204": {
+          "description": "The item group is deleted. The response has no body."
         }
       },
       "example_call": {
@@ -1547,7 +1550,7 @@
       "slug": "retrieve-an-item-group",
       "title": "Retrieve an item group",
       "summary": "Returns one item group by its `id`, under `item_group`.",
-      "description": "Reads the item group with this `id`. The `id` is the one a listing or a create returns. The record includes its `accounting_code` and `billing_preferences`.",
+      "description": "Reads the item group with this `id`. The record includes its `accounting_code` and `billing_preferences`.",
       "parameters": [
         {
           "name": "item_group_id",
@@ -1622,7 +1625,7 @@
         "example": {
           "item_group": {
             "display_name": "Hardware",
-            "description": "Hardware for Acme Pty Ltd"
+            "description": "Tools and fittings"
           }
         }
       },
@@ -1642,7 +1645,7 @@
         "body": {
           "item_group": {
             "display_name": "Hardware",
-            "description": "Hardware for Acme Pty Ltd"
+            "description": "Tools and fittings"
           }
         }
       }
@@ -1654,7 +1657,7 @@
       "slug": "retrieve-a-time-zone",
       "title": "Retrieve a time zone",
       "summary": "Returns one time zone by its `id`, under `time_zone`.",
-      "description": "Reads the time zone with this `id`, the record the listing returns. The `id` is the one the listing returns.",
+      "description": "Reads the time zone with this `id`, as the listing returns it.",
       "parameters": [
         {
           "name": "time_zone_id",
@@ -1690,7 +1693,7 @@
       "slug": "retrieve-a-variation",
       "title": "Retrieve a variation",
       "summary": "Returns one variation by its `id`, under `variation`.",
-      "description": "Reads the variation with this `id`. The `id` is the one a listing or a create returns. The record includes its `options`.",
+      "description": "Reads the variation with this `id`. The record includes its `options`.",
       "parameters": [
         {
           "name": "variation_id",
@@ -1765,7 +1768,7 @@
         "example": {
           "variation": {
             "display_name": "Size",
-            "description": "Size for Acme Pty Ltd"
+            "description": "Clothing sizes"
           }
         }
       },
@@ -1785,7 +1788,7 @@
         "body": {
           "variation": {
             "display_name": "Size",
-            "description": "Size for Acme Pty Ltd"
+            "description": "Clothing sizes"
           }
         }
       }
@@ -1794,8 +1797,8 @@
       "key": "create_settings_custom_object_customize",
       "method": "POST",
       "path": "/settings/custom_objects/{custom_object_id}/customize",
-      "slug": "customize-a-custom-objects-attributes",
-      "title": "Customize a custom object's attributes",
+      "slug": "customise-a-custom-objects-attributes",
+      "title": "Customise a custom object's attributes",
       "summary": "Sets which custom attributes a custom object holds, and in what order.",
       "description": "Send the attributes under `custom_object.attributes`, each with the custom attribute's `name` and its `order`. The response lists the configured attributes under `custom_object.configuration.attributes`.",
       "parameters": [
@@ -1943,6 +1946,9 @@
           "schema": {
             "$ref": "#/components/schemas/SettingsItemGroupsResponse"
           }
+        },
+        "201": {
+          "description": "The item group, under `item_group`."
         }
       },
       "example_call": {
@@ -1962,10 +1968,10 @@
       "key": "get_settings_custom_objects",
       "method": "GET",
       "path": "/settings/custom_objects",
-      "slug": "list-custom-object-definitions",
-      "title": "List custom object definitions",
-      "summary": "Returns a page of custom object definitions under `data`, with paging details under `pagination`.",
-      "description": "Lists the custom object definitions on the instance. Only enabled definitions are listed. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results.",
+      "slug": "list-enabled-custom-objects",
+      "title": "List enabled custom objects",
+      "summary": "Returns a page of custom objects under `data`, with paging details under `pagination`.",
+      "description": "Lists the custom objects on the instance. Only enabled custom objects are listed. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results.",
       "parameters": [
         {
           "name": "limit",
@@ -2001,7 +2007,7 @@
       "multipart": false,
       "responses": {
         "200": {
-          "description": "A page of custom object definitions, under `data`.",
+          "description": "A page of custom objects, under `data`.",
           "schema": {
             "$ref": "#/components/schemas/SettingsCustomObjectDefinitionList"
           }
@@ -2018,10 +2024,10 @@
       "key": "get_settings_custom_object",
       "method": "GET",
       "path": "/settings/custom_objects/{custom_object_id}",
-      "slug": "retrieve-a-custom-object-definition",
-      "title": "Retrieve a custom object definition",
-      "summary": "Returns one custom object definition by its `id`, under `custom_object`.",
-      "description": "Reads the custom object definition with this `id`, the record the listing returns. The `id` is the one the listing returns.",
+      "slug": "retrieve-a-custom-object-from-settings",
+      "title": "Retrieve a custom object from settings",
+      "summary": "Returns one custom object by its `id`, under `custom_object`.",
+      "description": "Reads the custom object with this `id`, as the listing returns it.",
       "parameters": [
         {
           "name": "custom_object_id",
@@ -2038,7 +2044,7 @@
       "multipart": false,
       "responses": {
         "200": {
-          "description": "The custom object definition, under `custom_object`.",
+          "description": "The custom object, under `custom_object`.",
           "schema": {
             "$ref": "#/components/schemas/SettingsCustomObjectDefinitionReadResponse"
           }
@@ -2054,10 +2060,10 @@
       "key": "create_custom_object",
       "method": "POST",
       "path": "/custom_objects",
-      "slug": "create-a-custom-object-schema",
-      "title": "Create a custom object schema",
-      "summary": "Creates a custom object schema and returns it under `custom_object`.",
-      "description": "Send the new schema under `custom_object`. `name` is required and must not be in use; write it as an identifier such as `service_contract`. Set where it is used with `use_in` and its `relation`.",
+      "slug": "create-a-custom-object",
+      "title": "Create a custom object",
+      "summary": "Creates a custom object and returns it under `custom_object`.",
+      "description": "Send the new custom object under `custom_object`. `name` is required and must not be in use; write it as an identifier such as `service_contract`. Set where it is used with `use_in` and its `relation`.",
       "parameters": [],
       "body": {
         "schema": {
@@ -2068,7 +2074,7 @@
               "properties": {
                 "name": {
                   "type": "string",
-                  "description": "The schema's name, an identifier such as `service_contract`. It must not be in use."
+                  "description": "The custom object's name, an identifier such as `service_contract`. It must not be in use."
                 },
                 "use_in": {
                   "type": "string",
@@ -2099,7 +2105,7 @@
       "multipart": false,
       "responses": {
         "201": {
-          "description": "The new custom object schema, under `custom_object`.",
+          "description": "The new custom object, under `custom_object`.",
           "schema": {
             "$ref": "#/components/schemas/SettingsCustomObjectsResponse"
           }
@@ -2120,9 +2126,9 @@
       "key": "update_custom_object",
       "method": "PATCH",
       "path": "/custom_objects/{custom_object_id}",
-      "slug": "update-a-custom-object-schema",
-      "title": "Update a custom object schema",
-      "summary": "Changes the fields you send on a custom object schema and returns it under `custom_object`.",
+      "slug": "update-a-custom-object",
+      "title": "Update a custom object",
+      "summary": "Changes the fields you send on a custom object and returns it under `custom_object`.",
       "description": "Send the fields to change under `custom_object`, such as `description`. `use_in`, `relation` and `custom_component` cannot be changed and are refused.",
       "parameters": [
         {
@@ -2162,7 +2168,7 @@
       "multipart": false,
       "responses": {
         "200": {
-          "description": "The updated custom object schema, under `custom_object`.",
+          "description": "The updated custom object, under `custom_object`.",
           "schema": {
             "$ref": "#/components/schemas/SettingsCustomObjectsResponse"
           }
@@ -2183,10 +2189,10 @@
       "key": "delete_custom_object",
       "method": "DELETE",
       "path": "/custom_objects/{custom_object_id}",
-      "slug": "delete-a-custom-object-schema",
-      "title": "Delete a custom object schema",
-      "summary": "Deletes a custom object schema. The response has no body.",
-      "description": "Deletes the custom object schema with this `id`. Reading the same `id` afterwards returns `404`.",
+      "slug": "delete-a-custom-object",
+      "title": "Delete a custom object",
+      "summary": "Deletes a custom object. The response has no body.",
+      "description": "Deletes the custom object with this `id`. Reading the same `id` afterwards returns `404`.",
       "parameters": [
         {
           "name": "custom_object_id",
@@ -2203,7 +2209,7 @@
       "multipart": false,
       "responses": {
         "204": {
-          "description": "The custom object schema is deleted. The response has no body."
+          "description": "The custom object is deleted. The response has no body."
         }
       },
       "example_call": {
@@ -2234,7 +2240,7 @@
                 },
                 "country": {
                   "type": "string",
-                  "description": "The country the currency belongs to."
+                  "description": "The country the currency belongs to. Its format is not documented yet; the example sends a country `id`."
                 }
               },
               "required": [
@@ -2325,7 +2331,7 @@
       "multipart": false,
       "responses": {
         "200": {
-          "description": "The currency is updated, under `currency`."
+          "description": "The updated currency, under `currency`."
         }
       },
       "example_call": {
@@ -2346,7 +2352,7 @@
       "slug": "create-a-custom-logic-script",
       "title": "Create a custom logic script",
       "summary": "Creates a custom logic script and returns it under `custom_logic_script`.",
-      "description": "Send the new script under `custom_logic_script`. `name`, `type` and `code` are required. The `code` is checked but not stored, and the response includes it.",
+      "description": "Send the new script under `custom_logic_script`. `name`, `type` and `code` are required. The `code` is validated and returned in the response, but it is not stored, so a later read does not return it.",
       "parameters": [],
       "body": {
         "schema": {
@@ -2482,8 +2488,8 @@
       "path": "/settings/custom_logic_scripts/{custom_logic_script_id}",
       "slug": "delete-a-custom-logic-script",
       "title": "Delete a custom logic script",
-      "summary": "Soft deletes a custom logic script. The response has no body.",
-      "description": "Soft deletes the custom logic script with this `id`. Reading the same `id` afterwards returns `404`.",
+      "summary": "Deletes a custom logic script. The response has no body.",
+      "description": "Deletes the custom logic script with this `id`. Reading the same `id` afterwards returns `404`.",
       "parameters": [
         {
           "name": "custom_logic_script_id",
@@ -2606,7 +2612,7 @@
       "slug": "retrieve-a-discount-profile",
       "title": "Retrieve a discount profile",
       "summary": "Returns one discount profile by its `id`, under `discount_profile`.",
-      "description": "Reads the discount profile with this `id`. The `id` is the one a listing or a create returns.",
+      "description": "Reads the discount profile with this `id`.",
       "parameters": [
         {
           "name": "discount_profile_id",
@@ -2797,7 +2803,7 @@
       "slug": "retrieve-a-field-setting",
       "title": "Retrieve a field setting",
       "summary": "Returns one field setting by its `id`, under `field_setting`.",
-      "description": "Reads the field setting with this `id`, the record the listing returns. The `id` is the one the listing returns.",
+      "description": "Reads the field setting with this `id`, as the listing returns it.",
       "parameters": [
         {
           "name": "field_setting_id",
@@ -2868,8 +2874,9 @@
       "path": "/settings/general_settings/{group}/{general_setting_id}",
       "slug": "retrieve-a-general-setting",
       "title": "Retrieve a general setting",
-      "summary": "Returns one general setting row by its `gs_` `id` within a group.",
-      "description": "Reads one general setting row by its `gs_` `id`. No response carries a `gs_` id, so there is no known way to obtain one. An `id` the group does not hold returns `404`, and an unknown group returns `400`.",
+      "summary": "Returns one general setting by its `gs_` id within a group.",
+      "description": "Reads one general setting by its `gs_` id. The other settings responses do not include `gs_` ids. An `id` the group does not hold returns `404`, and an unknown group returns `400`.",
+      "warning": "**A successful read has not been confirmed.** No other settings response includes a `gs_` id, so there is no documented way to get one.",
       "parameters": [
         {
           "name": "group",
@@ -2885,7 +2892,7 @@
           "name": "general_setting_id",
           "in": "path",
           "required": true,
-          "description": "A general setting's `gs_` `id`. No response carries one.",
+          "description": "A general setting's `gs_` id.",
           "schema": {
             "type": "string",
             "example": "gs_e566e646079916ffd2e1b69de9b40b84"
@@ -2919,7 +2926,7 @@
       "slug": "update-dashboard-general-settings",
       "title": "Update dashboard general settings",
       "summary": "Changes settings in the `dashboard` group of general settings and returns the group under `general_settings`.",
-      "description": "Send the settings to change under `general_settings.dashboard`. Flags are stored as `\"1\"` or `\"0\"` and read back as stored, so a `\"true\"` cannot be written back.",
+      "description": "Send the settings to change under `general_settings.dashboard`. Send flags as `\"1\"` or `\"0\"`. They are read back exactly as stored, so a flag that currently reads `\"true\"` cannot be set back to `\"true\"`.",
       "parameters": [],
       "body": {
         "schema": {
@@ -2996,7 +3003,7 @@
       "slug": "update-date-and-time-general-settings",
       "title": "Update date and time general settings",
       "summary": "Changes settings in the `date_and_time` group of general settings and returns the group under `general_settings`.",
-      "description": "Send the settings to change under `general_settings.date_and_time`. The group holds `date_format`, `time_format`, `time_zone` and `first_day_of_week`. Saving this group also sends the organisation to the catalogue processor, an external call.",
+      "description": "Send the settings to change under `general_settings.date_and_time`. The group holds `date_format`, `time_format`, `time_zone` and `first_day_of_week`. Saving this group also updates your organisation's details in an external service.",
       "parameters": [],
       "body": {
         "schema": {
@@ -3064,7 +3071,7 @@
       "slug": "update-display-general-settings",
       "title": "Update display general settings",
       "summary": "Changes settings in the `display` group of general settings and returns the group under `general_settings`.",
-      "description": "Send the settings to change under `general_settings.display`. Send column lists as arrays: lists sent as the strings a read returns are ignored, and an array write resets their order.",
+      "description": "Send the settings to change under `general_settings.display`. The fields of this group are not documented yet. Send column lists as arrays; lists sent as strings are ignored, and an array write resets their order.",
       "parameters": [],
       "body": {
         "schema": {
@@ -3119,6 +3126,7 @@
       "title": "Update the general group of general settings",
       "summary": "Changes settings in the `general` group. It also resets eight other instance settings that no call can set back.",
       "description": "Send the settings to change under `general_settings.general`. Saving this group also sets `accountingPeriod`, `fiscalYear`, `autoSaveBudget`, `customComponentActivity`, `enableRequireAction`, `strictBankAccountMatching`, `enableGrandOdata` and `addressRestrictedMode` to null, and no API call writes them back. Do not send this call unless you can reset those settings in the Exsited web app.",
+      "warning": "**This call cannot be undone through the API.** Saving the `general` group sets eight other instance settings to null. Reset them in the Exsited web app afterwards.",
       "parameters": [],
       "body": {
         "schema": {
@@ -3239,7 +3247,7 @@
       "slug": "update-order-general-settings",
       "title": "Update order general settings",
       "summary": "Changes settings in the `order` group of general settings and returns the group under `general_settings`.",
-      "description": "Send the settings to change under `general_settings.order`. The save reads both `general_settings.order` and `general_settings.product`.",
+      "description": "Send the settings to change under `general_settings.order`. Product settings can go under `general_settings.product` in the same call.",
       "parameters": [],
       "body": {
         "schema": {
@@ -3264,6 +3272,10 @@
                       "type": "string"
                     }
                   }
+                },
+                "product": {
+                  "type": "object",
+                  "description": "Optional product settings, saved in the same call."
                 }
               },
               "required": [
@@ -3310,7 +3322,7 @@
       "slug": "update-portal-general-settings",
       "title": "Update portal general settings",
       "summary": "Changes settings in the `portal` group of general settings and returns the group under `general_settings`.",
-      "description": "Send the settings to change under `general_settings.portal`. While `enableCustomerPortal` is off, any write to this group also turns every portal login off.",
+      "description": "Send the settings to change under `general_settings.portal`. While `enableCustomerPortal` is off, any write to this group also turns every portal login off. This changes the setting for every user of the instance.",
       "parameters": [],
       "body": {
         "schema": {
@@ -3449,7 +3461,7 @@
       "slug": "update-security-general-settings",
       "title": "Update security general settings",
       "summary": "Changes settings in the `security` group of general settings and returns the group under `general_settings`.",
-      "description": "Send the settings to change under `general_settings.security`. Send flags as `\"1\"` or `\"0\"`: the `\"true\"` a read returns is stored as false.",
+      "description": "Send the settings to change under `general_settings.security`. Send flags as `\"1\"` or `\"0\"`: the `\"true\"` a read returns is stored as false. This changes the setting for every user of the instance.",
       "parameters": [],
       "body": {
         "schema": {
@@ -3517,7 +3529,7 @@
       "slug": "update-transaction-general-settings",
       "title": "Update transaction general settings",
       "summary": "Changes settings in the `transaction` group of general settings and returns the group under `general_settings`.",
-      "description": "Send the settings to change under `general_settings.transaction`. Saving this group rebuilds every invoice default.",
+      "description": "Send the settings to change under `general_settings.transaction`. Saving this group also recalculates the invoice defaults for the whole instance.",
       "parameters": [],
       "body": {
         "schema": {
@@ -3679,7 +3691,7 @@
       "slug": "retrieve-a-payment-processor",
       "title": "Retrieve a payment processor",
       "summary": "Returns one payment processor by its `id`, under `payment_processor`.",
-      "description": "Reads the payment processor with this `id`. The `id` is the one a listing or a create returns.",
+      "description": "Reads the payment processor with this `id`.",
       "parameters": [
         {
           "name": "payment_processor_id",
@@ -3902,7 +3914,7 @@
       "slug": "retrieve-a-payment-term",
       "title": "Retrieve a payment term",
       "summary": "Returns one payment term by its `id`, under `payment_term`.",
-      "description": "Reads the payment term with this `id`. The `id` is the one a listing or a create returns. A read nests the period and count under `duration`.",
+      "description": "Reads the payment term with this `id`. A read nests the period and count under `duration`.",
       "parameters": [
         {
           "name": "payment_term_id",
@@ -4091,7 +4103,7 @@
       "slug": "retrieve-a-pricing-level",
       "title": "Retrieve a pricing level",
       "summary": "Returns one pricing level by its `id`, under `pricing_level`.",
-      "description": "Reads the pricing level with this `id`. The `id` is the one a listing or a create returns.",
+      "description": "Reads the pricing level with this `id`.",
       "parameters": [
         {
           "name": "pricing_level_id",
@@ -4293,7 +4305,7 @@
       "slug": "retrieve-a-shipping-profile",
       "title": "Retrieve a shipping profile",
       "summary": "Returns one shipping profile by its `id`, under `shipping_profile`.",
-      "description": "Reads the shipping profile with this `id`. The `id` is the one a listing or a create returns.",
+      "description": "Reads the shipping profile with this `id`.",
       "parameters": [
         {
           "name": "shipping_profile_id",
@@ -4331,8 +4343,9 @@
       "path": "/settings/shipping_profiles/{shipping_profile_id}",
       "slug": "update-a-shipping-profile",
       "title": "Update a shipping profile",
-      "summary": "Changes the fields you send on a shipping profile. Every body tested returns `500`.",
-      "description": "Send the fields to change under `shipping_profile`, such as `description`. Every body tested returns `500`, so this call has no known working body.",
+      "summary": "Changes the fields you send on a shipping profile.",
+      "description": "Send the fields to change under `shipping_profile`, such as `description`. At present this call returns `500` for every request, so the change is not applied.",
+      "warning": "**This call currently returns `500`.** The shipping profile is not changed.",
       "parameters": [
         {
           "name": "shipping_profile_id",
@@ -4374,7 +4387,7 @@
           "description": "The shipping profile is updated."
         },
         "500": {
-          "description": "Returned for every body tested."
+          "description": "Currently returned for every request."
         }
       },
       "example_call": {
@@ -4495,7 +4508,7 @@
       "slug": "retrieve-a-warehouse",
       "title": "Retrieve a warehouse",
       "summary": "Returns one warehouse by its `id`, under `warehouse`.",
-      "description": "Reads the warehouse with this `id`. The `id` is the one a listing or a create returns.",
+      "description": "Reads the warehouse with this `id`.",
       "parameters": [
         {
           "name": "warehouse_id",
@@ -4645,7 +4658,7 @@
                 },
                 "country": {
                   "type": "string",
-                  "description": "The country the tax applies in."
+                  "description": "The country the tax applies in. Its format is not documented yet; the example sends a country `id`."
                 }
               },
               "required": [
@@ -4688,7 +4701,7 @@
       "slug": "retrieve-a-tax",
       "title": "Retrieve a tax",
       "summary": "Returns one tax by its `id`, under `tax`.",
-      "description": "Reads the tax with this `id`, the record the listing returns. The record includes its `country` and any rates by state under `country_tax_by_states`.",
+      "description": "Reads the tax with this `id`, as the listing returns it. The record includes its `country` and any rates by state under `country_tax_by_states`.",
       "parameters": [
         {
           "name": "tax_id",
@@ -4763,7 +4776,7 @@
       "multipart": false,
       "responses": {
         "200": {
-          "description": "The tax is updated, under `tax`."
+          "description": "The updated tax, under `tax`."
         }
       },
       "example_call": {
@@ -4836,13 +4849,13 @@
       "type": "object",
       "properties": {
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
         },
         "custom_component": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "description": {
           "type": "string"
@@ -4857,7 +4870,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -4950,13 +4963,13 @@
           "type": "string"
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
         },
         "custom_component": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "description": {
           "type": "string"
@@ -4971,7 +4984,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -5043,7 +5056,7 @@
           "$ref": "#/components/schemas/SettingsCurrencyCountry"
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -5058,7 +5071,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -5141,7 +5154,7 @@
           "$ref": "#/components/schemas/SettingsDiscountProfileAccountingCode"
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -5171,7 +5184,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -5284,7 +5297,7 @@
           "type": "string"
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -5302,7 +5315,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -5455,7 +5468,7 @@
           "type": "number"
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -5464,7 +5477,7 @@
           "$ref": "#/components/schemas/SettingsPaymentProcessorCurrency"
         },
         "description": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "disconnected": {
           "type": "boolean"
@@ -5491,7 +5504,7 @@
           "type": "boolean"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -5574,7 +5587,7 @@
       "type": "object",
       "properties": {
         "description": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "display_name": {
           "type": "string"
@@ -5634,10 +5647,10 @@
       "type": "object",
       "properties": {
         "built_in_item": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -5655,13 +5668,13 @@
           "type": "string"
         },
         "is_default": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "is_tax_inclusive": {
           "type": "boolean"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -5730,7 +5743,7 @@
           "$ref": "#/components/schemas/SettingsShippingProfileAccountingCode"
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -5751,13 +5764,13 @@
           "type": "string"
         },
         "integration_connection": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "invoice_note": {
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -5858,7 +5871,7 @@
           }
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -5870,7 +5883,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -5925,7 +5938,7 @@
           "type": "number"
         },
         "state": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "status": {
           "type": "string"
@@ -5959,13 +5972,13 @@
           "type": "string"
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
         },
         "description": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "dst_enabled": {
           "type": "boolean"
@@ -5980,7 +5993,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -6032,7 +6045,7 @@
       "type": "object",
       "properties": {
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -6050,7 +6063,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -6070,7 +6083,7 @@
       "type": "object",
       "properties": {
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -6088,7 +6101,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -6148,7 +6161,7 @@
           "$ref": "#/components/schemas/SettingsWarehouseCountry"
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -6169,7 +6182,7 @@
           "type": "boolean"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -6227,7 +6240,7 @@
           "$ref": "#/components/schemas/SettingsCurrencyReadCountry"
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -6242,7 +6255,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -6296,13 +6309,13 @@
           "type": "string"
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
         },
         "description": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "display_name": {
           "type": "string"
@@ -6314,7 +6327,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -6363,7 +6376,7 @@
           "type": "string"
         },
         "pagination": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "url": {
           "type": "string"
@@ -6374,19 +6387,19 @@
       "type": "object",
       "properties": {
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
         },
         "description": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "display_code": {
           "type": "string"
         },
         "editable": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "enabled": {
           "type": "boolean"
@@ -6413,7 +6426,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -6422,7 +6435,7 @@
           "type": "boolean"
         },
         "note": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "object": {
           "type": "string"
@@ -6497,7 +6510,7 @@
       "type": "object",
       "properties": {
         "default_group": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "enabled": {
           "type": "string"
@@ -6508,7 +6521,7 @@
       "type": "object",
       "properties": {
         "default_manager": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "enabled": {
           "type": "string"
@@ -6587,7 +6600,7 @@
       "type": "object",
       "properties": {
         "default_group": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "enabled": {
           "type": "string"
@@ -6598,7 +6611,7 @@
       "type": "object",
       "properties": {
         "default_referral_tracking": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "enabled": {
           "type": "string"
@@ -6609,7 +6622,7 @@
       "type": "object",
       "properties": {
         "default_sales_rep_tracking": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "enabled": {
           "type": "string"
@@ -6797,7 +6810,7 @@
       "type": "object",
       "properties": {
         "default_group": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "enabled": {
           "type": "string"
@@ -6808,7 +6821,7 @@
       "type": "object",
       "properties": {
         "default_manager": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "enabled": {
           "type": "string"
@@ -6833,7 +6846,7 @@
       "type": "object",
       "properties": {
         "default_pricing_period": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "enabled": {
           "type": "string"
@@ -6866,7 +6879,7 @@
           "type": "string"
         },
         "tax": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "tax_included_in_sales_price_is_based_on": {
           "type": "string"
@@ -6937,13 +6950,13 @@
           "type": "string"
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
         },
         "description": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "dst_enabled": {
           "type": "boolean"
@@ -6958,7 +6971,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -7004,7 +7017,7 @@
           "type": "string"
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -7022,7 +7035,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -7104,7 +7117,7 @@
       "type": "object",
       "properties": {
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -7122,7 +7135,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -7148,7 +7161,7 @@
       "type": "object",
       "properties": {
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -7166,7 +7179,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -7203,13 +7216,13 @@
           "type": "string"
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
         },
         "description": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "display_name": {
           "type": "string"
@@ -7221,7 +7234,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -7242,7 +7255,7 @@
           "type": "string"
         },
         "code": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         }
       }
     },
@@ -7261,7 +7274,7 @@
           "$ref": "#/components/schemas/SettingsDiscountProfileAccountingCode"
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -7291,7 +7304,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -7375,19 +7388,19 @@
       "type": "object",
       "properties": {
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
         },
         "description": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "display_code": {
           "type": "string"
         },
         "editable": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "enabled": {
           "type": "boolean"
@@ -7414,7 +7427,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -7423,7 +7436,7 @@
           "type": "boolean"
         },
         "note": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "object": {
           "type": "string"
@@ -7492,7 +7505,7 @@
           "type": "string"
         },
         "defaultDashboard": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "executive": {
           "type": "string"
@@ -7518,7 +7531,7 @@
           "type": "string"
         },
         "first_day_of_week": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "time_format": {
           "type": "string"
@@ -7555,7 +7568,7 @@
           "type": "string"
         },
         "default_shipping_profile": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "displayed_price_is_inclusive_of_tax": {
           "type": "string"
@@ -7590,7 +7603,7 @@
       "type": "object",
       "properties": {
         "default_manager": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "enabled": {
           "type": "string"
@@ -7601,7 +7614,7 @@
       "type": "object",
       "properties": {
         "default_referral_tracking": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "enabled": {
           "type": "string"
@@ -7612,7 +7625,7 @@
       "type": "object",
       "properties": {
         "default_sales_rep_tracking": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "enabled": {
           "type": "string"
@@ -7751,7 +7764,7 @@
       "type": "object",
       "properties": {
         "accounting_method": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "allow_modification_of_following_credit_note_fields": {
           "$ref": "#/components/schemas/SettingsGeneralSettingsTransactionAllowModificationOfFollowingCreditNoteFields"
@@ -7775,7 +7788,7 @@
           "$ref": "#/components/schemas/SettingsGeneralSettingsTransactionDefaultAccountingCodes"
         },
         "default_shipping_profile": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "disable_notification_for_invoice_with_charges_of_zero_amount": {
           "type": "string"
@@ -7964,19 +7977,19 @@
       "type": "object",
       "properties": {
         "accounting_code": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "conversion_rate": {
           "type": "number"
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
         },
         "credentials": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "currency": {
           "$ref": "#/components/schemas/SettingsPaymentProcessorSavedCurrency"
@@ -8012,7 +8025,7 @@
           "type": "boolean"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -8072,7 +8085,7 @@
           "type": "number"
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -8081,7 +8094,7 @@
           "$ref": "#/components/schemas/SettingsPaymentProcessorCurrency"
         },
         "description": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "disconnected": {
           "type": "boolean"
@@ -8108,7 +8121,7 @@
           "type": "boolean"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -8142,13 +8155,13 @@
       "type": "object",
       "properties": {
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
         },
         "description": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "display_name": {
           "type": "string"
@@ -8163,7 +8176,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -8175,7 +8188,7 @@
           "type": "string"
         },
         "ordering": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "period": {
           "type": "string"
@@ -8197,7 +8210,7 @@
       "type": "object",
       "properties": {
         "description": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "display_name": {
           "type": "string"
@@ -8234,7 +8247,7 @@
       "type": "object",
       "properties": {
         "description": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "display_name": {
           "type": "string"
@@ -8274,16 +8287,16 @@
       "type": "object",
       "properties": {
         "built_in_item": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
         },
         "description": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "display_name": {
           "type": "string"
@@ -8295,10 +8308,10 @@
           "type": "string"
         },
         "is_default": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -8313,13 +8326,13 @@
           "type": "integer"
         },
         "price_tax_inclusive": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "status": {
           "type": "string"
         },
         "tax_exempt": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         }
       }
     },
@@ -8335,10 +8348,10 @@
       "type": "object",
       "properties": {
         "built_in_item": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -8356,13 +8369,13 @@
           "type": "string"
         },
         "is_default": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "is_tax_inclusive": {
           "type": "boolean"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -8405,7 +8418,7 @@
           "$ref": "#/components/schemas/SettingsShippingProfileAccountingCode"
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -8426,13 +8439,13 @@
           "type": "string"
         },
         "integration_connection": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "invoice_note": {
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -8484,7 +8497,7 @@
           "$ref": "#/components/schemas/SettingsWarehouseCountry"
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -8505,7 +8518,7 @@
           "type": "boolean"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -8554,7 +8567,7 @@
           }
         },
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -8566,7 +8579,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
