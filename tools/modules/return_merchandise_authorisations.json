@@ -1,0 +1,1604 @@
+{
+  "family": "return_merchandise_authorisations",
+  "tag": "Return merchandise authorisations",
+  "slug": "return-merchandise-authorisations",
+  "icon": "rotate-left",
+  "base": "/return_merchandise_authorisations",
+  "overview_description": "Authorise customer returns against fulfilled invoices, approve or reject them, receive returned stock and keep notes.",
+  "intro": "A return merchandise authorisation (RMA) records the goods a customer may return from a fulfilled invoice. These endpoints create, update, approve, reject and delete RMAs, receive the returned stock, and manage the RMA's notes and attachments. The module has 19 endpoints, and all seven SDKs call every one.",
+  "warning": "**Receiving returned stock commits it, and a received RMA cannot be deleted.** Only a draft RMA can be deleted at all.",
+  "notes": [
+    "**Writes take the RMA's `id`; the reads under it take its `code`.** Update, delete, approve, reject, receive and the note writes need the `rma_` `id` and refuse a code. The note and receipt reads resolve the RMA by `code` and return `404` for an `rma_` `id`.",
+    "**An RMA needs a fulfilled invoice.** The create body names the invoice by its internal id, `inv_` followed by the invoice's `uuid` without hyphens, and each return line by a fulfilled invoice line's `id`.",
+    "**A new RMA has `status` `active` and `return_status` `pending`.** The create call returns only the new RMA's `id`, `code`, `status` and `version`; read it for the rest.",
+    "**Approve and reject take no body and can notify approvers.** Both are refused with `422` when the RMA has no pending approval.",
+    "**Notes are JSON, not forms.** Create an RMA note takes `{\"note\": {\"note\": \"...\"}}` and no attachment.",
+    "**Listings page by cursor.** Pass `limit` and the previous page's `pagination.next_cursor` as `cursor`, and stop when `has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_return_merchandise_authorisations",
+      "method": "GET",
+      "path": "/return_merchandise_authorisations",
+      "slug": "list-return-merchandise-authorisations",
+      "title": "List return merchandise authorisations",
+      "summary": "Lists return merchandise authorisations (RMAs), one page at a time.",
+      "description": "Returns one page of RMAs under `data`. Each RMA carries its `code`, `status`, `return_status`, `item_count`, account and sale invoice. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of RMAs under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_return_merchandise_authorisation",
+      "method": "POST",
+      "path": "/return_merchandise_authorisations",
+      "slug": "create-a-return-merchandise-authorisation",
+      "title": "Create a return merchandise authorisation",
+      "summary": "Creates an RMA against a fulfilled invoice.",
+      "description": "Send `sale_invoice.id` and the `returns` lines under `return_merchandise_authorisation`. The invoice must have fulfilled stock, and each return names a fulfilled invoice line and a quantity. The new RMA has `status` `active` and `return_status` `pending`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "return_merchandise_authorisation"
+          ],
+          "properties": {
+            "return_merchandise_authorisation": {
+              "type": "object",
+              "properties": {
+                "sale_invoice": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The invoice's internal id: `inv_` followed by the invoice's `uuid` with the hyphens removed."
+                    }
+                  }
+                },
+                "returns": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "sale_invoice_line": {
+                        "type": "string",
+                        "description": "The `id` of a fulfilled line of the invoice."
+                      },
+                      "rma_quantity": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "return_merchandise_authorisation": {
+            "sale_invoice": {
+              "id": "inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d"
+            },
+            "returns": [
+              {
+                "sale_invoice_line": "INVOICE_LINE_ID",
+                "rma_quantity": 1
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new RMA's `id`, `code`, `status` and `version`, under `return_merchandise_authorisation`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationCreateResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "return_merchandise_authorisation": {
+            "sale_invoice": {
+              "id": "inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d"
+            },
+            "returns": [
+              {
+                "sale_invoice_line": "INVOICE_LINE_ID",
+                "rma_quantity": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "get_return_merchandise_authorisation",
+      "method": "GET",
+      "path": "/return_merchandise_authorisations/{rma_id}",
+      "slug": "retrieve-a-return-merchandise-authorisation",
+      "title": "Retrieve a return merchandise authorisation",
+      "summary": "Returns one RMA with its lines and receipts.",
+      "description": "Returns the RMA under `return_merchandise_authorisation`, including its `lines` and the receipts of returned stock in `receive_rmas`.",
+      "parameters": [
+        {
+          "name": "rma_id",
+          "in": "path",
+          "required": true,
+          "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+          "schema": {
+            "type": "string",
+            "example": "RMA_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The RMA, under `return_merchandise_authorisation`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "rma_id": "RMA_ID"
+        }
+      }
+    },
+    {
+      "key": "get_invoice_return_merchandise_authorisation_receive",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/return_merchandise_authorisations/{rma_id}/receive",
+      "slug": "list-an-invoice-rmas-receipts",
+      "title": "List an invoice RMA's receipts",
+      "summary": "Lists the stock receipts of one RMA, found through its invoice.",
+      "description": "Returns the receipts of returned stock under `data`, each with its `code`, `status` and `quantity_received`.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `code`, as in the RMA's `sale_invoice.code`.",
+          "schema": {
+            "type": "string",
+            "example": "INVOICE_CODE"
+          }
+        },
+        {
+          "name": "rma_id",
+          "in": "path",
+          "required": true,
+          "description": "The RMA's `code`.",
+          "schema": {
+            "type": "string",
+            "example": "RMA_CODE"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The receipts, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReceiptList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INVOICE_CODE",
+          "rma_id": "RMA_CODE"
+        }
+      }
+    },
+    {
+      "key": "get_invoice_return_merchandise_authorisation_receive_by_uuid",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/return_merchandise_authorisations/{rma_id}/receive/{receive_uuid}",
+      "slug": "retrieve-an-invoice-rma-receipt",
+      "title": "Retrieve an invoice RMA receipt",
+      "summary": "Returns one stock receipt of an RMA, found through its invoice.",
+      "description": "Returns the receipt under `receive_rma`, with its `code`, `status` and `quantity_received`.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `code`, as in the RMA's `sale_invoice.code`.",
+          "schema": {
+            "type": "string",
+            "example": "INVOICE_CODE"
+          }
+        },
+        {
+          "name": "rma_id",
+          "in": "path",
+          "required": true,
+          "description": "The RMA's `code`.",
+          "schema": {
+            "type": "string",
+            "example": "RMA_CODE"
+          }
+        },
+        {
+          "name": "receive_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The receipt's `id`, which starts with `rrma_`, or its `code`.",
+          "schema": {
+            "type": "string",
+            "example": "RECEIPT_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The receipt, under `receive_rma`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReceiptResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INVOICE_CODE",
+          "rma_id": "RMA_CODE",
+          "receive_uuid": "RECEIPT_ID"
+        }
+      }
+    },
+    {
+      "key": "create_return_merchandise_authorisation_note",
+      "method": "POST",
+      "path": "/return_merchandise_authorisations/{rma_id}/notes",
+      "slug": "create-an-rma-note",
+      "title": "Create an RMA note",
+      "summary": "Adds a text note to an RMA.",
+      "description": "Send JSON, not a form: `{\"note\": {\"note\": \"...\"}}`. This call takes no attachment.",
+      "parameters": [
+        {
+          "name": "rma_id",
+          "in": "path",
+          "required": true,
+          "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+          "schema": {
+            "type": "string",
+            "example": "RMA_ID"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "note"
+          ],
+          "properties": {
+            "note": {
+              "type": "object",
+              "required": [
+                "note"
+              ],
+              "properties": {
+                "note": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "note": {
+            "note": "Box arrived damaged"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The note is created."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rma_id": "RMA_ID"
+        },
+        "body": {
+          "note": {
+            "note": "Box arrived damaged"
+          }
+        }
+      }
+    },
+    {
+      "key": "receive_return_merchandise_authorisation",
+      "method": "POST",
+      "path": "/return_merchandise_authorisations/{rma_id}/receive",
+      "slug": "receive-returned-stock-for-an-rma",
+      "title": "Receive returned stock for an RMA",
+      "summary": "Records returned stock against an RMA and returns the RMA.",
+      "description": "Send `receive_returns` under `return_merchandise_authorisation`, each entry with a `uuid` and an `rma_receive_quantity`. The stock is committed, and a received RMA cannot be deleted.",
+      "parameters": [
+        {
+          "name": "rma_id",
+          "in": "path",
+          "required": true,
+          "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+          "schema": {
+            "type": "string",
+            "example": "RMA_ID"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "return_merchandise_authorisation"
+          ],
+          "properties": {
+            "return_merchandise_authorisation": {
+              "type": "object",
+              "required": [
+                "receive_returns"
+              ],
+              "properties": {
+                "receive_returns": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "uuid",
+                      "rma_receive_quantity"
+                    ],
+                    "properties": {
+                      "uuid": {
+                        "type": "string"
+                      },
+                      "rma_receive_quantity": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "return_merchandise_authorisation": {
+            "receive_returns": [
+              {
+                "uuid": "RMA_LINE_UUID",
+                "rma_receive_quantity": 1
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The RMA, under `return_merchandise_authorisation`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "rma_id": "RMA_ID"
+        },
+        "body": {
+          "return_merchandise_authorisation": {
+            "receive_returns": [
+              {
+                "uuid": "RMA_LINE_UUID",
+                "rma_receive_quantity": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_return_merchandise_authorisation",
+      "method": "DELETE",
+      "path": "/return_merchandise_authorisations/{rma_id}",
+      "slug": "delete-a-return-merchandise-authorisation",
+      "title": "Delete a return merchandise authorisation",
+      "summary": "Deletes a draft RMA and returns no body.",
+      "description": "Only a draft RMA is deleted. Any other RMA is refused with `400` and the code `stock_committed`.",
+      "parameters": [
+        {
+          "name": "rma_id",
+          "in": "path",
+          "required": true,
+          "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+          "schema": {
+            "type": "string",
+            "example": "RMA_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The RMA is deleted. There is no body."
+        },
+        "400": {
+          "description": "The RMA is not a draft (`stock_committed`)."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rma_id": "RMA_ID"
+        }
+      }
+    },
+    {
+      "key": "update_return_merchandise_authorisation",
+      "method": "PATCH",
+      "path": "/return_merchandise_authorisations/{rma_id}",
+      "slug": "update-a-return-merchandise-authorisation",
+      "title": "Update a return merchandise authorisation",
+      "summary": "Changes an RMA's date, note or returns and returns the RMA.",
+      "description": "Send `rma_date`, `note` or `returns` under `return_merchandise_authorisation`. The RMA comes back under the same key.",
+      "parameters": [
+        {
+          "name": "rma_id",
+          "in": "path",
+          "required": true,
+          "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+          "schema": {
+            "type": "string",
+            "example": "RMA_ID"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "return_merchandise_authorisation"
+          ],
+          "properties": {
+            "return_merchandise_authorisation": {
+              "type": "object",
+              "properties": {
+                "rma_date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "note": {
+                  "type": "string"
+                },
+                "returns": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "return_merchandise_authorisation": {
+            "rma_date": "2026-10-01",
+            "note": "Customer returned one unit"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The RMA, under `return_merchandise_authorisation`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "rma_id": "RMA_ID"
+        },
+        "body": {
+          "return_merchandise_authorisation": {
+            "rma_date": "2026-10-01",
+            "note": "Customer returned one unit"
+          }
+        }
+      }
+    },
+    {
+      "key": "approve_return_merchandise_authorisation",
+      "method": "POST",
+      "path": "/return_merchandise_authorisations/{rma_id}/approve",
+      "slug": "approve-a-return-merchandise-authorisation",
+      "title": "Approve a return merchandise authorisation",
+      "summary": "Approves an RMA that is waiting for approval.",
+      "description": "Send no body. The call can notify approvers. An RMA with no pending approval is refused with `422`.",
+      "parameters": [
+        {
+          "name": "rma_id",
+          "in": "path",
+          "required": true,
+          "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+          "schema": {
+            "type": "string",
+            "example": "RMA_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The RMA, under `return_merchandise_authorisation`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationResponse"
+          }
+        },
+        "422": {
+          "description": "The RMA has no pending approval."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rma_id": "RMA_ID"
+        }
+      }
+    },
+    {
+      "key": "delete_return_merchandise_authorisation_note",
+      "method": "DELETE",
+      "path": "/return_merchandise_authorisations/{rma_id}/notes/{note_id}",
+      "slug": "delete-an-rma-note",
+      "title": "Delete an RMA note",
+      "summary": "Deletes a note from an RMA and returns no body.",
+      "description": "Use the RMA's `rma_` `id` in the path; its `code` returns `404`.",
+      "parameters": [
+        {
+          "name": "rma_id",
+          "in": "path",
+          "required": true,
+          "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+          "schema": {
+            "type": "string",
+            "example": "RMA_ID"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "NOTE_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The note is deleted. There is no body."
+        },
+        "404": {
+          "description": "The path holds the RMA's `code` rather than its `id`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rma_id": "RMA_ID",
+          "note_id": "NOTE_ID"
+        }
+      }
+    },
+    {
+      "key": "delete_return_merchandise_authorisation_note_file",
+      "method": "DELETE",
+      "path": "/return_merchandise_authorisations/{rma_id}/notes/{note_id}/files/{file_id}",
+      "slug": "delete-an-rma-note-file",
+      "title": "Delete an RMA note file",
+      "summary": "Deletes an attachment from an RMA note and returns no body.",
+      "description": "Use the RMA's `rma_` `id` in the path, with the note's and the attachment's `id`.",
+      "parameters": [
+        {
+          "name": "rma_id",
+          "in": "path",
+          "required": true,
+          "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+          "schema": {
+            "type": "string",
+            "example": "RMA_ID"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "NOTE_ID"
+          }
+        },
+        {
+          "name": "file_id",
+          "in": "path",
+          "required": true,
+          "description": "The attachment's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "FILE_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The attachment is deleted. There is no body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rma_id": "RMA_ID",
+          "note_id": "NOTE_ID",
+          "file_id": "FILE_ID"
+        }
+      }
+    },
+    {
+      "key": "reject_return_merchandise_authorisation",
+      "method": "POST",
+      "path": "/return_merchandise_authorisations/{rma_id}/reject",
+      "slug": "reject-a-return-merchandise-authorisation",
+      "title": "Reject a return merchandise authorisation",
+      "summary": "Rejects an RMA that is waiting for approval.",
+      "description": "Send no body. The call can notify approvers. An RMA with no pending approval is refused with `422`.",
+      "parameters": [
+        {
+          "name": "rma_id",
+          "in": "path",
+          "required": true,
+          "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+          "schema": {
+            "type": "string",
+            "example": "RMA_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The RMA, under `return_merchandise_authorisation`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationResponse"
+          }
+        },
+        "422": {
+          "description": "The RMA has no pending approval."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rma_id": "RMA_ID"
+        }
+      }
+    },
+    {
+      "key": "get_return_merchandise_authorisation_notes",
+      "method": "GET",
+      "path": "/return_merchandise_authorisations/{rma_code}/notes",
+      "slug": "list-rma-notes",
+      "title": "List RMA notes",
+      "summary": "Lists an RMA's notes, one page at a time.",
+      "description": "Returns one page of the RMA's notes under `data`. Use the RMA's `code` in the path; its `rma_` `id` returns `404`. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
+      "parameters": [
+        {
+          "name": "rma_code",
+          "in": "path",
+          "required": true,
+          "description": "The RMA's `code`. Its `rma_` `id` returns `404`.",
+          "schema": {
+            "type": "string",
+            "example": "RMA_CODE"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of notes under `data`."
+        },
+        "404": {
+          "description": "The path holds the RMA's `id` rather than its `code`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rma_code": "RMA_CODE"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_return_merchandise_authorisation_note",
+      "method": "GET",
+      "path": "/return_merchandise_authorisations/{rma_code}/notes/{note_id}",
+      "slug": "retrieve-an-rma-note",
+      "title": "Retrieve an RMA note",
+      "summary": "Returns one note of an RMA under `note`.",
+      "description": "Use the RMA's `code` in the path and the note's `id`.",
+      "parameters": [
+        {
+          "name": "rma_code",
+          "in": "path",
+          "required": true,
+          "description": "The RMA's `code`. Its `rma_` `id` returns `404`.",
+          "schema": {
+            "type": "string",
+            "example": "RMA_CODE"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "NOTE_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The note, under `note`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rma_code": "RMA_CODE",
+          "note_id": "NOTE_ID"
+        }
+      }
+    },
+    {
+      "key": "get_return_merchandise_authorisation_note_files",
+      "method": "GET",
+      "path": "/return_merchandise_authorisations/{rma_code}/notes/{note_id}/files",
+      "slug": "list-rma-note-files",
+      "title": "List RMA note files",
+      "summary": "Lists the attachments of one RMA note.",
+      "description": "Returns the note's attachments under `data`. Use the RMA's `code` in the path.",
+      "parameters": [
+        {
+          "name": "rma_code",
+          "in": "path",
+          "required": true,
+          "description": "The RMA's `code`. Its `rma_` `id` returns `404`.",
+          "schema": {
+            "type": "string",
+            "example": "RMA_CODE"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "NOTE_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The attachments, under `data`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rma_code": "RMA_CODE",
+          "note_id": "NOTE_ID"
+        }
+      }
+    },
+    {
+      "key": "get_return_merchandise_authorisation_note_file",
+      "method": "GET",
+      "path": "/return_merchandise_authorisations/{rma_code}/notes/{note_id}/files/{file_id}",
+      "slug": "retrieve-an-rma-note-file",
+      "title": "Retrieve an RMA note file",
+      "summary": "Returns one attachment of an RMA note under `file`.",
+      "description": "Use the RMA's `code` in the path, with the note's and the attachment's `id`.",
+      "parameters": [
+        {
+          "name": "rma_code",
+          "in": "path",
+          "required": true,
+          "description": "The RMA's `code`. Its `rma_` `id` returns `404`.",
+          "schema": {
+            "type": "string",
+            "example": "RMA_CODE"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "NOTE_ID"
+          }
+        },
+        {
+          "name": "file_id",
+          "in": "path",
+          "required": true,
+          "description": "The attachment's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "FILE_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The attachment, under `file`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rma_code": "RMA_CODE",
+          "note_id": "NOTE_ID",
+          "file_id": "FILE_ID"
+        }
+      }
+    },
+    {
+      "key": "get_return_merchandise_authorisation_receive",
+      "method": "GET",
+      "path": "/return_merchandise_authorisations/{rma_code}/receive",
+      "slug": "list-an-rmas-receipts",
+      "title": "List an RMA's receipts",
+      "summary": "Lists the stock receipts of an RMA, one page at a time.",
+      "description": "Returns the receipts of returned stock under `data`, each with its `code`, `status` and `quantity_received`. Use the RMA's `code` in the path; its `rma_` `id` returns `404`. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
+      "parameters": [
+        {
+          "name": "rma_code",
+          "in": "path",
+          "required": true,
+          "description": "The RMA's `code`. Its `rma_` `id` returns `404`.",
+          "schema": {
+            "type": "string",
+            "example": "RMA_CODE"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The receipts, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReceiptList"
+          }
+        },
+        "404": {
+          "description": "The path holds the RMA's `id` rather than its `code`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rma_code": "RMA_CODE"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_return_merchandise_authorisation_receive_by_uuid",
+      "method": "GET",
+      "path": "/return_merchandise_authorisations/{rma_code}/receive/{receive_uuid}",
+      "slug": "retrieve-an-rma-receipt",
+      "title": "Retrieve an RMA receipt",
+      "summary": "Returns one stock receipt of an RMA under `receive_rma`.",
+      "description": "Use the RMA's `code` in the path and the receipt's `rrma_` `id` or `code`. The receipt comes back with its `status` and `quantity_received`.",
+      "parameters": [
+        {
+          "name": "rma_code",
+          "in": "path",
+          "required": true,
+          "description": "The RMA's `code`. Its `rma_` `id` returns `404`.",
+          "schema": {
+            "type": "string",
+            "example": "RMA_CODE"
+          }
+        },
+        {
+          "name": "receive_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The receipt's `id`, which starts with `rrma_`, or its `code`.",
+          "schema": {
+            "type": "string",
+            "example": "RECEIPT_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The receipt, under `receive_rma`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReceiptResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "rma_code": "RMA_CODE",
+          "receive_uuid": "RECEIPT_ID"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "ReturnMerchandiseAuthorisationCreated": {
+      "type": "object",
+      "properties": {
+        "activity_logs": {
+          "type": "array"
+        },
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationReceiptDetail": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReceiptDetailCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_updated_on": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "object": {
+          "type": "string"
+        },
+        "quantity_received": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationReceiptDetailCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationReceipt": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReceiptCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_updated_on": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "object": {
+          "type": "string"
+        },
+        "quantity_received": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationReceiptCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationRead": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReadAccount"
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReadCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "item_count": {
+          "type": "integer"
+        },
+        "last_updated_by": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_updated_on": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "lines": {
+          "type": "array"
+        },
+        "note": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "receive_rmas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReadReceiveRma"
+          }
+        },
+        "return_status": {
+          "type": "string"
+        },
+        "rma_date": {
+          "type": "string"
+        },
+        "sale_invoice": {
+          "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReadSaleInvoice"
+        },
+        "sale_order": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "warehouse": {
+          "type": "null",
+          "description": "Null in every response read."
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationReadSaleInvoice": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationReadReceiveRma": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReadReceiveRmaCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_updated_on": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "object": {
+          "type": "string"
+        },
+        "quantity_received": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationReadReceiveRmaCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationReadCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationReadAccount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisation"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisation": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationAccount"
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "item_count": {
+          "type": "integer"
+        },
+        "last_updated_by": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_updated_on": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "note": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "return_status": {
+          "type": "string"
+        },
+        "rma_date": {
+          "type": "string"
+        },
+        "sale_invoice": {
+          "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationSaleInvoice"
+        },
+        "sale_order": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "warehouse": {
+          "type": "null",
+          "description": "Null in every response read."
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationSaleInvoice": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationAccount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Send as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationPaginationLinks"
+        },
+        "records": {
+          "type": "integer",
+          "description": "Offset pages only: total matching records, not the page's length."
+        },
+        "offset": {
+          "type": "integer",
+          "description": "Offset pages only."
+        },
+        "next_page": {
+          "type": "string",
+          "description": "Offset pages only: the literal string `NULL` at the end of a listing, not JSON null."
+        },
+        "previous_page": {
+          "type": "string",
+          "description": "Offset pages only."
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationReceiptList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReceipt"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationPagination"
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationResponse": {
+      "type": "object",
+      "required": [
+        "return_merchandise_authorisation"
+      ],
+      "properties": {
+        "return_merchandise_authorisation": {
+          "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationRead"
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationCreateResponse": {
+      "type": "object",
+      "required": [
+        "return_merchandise_authorisation"
+      ],
+      "properties": {
+        "return_merchandise_authorisation": {
+          "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationCreated"
+        }
+      }
+    },
+    "ReturnMerchandiseAuthorisationReceiptResponse": {
+      "type": "object",
+      "required": [
+        "receive_rma"
+      ],
+      "properties": {
+        "receive_rma": {
+          "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReceiptDetail"
+        }
+      }
+    }
+  }
+}

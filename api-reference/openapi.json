@@ -113,6 +113,9 @@
     },
     {
       "name": "Rental assets"
+    },
+    {
+      "name": "Return merchandise authorisations"
     }
   ],
   "paths": {
@@ -38928,6 +38931,1774 @@
           }
         }
       }
+    },
+    "/return_merchandise_authorisations": {
+      "get": {
+        "tags": [
+          "Return merchandise authorisations"
+        ],
+        "summary": "List return merchandise authorisations",
+        "operationId": "return_merchandise_authorisations_get_return_merchandise_authorisations",
+        "description": "Returns one page of RMAs under `data`. Each RMA carries its `code`, `status`, `return_status`, `item_count`, account and sale invoice. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, as in `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of RMAs under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/return_merchandise_authorisations?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = (\n    client.return_merchandise_authorisations.get_return_merchandise_authorisations(\n        {\"limit\": 20}\n    )\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.getReturnMerchandiseAuthorisations({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->getReturnMerchandiseAuthorisations([\n    'limit' => 20,\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.return_merchandise_authorisations.return_merchandise_authorisations_dto.ReturnMerchandiseAuthorisationsDto.ReturnMerchandiseAuthorisationList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReturnMerchandiseAuthorisationList> response = client.returnMerchandiseAuthorisations().getReturnMerchandiseAuthorisations(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.GetReturnMerchandiseAuthorisationsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .getReturnMerchandiseAuthorisations(queryParams: {'limit': 20});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().GetReturnMerchandiseAuthorisations(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Return merchandise authorisations"
+        ],
+        "summary": "Create a return merchandise authorisation",
+        "operationId": "return_merchandise_authorisations_create_return_merchandise_authorisation",
+        "description": "Send `sale_invoice.id` and the `returns` lines under `return_merchandise_authorisation`. The invoice must have fulfilled stock, and each return names a fulfilled invoice line and a quantity. The new RMA has `status` `active` and `return_status` `pending`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new RMA's `id`, `code`, `status` and `version`, under `return_merchandise_authorisation`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationCreateResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/return_merchandise_authorisations\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"return_merchandise_authorisation\": {\n      \"sale_invoice\": {\n        \"id\": \"inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d\"\n      },\n      \"returns\": [\n        {\n          \"sale_invoice_line\": \"INVOICE_LINE_ID\",\n          \"rma_quantity\": 1\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = (\n    client.return_merchandise_authorisations.create_return_merchandise_authorisation(\n        {\n            \"return_merchandise_authorisation\": {\n                \"sale_invoice\": {\"id\": \"inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d\"},\n                \"returns\": [\n                    {\"sale_invoice_line\": \"INVOICE_LINE_ID\", \"rma_quantity\": 1}\n                ],\n            }\n        }\n    )\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.createReturnMerchandiseAuthorisation({\n    return_merchandise_authorisation: {\n        sale_invoice: {id: 'inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d'},\n        returns: [{sale_invoice_line: 'INVOICE_LINE_ID', rma_quantity: 1}],\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->createReturnMerchandiseAuthorisation([\n    'return_merchandise_authorisation' => [\n        'sale_invoice' => ['id' => 'inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d'],\n        'returns' => [['sale_invoice_line' => 'INVOICE_LINE_ID', 'rma_quantity' => 1]],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.return_merchandise_authorisations.return_merchandise_authorisations_dto.ReturnMerchandiseAuthorisationsDto;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReturnMerchandiseAuthorisationsDto.ReturnMerchandiseAuthorisations> response = client.returnMerchandiseAuthorisations().createReturnMerchandiseAuthorisation(\n        Map.of(\n                \"return_merchandise_authorisation\", Map.of(\n                        \"sale_invoice\", Map.of(\"id\", \"inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d\"),\n                        \"returns\", List.of(\n                                Map.of(\"sale_invoice_line\", \"INVOICE_LINE_ID\", \"rma_quantity\", 1)))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.CreateReturnMerchandiseAuthorisationAsync(new Dictionary<string, object?>\n{\n    [\"return_merchandise_authorisation\"] = new Dictionary<string, object?>\n    {\n        [\"sale_invoice\"] = new Dictionary<string, object?>\n        {\n            [\"id\"] = \"inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d\",\n        },\n        [\"returns\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"sale_invoice_line\"] = \"INVOICE_LINE_ID\",\n                [\"rma_quantity\"] = 1,\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .createReturnMerchandiseAuthorisation({\n      'return_merchandise_authorisation': {\n        'sale_invoice': {'id': 'inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d'},\n        'returns': [\n          {'sale_invoice_line': 'INVOICE_LINE_ID', 'rma_quantity': 1},\n        ],\n      },\n    });\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().CreateReturnMerchandiseAuthorisation(context.Background(), map[string]any{\n\t\"return_merchandise_authorisation\": map[string]any{\n\t\t\"sale_invoice\": map[string]any{\"id\": \"inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d\"},\n\t\t\"returns\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"sale_invoice_line\": \"INVOICE_LINE_ID\",\n\t\t\t\t\"rma_quantity\":      1,\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "return_merchandise_authorisation"
+                ],
+                "properties": {
+                  "return_merchandise_authorisation": {
+                    "type": "object",
+                    "properties": {
+                      "sale_invoice": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "The invoice's internal id: `inv_` followed by the invoice's `uuid` with the hyphens removed."
+                          }
+                        }
+                      },
+                      "returns": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "sale_invoice_line": {
+                              "type": "string",
+                              "description": "The `id` of a fulfilled line of the invoice."
+                            },
+                            "rma_quantity": {
+                              "type": "number"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "return_merchandise_authorisation": {
+                  "sale_invoice": {
+                    "id": "inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d"
+                  },
+                  "returns": [
+                    {
+                      "sale_invoice_line": "INVOICE_LINE_ID",
+                      "rma_quantity": 1
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/return_merchandise_authorisations/{rma_id}": {
+      "get": {
+        "tags": [
+          "Return merchandise authorisations"
+        ],
+        "summary": "Retrieve a return merchandise authorisation",
+        "operationId": "return_merchandise_authorisations_get_return_merchandise_authorisation",
+        "description": "Returns the RMA under `return_merchandise_authorisation`, including its `lines` and the receipts of returned stock in `receive_rmas`.",
+        "parameters": [
+          {
+            "name": "rma_id",
+            "in": "path",
+            "required": true,
+            "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The RMA, under `return_merchandise_authorisation`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/return_merchandise_authorisations/RMA_ID\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = (\n    client.return_merchandise_authorisations.get_return_merchandise_authorisation(\n        \"RMA_ID\"\n    )\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.getReturnMerchandiseAuthorisation('RMA_ID');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->getReturnMerchandiseAuthorisation('RMA_ID');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.return_merchandise_authorisations.return_merchandise_authorisations_dto.ReturnMerchandiseAuthorisationsDto.ReturnMerchandiseAuthorisationRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReturnMerchandiseAuthorisationRead> response = client.returnMerchandiseAuthorisations().getReturnMerchandiseAuthorisation(\n        \"RMA_ID\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.GetReturnMerchandiseAuthorisationAsync(\"RMA_ID\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .getReturnMerchandiseAuthorisation('RMA_ID');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().GetReturnMerchandiseAuthorisation(context.Background(), \"RMA_ID\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Return merchandise authorisations"
+        ],
+        "summary": "Delete a return merchandise authorisation",
+        "operationId": "return_merchandise_authorisations_delete_return_merchandise_authorisation",
+        "description": "Only a draft RMA is deleted. Any other RMA is refused with `400` and the code `stock_committed`.",
+        "parameters": [
+          {
+            "name": "rma_id",
+            "in": "path",
+            "required": true,
+            "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The RMA is deleted. There is no body."
+          },
+          "400": {
+            "description": "The RMA is not a draft (`stock_committed`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/return_merchandise_authorisations/RMA_ID\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = (\n    client.return_merchandise_authorisations.delete_return_merchandise_authorisation(\n        \"RMA_ID\"\n    )\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.deleteReturnMerchandiseAuthorisation('RMA_ID');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->deleteReturnMerchandiseAuthorisation(\n    'RMA_ID',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.returnMerchandiseAuthorisations().deleteReturnMerchandiseAuthorisation(\"RMA_ID\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.DeleteReturnMerchandiseAuthorisationAsync(\"RMA_ID\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .deleteReturnMerchandiseAuthorisation('RMA_ID');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().DeleteReturnMerchandiseAuthorisation(context.Background(), \"RMA_ID\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Return merchandise authorisations"
+        ],
+        "summary": "Update a return merchandise authorisation",
+        "operationId": "return_merchandise_authorisations_update_return_merchandise_authorisation",
+        "description": "Send `rma_date`, `note` or `returns` under `return_merchandise_authorisation`. The RMA comes back under the same key.",
+        "parameters": [
+          {
+            "name": "rma_id",
+            "in": "path",
+            "required": true,
+            "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The RMA, under `return_merchandise_authorisation`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/return_merchandise_authorisations/RMA_ID\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"return_merchandise_authorisation\": {\n      \"rma_date\": \"2026-10-01\",\n      \"note\": \"Customer returned one unit\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = (\n    client.return_merchandise_authorisations.update_return_merchandise_authorisation(\n        \"RMA_ID\",\n        {\n            \"return_merchandise_authorisation\": {\n                \"rma_date\": \"2026-10-01\",\n                \"note\": \"Customer returned one unit\",\n            }\n        },\n    )\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.updateReturnMerchandiseAuthorisation('RMA_ID', {\n    return_merchandise_authorisation: {rma_date: '2026-10-01', note: 'Customer returned one unit'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->updateReturnMerchandiseAuthorisation(\n    'RMA_ID',\n    [\n        'return_merchandise_authorisation' => [\n            'rma_date' => '2026-10-01',\n            'note' => 'Customer returned one unit',\n        ],\n    ],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.return_merchandise_authorisations.return_merchandise_authorisations_dto.ReturnMerchandiseAuthorisationsDto.ReturnMerchandiseAuthorisationRead;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReturnMerchandiseAuthorisationRead> response = client.returnMerchandiseAuthorisations().updateReturnMerchandiseAuthorisation(\n        \"RMA_ID\",\n        Map.of(\n                \"return_merchandise_authorisation\", Map.of(\n                        \"rma_date\", \"2026-10-01\",\n                        \"note\", \"Customer returned one unit\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.UpdateReturnMerchandiseAuthorisationAsync(\n    \"RMA_ID\",\n    new Dictionary<string, object?>\n    {\n        [\"return_merchandise_authorisation\"] = new Dictionary<string, object?>\n        {\n            [\"rma_date\"] = \"2026-10-01\",\n            [\"note\"] = \"Customer returned one unit\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .updateReturnMerchandiseAuthorisation('RMA_ID', {\n      'return_merchandise_authorisation': {\n        'rma_date': '2026-10-01',\n        'note': 'Customer returned one unit',\n      },\n    });\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().UpdateReturnMerchandiseAuthorisation(context.Background(), \"RMA_ID\", map[string]any{\n\t\"return_merchandise_authorisation\": map[string]any{\n\t\t\"rma_date\": \"2026-10-01\",\n\t\t\"note\":     \"Customer returned one unit\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "return_merchandise_authorisation"
+                ],
+                "properties": {
+                  "return_merchandise_authorisation": {
+                    "type": "object",
+                    "properties": {
+                      "rma_date": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "note": {
+                        "type": "string"
+                      },
+                      "returns": {
+                        "type": "array",
+                        "items": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "return_merchandise_authorisation": {
+                  "rma_date": "2026-10-01",
+                  "note": "Customer returned one unit"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoices/{invoice_id}/return_merchandise_authorisations/{rma_id}/receive": {
+      "get": {
+        "tags": [
+          "Return merchandise authorisations"
+        ],
+        "summary": "List an invoice RMA's receipts",
+        "operationId": "return_merchandise_authorisations_get_invoice_return_merchandise_authorisation_receive",
+        "description": "Returns the receipts of returned stock under `data`, each with its `code`, `status` and `quantity_received`.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `code`, as in the RMA's `sale_invoice.code`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "rma_id",
+            "in": "path",
+            "required": true,
+            "description": "The RMA's `code`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The receipts, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReceiptList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INVOICE_CODE/return_merchandise_authorisations/RMA_CODE/receive\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.return_merchandise_authorisations.get_invoice_return_merchandise_authorisation_receive(\n    \"INVOICE_CODE\", \"RMA_CODE\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.getInvoiceReturnMerchandiseAuthorisationReceive(\n    'INVOICE_CODE',\n    'RMA_CODE',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->getInvoiceReturnMerchandiseAuthorisationReceive(\n    'INVOICE_CODE',\n    'RMA_CODE',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.return_merchandise_authorisations.return_merchandise_authorisations_dto.ReturnMerchandiseAuthorisationsDto.InvoiceReturnMerchandiseAuthorisationReceiveList;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<InvoiceReturnMerchandiseAuthorisationReceiveList> response = client.returnMerchandiseAuthorisations().getInvoiceReturnMerchandiseAuthorisationReceive(\n        \"INVOICE_CODE\",\n        \"RMA_CODE\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.GetInvoiceReturnMerchandiseAuthorisationReceiveAsync(\n    \"INVOICE_CODE\",\n    \"RMA_CODE\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .getInvoiceReturnMerchandiseAuthorisationReceive(\n      'INVOICE_CODE',\n      'RMA_CODE',\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().GetInvoiceReturnMerchandiseAuthorisationReceive(context.Background(), \"INVOICE_CODE\", \"RMA_CODE\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/invoices/{invoice_id}/return_merchandise_authorisations/{rma_id}/receive/{receive_uuid}": {
+      "get": {
+        "tags": [
+          "Return merchandise authorisations"
+        ],
+        "summary": "Retrieve an invoice RMA receipt",
+        "operationId": "return_merchandise_authorisations_get_invoice_return_merchandise_authorisation_receive_by_uuid",
+        "description": "Returns the receipt under `receive_rma`, with its `code`, `status` and `quantity_received`.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `code`, as in the RMA's `sale_invoice.code`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "rma_id",
+            "in": "path",
+            "required": true,
+            "description": "The RMA's `code`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "receive_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The receipt's `id`, which starts with `rrma_`, or its `code`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The receipt, under `receive_rma`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReceiptResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INVOICE_CODE/return_merchandise_authorisations/RMA_CODE/receive/RECEIPT_ID\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.return_merchandise_authorisations.get_invoice_return_merchandise_authorisation_receive_by_uuid(\n    \"INVOICE_CODE\", \"RMA_CODE\", \"RECEIPT_ID\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.getInvoiceReturnMerchandiseAuthorisationReceiveByUuid(\n    'INVOICE_CODE',\n    'RMA_CODE',\n    'RECEIPT_ID',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->getInvoiceReturnMerchandiseAuthorisationReceiveByUuid(\n    'INVOICE_CODE',\n    'RMA_CODE',\n    'RECEIPT_ID',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.return_merchandise_authorisations.return_merchandise_authorisations_dto.ReturnMerchandiseAuthorisationsDto.InvoiceReturnMerchandiseAuthorisationReceive;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<InvoiceReturnMerchandiseAuthorisationReceive> response = client.returnMerchandiseAuthorisations().getInvoiceReturnMerchandiseAuthorisationReceiveByUuid(\n        \"INVOICE_CODE\",\n        \"RMA_CODE\",\n        \"RECEIPT_ID\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.GetInvoiceReturnMerchandiseAuthorisationReceiveByUuidAsync(\n    \"INVOICE_CODE\",\n    \"RMA_CODE\",\n    \"RECEIPT_ID\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .getInvoiceReturnMerchandiseAuthorisationReceiveByUuid(\n      'INVOICE_CODE',\n      'RMA_CODE',\n      'RECEIPT_ID',\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().GetInvoiceReturnMerchandiseAuthorisationReceiveByUUID(context.Background(), \"INVOICE_CODE\", \"RMA_CODE\", \"RECEIPT_ID\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/return_merchandise_authorisations/{rma_id}/notes": {
+      "post": {
+        "tags": [
+          "Return merchandise authorisations"
+        ],
+        "summary": "Create an RMA note",
+        "operationId": "return_merchandise_authorisations_create_return_merchandise_authorisation_note",
+        "description": "Send JSON, not a form: `{\"note\": {\"note\": \"...\"}}`. This call takes no attachment.",
+        "parameters": [
+          {
+            "name": "rma_id",
+            "in": "path",
+            "required": true,
+            "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The note is created."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/return_merchandise_authorisations/RMA_ID/notes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"note\": {\n      \"note\": \"Box arrived damaged\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.return_merchandise_authorisations.create_return_merchandise_authorisation_note(\n    \"RMA_ID\", {\"note\": {\"note\": \"Box arrived damaged\"}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.createReturnMerchandiseAuthorisationNote('RMA_ID', {\n    note: {note: 'Box arrived damaged'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->createReturnMerchandiseAuthorisationNote(\n    'RMA_ID',\n    ['note' => ['note' => 'Box arrived damaged']],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.returnMerchandiseAuthorisations().createReturnMerchandiseAuthorisationNote(\n        \"RMA_ID\",\n        Map.of(\"note\", Map.of(\"note\", \"Box arrived damaged\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.CreateReturnMerchandiseAuthorisationNoteAsync(\n    \"RMA_ID\",\n    new Dictionary<string, object?>\n    {\n        [\"note\"] = new Dictionary<string, object?>\n        {\n            [\"note\"] = \"Box arrived damaged\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .createReturnMerchandiseAuthorisationNote('RMA_ID', {\n      'note': {'note': 'Box arrived damaged'},\n    });\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().CreateReturnMerchandiseAuthorisationNote(context.Background(), \"RMA_ID\", map[string]any{\n\t\"note\": map[string]any{\"note\": \"Box arrived damaged\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "note"
+                ],
+                "properties": {
+                  "note": {
+                    "type": "object",
+                    "required": [
+                      "note"
+                    ],
+                    "properties": {
+                      "note": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "note": {
+                  "note": "Box arrived damaged"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/return_merchandise_authorisations/{rma_id}/receive": {
+      "post": {
+        "tags": [
+          "Return merchandise authorisations"
+        ],
+        "summary": "Receive returned stock for an RMA",
+        "operationId": "return_merchandise_authorisations_receive_return_merchandise_authorisation",
+        "description": "Send `receive_returns` under `return_merchandise_authorisation`, each entry with a `uuid` and an `rma_receive_quantity`. The stock is committed, and a received RMA cannot be deleted.",
+        "parameters": [
+          {
+            "name": "rma_id",
+            "in": "path",
+            "required": true,
+            "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The RMA, under `return_merchandise_authorisation`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/return_merchandise_authorisations/RMA_ID/receive\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"return_merchandise_authorisation\": {\n      \"receive_returns\": [\n        {\n          \"uuid\": \"RMA_LINE_UUID\",\n          \"rma_receive_quantity\": 1\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = (\n    client.return_merchandise_authorisations.receive_return_merchandise_authorisation(\n        \"RMA_ID\",\n        {\n            \"return_merchandise_authorisation\": {\n                \"receive_returns\": [\n                    {\"uuid\": \"RMA_LINE_UUID\", \"rma_receive_quantity\": 1}\n                ]\n            }\n        },\n    )\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.receiveReturnMerchandiseAuthorisation('RMA_ID', {\n    return_merchandise_authorisation: {receive_returns: [{uuid: 'RMA_LINE_UUID', rma_receive_quantity: 1}]},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->receiveReturnMerchandiseAuthorisation(\n    'RMA_ID',\n    [\n        'return_merchandise_authorisation' => [\n            'receive_returns' => [['uuid' => 'RMA_LINE_UUID', 'rma_receive_quantity' => 1]],\n        ],\n    ],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.return_merchandise_authorisations.return_merchandise_authorisations_dto.ReturnMerchandiseAuthorisationsDto.ReturnMerchandiseAuthorisationRead;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReturnMerchandiseAuthorisationRead> response = client.returnMerchandiseAuthorisations().receiveReturnMerchandiseAuthorisation(\n        \"RMA_ID\",\n        Map.of(\n                \"return_merchandise_authorisation\", Map.of(\n                        \"receive_returns\", List.of(\n                                Map.of(\"uuid\", \"RMA_LINE_UUID\", \"rma_receive_quantity\", 1)))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.ReceiveReturnMerchandiseAuthorisationAsync(\n    \"RMA_ID\",\n    new Dictionary<string, object?>\n    {\n        [\"return_merchandise_authorisation\"] = new Dictionary<string, object?>\n        {\n            [\"receive_returns\"] = new List<object?>\n            {\n                new Dictionary<string, object?>\n                {\n                    [\"uuid\"] = \"RMA_LINE_UUID\",\n                    [\"rma_receive_quantity\"] = 1,\n                },\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .receiveReturnMerchandiseAuthorisation('RMA_ID', {\n      'return_merchandise_authorisation': {\n        'receive_returns': [\n          {'uuid': 'RMA_LINE_UUID', 'rma_receive_quantity': 1},\n        ],\n      },\n    });\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().ReceiveReturnMerchandiseAuthorisation(context.Background(), \"RMA_ID\", map[string]any{\n\t\"return_merchandise_authorisation\": map[string]any{\n\t\t\"receive_returns\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"uuid\":                 \"RMA_LINE_UUID\",\n\t\t\t\t\"rma_receive_quantity\": 1,\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "return_merchandise_authorisation"
+                ],
+                "properties": {
+                  "return_merchandise_authorisation": {
+                    "type": "object",
+                    "required": [
+                      "receive_returns"
+                    ],
+                    "properties": {
+                      "receive_returns": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "uuid",
+                            "rma_receive_quantity"
+                          ],
+                          "properties": {
+                            "uuid": {
+                              "type": "string"
+                            },
+                            "rma_receive_quantity": {
+                              "type": "number"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "return_merchandise_authorisation": {
+                  "receive_returns": [
+                    {
+                      "uuid": "RMA_LINE_UUID",
+                      "rma_receive_quantity": 1
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/return_merchandise_authorisations/{rma_id}/approve": {
+      "post": {
+        "tags": [
+          "Return merchandise authorisations"
+        ],
+        "summary": "Approve a return merchandise authorisation",
+        "operationId": "return_merchandise_authorisations_approve_return_merchandise_authorisation",
+        "description": "Send no body. The call can notify approvers. An RMA with no pending approval is refused with `422`.",
+        "parameters": [
+          {
+            "name": "rma_id",
+            "in": "path",
+            "required": true,
+            "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The RMA, under `return_merchandise_authorisation`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The RMA has no pending approval.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/return_merchandise_authorisations/RMA_ID/approve\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = (\n    client.return_merchandise_authorisations.approve_return_merchandise_authorisation(\n        \"RMA_ID\"\n    )\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.approveReturnMerchandiseAuthorisation('RMA_ID');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->approveReturnMerchandiseAuthorisation(\n    'RMA_ID',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.return_merchandise_authorisations.return_merchandise_authorisations_dto.ReturnMerchandiseAuthorisationsDto.ReturnMerchandiseAuthorisationRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReturnMerchandiseAuthorisationRead> response = client.returnMerchandiseAuthorisations().approveReturnMerchandiseAuthorisation(\n        \"RMA_ID\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.ApproveReturnMerchandiseAuthorisationAsync(\"RMA_ID\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .approveReturnMerchandiseAuthorisation('RMA_ID');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().ApproveReturnMerchandiseAuthorisation(context.Background(), \"RMA_ID\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/return_merchandise_authorisations/{rma_id}/notes/{note_id}": {
+      "delete": {
+        "tags": [
+          "Return merchandise authorisations"
+        ],
+        "summary": "Delete an RMA note",
+        "operationId": "return_merchandise_authorisations_delete_return_merchandise_authorisation_note",
+        "description": "Use the RMA's `rma_` `id` in the path; its `code` returns `404`.",
+        "parameters": [
+          {
+            "name": "rma_id",
+            "in": "path",
+            "required": true,
+            "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The note is deleted. There is no body."
+          },
+          "404": {
+            "description": "The path holds the RMA's `code` rather than its `id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/return_merchandise_authorisations/RMA_ID/notes/NOTE_ID\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.return_merchandise_authorisations.delete_return_merchandise_authorisation_note(\n    \"RMA_ID\", \"NOTE_ID\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.deleteReturnMerchandiseAuthorisationNote(\n    'RMA_ID',\n    'NOTE_ID',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->deleteReturnMerchandiseAuthorisationNote(\n    'RMA_ID',\n    'NOTE_ID',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.returnMerchandiseAuthorisations().deleteReturnMerchandiseAuthorisationNote(\n        \"RMA_ID\",\n        \"NOTE_ID\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.DeleteReturnMerchandiseAuthorisationNoteAsync(\n    \"RMA_ID\",\n    \"NOTE_ID\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .deleteReturnMerchandiseAuthorisationNote('RMA_ID', 'NOTE_ID');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().DeleteReturnMerchandiseAuthorisationNote(context.Background(), \"RMA_ID\", \"NOTE_ID\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/return_merchandise_authorisations/{rma_id}/notes/{note_id}/files/{file_id}": {
+      "delete": {
+        "tags": [
+          "Return merchandise authorisations"
+        ],
+        "summary": "Delete an RMA note file",
+        "operationId": "return_merchandise_authorisations_delete_return_merchandise_authorisation_note_file",
+        "description": "Use the RMA's `rma_` `id` in the path, with the note's and the attachment's `id`.",
+        "parameters": [
+          {
+            "name": "rma_id",
+            "in": "path",
+            "required": true,
+            "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The attachment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The attachment is deleted. There is no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/return_merchandise_authorisations/RMA_ID/notes/NOTE_ID/files/FILE_ID\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.return_merchandise_authorisations.delete_return_merchandise_authorisation_note_file(\n    \"RMA_ID\", \"NOTE_ID\", \"FILE_ID\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.deleteReturnMerchandiseAuthorisationNoteFile(\n    'RMA_ID',\n    'NOTE_ID',\n    'FILE_ID',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->deleteReturnMerchandiseAuthorisationNoteFile(\n    'RMA_ID',\n    'NOTE_ID',\n    'FILE_ID',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.returnMerchandiseAuthorisations().deleteReturnMerchandiseAuthorisationNoteFile(\n        \"RMA_ID\",\n        \"NOTE_ID\",\n        \"FILE_ID\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.DeleteReturnMerchandiseAuthorisationNoteFileAsync(\n    \"RMA_ID\",\n    \"NOTE_ID\",\n    \"FILE_ID\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .deleteReturnMerchandiseAuthorisationNoteFile(\n      'RMA_ID',\n      'NOTE_ID',\n      'FILE_ID',\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().DeleteReturnMerchandiseAuthorisationNoteFile(context.Background(), \"RMA_ID\", \"NOTE_ID\", \"FILE_ID\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/return_merchandise_authorisations/{rma_id}/reject": {
+      "post": {
+        "tags": [
+          "Return merchandise authorisations"
+        ],
+        "summary": "Reject a return merchandise authorisation",
+        "operationId": "return_merchandise_authorisations_reject_return_merchandise_authorisation",
+        "description": "Send no body. The call can notify approvers. An RMA with no pending approval is refused with `422`.",
+        "parameters": [
+          {
+            "name": "rma_id",
+            "in": "path",
+            "required": true,
+            "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The RMA, under `return_merchandise_authorisation`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The RMA has no pending approval.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/return_merchandise_authorisations/RMA_ID/reject\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = (\n    client.return_merchandise_authorisations.reject_return_merchandise_authorisation(\n        \"RMA_ID\"\n    )\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.rejectReturnMerchandiseAuthorisation('RMA_ID');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->rejectReturnMerchandiseAuthorisation(\n    'RMA_ID',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.return_merchandise_authorisations.return_merchandise_authorisations_dto.ReturnMerchandiseAuthorisationsDto.ReturnMerchandiseAuthorisationRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReturnMerchandiseAuthorisationRead> response = client.returnMerchandiseAuthorisations().rejectReturnMerchandiseAuthorisation(\n        \"RMA_ID\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.RejectReturnMerchandiseAuthorisationAsync(\"RMA_ID\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .rejectReturnMerchandiseAuthorisation('RMA_ID');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().RejectReturnMerchandiseAuthorisation(context.Background(), \"RMA_ID\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/return_merchandise_authorisations/{rma_code}/notes": {
+      "get": {
+        "tags": [
+          "Return merchandise authorisations"
+        ],
+        "summary": "List RMA notes",
+        "operationId": "return_merchandise_authorisations_get_return_merchandise_authorisation_notes",
+        "description": "Returns one page of the RMA's notes under `data`. Use the RMA's `code` in the path; its `rma_` `id` returns `404`. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
+        "parameters": [
+          {
+            "name": "rma_code",
+            "in": "path",
+            "required": true,
+            "description": "The RMA's `code`. Its `rma_` `id` returns `404`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, as in `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of notes under `data`."
+          },
+          "404": {
+            "description": "The path holds the RMA's `id` rather than its `code`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/return_merchandise_authorisations/RMA_CODE/notes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = (\n    client.return_merchandise_authorisations.get_return_merchandise_authorisation_notes(\n        \"RMA_CODE\", {\"limit\": 20}\n    )\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.getReturnMerchandiseAuthorisationNotes('RMA_CODE', {\n    limit: 20,\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->getReturnMerchandiseAuthorisationNotes(\n    'RMA_CODE',\n    ['limit' => 20],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.returnMerchandiseAuthorisations().getReturnMerchandiseAuthorisationNotes(\n        \"RMA_CODE\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.GetReturnMerchandiseAuthorisationNotesAsync(\n    \"RMA_CODE\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .getReturnMerchandiseAuthorisationNotes(\n      'RMA_CODE',\n      queryParams: {'limit': 20},\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().GetReturnMerchandiseAuthorisationNotes(context.Background(), \"RMA_CODE\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/return_merchandise_authorisations/{rma_code}/notes/{note_id}": {
+      "get": {
+        "tags": [
+          "Return merchandise authorisations"
+        ],
+        "summary": "Retrieve an RMA note",
+        "operationId": "return_merchandise_authorisations_get_return_merchandise_authorisation_note",
+        "description": "Use the RMA's `code` in the path and the note's `id`.",
+        "parameters": [
+          {
+            "name": "rma_code",
+            "in": "path",
+            "required": true,
+            "description": "The RMA's `code`. Its `rma_` `id` returns `404`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note, under `note`."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/return_merchandise_authorisations/RMA_CODE/notes/NOTE_ID\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = (\n    client.return_merchandise_authorisations.get_return_merchandise_authorisation_note(\n        \"RMA_CODE\", \"NOTE_ID\"\n    )\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.getReturnMerchandiseAuthorisationNote(\n    'RMA_CODE',\n    'NOTE_ID',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->getReturnMerchandiseAuthorisationNote(\n    'RMA_CODE',\n    'NOTE_ID',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.returnMerchandiseAuthorisations().getReturnMerchandiseAuthorisationNote(\n        \"RMA_CODE\",\n        \"NOTE_ID\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.GetReturnMerchandiseAuthorisationNoteAsync(\n    \"RMA_CODE\",\n    \"NOTE_ID\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .getReturnMerchandiseAuthorisationNote('RMA_CODE', 'NOTE_ID');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().GetReturnMerchandiseAuthorisationNote(context.Background(), \"RMA_CODE\", \"NOTE_ID\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/return_merchandise_authorisations/{rma_code}/notes/{note_id}/files": {
+      "get": {
+        "tags": [
+          "Return merchandise authorisations"
+        ],
+        "summary": "List RMA note files",
+        "operationId": "return_merchandise_authorisations_get_return_merchandise_authorisation_note_files",
+        "description": "Returns the note's attachments under `data`. Use the RMA's `code` in the path.",
+        "parameters": [
+          {
+            "name": "rma_code",
+            "in": "path",
+            "required": true,
+            "description": "The RMA's `code`. Its `rma_` `id` returns `404`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The attachments, under `data`."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/return_merchandise_authorisations/RMA_CODE/notes/NOTE_ID/files\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.return_merchandise_authorisations.get_return_merchandise_authorisation_note_files(\n    \"RMA_CODE\", \"NOTE_ID\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.getReturnMerchandiseAuthorisationNoteFiles(\n    'RMA_CODE',\n    'NOTE_ID',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->getReturnMerchandiseAuthorisationNoteFiles(\n    'RMA_CODE',\n    'NOTE_ID',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.returnMerchandiseAuthorisations().getReturnMerchandiseAuthorisationNoteFiles(\n        \"RMA_CODE\",\n        \"NOTE_ID\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.GetReturnMerchandiseAuthorisationNoteFilesAsync(\n    \"RMA_CODE\",\n    \"NOTE_ID\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .getReturnMerchandiseAuthorisationNoteFiles('RMA_CODE', 'NOTE_ID');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().GetReturnMerchandiseAuthorisationNoteFiles(context.Background(), \"RMA_CODE\", \"NOTE_ID\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/return_merchandise_authorisations/{rma_code}/notes/{note_id}/files/{file_id}": {
+      "get": {
+        "tags": [
+          "Return merchandise authorisations"
+        ],
+        "summary": "Retrieve an RMA note file",
+        "operationId": "return_merchandise_authorisations_get_return_merchandise_authorisation_note_file",
+        "description": "Use the RMA's `code` in the path, with the note's and the attachment's `id`.",
+        "parameters": [
+          {
+            "name": "rma_code",
+            "in": "path",
+            "required": true,
+            "description": "The RMA's `code`. Its `rma_` `id` returns `404`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The attachment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The attachment, under `file`."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/return_merchandise_authorisations/RMA_CODE/notes/NOTE_ID/files/FILE_ID\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.return_merchandise_authorisations.get_return_merchandise_authorisation_note_file(\n    \"RMA_CODE\", \"NOTE_ID\", \"FILE_ID\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.getReturnMerchandiseAuthorisationNoteFile(\n    'RMA_CODE',\n    'NOTE_ID',\n    'FILE_ID',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->getReturnMerchandiseAuthorisationNoteFile(\n    'RMA_CODE',\n    'NOTE_ID',\n    'FILE_ID',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.returnMerchandiseAuthorisations().getReturnMerchandiseAuthorisationNoteFile(\n        \"RMA_CODE\",\n        \"NOTE_ID\",\n        \"FILE_ID\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.GetReturnMerchandiseAuthorisationNoteFileAsync(\n    \"RMA_CODE\",\n    \"NOTE_ID\",\n    \"FILE_ID\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .getReturnMerchandiseAuthorisationNoteFile(\n      'RMA_CODE',\n      'NOTE_ID',\n      'FILE_ID',\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().GetReturnMerchandiseAuthorisationNoteFile(context.Background(), \"RMA_CODE\", \"NOTE_ID\", \"FILE_ID\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/return_merchandise_authorisations/{rma_code}/receive": {
+      "get": {
+        "tags": [
+          "Return merchandise authorisations"
+        ],
+        "summary": "List an RMA's receipts",
+        "operationId": "return_merchandise_authorisations_get_return_merchandise_authorisation_receive",
+        "description": "Returns the receipts of returned stock under `data`, each with its `code`, `status` and `quantity_received`. Use the RMA's `code` in the path; its `rma_` `id` returns `404`. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
+        "parameters": [
+          {
+            "name": "rma_code",
+            "in": "path",
+            "required": true,
+            "description": "The RMA's `code`. Its `rma_` `id` returns `404`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, as in `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The receipts, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReceiptList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The path holds the RMA's `id` rather than its `code`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/return_merchandise_authorisations/RMA_CODE/receive?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.return_merchandise_authorisations.get_return_merchandise_authorisation_receive(\n    \"RMA_CODE\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.getReturnMerchandiseAuthorisationReceive('RMA_CODE', {\n    limit: 20,\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->getReturnMerchandiseAuthorisationReceive(\n    'RMA_CODE',\n    ['limit' => 20],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.return_merchandise_authorisations.return_merchandise_authorisations_dto.ReturnMerchandiseAuthorisationsDto.InvoiceReturnMerchandiseAuthorisationReceiveList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<InvoiceReturnMerchandiseAuthorisationReceiveList> response = client.returnMerchandiseAuthorisations().getReturnMerchandiseAuthorisationReceive(\n        \"RMA_CODE\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.GetReturnMerchandiseAuthorisationReceiveAsync(\n    \"RMA_CODE\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .getReturnMerchandiseAuthorisationReceive(\n      'RMA_CODE',\n      queryParams: {'limit': 20},\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().GetReturnMerchandiseAuthorisationReceive(context.Background(), \"RMA_CODE\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/return_merchandise_authorisations/{rma_code}/receive/{receive_uuid}": {
+      "get": {
+        "tags": [
+          "Return merchandise authorisations"
+        ],
+        "summary": "Retrieve an RMA receipt",
+        "operationId": "return_merchandise_authorisations_get_return_merchandise_authorisation_receive_by_uuid",
+        "description": "Use the RMA's `code` in the path and the receipt's `rrma_` `id` or `code`. The receipt comes back with its `status` and `quantity_received`.",
+        "parameters": [
+          {
+            "name": "rma_code",
+            "in": "path",
+            "required": true,
+            "description": "The RMA's `code`. Its `rma_` `id` returns `404`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "receive_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The receipt's `id`, which starts with `rrma_`, or its `code`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The receipt, under `receive_rma`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReceiptResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/return_merchandise_authorisations/RMA_CODE/receive/RECEIPT_ID\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.return_merchandise_authorisations.get_return_merchandise_authorisation_receive_by_uuid(\n    \"RMA_CODE\", \"RECEIPT_ID\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.getReturnMerchandiseAuthorisationReceiveByUuid(\n    'RMA_CODE',\n    'RECEIPT_ID',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->getReturnMerchandiseAuthorisationReceiveByUuid(\n    'RMA_CODE',\n    'RECEIPT_ID',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.return_merchandise_authorisations.return_merchandise_authorisations_dto.ReturnMerchandiseAuthorisationsDto.InvoiceReturnMerchandiseAuthorisationReceive;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<InvoiceReturnMerchandiseAuthorisationReceive> response = client.returnMerchandiseAuthorisations().getReturnMerchandiseAuthorisationReceiveByUuid(\n        \"RMA_CODE\",\n        \"RECEIPT_ID\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.GetReturnMerchandiseAuthorisationReceiveByUuidAsync(\n    \"RMA_CODE\",\n    \"RECEIPT_ID\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .getReturnMerchandiseAuthorisationReceiveByUuid('RMA_CODE', 'RECEIPT_ID');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().GetReturnMerchandiseAuthorisationReceiveByUUID(context.Background(), \"RMA_CODE\", \"RECEIPT_ID\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -59252,6 +61023,530 @@
         "properties": {
           "rental_asset_profile": {
             "$ref": "#/components/schemas/RentalAssetProfileView"
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationCreated": {
+        "type": "object",
+        "properties": {
+          "activity_logs": {
+            "type": "array"
+          },
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationReceiptDetail": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReceiptDetailCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "last_updated_on": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "object": {
+            "type": "string"
+          },
+          "quantity_received": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationReceiptDetailCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationReceipt": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReceiptCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "last_updated_on": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "object": {
+            "type": "string"
+          },
+          "quantity_received": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationReceiptCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationRead": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReadAccount"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReadCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "item_count": {
+            "type": "integer"
+          },
+          "last_updated_by": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "last_updated_on": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "lines": {
+            "type": "array"
+          },
+          "note": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "receive_rmas": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReadReceiveRma"
+            }
+          },
+          "return_status": {
+            "type": "string"
+          },
+          "rma_date": {
+            "type": "string"
+          },
+          "sale_invoice": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReadSaleInvoice"
+          },
+          "sale_order": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "warehouse": {
+            "type": "null",
+            "description": "Null in every response read."
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationReadSaleInvoice": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationReadReceiveRma": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReadReceiveRmaCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "last_updated_on": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "object": {
+            "type": "string"
+          },
+          "quantity_received": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationReadReceiveRmaCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationReadCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationReadAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReturnMerchandiseAuthorisation"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisation": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationAccount"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "item_count": {
+            "type": "integer"
+          },
+          "last_updated_by": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "last_updated_on": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "note": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "return_status": {
+            "type": "string"
+          },
+          "rma_date": {
+            "type": "string"
+          },
+          "sale_invoice": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationSaleInvoice"
+          },
+          "sale_order": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "warehouse": {
+            "type": "null",
+            "description": "Null in every response read."
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationSaleInvoice": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Send as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationPaginationLinks"
+          },
+          "records": {
+            "type": "integer",
+            "description": "Offset pages only: total matching records, not the page's length."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset pages only."
+          },
+          "next_page": {
+            "type": "string",
+            "description": "Offset pages only: the literal string `NULL` at the end of a listing, not JSON null."
+          },
+          "previous_page": {
+            "type": "string",
+            "description": "Offset pages only."
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationReceiptList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReceipt"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationPagination"
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationResponse": {
+        "type": "object",
+        "required": [
+          "return_merchandise_authorisation"
+        ],
+        "properties": {
+          "return_merchandise_authorisation": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationRead"
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationCreateResponse": {
+        "type": "object",
+        "required": [
+          "return_merchandise_authorisation"
+        ],
+        "properties": {
+          "return_merchandise_authorisation": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationCreated"
+          }
+        }
+      },
+      "ReturnMerchandiseAuthorisationReceiptResponse": {
+        "type": "object",
+        "required": [
+          "receive_rma"
+        ],
+        "properties": {
+          "receive_rma": {
+            "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReceiptDetail"
           }
         }
       },
