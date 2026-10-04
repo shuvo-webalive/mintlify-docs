@@ -284,6 +284,9 @@
     },
     {
       "name": "Reports"
+    },
+    {
+      "name": "Applications"
     }
   ],
   "paths": {
@@ -83886,6 +83889,466 @@
           }
         ]
       }
+    },
+    "/settings/applications": {
+      "get": {
+        "tags": [
+          "Applications"
+        ],
+        "summary": "List applications",
+        "operationId": "applications_get_settings_applications",
+        "description": "Records are under `data`, and the listing pages by cursor. Other fields filter as `filter_<field>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The number of records per page. A `limit` of `0` returns `400`.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` from the previous page, to read the next page.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by; prefix it with `-` for descending order.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of applications, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/applications?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.applications.get_settings_applications({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.applications.getSettingsApplications({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->applications->getSettingsApplications(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.applications.applications_dto.ApplicationsDto.SettingsApplicationList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsApplicationList> response = client.applications().getSettingsApplications(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Applications.GetSettingsApplicationsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.applications.getSettingsApplications(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Applications().GetSettingsApplications(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Applications"
+        ],
+        "summary": "Create an application",
+        "operationId": "applications_create_settings_application",
+        "description": "Send the application under `application` with a `name` and a `redirect_url`; both are required. Exsited generates the client id and secret, and the API never returns them.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new application, under `application`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/applications\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"application\": {\n      \"name\": \"Acme Integration\",\n      \"redirect_url\": \"https://example.com/callback\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.applications.create_settings_application(\n    {\n        \"application\": {\n            \"name\": \"Acme Integration\",\n            \"redirect_url\": \"https://example.com/callback\",\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.applications.createSettingsApplication({\n    application: {name: 'Acme Integration', redirect_url: 'https://example.com/callback'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->applications->createSettingsApplication([\n    'application' => [\n        'name' => 'Acme Integration',\n        'redirect_url' => 'https://example.com/callback',\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.applications.applications_dto.ApplicationsDto.SettingsApplication;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsApplication> response = client.applications().createSettingsApplication(\n        Map.of(\n                \"application\", Map.of(\n                        \"name\", \"Acme Integration\",\n                        \"redirect_url\", \"https://example.com/callback\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Applications.CreateSettingsApplicationAsync(new Dictionary<string, object?>\n{\n    [\"application\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Acme Integration\",\n        [\"redirect_url\"] = \"https://example.com/callback\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.applications.createSettingsApplication({\n  'application': {\n    'name': 'Acme Integration',\n    'redirect_url': 'https://example.com/callback',\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Applications().CreateSettingsApplication(context.Background(), map[string]any{\n\t\"application\": map[string]any{\n\t\t\"name\":         \"Acme Integration\",\n\t\t\"redirect_url\": \"https://example.com/callback\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "application": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "redirect_url": {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "redirect_url"
+                    ]
+                  }
+                },
+                "required": [
+                  "application"
+                ]
+              },
+              "example": {
+                "application": {
+                  "name": "Acme Integration",
+                  "redirect_url": "https://example.com/callback"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/applications/{application_id}": {
+      "get": {
+        "tags": [
+          "Applications"
+        ],
+        "summary": "Retrieve an application",
+        "operationId": "applications_get_settings_application",
+        "description": "Pass the application's `id` as `application_id`. The response holds the application under `application`.",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "description": "The application's `id`, which starts with `app_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The application, under `application`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No application has that `id`, for example after it is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/applications/app_0123456789abcdef\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.applications.get_settings_application(\"app_0123456789abcdef\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.applications.getSettingsApplication('app_0123456789abcdef');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->applications->getSettingsApplication('app_0123456789abcdef');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.applications.applications_dto.ApplicationsDto.SettingsApplication;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsApplication> response = client.applications().getSettingsApplication(\"app_0123456789abcdef\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Applications.GetSettingsApplicationAsync(\"app_0123456789abcdef\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.applications.getSettingsApplication(\n  'app_0123456789abcdef',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Applications().GetSettingsApplication(context.Background(), \"app_0123456789abcdef\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Applications"
+        ],
+        "summary": "Delete an application",
+        "operationId": "applications_delete_settings_application",
+        "description": "Pass the application's `id` as `application_id`. A successful call returns `204` with no body, and a read of the same `id` then returns `404`.",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "description": "The application's `id`, which starts with `app_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The application is deleted. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/applications/app_0123456789abcdef\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.applications.delete_settings_application(\"app_0123456789abcdef\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.applications.deleteSettingsApplication('app_0123456789abcdef');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->applications->deleteSettingsApplication('app_0123456789abcdef');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.applications().deleteSettingsApplication(\"app_0123456789abcdef\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Applications.DeleteSettingsApplicationAsync(\"app_0123456789abcdef\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.applications.deleteSettingsApplication(\n  'app_0123456789abcdef',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Applications().DeleteSettingsApplication(context.Background(), \"app_0123456789abcdef\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Applications"
+        ],
+        "summary": "Update an application",
+        "operationId": "applications_update_settings_application",
+        "description": "Send the fields to change under `application`, such as `display_name` and `description`, or a new `status`. The response holds the updated application under `application`.",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "description": "The application's `id`, which starts with `app_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated application, under `application`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/applications/app_0123456789abcdef\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"application\": {\n      \"display_name\": \"Acme Integration\",\n      \"description\": \"Syncs orders with Acme\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.applications.update_settings_application(\n    \"app_0123456789abcdef\",\n    {\n        \"application\": {\n            \"display_name\": \"Acme Integration\",\n            \"description\": \"Syncs orders with Acme\",\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.applications.updateSettingsApplication('app_0123456789abcdef', {\n    application: {display_name: 'Acme Integration', description: 'Syncs orders with Acme'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->applications->updateSettingsApplication('app_0123456789abcdef', [\n    'application' => [\n        'display_name' => 'Acme Integration',\n        'description' => 'Syncs orders with Acme',\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.applications.applications_dto.ApplicationsDto.SettingsApplication;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsApplication> response = client.applications().updateSettingsApplication(\n        \"app_0123456789abcdef\",\n        Map.of(\n                \"application\", Map.of(\n                        \"display_name\", \"Acme Integration\",\n                        \"description\", \"Syncs orders with Acme\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Applications.UpdateSettingsApplicationAsync(\n    \"app_0123456789abcdef\",\n    new Dictionary<string, object?>\n    {\n        [\"application\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Acme Integration\",\n            [\"description\"] = \"Syncs orders with Acme\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.applications.updateSettingsApplication(\n  'app_0123456789abcdef',\n  {\n    'application': {\n      'display_name': 'Acme Integration',\n      'description': 'Syncs orders with Acme',\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Applications().UpdateSettingsApplication(context.Background(), \"app_0123456789abcdef\", map[string]any{\n\t\"application\": map[string]any{\n\t\t\"display_name\": \"Acme Integration\",\n\t\t\"description\":  \"Syncs orders with Acme\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "application": {
+                    "type": "object",
+                    "properties": {
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "application"
+                ]
+              },
+              "example": {
+                "application": {
+                  "display_name": "Acme Integration",
+                  "description": "Syncs orders with Acme"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -126176,6 +126639,113 @@
           },
           "deleted": {
             "$ref": "#/components/schemas/ReportAmountCount"
+          }
+        }
+      },
+      "Application": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "The application id, starting with `app_`."
+          },
+          "status": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "created_by": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "last_updated_by": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "href": {
+            "type": "string"
+          }
+        }
+      },
+      "ApplicationResponse": {
+        "type": "object",
+        "properties": {
+          "application": {
+            "$ref": "#/components/schemas/Application"
+          }
+        }
+      },
+      "ApplicationList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Application"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/ApplicationPagination"
+          }
+        }
+      },
+      "ApplicationPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer"
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "`false` on the last page, even if `next_cursor` is set."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "prev_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "links": {
+            "$ref": "#/components/schemas/ApplicationPaginationLinks"
+          }
+        }
+      },
+      "ApplicationPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
           }
         }
       },
