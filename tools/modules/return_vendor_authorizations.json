@@ -5,8 +5,8 @@
   "icon": "truck-ramp-box",
   "base": "/return_vendor_authorizations",
   "overview_description": "Create, read, update and delete return vendor authorizations, the returns of purchased stock to a supplier.",
-  "intro": "A return vendor authorization records stock you send back to a supplier against lines of a purchase order. These endpoints create, list, read, update and delete returns and remove their notes and files. There are 7 endpoints, and all seven SDKs call every one.",
-  "warning": "**Only a draft return vendor authorization can be deleted, and the delete cannot be undone.** Any other status returns `400` `stock_committed`.",
+  "intro": "A return vendor authorization records stock you send back to a supplier against lines of a purchase order. These endpoints create, list, read, update and delete returns and remove their notes and files. This area has 7 endpoints, each available in all seven SDKs.",
+  "warning": "**Creating a return vendor authorization currently fails.** The create currently returns `500`, so the update and delete, which need an existing return, have not been confirmed to work. Only a draft can be deleted, any other status returns `400` `stock_committed`, and a delete cannot be undone.",
   "notes": [
     "**Every write body is wrapped in `return_vendor_authorization`.**",
     "**The create names a purchase order and its lines.** Each line takes `purchase_order_line` and `rva_qty`; `create_as_draft: true` saves a draft.",
@@ -23,6 +23,7 @@
       "title": "Create a return vendor authorization",
       "summary": "Creates a return to a supplier for purchase order lines and returns it under `return_vendor_authorization`.",
       "description": "Creates a return vendor authorization for lines of a purchase order, wrapped in `return_vendor_authorization`. Name the purchase order by its `id`, and each line by its `purchase_order_line` id with the `rva_qty` to return. Send `create_as_draft: true` to save it as a draft.",
+      "warning": "**Creating a return vendor authorization currently fails.** This call currently returns `500`.",
       "parameters": [],
       "body": {
         "schema": {
@@ -64,7 +65,7 @@
         },
         "example": {
           "return_vendor_authorization": {
-            "purchase_order": "PO-0001",
+            "purchase_order": "PURCHASE_ORDER_ID",
             "create_as_draft": true,
             "lines": [
               {
@@ -84,14 +85,14 @@
           }
         },
         "500": {
-          "description": "The server can fail with `500` on this call."
+          "description": "The create currently fails with `500`."
         }
       },
       "example_call": {
         "path": {},
         "body": {
           "return_vendor_authorization": {
-            "purchase_order": "PO-0001",
+            "purchase_order": "PURCHASE_ORDER_ID",
             "create_as_draft": true,
             "lines": [
               {
@@ -111,12 +112,13 @@
       "title": "Delete a draft return vendor authorization",
       "summary": "Deletes a draft return vendor authorization. Nothing comes back.",
       "description": "Deletes the return vendor authorization, addressed by its `rva_` id. Only a draft can be deleted. The call returns `204` with no body, and reading it afterwards returns `404`.",
+      "warning": "**This call has not been confirmed to work.** It needs a draft return vendor authorization, and creating one currently fails.",
       "parameters": [
         {
           "name": "rva_id",
           "in": "path",
           "required": true,
-          "description": "The return vendor authorization's `rva_` id. A code returns `404`.",
+          "description": "The return vendor authorization's `id`, which starts with `rva_`. Passing its code returns `404`.",
           "schema": {
             "type": "string",
             "example": "rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d"
@@ -133,7 +135,7 @@
           "description": "`stock_committed`: the return is not a draft."
         },
         "404": {
-          "description": "No return vendor authorization has that `rva_` id. A code also returns `404` here."
+          "description": "No return vendor authorization has that `id`. Passing its code also returns `404`."
         }
       },
       "example_call": {
@@ -150,6 +152,7 @@
       "title": "Update a return vendor authorization",
       "summary": "Changes the date, note or custom attributes of a return vendor authorization and returns it under `return_vendor_authorization`.",
       "description": "Updates the header of the return vendor authorization, wrapped in `return_vendor_authorization`: `rva_date`, `note` and `custom_attributes`. Address it by its `rva_` id or its code.",
+      "warning": "**This call has not been confirmed to work.** It needs an existing return vendor authorization, and creating one currently fails.",
       "parameters": [
         {
           "name": "rva_id",
@@ -230,6 +233,7 @@
       "title": "Delete a return vendor authorization note",
       "summary": "Deletes one note from a return vendor authorization. Nothing comes back.",
       "description": "Deletes the note, addressed by the return's `rva_` id and the note's `id`. No endpoint lists or creates these notes, so you need the note's `id` already. The call returns `204` with no body.",
+      "warning": "**This call has not been confirmed to work.** No endpoint creates or lists a return vendor authorization's notes.",
       "parameters": [
         {
           "name": "rva_id",
@@ -273,7 +277,8 @@
       "slug": "delete-a-return-vendor-authorization-note-file",
       "title": "Delete a return vendor authorization note file",
       "summary": "Removes one attachment from a return vendor authorization note. Nothing comes back.",
-      "description": "Deletes one file from the note. No endpoint lists these notes, so you need the note's `id` and the file's `id` already. The call returns `204` with no body.",
+      "description": "Deletes one file from the note. No endpoint lists these notes, so you need the note's `id` and the attachment's `uuid` already. The call returns `204` with no body.",
+      "warning": "**This call has not been confirmed to work.** No endpoint creates or lists a return vendor authorization's notes.",
       "parameters": [
         {
           "name": "rva_id",
