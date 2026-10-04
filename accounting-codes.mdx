@@ -27,5 +27,5 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 - **Requests and responses wrap the record in `accounting_code`.** A create sends `{"accounting_code": {...}}` and a read returns the record under the same key.
 - **A create sets the code type with `account_code_type`.** The stored record reports the same value in `default_match_key`, such as `sales_revenue`.
 - **Discount profiles need a discount accounting code.** A discount profile accepts only an accounting code whose `default_match_key` is `discount`.
-- **Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true.
+- **Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.
 - **A delete returns `204` with no body.** Reading the accounting code afterwards returns `404`.
