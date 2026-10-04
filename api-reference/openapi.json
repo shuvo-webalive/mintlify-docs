@@ -164,6 +164,9 @@
     },
     {
       "name": "Departments"
+    },
+    {
+      "name": "Designations"
     }
   ],
   "paths": {
@@ -54585,6 +54588,461 @@
           }
         ]
       }
+    },
+    "/settings/designations": {
+      "get": {
+        "tags": [
+          "Designations"
+        ],
+        "summary": "List designations",
+        "operationId": "designations_get_settings_designations",
+        "description": "Returns one page of designations under `data`, with `pagination` for the next page. Each designation carries its `id`, `name`, `display_name`, `description` and `status`. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by; prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of designations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DesignationList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/designations?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.designations.get_settings_designations({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.designations.getSettingsDesignations({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->designations->getSettingsDesignations(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.designations.designations_dto.DesignationsDto.SettingsDesignationList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsDesignationList> response = client.designations().getSettingsDesignations(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Designations.GetSettingsDesignationsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.designations.getSettingsDesignations(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Designations().GetSettingsDesignations(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Designations"
+        ],
+        "summary": "Create a designation",
+        "operationId": "designations_create_settings_designation",
+        "description": "Send the new designation under `designation`. `name` is required. The new designation comes back under `designation`, with its `des_` id.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new designation, under `designation`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DesignationResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/designations\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"designation\": {\n      \"name\": \"Site Supervisor\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.designations.create_settings_designation(\n    {\"designation\": {\"name\": \"Site Supervisor\"}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.designations.createSettingsDesignation({designation: {name: 'Site Supervisor'}});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->designations->createSettingsDesignation([\n    'designation' => ['name' => 'Site Supervisor'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.designations().createSettingsDesignation(\n        Map.of(\"designation\", Map.of(\"name\", \"Site Supervisor\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Designations.CreateSettingsDesignationAsync(new Dictionary<string, object?>\n{\n    [\"designation\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Site Supervisor\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.designations.createSettingsDesignation({\n  'designation': {'name': 'Site Supervisor'},\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Designations().CreateSettingsDesignation(context.Background(), map[string]any{\n\t\"designation\": map[string]any{\"name\": \"Site Supervisor\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "designation": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The designation's name."
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ]
+                  }
+                },
+                "required": [
+                  "designation"
+                ]
+              },
+              "example": {
+                "designation": {
+                  "name": "Site Supervisor"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/designations/{designation_id}": {
+      "get": {
+        "tags": [
+          "Designations"
+        ],
+        "summary": "Retrieve a designation",
+        "operationId": "designations_get_settings_designation",
+        "description": "Returns the designation under `designation`.",
+        "parameters": [
+          {
+            "name": "designation_id",
+            "in": "path",
+            "required": true,
+            "description": "The designation's `id`, which starts with `des_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The designation, under `designation`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DesignationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No designation has that `id`, for example because it has been deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/designations/des_8a1b2c3d4e5f40718293a4b5c6d7e8f9\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.designations.get_settings_designation(\n    \"des_8a1b2c3d4e5f40718293a4b5c6d7e8f9\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.designations.getSettingsDesignation('des_8a1b2c3d4e5f40718293a4b5c6d7e8f9');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->designations->getSettingsDesignation('des_8a1b2c3d4e5f40718293a4b5c6d7e8f9');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.designations.designations_dto.DesignationsDto.SettingsDesignation;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsDesignation> response = client.designations().getSettingsDesignation(\n        \"des_8a1b2c3d4e5f40718293a4b5c6d7e8f9\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Designations.GetSettingsDesignationAsync(\"des_8a1b2c3d4e5f40718293a4b5c6d7e8f9\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.designations.getSettingsDesignation(\n  'des_8a1b2c3d4e5f40718293a4b5c6d7e8f9',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Designations().GetSettingsDesignation(context.Background(), \"des_8a1b2c3d4e5f40718293a4b5c6d7e8f9\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Designations"
+        ],
+        "summary": "Delete a designation",
+        "operationId": "designations_delete_settings_designation",
+        "description": "Deletes the designation with this `id`. A successful delete returns `204` with no body, and reading the designation afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "designation_id",
+            "in": "path",
+            "required": true,
+            "description": "The designation's `id`, which starts with `des_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The designation is deleted. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/designations/des_8a1b2c3d4e5f40718293a4b5c6d7e8f9\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.designations.delete_settings_designation(\n    \"des_8a1b2c3d4e5f40718293a4b5c6d7e8f9\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.designations.deleteSettingsDesignation('des_8a1b2c3d4e5f40718293a4b5c6d7e8f9');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->designations->deleteSettingsDesignation(\n    'des_8a1b2c3d4e5f40718293a4b5c6d7e8f9',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.designations().deleteSettingsDesignation(\"des_8a1b2c3d4e5f40718293a4b5c6d7e8f9\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Designations.DeleteSettingsDesignationAsync(\"des_8a1b2c3d4e5f40718293a4b5c6d7e8f9\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.designations.deleteSettingsDesignation(\n  'des_8a1b2c3d4e5f40718293a4b5c6d7e8f9',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Designations().DeleteSettingsDesignation(context.Background(), \"des_8a1b2c3d4e5f40718293a4b5c6d7e8f9\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Designations"
+        ],
+        "summary": "Update a designation",
+        "operationId": "designations_update_settings_designation",
+        "description": "Send the fields to change under `designation`: `name`, `display_name` or `description`. The updated designation comes back under `designation`.",
+        "parameters": [
+          {
+            "name": "designation_id",
+            "in": "path",
+            "required": true,
+            "description": "The designation's `id`, which starts with `des_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated designation, under `designation`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DesignationResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/designations/des_8a1b2c3d4e5f40718293a4b5c6d7e8f9\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"designation\": {\n      \"display_name\": \"Senior Site Supervisor\",\n      \"description\": \"Leads the site crew\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.designations.update_settings_designation(\n    \"des_8a1b2c3d4e5f40718293a4b5c6d7e8f9\",\n    {\n        \"designation\": {\n            \"display_name\": \"Senior Site Supervisor\",\n            \"description\": \"Leads the site crew\",\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.designations.updateSettingsDesignation('des_8a1b2c3d4e5f40718293a4b5c6d7e8f9', {\n    designation: {display_name: 'Senior Site Supervisor', description: 'Leads the site crew'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->designations->updateSettingsDesignation(\n    'des_8a1b2c3d4e5f40718293a4b5c6d7e8f9',\n    [\n        'designation' => [\n            'display_name' => 'Senior Site Supervisor',\n            'description' => 'Leads the site crew',\n        ],\n    ],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.designations().updateSettingsDesignation(\n        \"des_8a1b2c3d4e5f40718293a4b5c6d7e8f9\",\n        Map.of(\n                \"designation\", Map.of(\n                        \"display_name\", \"Senior Site Supervisor\",\n                        \"description\", \"Leads the site crew\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Designations.UpdateSettingsDesignationAsync(\n    \"des_8a1b2c3d4e5f40718293a4b5c6d7e8f9\",\n    new Dictionary<string, object?>\n    {\n        [\"designation\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Senior Site Supervisor\",\n            [\"description\"] = \"Leads the site crew\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.designations.updateSettingsDesignation(\n  'des_8a1b2c3d4e5f40718293a4b5c6d7e8f9',\n  {\n    'designation': {\n      'display_name': 'Senior Site Supervisor',\n      'description': 'Leads the site crew',\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Designations().UpdateSettingsDesignation(context.Background(), \"des_8a1b2c3d4e5f40718293a4b5c6d7e8f9\", map[string]any{\n\t\"designation\": map[string]any{\n\t\t\"display_name\": \"Senior Site Supervisor\",\n\t\t\"description\":  \"Leads the site crew\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "designation": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "designation"
+                ]
+              },
+              "example": {
+                "designation": {
+                  "display_name": "Senior Site Supervisor",
+                  "description": "Leads the site crew"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -87163,6 +87621,106 @@
         "properties": {
           "department": {
             "$ref": "#/components/schemas/Department"
+          }
+        }
+      },
+      "Designation": {
+        "type": "object",
+        "properties": {
+          "created_by": {
+            "type": "null"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "description": {
+            "type": "null"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "type": "null"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "DesignationResponse": {
+        "type": "object",
+        "properties": {
+          "designation": {
+            "$ref": "#/components/schemas/Designation"
+          }
+        }
+      },
+      "DesignationList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Designation"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/DesignationPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "DesignationPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Rely on this rather than on `next_cursor`, which can still hold a value on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/DesignationPaginationLinks"
+          }
+        }
+      },
+      "DesignationPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
           }
         }
       },
