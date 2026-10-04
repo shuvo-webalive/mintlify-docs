@@ -1,0 +1,4732 @@
+{
+  "family": "bookings",
+  "tag": "Bookings",
+  "slug": "bookings",
+  "icon": "calendar-check",
+  "base": "/booking",
+  "overview_description": "Create, preview, change and delete bookings, and read their lines, billing, invoices, payments and PDFs.",
+  "intro": "A booking is an order whose lines reserve a labour for set booking times. These endpoints create, preview, change and delete bookings, and read and update their lines, billing preferences, invoices, payments, fulfillments, custom objects and PDFs. The module has 33 endpoints, and all seven SDKs call every one.",
+  "warning": "**Delete a booking removes whatever order has that `id`, of any type, and returns no body.** Check the `id` first: a read of it afterwards returns `404`.",
+  "notes": [
+    "**The `/booking/{booking_id}` reads, updates and delete work on any order.** They do not check the order's type. Change a booking and Preview a booking change accept only a booking-type order.",
+    "**Each line of a new booking needs a labour and its booking times.** The rest of the body is the order body, under `order`: `account_id`, `name` and `lines`.",
+    "**Most bodies sit under `order`; the change bodies sit under `booking`.** The line billing update takes `order.line.item_properties`, not `billing_preferences`.",
+    "**Updates return the whole booking under `order`.** Single reads use their own keys: `order_line`, `custom_object`, `item_fulfillment`, `order_kpis` and `payment`.",
+    "**Listings page by cursor.** Records are under `data`; pass `limit` and the previous page's `pagination.next_cursor` as `cursor`, and stop when `has_more` is `false`.",
+    "**There is no per-booking notes listing.** List booking notes returns the notes of every order, and `/booking/{booking_id}/notes` is refused."
+  ],
+  "endpoints": [
+    {
+      "key": "get_booking",
+      "method": "GET",
+      "path": "/booking",
+      "slug": "list-bookings",
+      "title": "List bookings",
+      "summary": "Lists bookings one page at a time.",
+      "description": "Returns one page of bookings under `data`, with a `pagination` block. Pass `limit` to set the page size and `cursor` to move to the next page. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of bookings under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_booking_by_id",
+      "method": "GET",
+      "path": "/booking/{booking_id}",
+      "slug": "retrieve-a-booking",
+      "title": "Retrieve a booking",
+      "summary": "Returns one booking with its lines, billing preferences and KPIs.",
+      "description": "Returns the booking under `order`, including its `lines`, `billing_preferences`, `custom_attributes` and `kpis`. This path serves any order, not only booking-type orders.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The booking, under `order`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingResponse"
+          }
+        },
+        "404": {
+          "description": "No order has that `id`, for example after it is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID"
+        }
+      }
+    },
+    {
+      "key": "create_booking",
+      "method": "POST",
+      "path": "/booking",
+      "slug": "create-a-booking",
+      "title": "Create a booking",
+      "summary": "Creates a booking and returns it under `booking`.",
+      "description": "Send the same body as creating an order, under `order`: the `account_id`, an optional `name` and the `lines`. Each line needs a labour and its booking times. The new booking comes back under `booking`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "order"
+          ],
+          "properties": {
+            "order": {
+              "type": "object",
+              "properties": {
+                "account_id": {
+                  "type": "string",
+                  "description": "The account's `id`."
+                },
+                "name": {
+                  "type": "string"
+                },
+                "lines": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "item_id": {
+                        "type": "string",
+                        "description": "The item's `id`."
+                      },
+                      "item_order_quantity": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "order": {
+            "account_id": "ACCOUNT_ID",
+            "name": "Meeting room booking",
+            "lines": [
+              {
+                "item_id": "ITEM_ID",
+                "item_order_quantity": 1
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new booking, under `booking`."
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "order": {
+            "account_id": "ACCOUNT_ID",
+            "name": "Meeting room booking",
+            "lines": [
+              {
+                "item_id": "ITEM_ID",
+                "item_order_quantity": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "preview_booking",
+      "method": "POST",
+      "path": "/booking/preview",
+      "slug": "preview-a-booking",
+      "title": "Preview a booking",
+      "summary": "Prices a booking without creating it.",
+      "description": "Takes the same body as Create a booking and creates nothing. The result comes back under `booking` and holds only an empty `activity_logs` list, with no cart data.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "order"
+          ],
+          "properties": {
+            "order": {
+              "type": "object",
+              "properties": {
+                "account_id": {
+                  "type": "string",
+                  "description": "The account's `id`."
+                },
+                "name": {
+                  "type": "string"
+                },
+                "lines": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "item_id": {
+                        "type": "string",
+                        "description": "The item's `id`."
+                      },
+                      "item_order_quantity": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "order": {
+            "account_id": "ACCOUNT_ID",
+            "name": "Meeting room booking",
+            "lines": [
+              {
+                "item_id": "ITEM_ID",
+                "item_order_quantity": 1
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The preview, under `booking`, holding an empty `activity_logs` list."
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "order": {
+            "account_id": "ACCOUNT_ID",
+            "name": "Meeting room booking",
+            "lines": [
+              {
+                "item_id": "ITEM_ID",
+                "item_order_quantity": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_booking",
+      "method": "DELETE",
+      "path": "/booking/{booking_id}",
+      "slug": "delete-a-booking",
+      "title": "Delete a booking",
+      "summary": "Deletes a booking and returns no body.",
+      "description": "Deletes the order with this `id`, whatever its type, so check the `id` before you call it. Reading the same `id` afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The order is deleted. There is no body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID"
+        }
+      }
+    },
+    {
+      "key": "get_booking_notes",
+      "method": "GET",
+      "path": "/booking/notes",
+      "slug": "list-booking-notes",
+      "title": "List booking notes",
+      "summary": "Lists the notes of every order, one page at a time.",
+      "description": "Returns one page of notes under `data`, the same list as the order notes listing. There is no per-booking notes listing: `/booking/{booking_id}/notes` is refused. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of notes under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingNoteList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_booking_billing_preferences",
+      "method": "GET",
+      "path": "/booking/{booking_id}/billing_preferences",
+      "slug": "retrieve-a-bookings-billing-preferences",
+      "title": "Retrieve a booking's billing preferences",
+      "summary": "Returns a booking's billing preferences under `order.billing_preferences`.",
+      "description": "Returns the invoice, payment and fulfillment settings of one booking, such as `invoice_mode`, `payment_term` and `billing_period`, under `order.billing_preferences`.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The billing preferences, under `order`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingBillingPreferencesResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID"
+        }
+      }
+    },
+    {
+      "key": "update_booking_billing_preferences",
+      "method": "PATCH",
+      "path": "/booking/{booking_id}/billing_preferences",
+      "slug": "update-a-bookings-billing-preferences",
+      "title": "Update a booking's billing preferences",
+      "summary": "Changes a booking's billing preferences and returns the whole booking.",
+      "description": "Send the fields to change under `order.billing_preferences`, such as `invoice_mode`. The whole booking comes back under `order`.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "order"
+          ],
+          "properties": {
+            "order": {
+              "type": "object",
+              "required": [
+                "billing_preferences"
+              ],
+              "properties": {
+                "billing_preferences": {
+                  "type": "object",
+                  "properties": {
+                    "invoice_mode": {
+                      "type": "string",
+                      "example": "MANUAL"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "order": {
+            "billing_preferences": {
+              "invoice_mode": "MANUAL"
+            }
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The whole booking, under `order`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID"
+        },
+        "body": {
+          "order": {
+            "billing_preferences": {
+              "invoice_mode": "MANUAL"
+            }
+          }
+        }
+      }
+    },
+    {
+      "key": "change_booking",
+      "method": "POST",
+      "path": "/booking/{booking_id}/change",
+      "slug": "change-a-booking",
+      "title": "Change a booking",
+      "summary": "Changes a booking from an effective date.",
+      "description": "Send `effective_date` and `lines` under `booking`, not `order`. Only a booking-type order is accepted. Change is the only transition this path offers.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "booking"
+          ],
+          "properties": {
+            "booking": {
+              "type": "object",
+              "properties": {
+                "effective_date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "lines": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "booking": {
+            "effective_date": "2026-10-01"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The booking is changed."
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID"
+        },
+        "body": {
+          "booking": {
+            "effective_date": "2026-10-01"
+          }
+        }
+      }
+    },
+    {
+      "key": "preview_booking_change",
+      "method": "POST",
+      "path": "/booking/{booking_id}/change/preview",
+      "slug": "preview-a-booking-change",
+      "title": "Preview a booking change",
+      "summary": "Shows the result of a booking change without making it.",
+      "description": "Takes the same body as Change a booking, under `booking`, and changes nothing. Only a booking-type order is accepted.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "booking"
+          ],
+          "properties": {
+            "booking": {
+              "type": "object",
+              "properties": {
+                "effective_date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "lines": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "booking": {
+            "effective_date": "2026-10-01"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The preview of the change."
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID"
+        },
+        "body": {
+          "booking": {
+            "effective_date": "2026-10-01"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_booking_information",
+      "method": "GET",
+      "path": "/booking/{booking_id}/information",
+      "slug": "retrieve-a-bookings-information",
+      "title": "Retrieve a booking's information",
+      "summary": "Returns a booking's header under `order`.",
+      "description": "Returns the booking's header details, such as `name`, `description`, `status` and `account`, under `order`.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The booking, under `order`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID"
+        }
+      }
+    },
+    {
+      "key": "update_booking_information",
+      "method": "PATCH",
+      "path": "/booking/{booking_id}/information",
+      "slug": "update-a-bookings-information",
+      "title": "Update a booking's information",
+      "summary": "Changes a booking's header and returns the whole booking.",
+      "description": "Send the header fields to change under `order`, such as `description`. The whole booking comes back under `order`.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "order"
+          ],
+          "properties": {
+            "order": {
+              "type": "object",
+              "properties": {
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "order": {
+            "description": "Quarterly planning day"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The whole booking, under `order`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID"
+        },
+        "body": {
+          "order": {
+            "description": "Quarterly planning day"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_booking_lines",
+      "method": "GET",
+      "path": "/booking/{booking_id}/lines",
+      "slug": "retrieve-a-bookings-lines",
+      "title": "Retrieve a booking's lines",
+      "summary": "Returns a booking with its lines under `order.lines`.",
+      "description": "Returns the booking under `order`, with every line in `lines`. Each line carries its item, quantity, price, tax and totals.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The booking with its lines, under `order`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID"
+        }
+      }
+    },
+    {
+      "key": "get_booking_line",
+      "method": "GET",
+      "path": "/booking/{booking_id}/lines/{line_uuid}",
+      "slug": "retrieve-a-booking-line",
+      "title": "Retrieve a booking line",
+      "summary": "Returns one line of a booking under `order_line`.",
+      "description": "Returns the line with its item, quantity, price snapshot, tax and `item_properties`, under `order_line`.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        },
+        {
+          "name": "line_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The `id` of one of the booking's `lines`.",
+          "schema": {
+            "type": "string",
+            "example": "LINE_UUID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The line, under `order_line`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingLineResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID",
+          "line_uuid": "LINE_UUID"
+        }
+      }
+    },
+    {
+      "key": "update_booking_line",
+      "method": "PATCH",
+      "path": "/booking/{booking_id}/lines/{line_uuid}",
+      "slug": "update-a-booking-line",
+      "title": "Update a booking line",
+      "summary": "Changes one line of a booking and returns the whole booking.",
+      "description": "Send the line fields to change under `order.line`, such as `item_description`. The whole booking comes back under `order`.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        },
+        {
+          "name": "line_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The `id` of one of the booking's `lines`.",
+          "schema": {
+            "type": "string",
+            "example": "LINE_UUID"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "order"
+          ],
+          "properties": {
+            "order": {
+              "type": "object",
+              "required": [
+                "line"
+              ],
+              "properties": {
+                "line": {
+                  "type": "object",
+                  "properties": {
+                    "item_description": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "order": {
+            "line": {
+              "item_description": "Meeting room, half day"
+            }
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The whole booking, under `order`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID",
+          "line_uuid": "LINE_UUID"
+        },
+        "body": {
+          "order": {
+            "line": {
+              "item_description": "Meeting room, half day"
+            }
+          }
+        }
+      }
+    },
+    {
+      "key": "update_booking_line_billing_preferences",
+      "method": "PATCH",
+      "path": "/booking/{booking_id}/lines/{line_uuid}/billing_preferences",
+      "slug": "update-a-booking-lines-billing-preferences",
+      "title": "Update a booking line's billing preferences",
+      "summary": "Changes the billing settings of one line and returns the whole booking.",
+      "description": "Send the settings under `order.line.item_properties`, not under `billing_preferences`, such as `charging_start_date`. The example targets a metered line. The whole booking comes back under `order`.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        },
+        {
+          "name": "line_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The `id` of one of the booking's `lines`.",
+          "schema": {
+            "type": "string",
+            "example": "LINE_UUID"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "order"
+          ],
+          "properties": {
+            "order": {
+              "type": "object",
+              "required": [
+                "line"
+              ],
+              "properties": {
+                "line": {
+                  "type": "object",
+                  "required": [
+                    "item_properties"
+                  ],
+                  "properties": {
+                    "item_properties": {
+                      "type": "object",
+                      "properties": {
+                        "charging_start_date": {
+                          "type": "string",
+                          "example": "SUBSCRIPTION_START_DATE"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "order": {
+            "line": {
+              "item_properties": {
+                "charging_start_date": "SUBSCRIPTION_START_DATE"
+              }
+            }
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The whole booking, under `order`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID",
+          "line_uuid": "LINE_UUID"
+        },
+        "body": {
+          "order": {
+            "line": {
+              "item_properties": {
+                "charging_start_date": "SUBSCRIPTION_START_DATE"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "key": "get_booking_custom_objects",
+      "method": "GET",
+      "path": "/booking/{booking_id}/custom_objects",
+      "slug": "list-a-bookings-custom-objects",
+      "title": "List a booking's custom objects",
+      "summary": "Lists the custom objects orders use, one page at a time.",
+      "description": "Returns one page of the custom objects defined for orders under `data`. Read one of them to see this booking's instances of it. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of custom objects under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingCustomObjectList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_booking_custom_object",
+      "method": "GET",
+      "path": "/booking/{booking_id}/custom_objects/{custom_object_id}",
+      "slug": "retrieve-a-booking-custom-object",
+      "title": "Retrieve a booking custom object",
+      "summary": "Returns one custom object with this booking's instances of it.",
+      "description": "Returns the custom object under `custom_object`, with the booking's instances in `instances` and a `pagination` block.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        },
+        {
+          "name": "custom_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom object's `id`, for a custom object used in orders (`use_in` is `SALE_ORDER`).",
+          "schema": {
+            "type": "string",
+            "example": "CUSTOM_OBJECT_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The custom object, under `custom_object`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingCustomObjectResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID",
+          "custom_object_id": "CUSTOM_OBJECT_ID"
+        }
+      }
+    },
+    {
+      "key": "get_booking_custom_object_instance",
+      "method": "GET",
+      "path": "/booking/{booking_id}/custom_objects/{custom_object_id}/instances/{instance_id}",
+      "slug": "retrieve-a-booking-custom-object-instance",
+      "title": "Retrieve a booking custom object instance",
+      "summary": "Returns one instance of a custom object on a booking.",
+      "description": "Returns a single instance, picked by its `id`, of a custom object on this booking.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        },
+        {
+          "name": "custom_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom object's `id`, for a custom object used in orders (`use_in` is `SALE_ORDER`).",
+          "schema": {
+            "type": "string",
+            "example": "CUSTOM_OBJECT_ID"
+          }
+        },
+        {
+          "name": "instance_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom object instance's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "INSTANCE_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The custom object instance."
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID",
+          "custom_object_id": "CUSTOM_OBJECT_ID",
+          "instance_id": "INSTANCE_ID"
+        }
+      }
+    },
+    {
+      "key": "get_booking_custom_objects_instances",
+      "method": "GET",
+      "path": "/booking/{booking_id}/custom_objects_instances",
+      "slug": "list-a-bookings-custom-objects-instances-path",
+      "title": "List a booking's custom objects (instances path)",
+      "summary": "Lists the custom objects orders use, by the `custom_objects_instances` path.",
+      "description": "Another path to List a booking's custom objects: it returns the same body, one page under `data`. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of custom objects under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingCustomObjectList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_booking_custom_objects_instance",
+      "method": "GET",
+      "path": "/booking/{booking_id}/custom_objects_instances/{custom_object_id}",
+      "slug": "retrieve-a-booking-custom-object-instances-path",
+      "title": "Retrieve a booking custom object (instances path)",
+      "summary": "Returns one custom object with this booking's instances, by the `custom_objects_instances` path.",
+      "description": "Another path to Retrieve a booking custom object: it returns the same body, under `custom_object`.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        },
+        {
+          "name": "custom_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom object's `id`, for a custom object used in orders (`use_in` is `SALE_ORDER`).",
+          "schema": {
+            "type": "string",
+            "example": "CUSTOM_OBJECT_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The custom object, under `custom_object`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingCustomObjectResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID",
+          "custom_object_id": "CUSTOM_OBJECT_ID"
+        }
+      }
+    },
+    {
+      "key": "get_booking_custom_objects_instance_instance",
+      "method": "GET",
+      "path": "/booking/{booking_id}/custom_objects_instances/{custom_object_id}/instances/{instance_id}",
+      "slug": "retrieve-a-booking-custom-object-instance-instances-path",
+      "title": "Retrieve a booking custom object instance (instances path)",
+      "summary": "Returns one custom object instance, by the `custom_objects_instances` path.",
+      "description": "Another path to Retrieve a booking custom object instance, returning the same body.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        },
+        {
+          "name": "custom_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom object's `id`, for a custom object used in orders (`use_in` is `SALE_ORDER`).",
+          "schema": {
+            "type": "string",
+            "example": "CUSTOM_OBJECT_ID"
+          }
+        },
+        {
+          "name": "instance_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom object instance's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "INSTANCE_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The custom object instance."
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID",
+          "custom_object_id": "CUSTOM_OBJECT_ID",
+          "instance_id": "INSTANCE_ID"
+        }
+      }
+    },
+    {
+      "key": "get_booking_invoices",
+      "method": "GET",
+      "path": "/booking/{booking_id}/invoices",
+      "slug": "list-a-bookings-invoices",
+      "title": "List a booking's invoices",
+      "summary": "Lists the invoices raised for a booking, one page at a time.",
+      "description": "Returns one page of the booking's invoices under `data`. Each invoice names the booking in `order`. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of invoices under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingInvoiceList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_booking_item_fulfillments",
+      "method": "GET",
+      "path": "/booking/{booking_id}/item_fulfillments",
+      "slug": "list-a-bookings-item-fulfillments",
+      "title": "List a booking's item fulfillments",
+      "summary": "Lists the item fulfillments of a booking, one page at a time.",
+      "description": "Returns one page of fulfillments under `data`, with a `pagination` block. A booking with no fulfillment returns an empty `data` list. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of fulfillments under `data`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_booking_item_fulfillment",
+      "method": "GET",
+      "path": "/booking/{booking_id}/item_fulfillments/{fulfillment_id}",
+      "slug": "retrieve-a-booking-item-fulfillment",
+      "title": "Retrieve a booking item fulfillment",
+      "summary": "Returns one item fulfillment under `item_fulfillment`.",
+      "description": "Returns the fulfillment with its `fulfillments` lines, status and tracking number. The server does not check that the fulfillment belongs to the booking in the path.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        },
+        {
+          "name": "fulfillment_id",
+          "in": "path",
+          "required": true,
+          "description": "The item fulfillment's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "FULFILLMENT_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The fulfillment, under `item_fulfillment`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingItemFulfillmentResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID",
+          "fulfillment_id": "FULFILLMENT_ID"
+        }
+      }
+    },
+    {
+      "key": "get_booking_kpis",
+      "method": "GET",
+      "path": "/booking/{booking_id}/kpis",
+      "slug": "retrieve-a-bookings-kpis",
+      "title": "Retrieve a booking's KPIs",
+      "summary": "Returns a booking's key figures under `order_kpis`.",
+      "description": "Returns figures such as `total_revenue`, `total_collected`, `total_outstanding` and `monthly_recurring_revenue`, under `order_kpis`.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The KPIs, under `order_kpis`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingKpisResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID"
+        }
+      }
+    },
+    {
+      "key": "get_booking_payment_methods",
+      "method": "GET",
+      "path": "/booking/{booking_id}/payment_methods",
+      "slug": "list-a-bookings-payment-methods",
+      "title": "List a booking's payment methods",
+      "summary": "Lists the payment methods bound to a booking.",
+      "description": "Returns the account payment methods restricted to this booking, under `order.payment_methods`.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The payment methods, under `order.payment_methods`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingPaymentMethodsResponse"
+          }
+        },
+        "404": {
+          "description": "No payment method is bound to the booking."
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID"
+        }
+      }
+    },
+    {
+      "key": "get_booking_payment_method",
+      "method": "GET",
+      "path": "/booking/{booking_id}/payment_methods/{payment_method_ref}",
+      "slug": "retrieve-a-booking-payment-method",
+      "title": "Retrieve a booking payment method",
+      "summary": "Returns one payment method bound to a booking, found by its reference.",
+      "description": "Returns the payment method whose `reference` matches, under `order.payment_method`.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        },
+        {
+          "name": "payment_method_ref",
+          "in": "path",
+          "required": true,
+          "description": "The payment method's `reference`, not its `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PAYMENT_METHOD_REFERENCE"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The payment method, under `order.payment_method`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingPaymentMethodResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID",
+          "payment_method_ref": "PAYMENT_METHOD_REFERENCE"
+        }
+      }
+    },
+    {
+      "key": "get_booking_payments",
+      "method": "GET",
+      "path": "/booking/{booking_id}/payments",
+      "slug": "list-a-bookings-payments",
+      "title": "List a booking's payments",
+      "summary": "Lists the payments made against a booking's invoices, one page at a time.",
+      "description": "Returns one page of payments under `data`. Each payment lists the invoices it applies to and how it is applied. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of payments under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingPaymentList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_booking_payment",
+      "method": "GET",
+      "path": "/booking/{booking_id}/payments/{payment_id}",
+      "slug": "retrieve-a-booking-payment",
+      "title": "Retrieve a booking payment",
+      "summary": "Returns one payment under `payment`.",
+      "description": "Returns the payment with its applied amounts and invoices. The server does not check that the payment belongs to the booking in the path.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        },
+        {
+          "name": "payment_id",
+          "in": "path",
+          "required": true,
+          "description": "The payment's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PAYMENT_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The payment, under `payment`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingPaymentResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID",
+          "payment_id": "PAYMENT_ID"
+        }
+      }
+    },
+    {
+      "key": "get_booking_pdf",
+      "method": "GET",
+      "path": "/booking/{booking_id}/pdf",
+      "slug": "retrieve-a-bookings-pdf-links",
+      "title": "Retrieve a booking's PDF links",
+      "summary": "Returns links to a booking's PDF under `order.pdf`.",
+      "description": "Returns `download_url`, `preview_url` and `file_size` for the booking's PDF, under `order.pdf`.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The PDF links, under `order.pdf`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingPdfResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID"
+        }
+      }
+    },
+    {
+      "key": "get_booking_quote_partial_invoices",
+      "method": "GET",
+      "path": "/booking/{booking_id}/quote_partial_invoices",
+      "slug": "list-a-bookings-quote-partial-invoices",
+      "title": "List a booking's quote partial invoices",
+      "summary": "Lists the deposit and instalment invoices of a converted quote.",
+      "description": "Returns the deposit and instalment invoices under `order.partial_invoices`. The list is empty for a booking that did not start as a quote.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The partial invoices, under `order.partial_invoices`.",
+          "schema": {
+            "$ref": "#/components/schemas/BookingQuotePartialInvoicesResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID"
+        }
+      }
+    },
+    {
+      "key": "get_booking_shipping_pdf",
+      "method": "GET",
+      "path": "/booking/{booking_id}/shipping_pdf/{shipping_line_id}",
+      "slug": "retrieve-a-booking-shipping-line-pdf",
+      "title": "Retrieve a booking shipping line PDF",
+      "summary": "Returns the PDF of one shipping line of a booking.",
+      "description": "Returns the generated shipping PDF of the line. Until the line has a generated shipping PDF, the call returns `404`.",
+      "parameters": [
+        {
+          "name": "booking_id",
+          "in": "path",
+          "required": true,
+          "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+          "schema": {
+            "type": "string",
+            "example": "BOOKING_ID"
+          }
+        },
+        {
+          "name": "shipping_line_id",
+          "in": "path",
+          "required": true,
+          "description": "The shipping line's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "SHIPPING_LINE_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The shipping PDF."
+        },
+        "404": {
+          "description": "The shipping line has no generated shipping PDF yet."
+        }
+      },
+      "example_call": {
+        "path": {
+          "booking_id": "BOOKING_ID",
+          "shipping_line_id": "SHIPPING_LINE_ID"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "BookingQuotePartialInvoices": {
+      "type": "object",
+      "properties": {
+        "partial_invoices": {
+          "type": "array"
+        }
+      }
+    },
+    "BookingPdf": {
+      "type": "object",
+      "properties": {
+        "pdf": {
+          "$ref": "#/components/schemas/BookingPdfPdf"
+        }
+      }
+    },
+    "BookingPdfPdf": {
+      "type": "object",
+      "properties": {
+        "download_url": {
+          "type": "string"
+        },
+        "file_size": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "preview_url": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingPaymentView": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/BookingPaymentViewAccount"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/BookingPaymentViewCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "credit_applied": {
+          "type": "array"
+        },
+        "custom_attributes": {
+          "type": "array"
+        },
+        "gift_certificate_applied": {
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "invoices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/BookingPaymentViewInvoice"
+          }
+        },
+        "last_updated_by": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_updated_on": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "object": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "payment_applied": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/BookingPaymentViewPaymentApplied"
+          }
+        },
+        "payment_note": {
+          "type": "string"
+        },
+        "reconcile_status": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "BookingPaymentViewPaymentApplied": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string"
+        },
+        "gateway_response": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "method": {
+          "type": "string"
+        },
+        "processor": {
+          "type": "string"
+        },
+        "reference": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingPaymentViewInvoice": {
+      "type": "object",
+      "properties": {
+        "applied": {
+          "type": "string"
+        },
+        "due_date": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "outstanding": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingPaymentViewCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingPaymentViewAccount": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingPaymentList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/BookingPayment"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/BookingPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingPayment": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/BookingPaymentAccount"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/BookingPaymentCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "credit_applied": {
+          "type": "array"
+        },
+        "gift_certificate_applied": {
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "invoices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/BookingPaymentInvoice"
+          }
+        },
+        "last_updated_by": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_updated_on": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "object": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "payment_applied": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/BookingPaymentPaymentApplied"
+          }
+        },
+        "payment_note": {
+          "type": "string"
+        },
+        "reconcile_status": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "BookingPaymentPaymentApplied": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string"
+        },
+        "gateway_response": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "method": {
+          "type": "string"
+        },
+        "processor": {
+          "type": "string"
+        },
+        "reference": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingPaymentInvoice": {
+      "type": "object",
+      "properties": {
+        "applied": {
+          "type": "string"
+        },
+        "due_date": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "outstanding": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingPaymentCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingPaymentAccount": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingPaymentMethod": {
+      "type": "object",
+      "properties": {
+        "payment_method": {
+          "$ref": "#/components/schemas/BookingPaymentMethodPaymentMethod"
+        }
+      }
+    },
+    "BookingPaymentMethodPaymentMethod": {
+      "type": "object",
+      "properties": {
+        "created_by": {
+          "type": "string"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "default": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "last_used_at": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "payment_count": {
+          "type": "integer"
+        },
+        "processor": {
+          "$ref": "#/components/schemas/BookingPaymentMethodPaymentMethodProcessor"
+        },
+        "processor_type": {
+          "type": "string"
+        },
+        "reference": {
+          "type": "string"
+        },
+        "restricted_to_orders": {
+          "type": "boolean"
+        },
+        "specified_order_ids": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "BookingPaymentMethodPaymentMethodProcessor": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingPaymentMethods": {
+      "type": "object",
+      "properties": {
+        "payment_methods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/BookingPaymentMethodsPaymentMethod"
+          }
+        }
+      }
+    },
+    "BookingPaymentMethodsPaymentMethod": {
+      "type": "object",
+      "properties": {
+        "created_by": {
+          "type": "string"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "default": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "last_used_at": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "payment_count": {
+          "type": "integer"
+        },
+        "processor": {
+          "$ref": "#/components/schemas/BookingPaymentMethodsPaymentMethodProcessor"
+        },
+        "processor_type": {
+          "type": "string"
+        },
+        "reference": {
+          "type": "string"
+        },
+        "restricted_to_orders": {
+          "type": "boolean"
+        },
+        "specified_order_ids": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "BookingPaymentMethodsPaymentMethodProcessor": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingKpis": {
+      "type": "object",
+      "properties": {
+        "deleted_at": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "estimated_total": {
+          "type": "string"
+        },
+        "last_cancelled_at": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_changed_at": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_invoice_issue_date": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_invoice_total": {
+          "type": "string"
+        },
+        "last_reactivated_at": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "monthly_recurring_revenue": {
+          "type": "string"
+        },
+        "next_invoice_issue_date": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "object": {
+          "type": "string"
+        },
+        "start_date": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "total_collected": {
+          "type": "string"
+        },
+        "total_due": {
+          "type": "string"
+        },
+        "total_invoice": {
+          "type": "integer"
+        },
+        "total_outstanding": {
+          "type": "string"
+        },
+        "total_revenue": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingItemFulfillment": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/BookingItemFulfillmentAccount"
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/BookingItemFulfillmentCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "custom_attributes": {
+          "type": "object"
+        },
+        "delivery_status": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "fulfillment_completed": {
+          "type": "boolean"
+        },
+        "fulfillment_date": {
+          "type": "string"
+        },
+        "fulfillment_note": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "fulfillment_status": {
+          "type": "string"
+        },
+        "fulfillments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/BookingItemFulfillmentFulfillment"
+          }
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "invoice": {
+          "$ref": "#/components/schemas/BookingItemFulfillmentInvoice"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/BookingItemFulfillmentLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "order": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "status": {
+          "type": "string"
+        },
+        "tracking_number": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "BookingItemFulfillmentLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingItemFulfillmentInvoice": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingItemFulfillmentFulfillment": {
+      "type": "object",
+      "properties": {
+        "fulfillment_index": {
+          "type": "integer"
+        },
+        "fulfillment_qty": {
+          "type": "number"
+        },
+        "fulfillment_sent_qty": {
+          "type": "number"
+        },
+        "id": {
+          "type": "string"
+        },
+        "inventory_tracking": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "item": {
+          "$ref": "#/components/schemas/BookingItemFulfillmentFulfillmentItem"
+        },
+        "object": {
+          "type": "string"
+        },
+        "pending_return": {
+          "type": "number"
+        },
+        "returned": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "serving_status": {
+          "type": "string"
+        },
+        "uom": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "uom_precision": {
+          "type": "null",
+          "description": "Null in every response read."
+        }
+      }
+    },
+    "BookingItemFulfillmentFulfillmentItem": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingItemFulfillmentCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingItemFulfillmentAccount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingInvoiceList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/BookingInvoice"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/BookingPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingInvoice": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/BookingInvoiceAccount"
+        },
+        "alternate_billing_end_date": {
+          "type": "string"
+        },
+        "alternate_billing_start_date": {
+          "type": "string"
+        },
+        "alternate_due_date": {
+          "type": "string"
+        },
+        "alternate_issue_date": {
+          "type": "string"
+        },
+        "billing_end_date": {
+          "type": "string"
+        },
+        "billing_start_date": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/BookingInvoiceCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/BookingInvoiceCurrency"
+        },
+        "custom_form": {
+          "$ref": "#/components/schemas/BookingInvoiceCustomForm"
+        },
+        "customer_purchase_order_id": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "discount_amount": {
+          "type": "number"
+        },
+        "due": {
+          "type": "string"
+        },
+        "due_date": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "invoice_note": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "last_payment": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_updated_by": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_updated_on": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "object": {
+          "type": "string"
+        },
+        "order": {
+          "$ref": "#/components/schemas/BookingInvoiceOrder"
+        },
+        "origin": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "paid": {
+          "type": "string"
+        },
+        "payment_status": {
+          "type": "string"
+        },
+        "price_tax_inclusive": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "string"
+        },
+        "tax_total": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "BookingInvoiceOrder": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingInvoiceCustomForm": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingInvoiceCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingInvoiceCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingInvoiceAccount": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingCustomObject": {
+      "type": "object",
+      "properties": {
+        "created_by": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "custom_component": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "description": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "instances": {
+          "type": "array"
+        },
+        "last_updated_by": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/BookingPagination"
+        },
+        "relation": {
+          "type": "string"
+        },
+        "use_in": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingCustomObjectList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/BookingCustomObjectEntry"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/BookingPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingCustomObjectEntry": {
+      "type": "object",
+      "properties": {
+        "created_by": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "custom_component": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "description": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "relation": {
+          "type": "string"
+        },
+        "use_in": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingLine": {
+      "type": "object",
+      "properties": {
+        "charge_item_uuid": {
+          "type": "string"
+        },
+        "expected_delivery_date": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "item": {
+          "$ref": "#/components/schemas/BookingLineItem"
+        },
+        "item_accounting_code": {
+          "$ref": "#/components/schemas/BookingLineItemAccountingCode"
+        },
+        "item_charge_type": {
+          "type": "string"
+        },
+        "item_custom_attributes": {
+          "type": "array"
+        },
+        "item_description": {
+          "type": "string"
+        },
+        "item_invoice_note": {
+          "type": "string"
+        },
+        "item_order_quantity": {
+          "type": "integer"
+        },
+        "item_price_snapshot": {
+          "$ref": "#/components/schemas/BookingLineItemPriceSnapshot"
+        },
+        "item_price_tax": {
+          "$ref": "#/components/schemas/BookingLineItemPriceTax"
+        },
+        "item_properties": {
+          "$ref": "#/components/schemas/BookingLineItemProperties"
+        },
+        "item_sale_tax_configuration": {
+          "$ref": "#/components/schemas/BookingLineItemSaleTaxConfiguration"
+        },
+        "item_type": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "pre_order_stock_details": {
+          "$ref": "#/components/schemas/BookingLinePreOrderStockDetails"
+        },
+        "shipping_cost": {
+          "type": "number"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "string"
+        },
+        "tax_exempt_when_sold": {
+          "type": "boolean"
+        },
+        "total": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "BookingLinePreOrderStockDetails": {
+      "type": "object",
+      "properties": {
+        "pending_reserve": {
+          "type": "string"
+        },
+        "reserved": {
+          "type": "string"
+        },
+        "sold": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingLineItemSaleTaxConfiguration": {
+      "type": "object",
+      "properties": {
+        "sale_price_is_based_on": {
+          "type": "string"
+        },
+        "tax_code": {
+          "$ref": "#/components/schemas/BookingLineItemSaleTaxConfigurationTaxCode"
+        }
+      }
+    },
+    "BookingLineItemSaleTaxConfigurationTaxCode": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        },
+        "rate": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingLineItemProperties": {
+      "type": "object",
+      "properties": {
+        "billing_mode": {
+          "type": "string"
+        },
+        "charging_and_billing_alignment": {
+          "type": "string"
+        },
+        "charging_start_date": {
+          "type": "string"
+        },
+        "pro_rata_partial_pricing_period": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingLineItemPriceTax": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "rate": {
+          "type": "number"
+        }
+      }
+    },
+    "BookingLineItemPriceSnapshot": {
+      "type": "object",
+      "properties": {
+        "pricing_rule": {
+          "$ref": "#/components/schemas/BookingLineItemPriceSnapshotPricingRule"
+        }
+      }
+    },
+    "BookingLineItemPriceSnapshotPricingRule": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "type": "number"
+        },
+        "price_period": {
+          "type": "string"
+        },
+        "price_type": {
+          "type": "string"
+        },
+        "pricing_level": {
+          "type": "string"
+        },
+        "pricing_method": {
+          "type": "string"
+        },
+        "pricing_schedule": {
+          "type": "string"
+        },
+        "uom": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "warehouse": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingLineItemAccountingCode": {
+      "type": "object",
+      "properties": {
+        "sales_revenue": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingLineItem": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingBillingPreferencesView": {
+      "type": "object",
+      "properties": {
+        "billing_preferences": {
+          "$ref": "#/components/schemas/BookingBillingPreferencesDetail"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingBillingPreferencesDetail": {
+      "type": "object",
+      "properties": {
+        "billing_period": {
+          "type": "string"
+        },
+        "communication_profile": {
+          "type": "string"
+        },
+        "consolidate_invoice": {
+          "type": "boolean"
+        },
+        "fulfillment_mode": {
+          "type": "string"
+        },
+        "fulfillment_term": {
+          "type": "string"
+        },
+        "invoice_mode": {
+          "type": "string"
+        },
+        "invoice_term": {
+          "type": "string"
+        },
+        "payment_mode": {
+          "type": "string"
+        },
+        "payment_processor": {
+          "type": "string"
+        },
+        "payment_term": {
+          "type": "string"
+        },
+        "payment_term_alignment": {
+          "type": "string"
+        },
+        "proforma_properties": {
+          "$ref": "#/components/schemas/BookingBillingPreferencesDetailProformaProperties"
+        }
+      }
+    },
+    "BookingBillingPreferencesDetailProformaProperties": {
+      "type": "object",
+      "properties": {
+        "acceptance_date": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "acceptance_required": {
+          "type": "boolean"
+        },
+        "acceptance_term": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "payment_required": {
+          "type": "boolean"
+        },
+        "terms_and_conditions": {
+          "type": "null",
+          "description": "Null in every response read."
+        }
+      }
+    },
+    "BookingNoteList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/BookingNote"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/BookingPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingNote": {
+      "type": "object",
+      "properties": {
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/BookingNoteAttachment"
+          }
+        },
+        "content": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/BookingNoteCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "group": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/BookingNoteLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "user": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "version": {
+          "type": "integer"
+        },
+        "watchers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/BookingNoteWatcher"
+          }
+        }
+      }
+    },
+    "BookingNoteWatcher": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingNoteLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingNoteCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingNoteAttachment": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingById": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/BookingByIdAccount"
+        },
+        "activity_logs": {
+          "type": "array",
+          "description": "Returned by the writes, not by the reads, and empty in every response read."
+        },
+        "allow_contract": {
+          "type": "boolean"
+        },
+        "billing_address": {
+          "$ref": "#/components/schemas/BookingByIdBillingAddress"
+        },
+        "billing_preferences": {
+          "$ref": "#/components/schemas/BookingByIdBillingPreferences"
+        },
+        "billing_start_date": {
+          "type": "string"
+        },
+        "communication_preferences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/BookingByIdCommunicationPreference"
+          }
+        },
+        "created_by": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/BookingByIdCurrency"
+        },
+        "custom_attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/BookingByIdCustomAttribute"
+          }
+        },
+        "custom_form": {
+          "$ref": "#/components/schemas/BookingByIdCustomForm"
+        },
+        "customer_purchase_order_id": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "discount_profile": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "invoice_note": {
+          "type": "string"
+        },
+        "kpis": {
+          "$ref": "#/components/schemas/BookingByIdKpis"
+        },
+        "last_updated_by": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/BookingByIdLine"
+          }
+        },
+        "manager": {
+          "$ref": "#/components/schemas/BookingByIdManager"
+        },
+        "name": {
+          "type": "string"
+        },
+        "next_billing_from_date": {
+          "type": "string"
+        },
+        "next_billing_from_date_utc": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "order_start_date": {
+          "type": "string"
+        },
+        "order_type": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "original_total": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "pre_order": {
+          "type": "boolean"
+        },
+        "price_tax_inclusive": {
+          "type": "boolean"
+        },
+        "quote_converted": {
+          "type": "boolean"
+        },
+        "quote_order": {
+          "type": "boolean"
+        },
+        "referral_account": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "sales_rep": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "shipping_address": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "shipping_cost": {
+          "type": "number"
+        },
+        "shipping_line_items": {
+          "type": "array"
+        },
+        "shipping_profile": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "status": {
+          "type": "string"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "string"
+        },
+        "time_zone": {
+          "$ref": "#/components/schemas/BookingByIdTimeZone"
+        },
+        "total": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "BookingByIdTimeZone": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingByIdManager": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingByIdLine": {
+      "type": "object",
+      "properties": {
+        "charge_item_uuid": {
+          "type": "string"
+        },
+        "expected_delivery_date": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "item": {
+          "$ref": "#/components/schemas/BookingByIdLineItem"
+        },
+        "item_accounting_code": {
+          "$ref": "#/components/schemas/BookingByIdLineItemAccountingCode"
+        },
+        "item_charge_type": {
+          "type": "string"
+        },
+        "item_custom_attributes": {
+          "type": "array"
+        },
+        "item_description": {
+          "type": "string"
+        },
+        "item_invoice_note": {
+          "type": "string"
+        },
+        "item_order_quantity": {
+          "type": "integer"
+        },
+        "item_price_snapshot": {
+          "$ref": "#/components/schemas/BookingByIdLineItemPriceSnapshot"
+        },
+        "item_price_tax": {
+          "$ref": "#/components/schemas/BookingByIdLineItemPriceTax"
+        },
+        "item_properties": {
+          "$ref": "#/components/schemas/BookingByIdLineItemProperties"
+        },
+        "item_sale_tax_configuration": {
+          "$ref": "#/components/schemas/BookingByIdLineItemSaleTaxConfiguration"
+        },
+        "item_type": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "pre_order_stock_details": {
+          "$ref": "#/components/schemas/BookingByIdLinePreOrderStockDetails"
+        },
+        "shipping_cost": {
+          "type": "number"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "string"
+        },
+        "tax_exempt_when_sold": {
+          "type": "boolean"
+        },
+        "total": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "BookingByIdLinePreOrderStockDetails": {
+      "type": "object",
+      "properties": {
+        "pending_reserve": {
+          "type": "string"
+        },
+        "reserved": {
+          "type": "string"
+        },
+        "sold": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingByIdLineItemSaleTaxConfiguration": {
+      "type": "object",
+      "properties": {
+        "sale_price_is_based_on": {
+          "type": "string"
+        },
+        "tax_code": {
+          "$ref": "#/components/schemas/BookingByIdLineItemSaleTaxConfigurationTaxCode"
+        }
+      }
+    },
+    "BookingByIdLineItemSaleTaxConfigurationTaxCode": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        },
+        "rate": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingByIdLineItemProperties": {
+      "type": "object",
+      "properties": {
+        "billing_mode": {
+          "type": "string"
+        },
+        "charging_and_billing_alignment": {
+          "type": "string"
+        },
+        "charging_start_date": {
+          "type": "string"
+        },
+        "pro_rata_partial_pricing_period": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingByIdLineItemPriceTax": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "rate": {
+          "type": "number"
+        }
+      }
+    },
+    "BookingByIdLineItemPriceSnapshot": {
+      "type": "object",
+      "properties": {
+        "pricing_rule": {
+          "$ref": "#/components/schemas/BookingByIdLineItemPriceSnapshotPricingRule"
+        }
+      }
+    },
+    "BookingByIdLineItemPriceSnapshotPricingRule": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "type": "number"
+        },
+        "price_period": {
+          "type": "string"
+        },
+        "price_type": {
+          "type": "string"
+        },
+        "pricing_level": {
+          "type": "string"
+        },
+        "pricing_method": {
+          "type": "string"
+        },
+        "pricing_schedule": {
+          "type": "string"
+        },
+        "uom": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "warehouse": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingByIdLineItemAccountingCode": {
+      "type": "object",
+      "properties": {
+        "sales_revenue": {
+          "description": "Any JSON value."
+        }
+      }
+    },
+    "BookingByIdLineItem": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingByIdKpis": {
+      "type": "object",
+      "properties": {
+        "deleted_at": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "estimated_total": {
+          "type": "string"
+        },
+        "last_cancelled_at": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_changed_at": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_invoice_issue_date": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_invoice_total": {
+          "type": "string"
+        },
+        "last_reactivated_at": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "monthly_recurring_revenue": {
+          "type": "string"
+        },
+        "next_invoice_issue_date": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "object": {
+          "type": "string"
+        },
+        "start_date": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "total_collected": {
+          "type": "string"
+        },
+        "total_due": {
+          "type": "string"
+        },
+        "total_invoice": {
+          "type": "integer"
+        },
+        "total_outstanding": {
+          "type": "string"
+        },
+        "total_revenue": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingByIdCustomForm": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingByIdCustomAttribute": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "value": {
+          "type": [
+            "string",
+            "array"
+          ],
+          "description": "A string or a list; both appear in responses."
+        }
+      }
+    },
+    "BookingByIdCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingByIdCommunicationPreference": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "BookingByIdBillingPreferences": {
+      "type": "object",
+      "properties": {
+        "billing_period": {
+          "type": "string"
+        },
+        "communication_profile": {
+          "type": "string"
+        },
+        "consolidate_invoice": {
+          "type": "boolean"
+        },
+        "fulfillment_mode": {
+          "type": "string"
+        },
+        "fulfillment_term": {
+          "type": "string"
+        },
+        "invoice_mode": {
+          "type": "string"
+        },
+        "invoice_term": {
+          "type": "string"
+        },
+        "payment_mode": {
+          "type": "string"
+        },
+        "payment_processor": {
+          "type": "string"
+        },
+        "payment_term": {
+          "type": "string"
+        },
+        "payment_term_alignment": {
+          "type": "string"
+        },
+        "proforma_properties": {
+          "$ref": "#/components/schemas/BookingByIdBillingPreferencesProformaProperties"
+        }
+      }
+    },
+    "BookingByIdBillingPreferencesProformaProperties": {
+      "type": "object",
+      "properties": {
+        "acceptance_date": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "acceptance_required": {
+          "type": "boolean"
+        },
+        "acceptance_term": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "payment_required": {
+          "type": "boolean"
+        },
+        "terms_and_conditions": {
+          "type": "null",
+          "description": "Null in every response read."
+        }
+      }
+    },
+    "BookingByIdBillingAddress": {
+      "type": "object",
+      "properties": {
+        "address_line_1": {
+          "type": "string"
+        },
+        "address_line_2": {
+          "type": "string"
+        },
+        "address_line_3": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "address_line_4": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "address_line_5": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "city": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingByIdAccount": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Booking"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/BookingPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "Booking": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/BookingAccount"
+        },
+        "allow_contract": {
+          "type": "boolean"
+        },
+        "billing_address": {
+          "$ref": "#/components/schemas/BookingBillingAddress"
+        },
+        "billing_preferences": {
+          "$ref": "#/components/schemas/BookingBillingPreferences"
+        },
+        "billing_start_date": {
+          "type": "string"
+        },
+        "billing_start_day_of_month": {
+          "type": "string"
+        },
+        "communication_preferences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/BookingCommunicationPreference"
+          }
+        },
+        "contract_properties": {
+          "$ref": "#/components/schemas/BookingContractProperties"
+        },
+        "created_by": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/BookingCurrency"
+        },
+        "custom_form": {
+          "$ref": "#/components/schemas/BookingCustomForm"
+        },
+        "customer_purchase_order_id": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "discount_profile": {
+          "$ref": "#/components/schemas/BookingDiscountProfile"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "invoice_note": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "manager": {
+          "$ref": "#/components/schemas/BookingManager"
+        },
+        "name": {
+          "type": "string"
+        },
+        "next_billing_from_date": {
+          "type": "string"
+        },
+        "next_billing_from_date_utc": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "order_start_date": {
+          "type": "string"
+        },
+        "order_type": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "original_total": {
+          "type": "string"
+        },
+        "pre_order": {
+          "type": "boolean"
+        },
+        "price_tax_inclusive": {
+          "type": "boolean"
+        },
+        "quote_converted": {
+          "type": "boolean"
+        },
+        "quote_order": {
+          "type": "boolean"
+        },
+        "referral_account": {
+          "$ref": "#/components/schemas/BookingReferralAccount"
+        },
+        "sales_rep": {
+          "$ref": "#/components/schemas/BookingSalesRep"
+        },
+        "shipping_address": {
+          "$ref": "#/components/schemas/BookingShippingAddress"
+        },
+        "shipping_cost": {
+          "type": "number"
+        },
+        "shipping_profile": {
+          "$ref": "#/components/schemas/BookingShippingProfile"
+        },
+        "status": {
+          "type": "string"
+        },
+        "time_zone": {
+          "$ref": "#/components/schemas/BookingTimeZone"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "BookingTimeZone": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingShippingProfile": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingShippingAddress": {
+      "type": "object",
+      "properties": {
+        "address_line_1": {
+          "type": "string"
+        },
+        "address_line_2": {
+          "type": "string"
+        },
+        "address_line_3": {
+          "type": "string"
+        },
+        "address_line_4": {
+          "type": "string"
+        },
+        "address_line_5": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingSalesRep": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingReferralAccount": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingManager": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingDiscountProfile": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "redemption_code": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingCustomForm": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingContractProperties": {
+      "type": "object",
+      "properties": {
+        "allow_downgrade": {
+          "type": "boolean"
+        },
+        "allow_downgrade_charge": {
+          "type": "boolean"
+        },
+        "allow_early_termination": {
+          "type": "boolean"
+        },
+        "allow_postponement": {
+          "type": "boolean"
+        },
+        "allow_trial": {
+          "type": "boolean"
+        },
+        "allow_upgrade": {
+          "type": "boolean"
+        },
+        "auto_renewal_ends_on": {
+          "type": "string"
+        },
+        "auto_renewal_require_customer_acceptance": {
+          "type": "boolean"
+        },
+        "auto_renewal_term": {
+          "type": "string"
+        },
+        "downgrade_charge_fixed": {
+          "type": "string"
+        },
+        "downgrade_charge_type": {
+          "type": "string"
+        },
+        "initial_contract_term": {
+          "type": "string"
+        },
+        "period_before_downgrade": {
+          "type": "string"
+        },
+        "renew_automatically": {
+          "type": "string"
+        },
+        "require_customer_acceptance": {
+          "type": "boolean"
+        },
+        "requires_payment_method": {
+          "type": "boolean"
+        },
+        "termination_accounting_code": {
+          "type": "string"
+        },
+        "termination_notice_period": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingCommunicationPreference": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "BookingBillingPreferences": {
+      "type": "object",
+      "properties": {
+        "billing_period": {
+          "type": "string"
+        },
+        "communication_profile": {
+          "type": "string"
+        },
+        "consolidate_invoice": {
+          "type": "boolean"
+        },
+        "consolidate_key": {
+          "type": "string"
+        },
+        "fulfillment_mode": {
+          "type": "string"
+        },
+        "fulfillment_term": {
+          "type": "string"
+        },
+        "invoice_mode": {
+          "type": "string"
+        },
+        "invoice_term": {
+          "type": "string"
+        },
+        "payment_mode": {
+          "type": "string"
+        },
+        "payment_processor": {
+          "type": "string"
+        },
+        "payment_term": {
+          "type": "string"
+        },
+        "payment_term_alignment": {
+          "type": "string"
+        },
+        "proforma_properties": {
+          "$ref": "#/components/schemas/BookingBillingPreferencesProformaProperties"
+        }
+      }
+    },
+    "BookingBillingPreferencesProformaProperties": {
+      "type": "object",
+      "properties": {
+        "acceptance_date": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "acceptance_required": {
+          "type": "boolean"
+        },
+        "acceptance_term": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "payment_required": {
+          "type": "boolean"
+        },
+        "terms_and_conditions": {
+          "type": "null",
+          "description": "Null in every response read."
+        }
+      }
+    },
+    "BookingBillingAddress": {
+      "type": "object",
+      "properties": {
+        "address_line_1": {
+          "type": "string"
+        },
+        "address_line_2": {
+          "type": "string"
+        },
+        "address_line_3": {
+          "type": "string"
+        },
+        "address_line_4": {
+          "type": "string"
+        },
+        "address_line_5": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingAccount": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Send as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/BookingPaginationLinks"
+        },
+        "records": {
+          "type": "integer",
+          "description": "Offset pages only: total matching records, not the page's length."
+        },
+        "offset": {
+          "type": "integer",
+          "description": "Offset pages only."
+        },
+        "next_page": {
+          "type": "string",
+          "description": "Offset pages only: the literal string `NULL` at the end of a listing, not JSON null."
+        },
+        "previous_page": {
+          "type": "string",
+          "description": "Offset pages only."
+        }
+      }
+    },
+    "BookingPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "BookingResponse": {
+      "type": "object",
+      "required": [
+        "order"
+      ],
+      "properties": {
+        "order": {
+          "$ref": "#/components/schemas/BookingById"
+        }
+      }
+    },
+    "BookingBillingPreferencesResponse": {
+      "type": "object",
+      "required": [
+        "order"
+      ],
+      "properties": {
+        "order": {
+          "$ref": "#/components/schemas/BookingBillingPreferencesView"
+        }
+      }
+    },
+    "BookingLineResponse": {
+      "type": "object",
+      "required": [
+        "order_line"
+      ],
+      "properties": {
+        "order_line": {
+          "$ref": "#/components/schemas/BookingLine"
+        }
+      }
+    },
+    "BookingCustomObjectResponse": {
+      "type": "object",
+      "required": [
+        "custom_object"
+      ],
+      "properties": {
+        "custom_object": {
+          "$ref": "#/components/schemas/BookingCustomObject"
+        }
+      }
+    },
+    "BookingItemFulfillmentResponse": {
+      "type": "object",
+      "required": [
+        "item_fulfillment"
+      ],
+      "properties": {
+        "item_fulfillment": {
+          "$ref": "#/components/schemas/BookingItemFulfillment"
+        }
+      }
+    },
+    "BookingKpisResponse": {
+      "type": "object",
+      "required": [
+        "order_kpis"
+      ],
+      "properties": {
+        "order_kpis": {
+          "$ref": "#/components/schemas/BookingKpis"
+        }
+      }
+    },
+    "BookingPaymentMethodsResponse": {
+      "type": "object",
+      "required": [
+        "order"
+      ],
+      "properties": {
+        "order": {
+          "$ref": "#/components/schemas/BookingPaymentMethods"
+        }
+      }
+    },
+    "BookingPaymentMethodResponse": {
+      "type": "object",
+      "required": [
+        "order"
+      ],
+      "properties": {
+        "order": {
+          "$ref": "#/components/schemas/BookingPaymentMethod"
+        }
+      }
+    },
+    "BookingPaymentResponse": {
+      "type": "object",
+      "required": [
+        "payment"
+      ],
+      "properties": {
+        "payment": {
+          "$ref": "#/components/schemas/BookingPaymentView"
+        }
+      }
+    },
+    "BookingPdfResponse": {
+      "type": "object",
+      "required": [
+        "order"
+      ],
+      "properties": {
+        "order": {
+          "$ref": "#/components/schemas/BookingPdf"
+        }
+      }
+    },
+    "BookingQuotePartialInvoicesResponse": {
+      "type": "object",
+      "required": [
+        "order"
+      ],
+      "properties": {
+        "order": {
+          "$ref": "#/components/schemas/BookingQuotePartialInvoices"
+        }
+      }
+    }
+  }
+}
