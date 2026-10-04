@@ -1,0 +1,596 @@
+{
+  "family": "custom_attributes",
+  "tag": "Custom attributes",
+  "slug": "custom-attributes",
+  "icon": "tags",
+  "base": "/custom_attributes",
+  "overview_description": "List, create, read, update and delete the custom attributes that add your own fields to Exsited records.",
+  "intro": "Custom attributes are fields you define yourself, such as a text, number or dropdown value, and attach to records like accounts. This area has 5 endpoints to list, create, read, update and delete them, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**Every write sends its fields under `custom_attribute`.** The create and update bodies wrap the fields in `custom_attribute`, and one attribute comes back under the same key.",
+    "**A create needs `name`, `display_name` and `type`.** Those are the fields the create example sends; `type` takes values such as `STRING`, `NUMBER` and `DROPDOWN`.",
+    "**Dropdown options go in as strings and come back as objects.** Send `options` as a list of strings; the response lists each option as an object with `name` and `display_order`.",
+    "**A create returns 201 with two extra fields.** The created attribute also carries `uuid` and `activity_logs`.",
+    "**The listing pages by cursor.** Pass `limit`, then the `next_cursor` from `pagination` as `cursor` while `has_more` is true.",
+    "**A delete returns 204 with no body.** Reading the attribute afterwards returns 404."
+  ],
+  "endpoints": [
+    {
+      "key": "get_custom_attributes",
+      "method": "GET",
+      "path": "/custom_attributes",
+      "slug": "list-custom-attributes",
+      "title": "List custom attributes",
+      "summary": "Returns one page of the custom attributes defined on your Exsited account.",
+      "description": "Lists the custom attributes with each one's type, options and the records it is used in. Records are under `data` and paging details under `pagination`. Fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by, such as `created_on`, or `-created_on` for newest first.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of custom attributes, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/CustomAttributeList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_custom_attribute",
+      "method": "POST",
+      "path": "/custom_attributes",
+      "slug": "create-a-custom-attribute",
+      "title": "Create a custom attribute",
+      "summary": "Creates a custom attribute and returns it, under `custom_attribute`.",
+      "description": "Defines a new custom attribute. Send `name`, `display_name` and `type` under `custom_attribute`; for a `DROPDOWN` attribute add `options` as a list of strings. The new attribute comes back with its `id`, `uuid` and `activity_logs`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "custom_attribute": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The attribute's name."
+                },
+                "display_name": {
+                  "type": "string",
+                  "description": "The name shown to users."
+                },
+                "type": {
+                  "type": "string",
+                  "description": "The attribute's type, such as `STRING`, `NUMBER` or `DROPDOWN`."
+                },
+                "description": {
+                  "type": "string"
+                },
+                "options": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "The choices of a `DROPDOWN` attribute, as plain strings."
+                }
+              }
+            }
+          },
+          "required": [
+            "custom_attribute"
+          ]
+        },
+        "example": {
+          "custom_attribute": {
+            "name": "contract_tier",
+            "display_name": "Contract tier",
+            "type": "STRING"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new custom attribute, under `custom_attribute`.",
+          "schema": {
+            "$ref": "#/components/schemas/CustomAttributeCreatedResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "custom_attribute": {
+            "name": "contract_tier",
+            "display_name": "Contract tier",
+            "type": "STRING"
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_custom_attribute",
+      "method": "DELETE",
+      "path": "/custom_attributes/{custom_attribute_id}",
+      "slug": "delete-a-custom-attribute",
+      "title": "Delete a custom attribute",
+      "summary": "Deletes a custom attribute and returns no body.",
+      "description": "Removes the custom attribute with this `id`. A successful call returns 204 with an empty body, and reading the attribute afterwards returns 404.",
+      "parameters": [
+        {
+          "name": "custom_attribute_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom attribute's `id`, as returned by the listing or the create call.",
+          "schema": {
+            "type": "string",
+            "example": "f3a8c1d6e2b94a7c8d5e0f1a2b3c4d5e"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The custom attribute is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "custom_attribute_id": "f3a8c1d6e2b94a7c8d5e0f1a2b3c4d5e"
+        }
+      }
+    },
+    {
+      "key": "get_custom_attribute",
+      "method": "GET",
+      "path": "/custom_attributes/{custom_attribute_id}",
+      "slug": "retrieve-a-custom-attribute",
+      "title": "Retrieve a custom attribute",
+      "summary": "Returns one custom attribute, under `custom_attribute`.",
+      "description": "Reads a single custom attribute by its `id`, with its type, options, limits and the records it is used in.",
+      "parameters": [
+        {
+          "name": "custom_attribute_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom attribute's `id`, as returned by the listing or the create call.",
+          "schema": {
+            "type": "string",
+            "example": "f3a8c1d6e2b94a7c8d5e0f1a2b3c4d5e"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The custom attribute, under `custom_attribute`.",
+          "schema": {
+            "$ref": "#/components/schemas/CustomAttributeResponse"
+          }
+        },
+        "404": {
+          "description": "No custom attribute has that `id`, for example because it is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "custom_attribute_id": "f3a8c1d6e2b94a7c8d5e0f1a2b3c4d5e"
+        }
+      }
+    },
+    {
+      "key": "update_custom_attribute",
+      "method": "PATCH",
+      "path": "/custom_attributes/{custom_attribute_id}",
+      "slug": "update-a-custom-attribute",
+      "title": "Update a custom attribute",
+      "summary": "Changes a custom attribute's fields and returns the updated attribute.",
+      "description": "Send the fields to change under `custom_attribute`, such as `display_name` and `description`. The updated attribute comes back under `custom_attribute`.",
+      "parameters": [
+        {
+          "name": "custom_attribute_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom attribute's `id`, as returned by the listing or the create call.",
+          "schema": {
+            "type": "string",
+            "example": "f3a8c1d6e2b94a7c8d5e0f1a2b3c4d5e"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "custom_attribute": {
+              "type": "object",
+              "properties": {
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "custom_attribute"
+          ]
+        },
+        "example": {
+          "custom_attribute": {
+            "display_name": "Contract tier (updated)",
+            "description": "The customer's support contract tier"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated custom attribute, under `custom_attribute`.",
+          "schema": {
+            "$ref": "#/components/schemas/CustomAttributeResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "custom_attribute_id": "f3a8c1d6e2b94a7c8d5e0f1a2b3c4d5e"
+        },
+        "body": {
+          "custom_attribute": {
+            "display_name": "Contract tier (updated)",
+            "description": "The customer's support contract tier"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "CustomAttribute": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "is_mandatory": {
+          "type": "boolean"
+        },
+        "encrypt_data": {
+          "type": "boolean"
+        },
+        "unit": {},
+        "uom": {},
+        "min_value": {},
+        "max_value": {},
+        "max_length": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "max_size": {},
+        "include_seconds": {},
+        "time_format": {},
+        "options": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/components/schemas/CustomAttributeOption"
+          }
+        },
+        "use_in": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CustomAttributeUseIn"
+          }
+        },
+        "meta_data": {},
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "created_by": {},
+        "last_updated_by": {},
+        "version": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "CustomAttributeCreated": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "is_mandatory": {
+          "type": "boolean"
+        },
+        "encrypt_data": {
+          "type": "boolean"
+        },
+        "unit": {},
+        "uom": {},
+        "min_value": {},
+        "max_value": {},
+        "max_length": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "max_size": {},
+        "include_seconds": {},
+        "time_format": {},
+        "options": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/components/schemas/CustomAttributeOption"
+          }
+        },
+        "use_in": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CustomAttributeUseIn"
+          }
+        },
+        "meta_data": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "created_by": {},
+        "last_updated_by": {},
+        "version": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "activity_logs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CustomAttributeActivityLog"
+          }
+        }
+      }
+    },
+    "CustomAttributeOption": {
+      "type": "object",
+      "properties": {
+        "display_order": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "CustomAttributeUseIn": {
+      "type": "object",
+      "properties": {
+        "associated_account_groups": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "associated_item_groups": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "associated_user_groups": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "resource": {
+          "type": "string"
+        },
+        "unique": {
+          "type": "boolean"
+        }
+      }
+    },
+    "CustomAttributeActivityLog": {
+      "type": "object",
+      "properties": {
+        "activity": {
+          "type": "string"
+        }
+      }
+    },
+    "CustomAttributeResponse": {
+      "type": "object",
+      "properties": {
+        "custom_attribute": {
+          "$ref": "#/components/schemas/CustomAttribute"
+        }
+      }
+    },
+    "CustomAttributeCreatedResponse": {
+      "type": "object",
+      "properties": {
+        "custom_attribute": {
+          "$ref": "#/components/schemas/CustomAttributeCreated"
+        }
+      }
+    },
+    "CustomAttributeList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CustomAttribute"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/CustomAttributePagination"
+        }
+      }
+    },
+    "CustomAttributePagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can be stale on the last page."
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "links": {
+          "$ref": "#/components/schemas/CustomAttributePaginationLinks"
+        }
+      }
+    },
+    "CustomAttributePaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}
