@@ -5,14 +5,14 @@
   "icon": "rotate-left",
   "base": "/purchase_refunds",
   "overview_description": "Record refunds from suppliers against purchase credit notes, and read, update and delete purchase refunds.",
-  "intro": "A purchase refund records money a supplier pays back against a purchase credit note. These endpoints record a refund from a credit note and read, update and delete refunds. There are 5 endpoints, and all seven SDKs call every one.",
-  "warning": "**Deleting a purchase refund cannot be undone.**",
+  "intro": "A purchase refund records money a supplier pays back against a purchase credit note. These endpoints record a refund from a credit note and read, update and delete refunds. This area has 5 endpoints, each available in all seven SDKs.",
+  "warning": "**Deleting a purchase refund cannot be undone.** Updating a purchase refund currently returns `500`, even for a valid body such as a new `reference`.",
   "notes": [
     "**A purchase refund is created from a purchase credit note.** Post it to `/purchase_credit_notes/{purchase_credit_note_id}/purchase_refunds`.",
     "**Every write body is wrapped in `purchase_refund`.**",
-    "**`payment_method` is the reference of one of the supplier's payment methods.**",
+    "**`payment_method` is the reference of one of the supplier's payment methods.** Take it from the `reference` of an entry in the supplier account's payment methods, under `account.payment_methods`.",
     "**The update takes only `alternate_date`, `reference`, `note` and `custom_attributes`.** Any other key returns `400`, and the amount cannot change.",
-    "**The update and delete address a refund by its code.** They match nothing else."
+    "**The update and delete address a refund by its `id`.** Its `uuid` does not match."
   ],
   "endpoints": [
     {
@@ -84,7 +84,7 @@
           "name": "purchase_refund_id",
           "in": "path",
           "required": true,
-          "description": "The purchase refund's `code`. The update and delete accept nothing else.",
+          "description": "The purchase refund's `id`.",
           "schema": {
             "type": "string",
             "example": "PR-0001"
@@ -101,7 +101,7 @@
           }
         },
         "404": {
-          "description": "No purchase refund has that code, for example after it is deleted."
+          "description": "No purchase refund has that `id`, for example after it is deleted."
         }
       },
       "example_call": {
@@ -213,12 +213,13 @@
       "title": "Update a purchase refund",
       "summary": "Changes a refund's reference, note, date or custom attributes and returns it under `purchase_refund`.",
       "description": "Updates the refund, wrapped in `purchase_refund`. Only `alternate_date`, `reference`, `note` and `custom_attributes` can change; any other key returns `400`, and the amount cannot change.",
+      "warning": "**Updating a purchase refund currently fails.** This call currently returns `500`, even for a valid body such as the example below.",
       "parameters": [
         {
           "name": "purchase_refund_id",
           "in": "path",
           "required": true,
-          "description": "The purchase refund's `code`. The update and delete accept nothing else.",
+          "description": "The purchase refund's `id`. The update and delete do not accept its `uuid`.",
           "schema": {
             "type": "string",
             "example": "PR-0001"
@@ -280,7 +281,7 @@
           "description": "The body holds a key other than `alternate_date`, `reference`, `note` and `custom_attributes`."
         },
         "500": {
-          "description": "The server can fail with `500` on this call even for a valid body."
+          "description": "The update currently fails with `500`, even for a valid body."
         }
       },
       "example_call": {
@@ -301,13 +302,13 @@
       "slug": "delete-a-purchase-refund",
       "title": "Delete a purchase refund",
       "summary": "Deletes a purchase refund. Nothing comes back.",
-      "description": "Deletes the refund, addressed by its code. The call returns `204` with no body, and reading the refund afterwards returns `404`.",
+      "description": "Deletes the refund, addressed by its `id`. The call returns `204` with no body, and reading the refund afterwards returns `404`.",
       "parameters": [
         {
           "name": "purchase_refund_id",
           "in": "path",
           "required": true,
-          "description": "The purchase refund's `code`. The update and delete accept nothing else.",
+          "description": "The purchase refund's `id`. The update and delete do not accept its `uuid`.",
           "schema": {
             "type": "string",
             "example": "PR-0001"
@@ -531,17 +532,11 @@
         "credit_note": {
           "$ref": "#/components/schemas/PurchaseRefundCreditNote"
         },
-        "credit_note_id": {
-          "type": "string"
-        },
         "custom_attributes": {
           "type": "array",
           "items": {
             "$ref": "#/components/schemas/PurchaseRefundCustomAttribute"
           }
-        },
-        "date": {
-          "type": "string"
         },
         "id": {
           "type": "string"
@@ -567,7 +562,6 @@
         "payment_processor": {
           "type": "string"
         },
-        "purchase_refund": {},
         "reference": {
           "type": "string"
         },
