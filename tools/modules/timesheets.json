@@ -1,0 +1,713 @@
+{
+  "family": "timesheets",
+  "tag": "Timesheets",
+  "slug": "timesheets",
+  "icon": "clock",
+  "base": "/timesheets",
+  "overview_description": "Manage timesheets in Exsited: record time worked against booked order lines, then list, read, update or delete it.",
+  "intro": "Timesheets record the time a labour worked on a booked order line. You can list, create, retrieve, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.",
+  "warning": "**Deleting a timesheet cannot be undone.** After a delete, reading the timesheet returns `404`.",
+  "notes": [
+    "**Request bodies go under `timesheet`.** The create and the update wrap their fields in a `timesheet` object, and every single-timesheet response returns it under `timesheet`.",
+    "**A timesheet belongs to a booked order line.** `sale_order_item` is the line's `ln_` id with the prefix changed to `soi_`, on a line that books a labour.",
+    "**Times are ISO 8601 in UTC.** Send `start_time` and `end_time` as values such as `2026-11-09T09:00:00Z`.",
+    "**Timesheet ids start with `ts_`.** Pass that `id` as `created_timesheet_id`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_timesheets",
+      "method": "GET",
+      "path": "/timesheets",
+      "slug": "list-timesheets",
+      "title": "List timesheets",
+      "summary": "Lists timesheets, one page at a time.",
+      "description": "Returns one page of timesheets under `data`, with `pagination` for the next page. Each timesheet carries its `labour`, `sale_order`, `sale_order_item`, `start_time`, `end_time` and `status`. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by; prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of timesheets.",
+          "schema": {
+            "$ref": "#/components/schemas/TimesheetList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_timesheet",
+      "method": "POST",
+      "path": "/timesheets",
+      "slug": "create-a-timesheet",
+      "title": "Create a timesheet",
+      "summary": "Records time worked against a booked order line and returns the timesheet under `timesheet`.",
+      "description": "Send the timesheet under `timesheet` with the `sale_order_item` it is for and its `start_time` and `end_time`. The `sale_order_item` is the order line's id with its `ln_` prefix replaced by `soi_`, on an order line that books a labour. The new timesheet comes back under `timesheet`, with its `ts_` id.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "timesheet": {
+              "type": "object",
+              "properties": {
+                "sale_order_item": {
+                  "type": "string",
+                  "description": "The order line, as `soi_` followed by the line's id without its `ln_` prefix."
+                },
+                "start_time": {
+                  "type": "string",
+                  "description": "When the work started, in ISO 8601 UTC, such as `2026-11-09T09:00:00Z`."
+                },
+                "end_time": {
+                  "type": "string",
+                  "description": "When the work ended, in ISO 8601 UTC."
+                }
+              }
+            }
+          },
+          "required": [
+            "timesheet"
+          ]
+        },
+        "example": {
+          "timesheet": {
+            "sale_order_item": "soi_4d7e9a2b1c3f4e5d8a6b7c9d0e1f2a3b",
+            "start_time": "2026-11-09T09:00:00Z",
+            "end_time": "2026-11-09T10:00:00Z"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new timesheet, under `timesheet`.",
+          "schema": {
+            "$ref": "#/components/schemas/TimesheetsResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "timesheet": {
+            "sale_order_item": "soi_4d7e9a2b1c3f4e5d8a6b7c9d0e1f2a3b",
+            "start_time": "2026-11-09T09:00:00Z",
+            "end_time": "2026-11-09T10:00:00Z"
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_timesheet",
+      "method": "DELETE",
+      "path": "/timesheets/{created_timesheet_id}",
+      "slug": "delete-a-timesheet",
+      "title": "Delete a timesheet",
+      "summary": "Deletes a timesheet; the response has no body.",
+      "description": "Deletes the timesheet with this `id`. A successful delete returns `204` with no body, and reading the timesheet afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "created_timesheet_id",
+          "in": "path",
+          "required": true,
+          "description": "The timesheet's `id`, which starts with `ts_`.",
+          "schema": {
+            "type": "string",
+            "example": "ts_6a5b4c3d2e1f40a9b8c7d6e5f4a3b2c1"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The timesheet is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "created_timesheet_id": "ts_6a5b4c3d2e1f40a9b8c7d6e5f4a3b2c1"
+        }
+      }
+    },
+    {
+      "key": "update_timesheet",
+      "method": "PATCH",
+      "path": "/timesheets/{created_timesheet_id}",
+      "slug": "update-a-timesheet",
+      "title": "Update a timesheet",
+      "summary": "Changes a timesheet's times and returns it under `timesheet`.",
+      "description": "Send the fields to change under `timesheet`, such as a new `end_time`. The updated timesheet comes back under `timesheet`.",
+      "parameters": [
+        {
+          "name": "created_timesheet_id",
+          "in": "path",
+          "required": true,
+          "description": "The timesheet's `id`, which starts with `ts_`.",
+          "schema": {
+            "type": "string",
+            "example": "ts_6a5b4c3d2e1f40a9b8c7d6e5f4a3b2c1"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "timesheet": {
+              "type": "object",
+              "properties": {
+                "start_time": {
+                  "type": "string"
+                },
+                "end_time": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "timesheet"
+          ]
+        },
+        "example": {
+          "timesheet": {
+            "end_time": "2026-11-09T10:30:00Z"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated timesheet, under `timesheet`.",
+          "schema": {
+            "$ref": "#/components/schemas/TimesheetUpdatedResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "created_timesheet_id": "ts_6a5b4c3d2e1f40a9b8c7d6e5f4a3b2c1"
+        },
+        "body": {
+          "timesheet": {
+            "end_time": "2026-11-09T10:30:00Z"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_timesheet",
+      "method": "GET",
+      "path": "/timesheets/{created_timesheet_id}",
+      "slug": "retrieve-a-timesheet",
+      "title": "Retrieve a timesheet",
+      "summary": "Retrieves one timesheet by its `ts_` id.",
+      "description": "Returns the timesheet under `timesheet`, including its `activity_logs`. Use the `ts_` id that the list and the create return.",
+      "parameters": [
+        {
+          "name": "created_timesheet_id",
+          "in": "path",
+          "required": true,
+          "description": "The timesheet's `id`, which starts with `ts_`.",
+          "schema": {
+            "type": "string",
+            "example": "ts_6a5b4c3d2e1f40a9b8c7d6e5f4a3b2c1"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The timesheet, under `timesheet`.",
+          "schema": {
+            "$ref": "#/components/schemas/TimesheetsResponse"
+          }
+        },
+        "404": {
+          "description": "No timesheet has that `id`, for example because it has been deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "created_timesheet_id": "ts_6a5b4c3d2e1f40a9b8c7d6e5f4a3b2c1"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "Timesheets": {
+      "type": "object",
+      "properties": {
+        "activity_logs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/TimesheetsActivityLog"
+          }
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/TimesheetsCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "labour": {
+          "$ref": "#/components/schemas/TimesheetsLabour"
+        },
+        "last_updated_by": {
+          "type": "null"
+        },
+        "last_updated_on": {
+          "type": "null"
+        },
+        "object": {
+          "type": "string"
+        },
+        "sale_order": {
+          "$ref": "#/components/schemas/TimesheetsSaleOrder"
+        },
+        "sale_order_item": {
+          "$ref": "#/components/schemas/TimesheetsSaleOrderItem"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "TimesheetsActivityLog": {
+      "type": "object",
+      "properties": {
+        "activity": {
+          "type": "string"
+        }
+      }
+    },
+    "TimesheetsCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TimesheetsLabour": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TimesheetsSaleOrder": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TimesheetsSaleOrderItem": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TimesheetsResponse": {
+      "type": "object",
+      "properties": {
+        "timesheet": {
+          "$ref": "#/components/schemas/Timesheets"
+        }
+      }
+    },
+    "TimesheetList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Timesheet"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/TimesheetPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "Timesheet": {
+      "type": "object",
+      "properties": {
+        "created_by": {
+          "$ref": "#/components/schemas/TimesheetCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "labour": {
+          "$ref": "#/components/schemas/TimesheetLabour"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/TimesheetLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "sale_order": {
+          "$ref": "#/components/schemas/TimesheetSaleOrder"
+        },
+        "sale_order_item": {
+          "$ref": "#/components/schemas/TimesheetSaleOrderItem"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "TimesheetCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TimesheetLabour": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TimesheetLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TimesheetSaleOrder": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TimesheetSaleOrderItem": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TimesheetPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Rely on this rather than on `next_cursor`, which can still hold a value on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/TimesheetPaginationLinks"
+        }
+      }
+    },
+    "TimesheetPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "TimesheetUpdated": {
+      "type": "object",
+      "properties": {
+        "activity_logs": {
+          "type": "array"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/TimesheetUpdatedCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "labour": {
+          "$ref": "#/components/schemas/TimesheetUpdatedLabour"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/TimesheetUpdatedLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "sale_order": {
+          "$ref": "#/components/schemas/TimesheetUpdatedSaleOrder"
+        },
+        "sale_order_item": {
+          "$ref": "#/components/schemas/TimesheetUpdatedSaleOrderItem"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "TimesheetUpdatedCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TimesheetUpdatedLabour": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TimesheetUpdatedLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TimesheetUpdatedSaleOrder": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TimesheetUpdatedSaleOrderItem": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TimesheetUpdatedResponse": {
+      "type": "object",
+      "properties": {
+        "timesheet": {
+          "$ref": "#/components/schemas/TimesheetUpdated"
+        }
+      }
+    }
+  }
+}
