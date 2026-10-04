@@ -49979,11 +49979,21 @@
         ],
         "summary": "Update labour availability in bulk",
         "operationId": "labours_update_labour_availability",
-        "description": "Send `labours`, an array with one entry per labour: its `id` and the slots to set in `labour_availability` or `labour_custom_availability`. Each slot has a `preferred_day`, `start_time`, `end_time` and `available`. A successful update returns `204` with no body.",
+        "description": "Send `labours`, an array with one entry per labour: its `id` and the slots to set in `labour_availability` or `labour_custom_availability`. Each slot has a `preferred_day`, `start_time`, `end_time` and `available`. When it succeeds, the update returns `204` with no body.",
         "parameters": [],
         "responses": {
           "204": {
             "description": "The availability is updated. No body."
+          },
+          "500": {
+            "description": "The bulk availability update currently fails.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         },
         "x-codeSamples": [
@@ -50841,7 +50851,7 @@
         ],
         "summary": "Delete a labour profile",
         "operationId": "labours_delete_labour_profile",
-        "description": "Deletes the labour profile with this `id`. Reading the profile afterwards returns `404`.",
+        "description": "Deletes the labour profile with this `id`. Reading the profile afterwards returns `404`. A profile that a booked labour uses cannot be deleted.",
         "parameters": [
           {
             "name": "labour_profile_id",
@@ -50855,7 +50865,7 @@
         ],
         "responses": {
           "200": {
-            "description": "The labour profile is deleted."
+            "description": "The labour profile is deleted. Read the profile afterwards to confirm it returns `404`."
           }
         },
         "x-codeSamples": [
@@ -51020,7 +51030,7 @@
             "name": "labour_uuid",
             "in": "path",
             "required": true,
-            "description": "The labour's `id`.",
+            "description": "The labour's `id`, as Create a labour and List labours return it. Despite the parameter name, pass the `id`.",
             "schema": {
               "type": "string"
             }
@@ -51130,7 +51140,7 @@
             "name": "labour_uuid",
             "in": "path",
             "required": true,
-            "description": "The labour's `id`.",
+            "description": "The labour's `id`, as Create a labour and List labours return it. Despite the parameter name, pass the `id`.",
             "schema": {
               "type": "string"
             }
@@ -51196,7 +51206,7 @@
             "name": "labour_uuid",
             "in": "path",
             "required": true,
-            "description": "The labour's `id`.",
+            "description": "The labour's `id`, as Create a labour and List labours return it. Despite the parameter name, pass the `id`.",
             "schema": {
               "type": "string"
             }
@@ -51281,7 +51291,7 @@
             "name": "labour_id",
             "in": "path",
             "required": true,
-            "description": "The labour's `id`.",
+            "description": "The labour's `id`, the same value the update and the read take.",
             "schema": {
               "type": "string"
             }
@@ -51368,7 +51378,7 @@
             "name": "labour_id",
             "in": "path",
             "required": true,
-            "description": "The labour's `id`.",
+            "description": "The labour's `id`, the same value the update and the read take.",
             "schema": {
               "type": "string"
             }
@@ -51455,7 +51465,7 @@
             "name": "labour_uuid",
             "in": "path",
             "required": true,
-            "description": "The labour's `code`.",
+            "description": "The labour's `code`, such as `LAB-00003`. Despite the parameter name, this route takes the code.",
             "schema": {
               "type": "string"
             }

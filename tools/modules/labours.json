@@ -5,11 +5,11 @@
   "icon": "user-gear",
   "base": "/labours",
   "overview_description": "Manage labours in Exsited: labours, labour profiles and their sessions, availability, booking windows and orders.",
-  "intro": "Labours are the people or resources you book on orders, and labour profiles set their prices, sessions and availability. You can manage labours and profiles, set availability, find labours free to book and list the orders that book a labour. This area has 19 endpoints, and all seven SDKs call every one.",
-  "warning": "**A booked labour cannot be deleted, and deletes cannot be undone.** Cancel a booked labour instead; a deleted labour or labour profile then returns `404`.",
+  "intro": "Labours are the people or resources you book on orders, and labour profiles set their prices, sessions and availability. You can manage labours and profiles, set availability, find labours free to book and list the orders that book a labour. This area has 19 endpoints, each available in all seven SDKs.",
+  "warning": "**A booked labour cannot be deleted, and deletes cannot be undone.** To take a booked labour out of use, cancel it instead; a labour profile that a booked labour uses cannot be deleted either. After a delete, reading the labour or labour profile returns `404`. The bulk availability update (`PATCH /labour_availability`) currently returns `500`.",
   "notes": [
-    "**Bodies go under a wrapper key.** Labours go under `labour`, profiles under `labour_profile`, and the bulk availability update under `labours`; single records come back under `labour`, `labour_profile`, `labour_profile_session` or `labour_calendar`.",
-    "**A labour profile needs at least one session.** A create without `labour_profile_sessions` is refused with `400`.",
+    "**Requests and responses use a wrapper key.** Labours go under `labour`, profiles under `labour_profile`, and the bulk availability update under `labours`; single records come back under `labour`, `labour_profile`, `labour_profile_session` or `labour_calendar`.",
+    "**A new labour profile needs at least one session.** A create without `labour_profile_sessions` is refused with `400`.",
     "**A labour names its profile by `name`.** Send the profile's `name` as `labour.labour_profile` when you create a labour.",
     "**Cancel and reactivate take an empty JSON object.** Cancel sets `status` to `inactive`, reactivate sets it to `active`, and reactivating an active labour is refused.",
     "**Some routes take the labour's `code`.** The orders route takes the `code`, the calendar takes the `id` or the `code`, and the other labour routes take the `id`.",
@@ -622,7 +622,8 @@
       "slug": "delete-a-labour-profile",
       "title": "Delete a labour profile",
       "summary": "Deletes a labour profile.",
-      "description": "Deletes the labour profile with this `id`. Reading the profile afterwards returns `404`.",
+      "description": "Deletes the labour profile with this `id`. Reading the profile afterwards returns `404`. A profile that a booked labour uses cannot be deleted.",
+      "warning": "**The success status of this call has not been confirmed.** It is listed as `200`; read the profile afterwards to check that it returns `404`.",
       "parameters": [
         {
           "name": "labour_profile_id",
@@ -639,7 +640,7 @@
       "multipart": false,
       "responses": {
         "200": {
-          "description": "The labour profile is deleted."
+          "description": "The labour profile is deleted. Read the profile afterwards to confirm it returns `404`."
         }
       },
       "example_call": {
@@ -728,7 +729,7 @@
           "name": "labour_uuid",
           "in": "path",
           "required": true,
-          "description": "The labour's `id`.",
+          "description": "The labour's `id`, as Create a labour and List labours return it. Despite the parameter name, pass the `id`.",
           "schema": {
             "type": "string",
             "example": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d"
@@ -800,7 +801,7 @@
           "name": "labour_uuid",
           "in": "path",
           "required": true,
-          "description": "The labour's `id`.",
+          "description": "The labour's `id`, as Create a labour and List labours return it. Despite the parameter name, pass the `id`.",
           "schema": {
             "type": "string",
             "example": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d"
@@ -833,7 +834,7 @@
           "name": "labour_uuid",
           "in": "path",
           "required": true,
-          "description": "The labour's `id`.",
+          "description": "The labour's `id`, as Create a labour and List labours return it. Despite the parameter name, pass the `id`.",
           "schema": {
             "type": "string",
             "example": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d"
@@ -872,7 +873,7 @@
           "name": "labour_id",
           "in": "path",
           "required": true,
-          "description": "The labour's `id`.",
+          "description": "The labour's `id`, the same value the update and the read take.",
           "schema": {
             "type": "string",
             "example": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d"
@@ -915,7 +916,7 @@
           "name": "labour_id",
           "in": "path",
           "required": true,
-          "description": "The labour's `id`.",
+          "description": "The labour's `id`, the same value the update and the read take.",
           "schema": {
             "type": "string",
             "example": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d"
@@ -958,7 +959,7 @@
           "name": "labour_uuid",
           "in": "path",
           "required": true,
-          "description": "The labour's `code`.",
+          "description": "The labour's `code`, such as `LAB-00003`. Despite the parameter name, this route takes the code.",
           "schema": {
             "type": "string",
             "example": "LAB-00003"
@@ -1010,7 +1011,8 @@
       "slug": "update-labour-availability-in-bulk",
       "title": "Update labour availability in bulk",
       "summary": "Sets the availability slots of one or more labours in one call.",
-      "description": "Send `labours`, an array with one entry per labour: its `id` and the slots to set in `labour_availability` or `labour_custom_availability`. Each slot has a `preferred_day`, `start_time`, `end_time` and `available`. A successful update returns `204` with no body.",
+      "description": "Send `labours`, an array with one entry per labour: its `id` and the slots to set in `labour_availability` or `labour_custom_availability`. Each slot has a `preferred_day`, `start_time`, `end_time` and `available`. When it succeeds, the update returns `204` with no body.",
+      "warning": "**This call currently returns `500`.** The bulk availability update fails on the API, so the `204` response below has not been confirmed.",
       "parameters": [],
       "body": {
         "schema": {
@@ -1102,6 +1104,9 @@
       "responses": {
         "204": {
           "description": "The availability is updated. No body."
+        },
+        "500": {
+          "description": "The bulk availability update currently fails."
         }
       },
       "example_call": {
