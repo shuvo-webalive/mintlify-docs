@@ -1,0 +1,35 @@
+---
+title: "Teams"
+sidebarTitle: "Overview"
+description: "Manage teams in Exsited: list, create, retrieve, update, enable, disable and delete them."
+---
+
+Teams group people in your Exsited settings. You can list, create, retrieve, update and delete teams, and enable or disable one through its `status`. This area has 5 endpoints, and all seven SDKs call every one.
+
+<Warning>
+  **A team with members cannot be deleted, and a delete cannot be undone.** Remove the members first; after a delete, reading the team returns `404`.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List teams](/api-reference/teams/list-teams) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/teams` | Lists the teams set up in Exsited, one page at a time. |
+| [Create a team](/api-reference/teams/create-a-team) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/teams` | Creates a team and returns it under `team`. |
+| [Retrieve a team](/api-reference/teams/retrieve-a-team) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/teams/{team_id}` | Retrieves one team by its id. |
+| [Delete a team](/api-reference/teams/delete-a-team) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/teams/{team_id}` | Deletes a team that has no members; the response has no body. |
+| [Update a team](/api-reference/teams/update-a-team) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/teams/{team_id}` | Updates a team's details, or enables or disables it. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Request bodies go under `team`.** Both the create and the update wrap their fields in a `team` object, and every single-team response returns it under `team`.
+- **Team ids are not uuids.** An id such as `team_00000000000000010000000000000006` encodes the parent organisation and a row number.
+- **`version` is always null on a team.** Do not rely on it for change detection.
+- **`status` takes `active` or `inactive`.** Send it in an update to enable or disable a team.
+- **`display_name` defaults to `name`.** A team created with only a `name` gets the same value as its `display_name`.

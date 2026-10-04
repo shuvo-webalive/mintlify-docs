@@ -1,0 +1,393 @@
+{
+  "family": "teams",
+  "tag": "Teams",
+  "slug": "teams",
+  "icon": "people-group",
+  "base": "/settings/teams",
+  "overview_description": "Manage teams in Exsited: list, create, retrieve, update, enable, disable and delete them.",
+  "intro": "Teams group people in your Exsited settings. You can list, create, retrieve, update and delete teams, and enable or disable one through its `status`. This area has 5 endpoints, and all seven SDKs call every one.",
+  "warning": "**A team with members cannot be deleted, and a delete cannot be undone.** Remove the members first; after a delete, reading the team returns `404`.",
+  "notes": [
+    "**Request bodies go under `team`.** Both the create and the update wrap their fields in a `team` object, and every single-team response returns it under `team`.",
+    "**Team ids are not uuids.** An id such as `team_00000000000000010000000000000006` encodes the parent organisation and a row number.",
+    "**`version` is always null on a team.** Do not rely on it for change detection.",
+    "**`status` takes `active` or `inactive`.** Send it in an update to enable or disable a team.",
+    "**`display_name` defaults to `name`.** A team created with only a `name` gets the same value as its `display_name`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_teams",
+      "method": "GET",
+      "path": "/settings/teams",
+      "slug": "list-teams",
+      "title": "List teams",
+      "summary": "Lists the teams set up in Exsited, one page at a time.",
+      "description": "Returns one page of teams under `data`, with `pagination` for the next page. Each team carries its `id`, `name`, `display_name`, `description`, `status` and `managed_by`. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by; prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of teams.",
+          "schema": {
+            "$ref": "#/components/schemas/TeamList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_team",
+      "method": "POST",
+      "path": "/settings/teams",
+      "slug": "create-a-team",
+      "title": "Create a team",
+      "summary": "Creates a team and returns it under `team`.",
+      "description": "Send the new team under `team` with its `name`. When you send no `display_name`, the team's `display_name` is set to its `name`. The new team comes back under `team`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "team": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The team's name."
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          },
+          "required": [
+            "team"
+          ]
+        },
+        "example": {
+          "team": {
+            "name": "Field Services"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new team, under `team`.",
+          "schema": {
+            "$ref": "#/components/schemas/TeamResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "team": {
+            "name": "Field Services"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_team",
+      "method": "GET",
+      "path": "/settings/teams/{team_id}",
+      "slug": "retrieve-a-team",
+      "title": "Retrieve a team",
+      "summary": "Retrieves one team by its id.",
+      "description": "Returns the team under `team`.",
+      "parameters": [
+        {
+          "name": "team_id",
+          "in": "path",
+          "required": true,
+          "description": "The team's `id`, such as `team_00000000000000010000000000000006`. Team ids are not uuids.",
+          "schema": {
+            "type": "string",
+            "example": "team_00000000000000010000000000000006"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The team, under `team`.",
+          "schema": {
+            "$ref": "#/components/schemas/TeamResponse"
+          }
+        },
+        "404": {
+          "description": "No team has that `id`, for example because it has been deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "team_id": "team_00000000000000010000000000000006"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_team",
+      "method": "DELETE",
+      "path": "/settings/teams/{team_id}",
+      "slug": "delete-a-team",
+      "title": "Delete a team",
+      "summary": "Deletes a team that has no members; the response has no body.",
+      "description": "Deletes the team with this `id`. The API refuses the delete while the team still has members, so remove them first. A successful delete returns `204` with no body, and reading the team afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "team_id",
+          "in": "path",
+          "required": true,
+          "description": "The team's `id`, such as `team_00000000000000010000000000000006`. Team ids are not uuids.",
+          "schema": {
+            "type": "string",
+            "example": "team_00000000000000010000000000000006"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The team is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "team_id": "team_00000000000000010000000000000006"
+        }
+      }
+    },
+    {
+      "key": "update_settings_team",
+      "method": "PATCH",
+      "path": "/settings/teams/{team_id}",
+      "slug": "update-a-team",
+      "title": "Update a team",
+      "summary": "Updates a team's details, or enables or disables it.",
+      "description": "Send the fields to change under `team`, such as `display_name` or `description`. To enable or disable the team, send `status` as `active` or `inactive`. The updated team comes back under `team`.",
+      "parameters": [
+        {
+          "name": "team_id",
+          "in": "path",
+          "required": true,
+          "description": "The team's `id`, such as `team_00000000000000010000000000000006`. Team ids are not uuids.",
+          "schema": {
+            "type": "string",
+            "example": "team_00000000000000010000000000000006"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "team": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "active",
+                    "inactive"
+                  ]
+                }
+              }
+            }
+          },
+          "required": [
+            "team"
+          ]
+        },
+        "example": {
+          "team": {
+            "display_name": "Field Services North",
+            "description": "Northern region crew"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated team, under `team`.",
+          "schema": {
+            "$ref": "#/components/schemas/TeamResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "team_id": "team_00000000000000010000000000000006"
+        },
+        "body": {
+          "team": {
+            "display_name": "Field Services North",
+            "description": "Northern region crew"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "Team": {
+      "type": "object",
+      "properties": {
+        "created_by": {
+          "type": "null"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "type": "null"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "managed_by": {
+          "type": "null"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "null"
+        }
+      }
+    },
+    "TeamResponse": {
+      "type": "object",
+      "properties": {
+        "team": {
+          "$ref": "#/components/schemas/Team"
+        }
+      }
+    },
+    "TeamList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Team"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/TeamPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "TeamPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Rely on this rather than on `next_cursor`, which can still hold a value on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/TeamPaginationLinks"
+        }
+      }
+    },
+    "TeamPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
