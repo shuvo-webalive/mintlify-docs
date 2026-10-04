@@ -5,15 +5,14 @@
   "icon": "cubes",
   "base": "/component",
   "overview_description": "Define custom components, then create and manage their objects, notes, activities, linked records and workflow status.",
-  "intro": "A custom component is a record type you define, such as a service contract, whose objects belong to accounts and carry their own attributes, notes, activity log and workflow. This area has 39 endpoints covering component definitions, their instances and objects, and everything attached to an object, and all seven SDKs call every one.",
+  "intro": "A custom component is a record type you define, such as a service contract, whose objects belong to accounts and carry their own attributes, notes, activity log and workflow. This area has 39 endpoints covering component definitions, their instances (called objects on the `/components/{component_uuid}/objects` routes) and everything attached to an instance, and all seven SDKs call every one.",
   "warning": "**Replacing an object's linked accounts or orders unlinks every record you leave out, and changing its workflow status runs the transition and its actions at once.**",
   "notes": [
-    "**`component_uuid` takes two kinds of value.** The instance calls on `/component/{component_uuid}` and `/component/{component_uuid}/{component_object_id}` with POST, PATCH and DELETE on an instance take the component's dashed `uuid`; every other call takes the definition's `cmp_` id.",
-    "**Instance bodies use the component's name as their key.** `POST /component/{component_uuid}` and `PATCH /component/{component_uuid}/{component_object_id}` send and return the instance under the component's `name`, such as `service_contract`.",
-    "**Object calls under `/components/` use `custom_component_object`.** Objects are created, read, updated and returned under that key, and `parents` names the record that owns the object.",
+    "**`component_uuid` takes two kinds of value.** Three instance calls take the component's dashed uuid: `POST /component/{component_uuid}`, and `PATCH` and `DELETE` on `/component/{component_uuid}/{component_object_id}`. Every other call, including reading, updating and deleting a definition on `/component/{component_uuid}`, takes the definition's `cmp_` id.",
+    "**Instances have two sets of routes.** `/component/{component_uuid}/...` takes the dashed uuid and sends and returns the instance under the component's `name`, such as `service_contract`. `/components/{component_uuid}/objects/...` takes the `cmp_` id and uses `custom_component_object`, where `parents` names the record that owns the instance.",
     "**Notes are sent as multipart forms, not JSON.** Put the text in the `note` field and any files beside it; a file's `uuid` in `attachments` is the `file_id` for the file calls.",
     "**A custom object instance is created on the custom object's own path.** The create has no `instances` segment and sends `custom_object_instances`; the read, update and delete use `instances/{instance_id}`, and the update sends `custom_object_instance`.",
-    "**Listings page by cursor.** Pass `limit`, then the `next_cursor` from `pagination` as `cursor` while `has_more` is true."
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`."
   ],
   "endpoints": [
     {
@@ -121,7 +120,7 @@
           "name": "component_uuid",
           "in": "path",
           "required": true,
-          "description": "The component's dashed `uuid`, not its `cmp_` id.",
+          "description": "The component's dashed `uuid`, not its `cmp_` id. It is the `uuid` the component has in the `GET /settings/components` listing.",
           "schema": {
             "type": "string",
             "example": "5c8e1f2a-3b4d-4e6f-9a0b-1c2d3e4f5a6b"
@@ -209,13 +208,13 @@
       "slug": "delete-a-component-instance",
       "title": "Delete a component instance",
       "summary": "Deletes a component instance and returns no body.",
-      "description": "Removes the instance with this `id` from the component with this dashed `uuid`. A successful call returns 204 with an empty body; reading or deleting the instance again returns 404.",
+      "description": "Removes the instance with this `id` from the component with this dashed `uuid`. A successful call returns `204` with an empty body; reading or deleting the instance again returns `404`.",
       "parameters": [
         {
           "name": "component_uuid",
           "in": "path",
           "required": true,
-          "description": "The component's dashed `uuid`, not its `cmp_` id.",
+          "description": "The component's dashed `uuid`, not its `cmp_` id. It is the `uuid` the component has in the `GET /settings/components` listing.",
           "schema": {
             "type": "string",
             "example": "5c8e1f2a-3b4d-4e6f-9a0b-1c2d3e4f5a6b"
@@ -255,14 +254,14 @@
       "path": "/component/{component_uuid}/{component_object_id}",
       "slug": "update-a-component-instance",
       "title": "Update a component instance",
-      "summary": "Changes a component instance and returns it under the component's name, with status 202.",
-      "description": "Updates the instance with this `id` in the component with this dashed `uuid`. The body has one key, the component's `name`, holding the fields to change, such as `attributes`. The updated instance comes back under the same key with a new `version`.",
+      "summary": "Changes a component instance and returns it under the component's name.",
+      "description": "Updates the instance with this `id` in the component with this dashed `uuid`. The body has one key, the component's `name`, holding the fields to change, such as `attributes`. The updated instance comes back under the same key with a new `version`. The shape of each `attributes` entry is not documented yet; the example sends an empty list.",
       "parameters": [
         {
           "name": "component_uuid",
           "in": "path",
           "required": true,
-          "description": "The component's dashed `uuid`, not its `cmp_` id.",
+          "description": "The component's dashed `uuid`, not its `cmp_` id. It is the `uuid` the component has in the `GET /settings/components` listing.",
           "schema": {
             "type": "string",
             "example": "5c8e1f2a-3b4d-4e6f-9a0b-1c2d3e4f5a6b"
@@ -595,7 +594,7 @@
       "slug": "retrieve-a-component-objects-pdf",
       "title": "Retrieve a component object's PDF",
       "summary": "Returns the PDF details of a component object.",
-      "description": "Reads the PDF of the object with this `id` in the component with this `cmp_` id.",
+      "description": "Reads the PDF details of the object with this `id` in the component with this `cmp_` id. The fields of the response are not documented yet.",
       "parameters": [
         {
           "name": "component_uuid",
@@ -871,7 +870,7 @@
       "slug": "update-a-component-object",
       "title": "Update a component object",
       "summary": "Changes a component object and returns it, under `custom_component_object`.",
-      "description": "Send the fields to change under `custom_component_object`, such as `attributes`. If you send `version_id`, it must match the object's current version. `code`, `parents` and `custom_form` cannot be changed and are refused. Each update raises the object's `version` by one.",
+      "description": "Send the fields to change under `custom_component_object`, such as `attributes`. If you send `version_id`, it must match the object's current version. `code`, `parents` and `custom_form` cannot be changed and are refused. Each update raises the object's `version` by one. The shape of each `attributes` entry is not documented yet; the example sends an empty list.",
       "parameters": [
         {
           "name": "component_uuid",
@@ -952,7 +951,7 @@
       "slug": "delete-a-component-object",
       "title": "Delete a component object",
       "summary": "Deletes a component object and returns no body.",
-      "description": "Removes the object with this `id` from the component with this `cmp_` id. A successful call returns 204 with an empty body; reading or deleting the object again returns 404.",
+      "description": "Removes the object with this `id` from the component with this `cmp_` id. A successful call returns `204` with an empty body; reading or deleting the object again returns `404`.",
       "parameters": [
         {
           "name": "component_uuid",
@@ -1085,8 +1084,8 @@
       "key": "get_component_object_activity_by_id",
       "method": "GET",
       "path": "/components/{component_uuid}/objects/{component_object_id}/activity/{activity_id}",
-      "slug": "retrieve-a-component-object-activity",
-      "title": "Retrieve a component object activity",
+      "slug": "retrieve-a-component-objects-activity",
+      "title": "Retrieve a component object's activity",
       "summary": "Returns one activity of a component object, under `custom_component_object_activity`.",
       "description": "Reads a single activity by its `id`, with its type, message and the user name it is logged under.",
       "parameters": [
@@ -1493,8 +1492,8 @@
       "key": "get_component_object_note",
       "method": "GET",
       "path": "/components/{component_uuid}/objects/{component_object_id}/notes/{note_id}",
-      "slug": "retrieve-a-component-object-note",
-      "title": "Retrieve a component object note",
+      "slug": "retrieve-a-component-objects-note",
+      "title": "Retrieve a component object's note",
       "summary": "Returns one note on a component object, under `note`.",
       "description": "Reads a single note by its `id`, with its content, attachments, author and the object it belongs to.",
       "parameters": [
@@ -1554,8 +1553,8 @@
       "key": "get_component_object_note_files",
       "method": "GET",
       "path": "/components/{component_uuid}/objects/{component_object_id}/notes/{note_id}/files",
-      "slug": "list-a-component-object-notes-files",
-      "title": "List a component object note's files",
+      "slug": "list-the-files-of-a-component-objects-note",
+      "title": "List the files of a component object's note",
       "summary": "Returns the files attached to a note on a component object.",
       "description": "Lists the files attached to the note, each with its `uuid`, file name, content type and size. Files are under `data`; `pagination` carries `has_more` only.",
       "parameters": [
@@ -1612,8 +1611,8 @@
       "key": "get_component_object_note_file",
       "method": "GET",
       "path": "/components/{component_uuid}/objects/{component_object_id}/notes/{note_id}/files/{file_id}",
-      "slug": "retrieve-a-component-object-note-file",
-      "title": "Retrieve a component object note file",
+      "slug": "retrieve-a-file-of-a-component-objects-note",
+      "title": "Retrieve a file of a component object's note",
       "summary": "Returns the details of one file attached to a note, under `file`.",
       "description": "Reads one attachment of the note by its `uuid`, with its file name, content type, size and link.",
       "parameters": [
@@ -1834,7 +1833,7 @@
       "slug": "delete-a-component-object-note",
       "title": "Delete a component object note",
       "summary": "Deletes a note from a component object and returns no body.",
-      "description": "Removes the note with this `id`. A successful call returns 204 with an empty body, and reading the note afterwards returns 404.",
+      "description": "Removes the note with this `id`. A successful call returns `204` with an empty body, and reading the note afterwards returns `404`.",
       "parameters": [
         {
           "name": "component_uuid",
@@ -1886,10 +1885,10 @@
       "key": "delete_component_object_note_file",
       "method": "DELETE",
       "path": "/components/{component_uuid}/objects/{component_object_id}/notes/{note_id}/files/{file_id}",
-      "slug": "delete-a-component-object-note-file",
-      "title": "Delete a component object note file",
+      "slug": "delete-a-file-from-a-component-objects-note",
+      "title": "Delete a file from a component object's note",
       "summary": "Deletes one file from a note and returns no body.",
-      "description": "Removes the attachment with this `uuid` from the note. A successful call returns 204 with an empty body, and the note's files listing no longer shows it.",
+      "description": "Removes the attachment with this `uuid` from the note. A successful call returns `204` with an empty body, and the note's files listing no longer shows it.",
       "parameters": [
         {
           "name": "component_uuid",
@@ -1937,6 +1936,9 @@
       "responses": {
         "204": {
           "description": "The file is deleted. No body."
+        },
+        "404": {
+          "description": "Currently returned even for a file the note lists."
         }
       },
       "example_call": {
@@ -1946,7 +1948,8 @@
           "note_id": "e7f9a1b3c5d74e9f8a2b4c6d8e0f1a3b",
           "file_id": "9b2e4c6a-1d3f-4a5b-8c7d-0e1f2a3b4c5d"
         }
-      }
+      },
+      "warning": "**This call currently returns `404`, even for a file the note lists.**"
     },
     {
       "key": "get_component_object_custom_object",
@@ -2013,7 +2016,7 @@
       "slug": "create-a-custom-object-instance-on-a-component-object",
       "title": "Create a custom object instance on a component object",
       "summary": "Creates an instance of a custom object on a component object.",
-      "description": "Creates a new instance of the custom object with this `co_` id. The path ends at the custom object, with no `instances` segment. Send the instance's `attributes` list under `custom_object_instances`, a plural key over one instance.",
+      "description": "Creates a new instance of the custom object with this `co_` id. The path ends at the custom object, with no `instances` segment. Send the instance's `attributes` list under `custom_object_instances`, a plural key over one instance. The shape of each `attributes` entry is not documented yet; the example sends an empty list.",
       "parameters": [
         {
           "name": "component_uuid",
@@ -2092,7 +2095,8 @@
             "attributes": []
           }
         }
-      }
+      },
+      "warning": "**This call has not been confirmed.** Read the record afterwards to check the result."
     },
     {
       "key": "get_component_object_custom_object_instance",
@@ -2170,7 +2174,7 @@
       "slug": "update-a-custom-object-instance-on-a-component-object",
       "title": "Update a custom object instance on a component object",
       "summary": "Changes a custom object instance on a component object.",
-      "description": "Send the instance's `attributes` list under `custom_object_instance`, the singular key.",
+      "description": "Send the instance's `attributes` list under `custom_object_instance`, the singular key. The shape of each `attributes` entry is not documented yet; the example sends an empty list.",
       "parameters": [
         {
           "name": "component_uuid",
@@ -2260,7 +2264,8 @@
             "attributes": []
           }
         }
-      }
+      },
+      "warning": "**This call has not been confirmed.** Read the record afterwards to check the result."
     },
     {
       "key": "delete_component_object_custom_object_instance",
@@ -2269,7 +2274,7 @@
       "slug": "delete-a-custom-object-instance-on-a-component-object",
       "title": "Delete a custom object instance on a component object",
       "summary": "Deletes a custom object instance on a component object and returns no body.",
-      "description": "Removes the instance with this `coi_` id from the custom object with this `co_` id. A successful call returns 204 with an empty body.",
+      "description": "Removes the instance with this `coi_` id from the custom object with this `co_` id. A successful call returns `204` with an empty body.",
       "parameters": [
         {
           "name": "component_uuid",
@@ -2326,7 +2331,8 @@
           "custom_object_id": "co_7e9b1d3f5a2c4e6b8d0f2a4c6e8b1d3f",
           "instance_id": "coi_2c4e6a8b0d1f4a3c5e7b9d0f2a4c6e8b"
         }
-      }
+      },
+      "warning": "**This call has not been confirmed.** Read the record afterwards to check the result."
     },
     {
       "key": "link_component_object_domains",
@@ -2335,7 +2341,7 @@
       "slug": "link-accounts-or-orders-to-a-component-object",
       "title": "Link accounts or orders to a component object",
       "summary": "Links accounts or orders to a component object and returns the object.",
-      "description": "Send `domain_type`, `account` or `order`, and the records to link as `domains[].domain_id`, under `custom_component_object`. The object comes back under `custom_component_object`, and its `accounts` then include the linked accounts.",
+      "description": "Send `domain_type`, `account` or `order`, and the records to link as `domains[].domain_id`, under `custom_component_object`. The object comes back under `custom_component_object`.",
       "parameters": [
         {
           "name": "component_uuid",
@@ -2413,6 +2419,9 @@
           "schema": {
             "$ref": "#/components/schemas/ComponentObjectRecordResponse"
           }
+        },
+        "500": {
+          "description": "Currently returned when linking an account."
         }
       },
       "example_call": {
@@ -2430,7 +2439,8 @@
             ]
           }
         }
-      }
+      },
+      "warning": "**Linking an account currently returns `500`.**"
     },
     {
       "key": "update_component_object_domains",
@@ -2517,6 +2527,9 @@
           "schema": {
             "$ref": "#/components/schemas/ComponentObjectRecordResponse"
           }
+        },
+        "500": {
+          "description": "Currently returned when the set holds an account."
         }
       },
       "example_call": {
@@ -2534,7 +2547,8 @@
             ]
           }
         }
-      }
+      },
+      "warning": "**Replacing the linked accounts currently returns `500`.**"
     },
     {
       "key": "unlink_component_object_domains",
@@ -2716,7 +2730,8 @@
             "workflow_status": "Approved"
           }
         }
-      }
+      },
+      "warning": "**This call has not been confirmed.** Read the record afterwards to check the result."
     },
     {
       "key": "delete_component",
@@ -2725,7 +2740,7 @@
       "slug": "delete-a-component-definition",
       "title": "Delete a component definition",
       "summary": "Deletes a component definition and returns no body.",
-      "description": "Removes the component definition with this `cmp_` id. A successful call returns 204 with an empty body, and deleting it again returns 404.",
+      "description": "Removes the component definition with this `cmp_` id. A successful call returns `204` with an empty body, and deleting it again returns `404`.",
       "parameters": [
         {
           "name": "component_uuid",
