@@ -279,7 +279,8 @@ def token_operation():
                 "expires_in": {"type": "integer", "description": "Seconds until the token expires, for example `3600`.", "example": 3600},
                 "refresh_token": {"type": "string", "description": "Exchanged for a new access token when this one expires.", "example": "REFRESH_TOKEN"},
             }}}}},
-            "302": {"description": "The credentials were not accepted. The API redirects to its sign-in page instead of returning an error body, so this page shows `redirect to unsafe URL blocked`."},
+            "400": {"description": "The client ID is recognised but the client secret or redirect URI is wrong, or `redirect_uri` is missing.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+            "302": {"description": "The client ID is not recognised, or `grant_type` is missing. The API redirects to its sign-in page instead of returning an error body, so this page shows `redirect to unsafe URL blocked`."},
         },
         "x-codeSamples": [{"lang": "bash", "label": "cURL", "source": TOKEN_CURL}],
     }
@@ -326,9 +327,10 @@ cURL, another HTTP client, or to try the API on this site. A token lasts `expire
 </Steps>
 
 <Note>
-  If the credentials are wrong, the API returns a redirect to its sign-in page rather than an
-  error, and this page shows `redirect to unsafe URL blocked`. Check the client ID, client secret
-  and redirect URI, and send again.
+  A wrong client secret or redirect URI returns `400`. An unknown client ID, or a request without
+  `grant_type`, returns a redirect to the sign-in page instead of an error, and this page shows
+  `redirect to unsafe URL blocked`. The SDKs report both as an authentication error. Check the
+  client ID, client secret and redirect URI, and send again.
 </Note>
 
 <Warning>
