@@ -1,0 +1,240 @@
+{
+  "family": "settings_workflows",
+  "tag": "Workflow settings",
+  "slug": "workflow-settings",
+  "icon": "gear",
+  "base": "/settings/workflows",
+  "overview_description": "Read the workflows on your instance from the settings area: list them or retrieve one.",
+  "intro": "Workflow settings give read-only access to the workflows set up on your instance. You can list them and retrieve one; changes go through the workflows endpoints. This area has 2 endpoints, and all seven Exsited SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**This area is read only.** Every write under `/settings/workflows` is refused with `400`; create, update and delete workflows under `/workflows`.",
+    "**One workflow comes back under `workflow`.** A listing puts its records under `data`.",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_workflows",
+      "method": "GET",
+      "path": "/settings/workflows",
+      "slug": "list-workflow-settings",
+      "title": "List workflow settings",
+      "summary": "Lists the workflows on your instance from the settings area, one page at a time.",
+      "description": "Returns a page of workflows under `data`, with cursor `pagination`. This listing is read only; create and change workflows under `/workflows`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of workflows.",
+          "schema": {
+            "$ref": "#/components/schemas/SettingsWorkflowList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_settings_workflow",
+      "method": "GET",
+      "path": "/settings/workflows/{workflow_id}",
+      "slug": "retrieve-a-workflow-setting",
+      "title": "Retrieve a workflow setting",
+      "summary": "Retrieves one workflow from the settings area by its id.",
+      "description": "Returns the workflow under `workflow`. Use the `id` a listed workflow carries.",
+      "parameters": [
+        {
+          "name": "workflow_id",
+          "in": "path",
+          "required": true,
+          "description": "The workflow's `id`, as the listing shows it.",
+          "schema": {
+            "type": "string",
+            "example": "wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The workflow, under `workflow`.",
+          "schema": {
+            "$ref": "#/components/schemas/SettingsWorkflowResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "workflow_id": "wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "SettingsWorkflow": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The workflow's id."
+        },
+        "status": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "code": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "description": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "entity": {
+          "type": "string"
+        },
+        "event": {
+          "type": "string"
+        },
+        "is_pre_built": {
+          "type": "boolean"
+        },
+        "enable_stage": {
+          "type": "boolean"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "created_by": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "last_updated_by": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "SettingsWorkflowResponse": {
+      "type": "object",
+      "properties": {
+        "workflow": {
+          "$ref": "#/components/schemas/SettingsWorkflow"
+        }
+      }
+    },
+    "SettingsWorkflowList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "description": "Always `list`."
+        },
+        "url": {
+          "type": "string",
+          "description": "The path this page was read from."
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/SettingsWorkflow"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/SettingsWorkflowPagination"
+        }
+      }
+    },
+    "SettingsWorkflowPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Pass as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "links": {
+          "$ref": "#/components/schemas/SettingsWorkflowPaginationLinks"
+        }
+      }
+    },
+    "SettingsWorkflowPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}
