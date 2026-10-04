@@ -1,0 +1,404 @@
+{
+  "family": "pricing_periods",
+  "tag": "Pricing periods",
+  "slug": "pricing-periods",
+  "icon": "calendar-week",
+  "base": "/settings/pricing_periods",
+  "overview_description": "List, create, read, update, enable, disable and delete pricing periods, each linked to a time period.",
+  "intro": "A pricing period is a settings record linked to a time period. You can list, create, read, update, enable or disable and delete pricing periods. This area has 5 endpoints, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**Listings and single reads return `time_period` as null.** This happens whatever the record holds; the create response does carry the time period.",
+    "**A create links the time period by its `tp_` id.** Send it as `time_period`, with `name` and `display_name`, under `pricing_period`.",
+    "**`status` takes `active` or `inactive`.** Send it in an update to enable or disable a pricing period.",
+    "**Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true.",
+    "**A delete returns `204` with no body.** Reading the pricing period afterwards returns `404`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_pricing_periods",
+      "method": "GET",
+      "path": "/settings/pricing_periods",
+      "slug": "list-pricing-periods",
+      "title": "List pricing periods",
+      "summary": "Returns a page of pricing periods under `data`, with paging details under `pagination`.",
+      "description": "Lists the pricing periods on the instance. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results. Each record's `time_period` reads null here, whatever the record holds.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of pricing periods, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/PricingPeriodList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_pricing_period",
+      "method": "POST",
+      "path": "/settings/pricing_periods",
+      "slug": "create-a-pricing-period",
+      "title": "Create a pricing period",
+      "summary": "Creates a pricing period and returns it under `pricing_period`.",
+      "description": "Send the new pricing period under `pricing_period`. Link it to a time period by sending the time period's `tp_` id as `time_period`. The response carries that time period under `time_period`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "pricing_period": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The pricing period's name."
+                },
+                "display_name": {
+                  "type": "string",
+                  "description": "The name shown for the pricing period."
+                },
+                "time_period": {
+                  "type": "string",
+                  "description": "The time period's `tp_` id."
+                }
+              }
+            }
+          },
+          "required": [
+            "pricing_period"
+          ]
+        },
+        "example": {
+          "pricing_period": {
+            "name": "Monthly price",
+            "display_name": "Monthly price",
+            "time_period": "tp_580762f904bd2bd26d3d7e71ae87aa72"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new pricing period, under `pricing_period`.",
+          "schema": {
+            "$ref": "#/components/schemas/PricingPeriodResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "pricing_period": {
+            "name": "Monthly price",
+            "display_name": "Monthly price",
+            "time_period": "tp_580762f904bd2bd26d3d7e71ae87aa72"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_pricing_period",
+      "method": "GET",
+      "path": "/settings/pricing_periods/{pricing_period_id}",
+      "slug": "retrieve-a-pricing-period",
+      "title": "Retrieve a pricing period",
+      "summary": "Returns one pricing period by its `id`, under `pricing_period`.",
+      "description": "Reads the pricing period with this `id`. The `id` is the one a listing or a create returns. Its `time_period` reads null here, whatever the record holds.",
+      "parameters": [
+        {
+          "name": "pricing_period_id",
+          "in": "path",
+          "required": true,
+          "description": "The pricing period's `id`, as a listing or a create returns it.",
+          "schema": {
+            "type": "string",
+            "example": "f216c928c95f828e123939dcefba4b7c"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The pricing period, under `pricing_period`.",
+          "schema": {
+            "$ref": "#/components/schemas/PricingPeriodResponse"
+          }
+        },
+        "404": {
+          "description": "No pricing period has that `id`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "pricing_period_id": "f216c928c95f828e123939dcefba4b7c"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_pricing_period",
+      "method": "DELETE",
+      "path": "/settings/pricing_periods/{pricing_period_id}",
+      "slug": "delete-a-pricing-period",
+      "title": "Delete a pricing period",
+      "summary": "Deletes a pricing period. The response has no body.",
+      "description": "Deletes the pricing period with this `id`. Reading the same `id` afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "pricing_period_id",
+          "in": "path",
+          "required": true,
+          "description": "The pricing period's `id`, as a listing or a create returns it.",
+          "schema": {
+            "type": "string",
+            "example": "f216c928c95f828e123939dcefba4b7c"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The pricing period is deleted. The response has no body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "pricing_period_id": "f216c928c95f828e123939dcefba4b7c"
+        }
+      }
+    },
+    {
+      "key": "update_settings_pricing_period",
+      "method": "PATCH",
+      "path": "/settings/pricing_periods/{pricing_period_id}",
+      "slug": "update-a-pricing-period",
+      "title": "Update a pricing period",
+      "summary": "Changes the fields of a pricing period, or enables or disables it, and returns it under `pricing_period`.",
+      "description": "Send the fields to change under `pricing_period`. To enable or disable it, send `status` as `active` or `inactive`.",
+      "parameters": [
+        {
+          "name": "pricing_period_id",
+          "in": "path",
+          "required": true,
+          "description": "The pricing period's `id`, as a listing or a create returns it.",
+          "schema": {
+            "type": "string",
+            "example": "f216c928c95f828e123939dcefba4b7c"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "pricing_period": {
+              "type": "object",
+              "properties": {
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "description": "`active` or `inactive`."
+                }
+              }
+            }
+          },
+          "required": [
+            "pricing_period"
+          ]
+        },
+        "example": {
+          "pricing_period": {
+            "display_name": "Monthly price (AU)",
+            "description": "Priced once a month"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated pricing period, under `pricing_period`.",
+          "schema": {
+            "$ref": "#/components/schemas/PricingPeriodResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "pricing_period_id": "f216c928c95f828e123939dcefba4b7c"
+        },
+        "body": {
+          "pricing_period": {
+            "display_name": "Monthly price (AU)",
+            "description": "Priced once a month"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "PricingPeriodList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PricingPeriod"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/PricingPeriodPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "PricingPeriod": {
+      "type": "object",
+      "properties": {
+        "created_by": {
+          "description": "Null in every record read so far, so its type is not known."
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "description": "Null in every record read so far, so its type is not known."
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "time_period": {
+          "$ref": "#/components/schemas/PricingPeriodTimePeriod"
+        }
+      }
+    },
+    "PricingPeriodTimePeriod": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PricingPeriodPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass this back as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/PricingPeriodPaginationLinks"
+        }
+      }
+    },
+    "PricingPeriodPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "PricingPeriodResponse": {
+      "type": "object",
+      "properties": {
+        "pricing_period": {
+          "$ref": "#/components/schemas/PricingPeriod"
+        }
+      }
+    }
+  }
+}
