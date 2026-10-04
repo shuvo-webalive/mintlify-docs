@@ -5,8 +5,8 @@
   "icon": "file-invoice",
   "base": "/invoices",
   "overview_description": "Create, read, amend, cancel, reactivate and delete invoices, and reach their lines, notes, files, fulfillments and returns.",
-  "intro": "An invoice bills an account for items, either on its own or raised from an order. This area has 30 endpoints: create, read, amend, cancel, reactivate and delete invoices, and read their lines, KPIs, PDF links, notes, files, fulfillments, return merchandise authorisations and custom objects. All seven SDKs call every one.",
-  "warning": "**`GET /invoices/{invoice_id}/lines/{line_id}` ignores `line_id` and always returns the invoice's first line.**",
+  "intro": "An invoice bills an account for items, either on its own or raised from an order. This area has 30 endpoints: create, read, update, amend, cancel, reactivate and delete invoices; raise an invoice for an order; read their lines, KPIs and PDF links; add, read and delete notes and note files; and read their fulfillments, return merchandise authorisations and custom objects. Every SDK supports all of them.",
+  "warning": "**`GET /invoices/{invoice_id}/lines/{line_id}` ignores `line_id` and always returns the invoice's first line.** Deleting a note file currently returns `404` `attachment not found`, even for a file the note's files listing shows.",
   "notes": [
     "**Pass an invoice's `id`, never its `uuid`.** Every `{invoice_id}` is the invoice's `id`, such as `INV-0001`.",
     "**Write bodies go under an `invoice` key.** Create, update, amend, cancel and reactivate all wrap their fields in `invoice`. Amend, cancel, reactivate and creating an invoice for an order also work with no body.",
@@ -23,7 +23,7 @@
       "slug": "list-invoices",
       "title": "List invoices",
       "summary": "Returns one page of invoices, with a cursor for the next page.",
-      "description": "Lists every invoice you can see, one page at a time. The records are under `data` and the paging details under `pagination`. A listed invoice does not include its `lines`; retrieve the invoice to get them. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+      "description": "Lists every invoice you can see, one page at a time. The records are under `data` and the paging details under `pagination`. A listed invoice does not include its `lines`; retrieve the invoice to get them. To filter, add `filter_<field>=<value>`, or `filter_<field>_<operator>=<value>` with an operator such as `gte` or `contains`.",
       "parameters": [
         {
           "name": "limit",
@@ -623,7 +623,7 @@
       "slug": "list-an-invoices-item-fulfillments",
       "title": "List an invoice's item fulfillments",
       "summary": "Returns one page of the item fulfillments recorded against an invoice.",
-      "description": "Lists the fulfillments against the invoice, one page at a time, under `data`. The path is spelled `item_fulfillments`.",
+      "description": "Lists the fulfillments against the invoice, one page at a time, under `data`.",
       "parameters": [
         {
           "name": "invoice_id",
@@ -707,10 +707,10 @@
           "name": "fulfillment_id",
           "in": "path",
           "required": true,
-          "description": "The item fulfillment's `id`.",
+          "description": "The item fulfillment's `id`, which starts with `ifm_`.",
           "schema": {
             "type": "string",
-            "example": "IF-0001"
+            "example": "ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9"
           }
         }
       ],
@@ -730,7 +730,7 @@
       "example_call": {
         "path": {
           "invoice_id": "INV-0001",
-          "fulfillment_id": "IF-0001"
+          "fulfillment_id": "ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9"
         }
       }
     },
@@ -1250,7 +1250,7 @@
       "slug": "create-an-invoice-for-an-order",
       "title": "Create an invoice for an order",
       "summary": "Raises an invoice against an order and returns it.",
-      "description": "Creates an invoice for the order's lines. The body is optional; send fields such as `invoice_note` under `invoice`.",
+      "description": "Creates an invoice for the order's lines. The body is optional; send fields such as `invoice_note` under `invoice`. The account's `invoice_mode` may need to be `MANUAL`.",
       "parameters": [
         {
           "name": "order_id",
@@ -1557,10 +1557,10 @@
           "name": "custom_object_id",
           "in": "path",
           "required": true,
-          "description": "The custom object's `id`.",
+          "description": "The custom object's `id`, which starts with `co_`.",
           "schema": {
             "type": "string",
-            "example": "CO-0001"
+            "example": "co_5d2a8f1c3b7e4a9d8c6b1e2f3a4d5c6b"
           }
         }
       ],
@@ -1574,9 +1574,10 @@
       "example_call": {
         "path": {
           "invoice_id": "INV-0001",
-          "custom_object_id": "CO-0001"
+          "custom_object_id": "co_5d2a8f1c3b7e4a9d8c6b1e2f3a4d5c6b"
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** The response body is not documented yet."
     },
     {
       "key": "get_invoice_custom_object_instance",
@@ -1601,20 +1602,20 @@
           "name": "custom_object_id",
           "in": "path",
           "required": true,
-          "description": "The custom object's `id`.",
+          "description": "The custom object's `id`, which starts with `co_`.",
           "schema": {
             "type": "string",
-            "example": "CO-0001"
+            "example": "co_5d2a8f1c3b7e4a9d8c6b1e2f3a4d5c6b"
           }
         },
         {
           "name": "instance_id",
           "in": "path",
           "required": true,
-          "description": "The custom object instance's `id`.",
+          "description": "The custom object instance's `id`, which starts with `coi_`.",
           "schema": {
             "type": "string",
-            "example": "COI-0001"
+            "example": "coi_9f3b6c1d2e8a4b7c9d5e1f2a3b4c6d7e"
           }
         }
       ],
@@ -1628,10 +1629,11 @@
       "example_call": {
         "path": {
           "invoice_id": "INV-0001",
-          "custom_object_id": "CO-0001",
-          "instance_id": "COI-0001"
+          "custom_object_id": "co_5d2a8f1c3b7e4a9d8c6b1e2f3a4d5c6b",
+          "instance_id": "coi_9f3b6c1d2e8a4b7c9d5e1f2a3b4c6d7e"
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** The response body is not documented yet."
     },
     {
       "key": "delete_invoice_note_file",
@@ -1640,7 +1642,7 @@
       "slug": "delete-an-invoice-note-file",
       "title": "Delete an invoice note file",
       "summary": "Deletes one file from a note on an invoice.",
-      "description": "Deletes the attachment by its `uuid`. The server can return `404` with `attachment not found` even for a file the note's files listing shows.",
+      "description": "Deletes the attachment by its `uuid`. A delete returns `204` with no body.",
       "parameters": [
         {
           "name": "invoice_id",
@@ -1680,7 +1682,7 @@
           "description": "The file is deleted. The response has no body."
         },
         "404": {
-          "description": "The attachment is not deleted. This can happen even for a file the note's files listing shows."
+          "description": "`attachment not found`, returned even for a file the note's files listing shows."
         }
       },
       "example_call": {
@@ -1689,7 +1691,8 @@
           "note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d",
           "file_id": "6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f"
         }
-      }
+      },
+      "warning": "**This call currently returns `404`.** The message is `attachment not found`, even for a file the note's files listing shows."
     }
   ],
   "schemas": {
@@ -1849,7 +1852,8 @@
           "type": "array",
           "items": {
             "$ref": "#/components/schemas/InvoiceLine"
-          }
+          },
+          "description": "Returned by Retrieve an invoice and by the invoice writes. A listing entry and Retrieve an invoice's information leave it out."
         },
         "custom_attributes": {
           "type": "array",
@@ -2364,29 +2368,6 @@
         },
         "links": {
           "$ref": "#/components/schemas/InvoicePaginationLinks"
-        },
-        "records": {
-          "type": "integer",
-          "description": "The total number of matching records, not the length of this page."
-        },
-        "offset": {
-          "type": "integer"
-        },
-        "next_page": {
-          "type": "string",
-          "description": "On the last page this is the string `NULL`, not JSON null."
-        },
-        "previous_page": {
-          "type": "string"
-        },
-        "has_next": {
-          "type": "boolean"
-        },
-        "has_prev": {
-          "type": "boolean"
-        },
-        "per_page": {
-          "type": "integer"
         }
       }
     },
