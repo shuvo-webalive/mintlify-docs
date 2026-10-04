@@ -39371,7 +39371,7 @@
         "tags": [
           "Return merchandise authorisations"
         ],
-        "summary": "List return merchandise authorisations",
+        "summary": "List RMAs",
         "operationId": "return_merchandise_authorisations_get_return_merchandise_authorisations",
         "description": "Returns one page of RMAs under `data`. Each RMA carries its `code`, `status`, `return_status`, `item_count`, account and sale invoice. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
         "parameters": [
@@ -39464,7 +39464,7 @@
         "tags": [
           "Return merchandise authorisations"
         ],
-        "summary": "Create a return merchandise authorisation",
+        "summary": "Create an RMA",
         "operationId": "return_merchandise_authorisations_create_return_merchandise_authorisation",
         "description": "Send `sale_invoice.id` and the `returns` lines under `return_merchandise_authorisation`. The invoice must have fulfilled stock, and each return names a fulfilled invoice line and a quantity. The new RMA has `status` `active` and `return_status` `pending`.",
         "parameters": [],
@@ -39484,42 +39484,42 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/return_merchandise_authorisations\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"return_merchandise_authorisation\": {\n      \"sale_invoice\": {\n        \"id\": \"inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d\"\n      },\n      \"returns\": [\n        {\n          \"sale_invoice_line\": \"INVOICE_LINE_ID\",\n          \"rma_quantity\": 1\n        }\n      ]\n    }\n  }'"
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/return_merchandise_authorisations\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"return_merchandise_authorisation\": {\n      \"sale_invoice\": {\n        \"id\": \"INVOICE_INTERNAL_ID\"\n      },\n      \"returns\": [\n        {\n          \"sale_invoice_line\": \"INVOICE_LINE_ID\",\n          \"rma_quantity\": 1\n        }\n      ]\n    }\n  }'"
           },
           {
             "lang": "python",
             "label": "Python",
-            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = (\n    client.return_merchandise_authorisations.create_return_merchandise_authorisation(\n        {\n            \"return_merchandise_authorisation\": {\n                \"sale_invoice\": {\"id\": \"inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d\"},\n                \"returns\": [\n                    {\"sale_invoice_line\": \"INVOICE_LINE_ID\", \"rma_quantity\": 1}\n                ],\n            }\n        }\n    )\n)\nprint(response.data)\n"
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = (\n    client.return_merchandise_authorisations.create_return_merchandise_authorisation(\n        {\n            \"return_merchandise_authorisation\": {\n                \"sale_invoice\": {\"id\": \"INVOICE_INTERNAL_ID\"},\n                \"returns\": [\n                    {\"sale_invoice_line\": \"INVOICE_LINE_ID\", \"rma_quantity\": 1}\n                ],\n            }\n        }\n    )\n)\nprint(response.data)\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.createReturnMerchandiseAuthorisation({\n    return_merchandise_authorisation: {\n        sale_invoice: {id: 'inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d'},\n        returns: [{sale_invoice_line: 'INVOICE_LINE_ID', rma_quantity: 1}],\n    },\n});\nconsole.log(response.data);\n"
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnMerchandiseAuthorisations.createReturnMerchandiseAuthorisation({\n    return_merchandise_authorisation: {\n        sale_invoice: {id: 'INVOICE_INTERNAL_ID'},\n        returns: [{sale_invoice_line: 'INVOICE_LINE_ID', rma_quantity: 1}],\n    },\n});\nconsole.log(response.data);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->createReturnMerchandiseAuthorisation([\n    'return_merchandise_authorisation' => [\n        'sale_invoice' => ['id' => 'inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d'],\n        'returns' => [['sale_invoice_line' => 'INVOICE_LINE_ID', 'rma_quantity' => 1]],\n    ],\n]);\nprint_r($response->data);\n"
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnMerchandiseAuthorisations->createReturnMerchandiseAuthorisation([\n    'return_merchandise_authorisation' => [\n        'sale_invoice' => ['id' => 'INVOICE_INTERNAL_ID'],\n        'returns' => [['sale_invoice_line' => 'INVOICE_LINE_ID', 'rma_quantity' => 1]],\n    ],\n]);\nprint_r($response->data);\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.return_merchandise_authorisations.return_merchandise_authorisations_dto.ReturnMerchandiseAuthorisationsDto;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReturnMerchandiseAuthorisationsDto.ReturnMerchandiseAuthorisations> response = client.returnMerchandiseAuthorisations().createReturnMerchandiseAuthorisation(\n        Map.of(\n                \"return_merchandise_authorisation\", Map.of(\n                        \"sale_invoice\", Map.of(\"id\", \"inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d\"),\n                        \"returns\", List.of(\n                                Map.of(\"sale_invoice_line\", \"INVOICE_LINE_ID\", \"rma_quantity\", 1)))));\nSystem.out.println(response.getMap());\n"
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.return_merchandise_authorisations.return_merchandise_authorisations_dto.ReturnMerchandiseAuthorisationsDto;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReturnMerchandiseAuthorisationsDto.ReturnMerchandiseAuthorisations> response = client.returnMerchandiseAuthorisations().createReturnMerchandiseAuthorisation(\n        Map.of(\n                \"return_merchandise_authorisation\", Map.of(\n                        \"sale_invoice\", Map.of(\"id\", \"INVOICE_INTERNAL_ID\"),\n                        \"returns\", List.of(\n                                Map.of(\"sale_invoice_line\", \"INVOICE_LINE_ID\", \"rma_quantity\", 1)))));\nSystem.out.println(response.getMap());\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.CreateReturnMerchandiseAuthorisationAsync(new Dictionary<string, object?>\n{\n    [\"return_merchandise_authorisation\"] = new Dictionary<string, object?>\n    {\n        [\"sale_invoice\"] = new Dictionary<string, object?>\n        {\n            [\"id\"] = \"inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d\",\n        },\n        [\"returns\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"sale_invoice_line\"] = \"INVOICE_LINE_ID\",\n                [\"rma_quantity\"] = 1,\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnMerchandiseAuthorisations.CreateReturnMerchandiseAuthorisationAsync(new Dictionary<string, object?>\n{\n    [\"return_merchandise_authorisation\"] = new Dictionary<string, object?>\n    {\n        [\"sale_invoice\"] = new Dictionary<string, object?>\n        {\n            [\"id\"] = \"INVOICE_INTERNAL_ID\",\n        },\n        [\"returns\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"sale_invoice_line\"] = \"INVOICE_LINE_ID\",\n                [\"rma_quantity\"] = 1,\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .createReturnMerchandiseAuthorisation({\n      'return_merchandise_authorisation': {\n        'sale_invoice': {'id': 'inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d'},\n        'returns': [\n          {'sale_invoice_line': 'INVOICE_LINE_ID', 'rma_quantity': 1},\n        ],\n      },\n    });\nprint(response.map);\n"
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnMerchandiseAuthorisations\n    .createReturnMerchandiseAuthorisation({\n      'return_merchandise_authorisation': {\n        'sale_invoice': {'id': 'INVOICE_INTERNAL_ID'},\n        'returns': [\n          {'sale_invoice_line': 'INVOICE_LINE_ID', 'rma_quantity': 1},\n        ],\n      },\n    });\nprint(response.map);\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().CreateReturnMerchandiseAuthorisation(context.Background(), map[string]any{\n\t\"return_merchandise_authorisation\": map[string]any{\n\t\t\"sale_invoice\": map[string]any{\"id\": \"inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d\"},\n\t\t\"returns\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"sale_invoice_line\": \"INVOICE_LINE_ID\",\n\t\t\t\t\"rma_quantity\":      1,\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnMerchandiseAuthorisations().CreateReturnMerchandiseAuthorisation(context.Background(), map[string]any{\n\t\"return_merchandise_authorisation\": map[string]any{\n\t\t\"sale_invoice\": map[string]any{\"id\": \"INVOICE_INTERNAL_ID\"},\n\t\t\"returns\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"sale_invoice_line\": \"INVOICE_LINE_ID\",\n\t\t\t\t\"rma_quantity\":      1,\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
           }
         ],
         "requestBody": {
@@ -39566,7 +39566,7 @@
               "example": {
                 "return_merchandise_authorisation": {
                   "sale_invoice": {
-                    "id": "inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d"
+                    "id": "INVOICE_INTERNAL_ID"
                   },
                   "returns": [
                     {
@@ -39586,7 +39586,7 @@
         "tags": [
           "Return merchandise authorisations"
         ],
-        "summary": "Retrieve a return merchandise authorisation",
+        "summary": "Retrieve an RMA",
         "operationId": "return_merchandise_authorisations_get_return_merchandise_authorisation",
         "description": "Returns the RMA under `return_merchandise_authorisation`, including its `lines` and the receipts of returned stock in `receive_rmas`.",
         "parameters": [
@@ -39594,7 +39594,7 @@
             "name": "rma_id",
             "in": "path",
             "required": true,
-            "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+            "description": "The RMA's `id`, which starts with `rma_`.",
             "schema": {
               "type": "string"
             }
@@ -39659,9 +39659,9 @@
         "tags": [
           "Return merchandise authorisations"
         ],
-        "summary": "Delete a return merchandise authorisation",
+        "summary": "Delete an RMA",
         "operationId": "return_merchandise_authorisations_delete_return_merchandise_authorisation",
-        "description": "Only a draft RMA is deleted. Any other RMA is refused with `400` and the code `stock_committed`.",
+        "description": "Only a draft RMA can be deleted. Any other RMA is refused with `400` and the code `stock_committed`.",
         "parameters": [
           {
             "name": "rma_id",
@@ -39679,6 +39679,16 @@
           },
           "400": {
             "description": "The RMA is not a draft (`stock_committed`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Deleting an RMA currently fails, even for a draft RMA.",
             "content": {
               "application/json": {
                 "schema": {
@@ -39735,9 +39745,9 @@
         "tags": [
           "Return merchandise authorisations"
         ],
-        "summary": "Update a return merchandise authorisation",
+        "summary": "Update an RMA",
         "operationId": "return_merchandise_authorisations_update_return_merchandise_authorisation",
-        "description": "Send `rma_date`, `note` or `returns` under `return_merchandise_authorisation`. The RMA comes back under the same key.",
+        "description": "Send `rma_date`, `note` or `returns` under `return_merchandise_authorisation`. The RMA comes back under the same key. The shape of a `returns` entry is not documented.",
         "parameters": [
           {
             "name": "rma_id",
@@ -39756,6 +39766,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Updating an RMA currently fails, even for a draft RMA.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -39849,7 +39869,7 @@
         "tags": [
           "Return merchandise authorisations"
         ],
-        "summary": "List an invoice RMA's receipts",
+        "summary": "List an RMA's receipts through its invoice",
         "operationId": "return_merchandise_authorisations_get_invoice_return_merchandise_authorisation_receive",
         "description": "Returns the receipts of returned stock under `data`, each with its `code`, `status` and `quantity_received`.",
         "parameters": [
@@ -39933,7 +39953,7 @@
         "tags": [
           "Return merchandise authorisations"
         ],
-        "summary": "Retrieve an invoice RMA receipt",
+        "summary": "Retrieve an RMA receipt through its invoice",
         "operationId": "return_merchandise_authorisations_get_invoice_return_merchandise_authorisation_receive_by_uuid",
         "description": "Returns the receipt under `receive_rma`, with its `code`, `status` and `quantity_received`.",
         "parameters": [
@@ -40219,7 +40239,8 @@
                           ],
                           "properties": {
                             "uuid": {
-                              "type": "string"
+                              "type": "string",
+                              "description": "The `uuid` of the entry to receive; which record it names is not documented."
                             },
                             "rma_receive_quantity": {
                               "type": "number"
@@ -40251,7 +40272,7 @@
         "tags": [
           "Return merchandise authorisations"
         ],
-        "summary": "Approve a return merchandise authorisation",
+        "summary": "Approve an RMA",
         "operationId": "return_merchandise_authorisations_approve_return_merchandise_authorisation",
         "description": "Send no body. The call can notify approvers. An RMA with no pending approval is refused with `422`.",
         "parameters": [
@@ -40509,7 +40530,7 @@
         "tags": [
           "Return merchandise authorisations"
         ],
-        "summary": "Reject a return merchandise authorisation",
+        "summary": "Reject an RMA",
         "operationId": "return_merchandise_authorisations_reject_return_merchandise_authorisation",
         "description": "Send no body. The call can notify approvers. An RMA with no pending approval is refused with `422`.",
         "parameters": [
@@ -105174,11 +105195,11 @@
           },
           "last_updated_by": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_updated_on": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "object": {
             "type": "string"
@@ -105222,11 +105243,11 @@
           },
           "last_updated_by": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_updated_on": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "object": {
             "type": "string"
@@ -105276,11 +105297,11 @@
           },
           "last_updated_by": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_updated_on": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "lines": {
             "type": "array"
@@ -105308,7 +105329,7 @@
           },
           "sale_order": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "status": {
             "type": "string"
@@ -105318,7 +105339,7 @@
           },
           "warehouse": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           }
         }
       },
@@ -105359,11 +105380,11 @@
           },
           "last_updated_by": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_updated_on": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "object": {
             "type": "string"
@@ -105464,11 +105485,11 @@
           },
           "last_updated_by": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_updated_on": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "note": {
             "type": "string"
@@ -105487,7 +105508,7 @@
           },
           "sale_order": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "status": {
             "type": "string"
@@ -105497,7 +105518,7 @@
           },
           "warehouse": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           }
         }
       },
@@ -105569,22 +105590,6 @@
           },
           "links": {
             "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationPaginationLinks"
-          },
-          "records": {
-            "type": "integer",
-            "description": "Offset pages only: total matching records, not the page's length."
-          },
-          "offset": {
-            "type": "integer",
-            "description": "Offset pages only."
-          },
-          "next_page": {
-            "type": "string",
-            "description": "Offset pages only: the literal string `NULL` at the end of a listing, not JSON null."
-          },
-          "previous_page": {
-            "type": "string",
-            "description": "Offset pages only."
           }
         }
       },
