@@ -4,7 +4,11 @@ sidebarTitle: "Overview"
 description: "List, create, read, update and delete the communication profiles that hold your account messages."
 ---
 
-A communication profile holds a set of messages and channel settings that accounts use. Here you list, create, read, update and delete profiles. This area has 5 endpoints, and all seven SDKs call every one.
+A communication profile holds a set of messages and channel settings that accounts use. Here you list, create, read, update and delete profiles. This area has 5 endpoints, and every SDK supports all of them.
+
+<Warning>
+  **Creating a communication profile currently fails.** `POST /settings/communication_profiles` returns `500` and creates nothing, so you can update and delete only profiles that already exist.
+</Warning>
 
 ## At a glance
 
@@ -13,8 +17,8 @@ A communication profile holds a set of messages and channel settings that accoun
 | [List communication profiles](/api-reference/communication-profiles/list-communication-profiles) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/settings/communication_profiles` | Lists your communication profiles, a page at a time. |
 | [Create a communication profile](/api-reference/communication-profiles/create-a-communication-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/settings/communication_profiles` | Creates a communication profile and returns it under `communication_profile`. |
 | [Retrieve a communication profile](/api-reference/communication-profiles/retrieve-a-communication-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/settings/communication_profiles/{communication_profile_id}` | Returns one communication profile, under `communication_profile`. |
-| [Delete a communication profile](/api-reference/communication-profiles/delete-a-communication-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `/settings/communication_profiles/{communication_profile_id}` | Deletes a communication profile that is not the default. |
 | [Update a communication profile](/api-reference/communication-profiles/update-a-communication-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `/settings/communication_profiles/{communication_profile_id}` | Changes a communication profile's fields and channel settings. |
+| [Delete a communication profile](/api-reference/communication-profiles/delete-a-communication-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `/settings/communication_profiles/{communication_profile_id}` | Deletes a communication profile that is not the default. |
 
 ## Before you call
 
@@ -24,8 +28,7 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 
 ## Things to know
 
-- **A profile is named by its `cmp_` id.** List communication profiles returns each profile's `id`.
+- **Each profile's id starts with `cmp_`.** List communication profiles returns each profile's `id`.
 - **`name` is required to create a profile.** Its messages are copied from the profile in `copy_from`, or from the default profile.
 - **One profile comes back under `communication_profile`; a listing comes back under `data`.** A listing also carries `pagination`; pass `pagination.next_cursor` as `cursor` while `has_more` is `true`.
 - **The default profile cannot be deleted.** A delete marks the profile deleted, and reading it then returns `404`.
-- **Creating a profile can fail with `500`.**
