@@ -54394,7 +54394,7 @@
             "name": "milestone_uuid",
             "in": "path",
             "required": true,
-            "description": "The milestone's id: its `wfm_` id or its raw uuid.",
+            "description": "The milestone's id, as a milestones listing shows it.",
             "schema": {
               "type": "string"
             }
@@ -56585,7 +56585,7 @@
         ],
         "summary": "Create a workflow",
         "operationId": "workflows_create_workflow",
-        "description": "Send the workflow wrapped in `workflow`. `name` is required, and a key the API does not read is refused. The new workflow starts with the status `draft` and comes back under `workflow`.",
+        "description": "Send the workflow wrapped in `workflow`. `name` is required. Unknown keys are refused. The new workflow starts with the status `draft` and comes back under `workflow`.",
         "parameters": [],
         "responses": {
           "201": {
@@ -56594,6 +56594,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/WorkflowResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Currently returned for every request; no workflow is created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -57325,7 +57335,7 @@
         ],
         "summary": "List a component instance's workflow history",
         "operationId": "workflows_get_workflow_custom_component_history",
-        "description": "Name the component by its dashed uuid and the instance by its `code`. Returns a page of history entries under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+        "description": "Identify the component by its dashed uuid and the instance by its `code`. Returns a page of history entries under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
         "parameters": [
           {
             "name": "component_uuid",
@@ -57448,7 +57458,7 @@
         ],
         "summary": "List a component instance's milestones",
         "operationId": "workflows_get_workflow_custom_component_milestones",
-        "description": "Name the component by its dashed uuid and the instance by its `code`. Returns a page of milestones under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+        "description": "Identify the component by its dashed uuid and the instance by its `code`. Returns a page of milestones under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
         "parameters": [
           {
             "name": "component_uuid",
@@ -57571,7 +57581,7 @@
         ],
         "summary": "Retrieve a component instance's milestone",
         "operationId": "workflows_get_workflow_custom_component_milestone",
-        "description": "Name the component by its dashed uuid and the instance by its `code`. Returns the milestone under `workflow_milestone_instance`. A milestone id that does not exist returns `404` with the code `resource_not_found`.",
+        "description": "Identify the component by its dashed uuid and the instance by its `code`. Returns the milestone under `workflow_milestone_instance`. A milestone id that does not exist returns `404` with the code `resource_not_found`.",
         "parameters": [
           {
             "name": "component_uuid",
@@ -57665,9 +57675,9 @@
         "tags": [
           "Workflows"
         ],
-        "summary": "Retrieve a component instance's workflow history by code",
+        "summary": "List a component instance's workflow history by instance code",
         "operationId": "workflows_get_workflow_component_history",
-        "description": "Returns the history under `histories`, with `pagination` beside it.",
+        "description": "Unlike `/workflows/custom_components/...`, this route takes only the instance's `code` and returns its records under `histories`, not `data`, with `pagination` beside them.",
         "parameters": [
           {
             "name": "component_object_id",
@@ -57733,9 +57743,9 @@
         "tags": [
           "Workflows"
         ],
-        "summary": "Retrieve a component instance's milestones by code",
+        "summary": "List a component instance's milestones by settings uuid",
         "operationId": "workflows_get_workflow_component_cc_instance_cc_milestone",
-        "description": "Returns the milestones under `milestones`, with `pagination` beside it.",
+        "description": "Unlike `/workflows/custom_components/...`, this route takes the component's `uuid` as the component settings listing shows it, and returns its records under `milestones`, not `data`, with `pagination` beside them.",
         "parameters": [
           {
             "name": "component_uuid",
