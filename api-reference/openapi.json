@@ -134,6 +134,9 @@
     },
     {
       "name": "Purchase credit note applications"
+    },
+    {
+      "name": "Purchase express"
     }
   ],
   "paths": {
@@ -48074,6 +48077,128 @@
           }
         ]
       }
+    },
+    "/purchase_express": {
+      "post": {
+        "tags": [
+          "Purchase express"
+        ],
+        "summary": "Create a purchase order in one call",
+        "operationId": "purchase_express_create_purchase_express",
+        "description": "Creates a purchase order for a supplier in one call, with the body under `account.purchase_order`. If the body also nests a purchase invoice and payment, they are created in the same call; without them, nothing is billed or paid. The new purchase order comes back under `purchase_express`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new purchase order, under `purchase_express`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseExpressResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/purchase_express\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"account\": {\n      \"id\": \"W13ZGY\",\n      \"purchase_order\": {\n        \"lines\": [\n          {\n            \"item_id\": \"ITEM-0001\",\n            \"item_quantity\": 1\n          }\n        ]\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_express.create_purchase_express(\n    {\n        \"account\": {\n            \"id\": \"W13ZGY\",\n            \"purchase_order\": {\"lines\": [{\"item_id\": \"ITEM-0001\", \"item_quantity\": 1}]},\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseExpress.createPurchaseExpress({\n    account: {id: 'W13ZGY', purchase_order: {lines: [{item_id: 'ITEM-0001', item_quantity: 1}]}},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseExpress->createPurchaseExpress([\n    'account' => [\n        'id' => 'W13ZGY',\n        'purchase_order' => ['lines' => [['item_id' => 'ITEM-0001', 'item_quantity' => 1]]],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_express.purchase_express_dto.PurchaseExpressDto;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseExpressDto.PurchaseExpress> response = client.purchaseExpress().createPurchaseExpress(\n        Map.of(\n                \"account\", Map.of(\n                        \"id\", \"W13ZGY\",\n                        \"purchase_order\", Map.of(\n                                \"lines\", List.of(Map.of(\"item_id\", \"ITEM-0001\", \"item_quantity\", 1))))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseExpress.CreatePurchaseExpressAsync(new Dictionary<string, object?>\n{\n    [\"account\"] = new Dictionary<string, object?>\n    {\n        [\"id\"] = \"W13ZGY\",\n        [\"purchase_order\"] = new Dictionary<string, object?>\n        {\n            [\"lines\"] = new List<object?>\n            {\n                new Dictionary<string, object?>\n                {\n                    [\"item_id\"] = \"ITEM-0001\",\n                    [\"item_quantity\"] = 1,\n                },\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseExpress.createPurchaseExpress({\n  'account': {\n    'id': 'W13ZGY',\n    'purchase_order': {\n      'lines': [\n        {'item_id': 'ITEM-0001', 'item_quantity': 1},\n      ],\n    },\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseExpress().CreatePurchaseExpress(context.Background(), map[string]any{\n\t\"account\": map[string]any{\n\t\t\"id\": \"W13ZGY\",\n\t\t\"purchase_order\": map[string]any{\n\t\t\t\"lines\": []any{\n\t\t\t\tmap[string]any{\"item_id\": \"ITEM-0001\", \"item_quantity\": 1},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "account": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "The supplier account's `id`."
+                      },
+                      "purchase_order": {
+                        "type": "object",
+                        "properties": {
+                          "lines": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "item_id": {
+                                  "type": "string"
+                                },
+                                "item_quantity": {
+                                  "type": "number"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "description": "The purchase order to create, with its lines."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "account"
+                ]
+              },
+              "example": {
+                "account": {
+                  "id": "W13ZGY",
+                  "purchase_order": {
+                    "lines": [
+                      {
+                        "item_id": "ITEM-0001",
+                        "item_quantity": 1
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -77211,6 +77336,201 @@
         "properties": {
           "purchase_credit_note_application": {
             "$ref": "#/components/schemas/PurchaseCreditNoteApplicationRead"
+          }
+        }
+      },
+      "PurchaseExpress": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PurchaseExpressAccount"
+          },
+          "activity_logs": {
+            "type": "array",
+            "items": {}
+          },
+          "bill_total": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseExpressCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/PurchaseExpressCurrency"
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {}
+          },
+          "custom_form": {
+            "$ref": "#/components/schemas/PurchaseExpressCustomForm"
+          },
+          "due_date": {
+            "type": "string"
+          },
+          "due_total": {
+            "type": "string"
+          },
+          "expected_completion_date": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_price_tax_inclusive": {},
+          "issue_date": {
+            "type": "string"
+          },
+          "kpis": {
+            "$ref": "#/components/schemas/PurchaseExpressKpis"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "operational_status": {
+            "type": "string"
+          },
+          "origin": {},
+          "paid_amount": {
+            "type": "string"
+          },
+          "purchase_order_note": {},
+          "sale_order": {},
+          "status": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "supplier_invoice_id": {},
+          "tax_total": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "warehouse": {}
+        }
+      },
+      "PurchaseExpressAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseExpressCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseExpressCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseExpressCustomForm": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseExpressKpis": {
+        "type": "object",
+        "properties": {
+          "estimated_total": {
+            "type": "string"
+          },
+          "issue_date": {},
+          "last_cancelled_on": {},
+          "last_changed_on": {},
+          "last_deleted_on": {},
+          "last_invoice_issue_date": {},
+          "last_invoice_total": {
+            "type": "string"
+          },
+          "last_reactivated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "total_expense": {
+            "type": "string"
+          },
+          "total_outstanding": {
+            "type": "string"
+          },
+          "total_overdue": {
+            "type": "string"
+          },
+          "total_purchase_invoice": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchaseExpressResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_express": {
+            "$ref": "#/components/schemas/PurchaseExpress"
           }
         }
       },
