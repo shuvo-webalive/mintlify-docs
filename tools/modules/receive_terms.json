@@ -1,0 +1,398 @@
+{
+  "family": "receive_terms",
+  "tag": "Receive terms",
+  "slug": "receive-terms",
+  "icon": "calendar-days",
+  "base": "/settings/receive_terms",
+  "overview_description": "Create, list, read, update, enable, disable and delete receive terms in the account settings.",
+  "intro": "Receive terms are account settings, each defined by a `period` and a `duration`. These endpoints create, list, read, update and delete receive terms, and enable or disable them. There are 5 endpoints, and all seven SDKs call every one.",
+  "warning": "**Deleting a receive term cannot be undone.** Set its `status` to `inactive` instead to stop using it.",
+  "notes": [
+    "**Every write body is wrapped in `receive_term`.**",
+    "**`period` is sent in upper case and read back in lower case.** Send `MONTHLY`, read `monthly`.",
+    "**The create takes `name`, `display_name`, `period` and `duration`.**",
+    "**`status` takes `active` or `inactive`.** Use the update to enable or disable a term.",
+    "**Listings page by cursor.** Records are under `data`; pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_receive_terms",
+      "method": "GET",
+      "path": "/settings/receive_terms",
+      "slug": "list-receive-terms",
+      "title": "List receive terms",
+      "summary": "Returns one page of receive terms.",
+      "description": "Lists the receive terms set up on the account, one page at a time, under `data`. Other fields filter the list as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of receive terms.",
+          "schema": {
+            "$ref": "#/components/schemas/ReceiveTermList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_receive_term",
+      "method": "POST",
+      "path": "/settings/receive_terms",
+      "slug": "create-a-receive-term",
+      "title": "Create a receive term",
+      "summary": "Creates a receive term and returns it under `receive_term`.",
+      "description": "Creates a receive term from a `name`, `display_name`, `period` and `duration`, wrapped in `receive_term`. Send `period` in upper case, such as `MONTHLY`; it comes back in lower case.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "receive_term": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "period": {
+                  "type": "string",
+                  "description": "The period unit, in upper case, such as `MONTHLY`."
+                },
+                "duration": {
+                  "type": "integer",
+                  "description": "How many periods the term lasts."
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "receive_term"
+          ]
+        },
+        "example": {
+          "receive_term": {
+            "name": "net-30",
+            "display_name": "Net 30",
+            "period": "MONTHLY",
+            "duration": 1
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new receive term, under `receive_term`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReceiveTermResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "receive_term": {
+            "name": "net-30",
+            "display_name": "Net 30",
+            "period": "MONTHLY",
+            "duration": 1
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_receive_term",
+      "method": "GET",
+      "path": "/settings/receive_terms/{receive_term_id}",
+      "slug": "retrieve-a-receive-term",
+      "title": "Retrieve a receive term",
+      "summary": "Returns one receive term under `receive_term`.",
+      "description": "Returns the receive term with its name, period, duration and status under `receive_term`.",
+      "parameters": [
+        {
+          "name": "receive_term_id",
+          "in": "path",
+          "required": true,
+          "description": "The receive term's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "RT-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The receive term, under `receive_term`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReceiveTermResponse"
+          }
+        },
+        "404": {
+          "description": "No receive term has that `id`, for example after it is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "receive_term_id": "RT-0001"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_receive_term",
+      "method": "DELETE",
+      "path": "/settings/receive_terms/{receive_term_id}",
+      "slug": "delete-a-receive-term",
+      "title": "Delete a receive term",
+      "summary": "Deletes a receive term. Nothing comes back.",
+      "description": "Deletes the receive term. The call returns `204` with no body, and reading it afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "receive_term_id",
+          "in": "path",
+          "required": true,
+          "description": "The receive term's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "RT-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The receive term is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "receive_term_id": "RT-0001"
+        }
+      }
+    },
+    {
+      "key": "update_settings_receive_term",
+      "method": "PATCH",
+      "path": "/settings/receive_terms/{receive_term_id}",
+      "slug": "update-a-receive-term",
+      "title": "Update a receive term",
+      "summary": "Changes a receive term, or enables or disables it, and returns it under `receive_term`.",
+      "description": "Updates fields of the receive term, such as `display_name` and `description`, wrapped in `receive_term`. Set `status` to `active` or `inactive` to enable or disable it.",
+      "parameters": [
+        {
+          "name": "receive_term_id",
+          "in": "path",
+          "required": true,
+          "description": "The receive term's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "RT-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "receive_term": {
+              "type": "object",
+              "properties": {
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "description": "`active` or `inactive`.",
+                  "enum": [
+                    "active",
+                    "inactive"
+                  ]
+                }
+              }
+            }
+          },
+          "required": [
+            "receive_term"
+          ]
+        },
+        "example": {
+          "receive_term": {
+            "display_name": "Net 30 days",
+            "description": "Goods received within one month."
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated receive term, under `receive_term`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReceiveTermResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "receive_term_id": "RT-0001"
+        },
+        "body": {
+          "receive_term": {
+            "display_name": "Net 30 days",
+            "description": "Goods received within one month."
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "ReceiveTerm": {
+      "type": "object",
+      "properties": {
+        "created_by": {},
+        "created_on": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "period": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "ReceiveTermPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "ReceiveTermPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size the API applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can be set on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": "string",
+          "description": "The cursor of the previous page."
+        },
+        "links": {
+          "$ref": "#/components/schemas/ReceiveTermPaginationLinks"
+        }
+      }
+    },
+    "ReceiveTermList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ReceiveTerm"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ReceiveTermPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "ReceiveTermResponse": {
+      "type": "object",
+      "properties": {
+        "receive_term": {
+          "$ref": "#/components/schemas/ReceiveTerm"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+---
+title: "Receive terms"
+sidebarTitle: "Overview"
+description: "Create, list, read, update, enable, disable and delete receive terms in the account settings."
+---
+
+Receive terms are account settings, each defined by a `period` and a `duration`. These endpoints create, list, read, update and delete receive terms, and enable or disable them. There are 5 endpoints, and all seven SDKs call every one.
+
+<Warning>
+  **Deleting a receive term cannot be undone.** Set its `status` to `inactive` instead to stop using it.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List receive terms](/api-reference/receive-terms/list-receive-terms) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/receive_terms` | Returns one page of receive terms. |
+| [Create a receive term](/api-reference/receive-terms/create-a-receive-term) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/receive_terms` | Creates a receive term and returns it under `receive_term`. |
+| [Retrieve a receive term](/api-reference/receive-terms/retrieve-a-receive-term) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/receive_terms/{receive_term_id}` | Returns one receive term under `receive_term`. |
+| [Delete a receive term](/api-reference/receive-terms/delete-a-receive-term) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/receive_terms/{receive_term_id}` | Deletes a receive term. Nothing comes back. |
+| [Update a receive term](/api-reference/receive-terms/update-a-receive-term) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/receive_terms/{receive_term_id}` | Changes a receive term, or enables or disables it, and returns it under `receive_term`. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Every write body is wrapped in `receive_term`.**
+- **`period` is sent in upper case and read back in lower case.** Send `MONTHLY`, read `monthly`.
+- **The create takes `name`, `display_name`, `period` and `duration`.**
+- **`status` takes `active` or `inactive`.** Use the update to enable or disable a term.
+- **Listings page by cursor.** Records are under `data`; pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`.
