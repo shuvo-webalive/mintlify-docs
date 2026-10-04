@@ -1,0 +1,408 @@
+{
+  "family": "alert_responsibility",
+  "tag": "Alert responsibilities",
+  "slug": "alert-responsibilities",
+  "icon": "user-tag",
+  "base": "/alert_responsibility",
+  "overview_description": "Create, read, update and delete the alert responsibilities that say who handles alerts.",
+  "intro": "Alert responsibilities say who handles which alerts. You can list, create, read, update and delete them on the singular `/alert_responsibility` path. This area has 5 endpoints, and all seven Exsited SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**The path is singular.** Use `/alert_responsibility`. The `href` and `url` values in these records say `/alert_responsibilities`, a path not served at the top level.",
+    "**Writes are wrapped in `alert_responsibility`.** `name` is required and unique; a create reads only `name`, `display_name` and `description`.",
+    "**Reads take the `ar_` id or the raw uuid; the delete takes the `ar_` id only.**",
+    "**These are the same records as Alert responsibility settings.** `/settings/alert_responsibilities` serves them too.",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_alert_responsibilities",
+      "method": "GET",
+      "path": "/alert_responsibility",
+      "slug": "list-alert-responsibilities",
+      "title": "List alert responsibilities",
+      "summary": "Lists the alert responsibilities on your instance, one page at a time.",
+      "description": "Returns a page of alert responsibilities under `data`, with cursor `pagination`. The path is singular. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of alert responsibilities.",
+          "schema": {
+            "$ref": "#/components/schemas/AlertResponsibilityList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_alert_responsibility",
+      "method": "GET",
+      "path": "/alert_responsibility/{alert_responsibility_id}",
+      "slug": "retrieve-an-alert-responsibility",
+      "title": "Retrieve an alert responsibility",
+      "summary": "Retrieves one alert responsibility by its `ar_` id or its raw uuid.",
+      "description": "Returns the alert responsibility under `alert_responsibility`. A deleted one returns `404`.",
+      "parameters": [
+        {
+          "name": "alert_responsibility_id",
+          "in": "path",
+          "required": true,
+          "description": "The alert responsibility's `ar_` id, or its raw uuid.",
+          "schema": {
+            "type": "string",
+            "example": "ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The alert responsibility, under `alert_responsibility`.",
+          "schema": {
+            "$ref": "#/components/schemas/AlertResponsibilityResponse"
+          }
+        },
+        "404": {
+          "description": "No alert responsibility has that id, or it is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "alert_responsibility_id": "ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b"
+        }
+      }
+    },
+    {
+      "key": "create_alert_responsibility",
+      "method": "POST",
+      "path": "/alert_responsibility",
+      "slug": "create-an-alert-responsibility",
+      "title": "Create an alert responsibility",
+      "summary": "Creates an alert responsibility and returns it.",
+      "description": "Send the record wrapped in `alert_responsibility`. `name` is required and must be unique; `display_name` and `description` are the only other keys read. The new record comes back under `alert_responsibility`, with its `activity_logs`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "alert_responsibility": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The responsibility's name. Must be unique."
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "description": "Only `name`, `display_name` and `description` are read."
+            }
+          },
+          "required": [
+            "alert_responsibility"
+          ]
+        },
+        "example": {
+          "alert_responsibility": {
+            "name": "Billing alerts",
+            "description": "Alerts about failed billing."
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new alert responsibility, under `alert_responsibility`.",
+          "schema": {
+            "$ref": "#/components/schemas/AlertResponsibilityResponse"
+          }
+        }
+      },
+      "example_call": {
+        "body": {
+          "alert_responsibility": {
+            "name": "Billing alerts",
+            "description": "Alerts about failed billing."
+          }
+        }
+      }
+    },
+    {
+      "key": "update_alert_responsibility",
+      "method": "PATCH",
+      "path": "/alert_responsibility/{alert_responsibility_id}",
+      "slug": "update-an-alert-responsibility",
+      "title": "Update an alert responsibility",
+      "summary": "Changes an alert responsibility and returns it.",
+      "description": "Send the fields to change wrapped in `alert_responsibility`: `name`, `display_name`, `description`, and `status`, which moves between `active` and `inactive`.",
+      "parameters": [
+        {
+          "name": "alert_responsibility_id",
+          "in": "path",
+          "required": true,
+          "description": "The alert responsibility's `ar_` id, or its raw uuid.",
+          "schema": {
+            "type": "string",
+            "example": "ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "alert_responsibility": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "description": "`active` or `inactive`."
+                }
+              },
+              "description": "The fields to change."
+            }
+          },
+          "required": [
+            "alert_responsibility"
+          ]
+        },
+        "example": {
+          "alert_responsibility": {
+            "description": "Alerts about failed billing and refunds.",
+            "status": "inactive"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated alert responsibility, under `alert_responsibility`.",
+          "schema": {
+            "$ref": "#/components/schemas/AlertResponsibilityResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "alert_responsibility_id": "ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b"
+        },
+        "body": {
+          "alert_responsibility": {
+            "description": "Alerts about failed billing and refunds.",
+            "status": "inactive"
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_alert_responsibility",
+      "method": "DELETE",
+      "path": "/alert_responsibility/{alert_responsibility_id}",
+      "slug": "delete-an-alert-responsibility",
+      "title": "Delete an alert responsibility",
+      "summary": "Deletes an alert responsibility. Nothing comes back.",
+      "description": "Returns `204` with no body. The delete is soft, and a read afterwards returns `404`. Name the record by its `ar_` id; the raw uuid is not accepted here.",
+      "parameters": [
+        {
+          "name": "alert_responsibility_id",
+          "in": "path",
+          "required": true,
+          "description": "The alert responsibility's `ar_` id.",
+          "schema": {
+            "type": "string",
+            "example": "ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The alert responsibility is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "alert_responsibility_id": "ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "AlertResponsibility": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The alert responsibility's `ar_` id."
+        },
+        "status": {
+          "type": "string",
+          "description": "`active` or `inactive`."
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique across alert responsibilities."
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string",
+          "description": "Points at `/alert_responsibilities`, a path not served at the top level."
+        },
+        "activity_logs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "Present on the create response only."
+        }
+      }
+    },
+    "AlertResponsibilityResponse": {
+      "type": "object",
+      "properties": {
+        "alert_responsibility": {
+          "$ref": "#/components/schemas/AlertResponsibility"
+        }
+      }
+    },
+    "AlertResponsibilityList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "description": "Always `list`."
+        },
+        "url": {
+          "type": "string",
+          "description": "The path this page was read from."
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/AlertResponsibility"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/AlertResponsibilityPagination"
+        }
+      }
+    },
+    "AlertResponsibilityPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Pass as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "links": {
+          "$ref": "#/components/schemas/AlertResponsibilityPaginationLinks"
+        }
+      }
+    },
+    "AlertResponsibilityPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

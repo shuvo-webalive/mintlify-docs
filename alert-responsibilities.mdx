@@ -1,0 +1,31 @@
+---
+title: "Alert responsibilities"
+sidebarTitle: "Overview"
+description: "Create, read, update and delete the alert responsibilities that say who handles alerts."
+---
+
+Alert responsibilities say who handles which alerts. You can list, create, read, update and delete them on the singular `/alert_responsibility` path. This area has 5 endpoints, and all seven Exsited SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List alert responsibilities](/api-reference/alert-responsibilities/list-alert-responsibilities) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/alert_responsibility` | Lists the alert responsibilities on your instance, one page at a time. |
+| [Retrieve an alert responsibility](/api-reference/alert-responsibilities/retrieve-an-alert-responsibility) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/alert_responsibility/{alert_responsibility_id}` | Retrieves one alert responsibility by its `ar_` id or its raw uuid. |
+| [Create an alert responsibility](/api-reference/alert-responsibilities/create-an-alert-responsibility) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/alert_responsibility` | Creates an alert responsibility and returns it. |
+| [Update an alert responsibility](/api-reference/alert-responsibilities/update-an-alert-responsibility) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/alert_responsibility/{alert_responsibility_id}` | Changes an alert responsibility and returns it. |
+| [Delete an alert responsibility](/api-reference/alert-responsibilities/delete-an-alert-responsibility) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/alert_responsibility/{alert_responsibility_id}` | Deletes an alert responsibility. Nothing comes back. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **The path is singular.** Use `/alert_responsibility`. The `href` and `url` values in these records say `/alert_responsibilities`, a path not served at the top level.
+- **Writes are wrapped in `alert_responsibility`.** `name` is required and unique; a create reads only `name`, `display_name` and `description`.
+- **Reads take the `ar_` id or the raw uuid; the delete takes the `ar_` id only.**
+- **These are the same records as Alert responsibility settings.** `/settings/alert_responsibilities` serves them too.
+- **Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.

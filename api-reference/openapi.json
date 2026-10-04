@@ -203,6 +203,9 @@
     },
     {
       "name": "Alert responsibility settings"
+    },
+    {
+      "name": "Alert responsibilities"
     }
   ],
   "paths": {
@@ -60712,6 +60715,468 @@
           }
         }
       }
+    },
+    "/alert_responsibility": {
+      "get": {
+        "tags": [
+          "Alert responsibilities"
+        ],
+        "summary": "List alert responsibilities",
+        "operationId": "alert_responsibility_get_alert_responsibilities",
+        "description": "Returns a page of alert responsibilities under `data`, with cursor `pagination`. The path is singular. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of alert responsibilities.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertResponsibilityList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/alert_responsibility?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.alert_responsibility.get_alert_responsibilities({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.alertResponsibility.getAlertResponsibilities({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->alertResponsibility->getAlertResponsibilities(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.alert_responsibility.alert_responsibility_dto.AlertResponsibilityDto.AlertResponsibilityList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<AlertResponsibilityList> response = client.alertResponsibility().getAlertResponsibilities(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AlertResponsibility.GetAlertResponsibilitiesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.alertResponsibility.getAlertResponsibilities(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AlertResponsibility().GetAlertResponsibilities(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Alert responsibilities"
+        ],
+        "summary": "Create an alert responsibility",
+        "operationId": "alert_responsibility_create_alert_responsibility",
+        "description": "Send the record wrapped in `alert_responsibility`. `name` is required and must be unique; `display_name` and `description` are the only other keys read. The new record comes back under `alert_responsibility`, with its `activity_logs`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new alert responsibility, under `alert_responsibility`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertResponsibilityResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/alert_responsibility\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"alert_responsibility\": {\n      \"name\": \"Billing alerts\",\n      \"description\": \"Alerts about failed billing.\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.alert_responsibility.create_alert_responsibility(\n    {\n        \"alert_responsibility\": {\n            \"name\": \"Billing alerts\",\n            \"description\": \"Alerts about failed billing.\",\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.alertResponsibility.createAlertResponsibility({\n    alert_responsibility: {name: 'Billing alerts', description: 'Alerts about failed billing.'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->alertResponsibility->createAlertResponsibility([\n    'alert_responsibility' => [\n        'name' => 'Billing alerts',\n        'description' => 'Alerts about failed billing.',\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.alert_responsibility.alert_responsibility_dto.AlertResponsibilityDto;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<AlertResponsibilityDto.AlertResponsibility> response = client.alertResponsibility().createAlertResponsibility(\n        Map.of(\n                \"alert_responsibility\", Map.of(\n                        \"name\", \"Billing alerts\",\n                        \"description\", \"Alerts about failed billing.\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AlertResponsibility.CreateAlertResponsibilityAsync(new Dictionary<string, object?>\n{\n    [\"alert_responsibility\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Billing alerts\",\n        [\"description\"] = \"Alerts about failed billing.\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.alertResponsibility.createAlertResponsibility({\n  'alert_responsibility': {\n    'name': 'Billing alerts',\n    'description': 'Alerts about failed billing.',\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AlertResponsibility().CreateAlertResponsibility(context.Background(), map[string]any{\n\t\"alert_responsibility\": map[string]any{\n\t\t\"name\":        \"Billing alerts\",\n\t\t\"description\": \"Alerts about failed billing.\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "alert_responsibility": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The responsibility's name. Must be unique."
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ],
+                    "description": "Only `name`, `display_name` and `description` are read."
+                  }
+                },
+                "required": [
+                  "alert_responsibility"
+                ]
+              },
+              "example": {
+                "alert_responsibility": {
+                  "name": "Billing alerts",
+                  "description": "Alerts about failed billing."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/alert_responsibility/{alert_responsibility_id}": {
+      "get": {
+        "tags": [
+          "Alert responsibilities"
+        ],
+        "summary": "Retrieve an alert responsibility",
+        "operationId": "alert_responsibility_get_alert_responsibility",
+        "description": "Returns the alert responsibility under `alert_responsibility`. A deleted one returns `404`.",
+        "parameters": [
+          {
+            "name": "alert_responsibility_id",
+            "in": "path",
+            "required": true,
+            "description": "The alert responsibility's `ar_` id, or its raw uuid.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The alert responsibility, under `alert_responsibility`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertResponsibilityResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No alert responsibility has that id, or it is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/alert_responsibility/ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.alert_responsibility.get_alert_responsibility(\n    \"ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.alertResponsibility.getAlertResponsibility('ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->alertResponsibility->getAlertResponsibility(\n    'ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.alert_responsibility.alert_responsibility_dto.AlertResponsibilityDto;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<AlertResponsibilityDto.AlertResponsibility> response = client.alertResponsibility().getAlertResponsibility(\n        \"ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AlertResponsibility.GetAlertResponsibilityAsync(\"ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.alertResponsibility.getAlertResponsibility(\n  'ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AlertResponsibility().GetAlertResponsibility(context.Background(), \"ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Alert responsibilities"
+        ],
+        "summary": "Update an alert responsibility",
+        "operationId": "alert_responsibility_update_alert_responsibility",
+        "description": "Send the fields to change wrapped in `alert_responsibility`: `name`, `display_name`, `description`, and `status`, which moves between `active` and `inactive`.",
+        "parameters": [
+          {
+            "name": "alert_responsibility_id",
+            "in": "path",
+            "required": true,
+            "description": "The alert responsibility's `ar_` id, or its raw uuid.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated alert responsibility, under `alert_responsibility`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertResponsibilityResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/alert_responsibility/ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"alert_responsibility\": {\n      \"description\": \"Alerts about failed billing and refunds.\",\n      \"status\": \"inactive\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.alert_responsibility.update_alert_responsibility(\n    \"ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b\",\n    {\n        \"alert_responsibility\": {\n            \"description\": \"Alerts about failed billing and refunds.\",\n            \"status\": \"inactive\",\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.alertResponsibility.updateAlertResponsibility('ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b', {\n    alert_responsibility: {description: 'Alerts about failed billing and refunds.', status: 'inactive'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->alertResponsibility->updateAlertResponsibility(\n    'ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b',\n    [\n        'alert_responsibility' => [\n            'description' => 'Alerts about failed billing and refunds.',\n            'status' => 'inactive',\n        ],\n    ],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.alert_responsibility.alert_responsibility_dto.AlertResponsibilityDto;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<AlertResponsibilityDto.AlertResponsibility> response = client.alertResponsibility().updateAlertResponsibility(\n        \"ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b\",\n        Map.of(\n                \"alert_responsibility\", Map.of(\n                        \"description\", \"Alerts about failed billing and refunds.\",\n                        \"status\", \"inactive\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AlertResponsibility.UpdateAlertResponsibilityAsync(\n    \"ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b\",\n    new Dictionary<string, object?>\n    {\n        [\"alert_responsibility\"] = new Dictionary<string, object?>\n        {\n            [\"description\"] = \"Alerts about failed billing and refunds.\",\n            [\"status\"] = \"inactive\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.alertResponsibility.updateAlertResponsibility(\n  'ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b',\n  {\n    'alert_responsibility': {\n      'description': 'Alerts about failed billing and refunds.',\n      'status': 'inactive',\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AlertResponsibility().UpdateAlertResponsibility(context.Background(), \"ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b\", map[string]any{\n\t\"alert_responsibility\": map[string]any{\n\t\t\"description\": \"Alerts about failed billing and refunds.\",\n\t\t\"status\":      \"inactive\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "alert_responsibility": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "description": "`active` or `inactive`."
+                      }
+                    },
+                    "description": "The fields to change."
+                  }
+                },
+                "required": [
+                  "alert_responsibility"
+                ]
+              },
+              "example": {
+                "alert_responsibility": {
+                  "description": "Alerts about failed billing and refunds.",
+                  "status": "inactive"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Alert responsibilities"
+        ],
+        "summary": "Delete an alert responsibility",
+        "operationId": "alert_responsibility_delete_alert_responsibility",
+        "description": "Returns `204` with no body. The delete is soft, and a read afterwards returns `404`. Name the record by its `ar_` id; the raw uuid is not accepted here.",
+        "parameters": [
+          {
+            "name": "alert_responsibility_id",
+            "in": "path",
+            "required": true,
+            "description": "The alert responsibility's `ar_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The alert responsibility is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/alert_responsibility/ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.alert_responsibility.delete_alert_responsibility(\n    \"ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.alertResponsibility.deleteAlertResponsibility('ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->alertResponsibility->deleteAlertResponsibility(\n    'ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.alertResponsibility().deleteAlertResponsibility(\n        \"ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AlertResponsibility.DeleteAlertResponsibilityAsync(\"ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.alertResponsibility.deleteAlertResponsibility(\n  'ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AlertResponsibility().DeleteAlertResponsibility(context.Background(), \"ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -94941,6 +95406,128 @@
         }
       },
       "SettingsAlertResponsibilityPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "prev": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "AlertResponsibility": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "The alert responsibility's `ar_` id."
+          },
+          "status": {
+            "type": "string",
+            "description": "`active` or `inactive`."
+          },
+          "name": {
+            "type": "string",
+            "description": "Unique across alert responsibilities."
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string",
+            "description": "Points at `/alert_responsibilities`, a path not served at the top level."
+          },
+          "activity_logs": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "Present on the create response only."
+          }
+        }
+      },
+      "AlertResponsibilityResponse": {
+        "type": "object",
+        "properties": {
+          "alert_responsibility": {
+            "$ref": "#/components/schemas/AlertResponsibility"
+          }
+        }
+      },
+      "AlertResponsibilityList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "description": "Always `list`."
+          },
+          "url": {
+            "type": "string",
+            "description": "The path this page was read from."
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AlertResponsibility"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/AlertResponsibilityPagination"
+          }
+        }
+      },
+      "AlertResponsibilityPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "links": {
+            "$ref": "#/components/schemas/AlertResponsibilityPaginationLinks"
+          }
+        }
+      },
+      "AlertResponsibilityPaginationLinks": {
         "type": "object",
         "properties": {
           "next": {
