@@ -1,0 +1,388 @@
+{
+  "family": "approval_user_groups",
+  "tag": "Approval user groups",
+  "slug": "approval-user-groups",
+  "icon": "users",
+  "base": "/settings/approval_user_groups",
+  "overview_description": "Create, read, update and delete the user groups that approve transactions.",
+  "intro": "Approval user groups collect the users who can approve transactions. You can list, create, read, update and delete them. This area has 5 endpoints, and all seven Exsited SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**Writes are wrapped in `approval_user_group`.** One group comes back under the same key, and `name` is required to create one.",
+    "**An update changes the name, display name or description.**",
+    "**Approval user group ids start with `aug_`.** A deleted group returns `404`.",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_approval_user_groups",
+      "method": "GET",
+      "path": "/settings/approval_user_groups",
+      "slug": "list-approval-user-groups",
+      "title": "List approval user groups",
+      "summary": "Lists the approval user groups on your instance, one page at a time.",
+      "description": "Returns a page of approval user groups under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of approval user groups.",
+          "schema": {
+            "$ref": "#/components/schemas/SettingsApprovalUserGroupList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_approval_user_group",
+      "method": "POST",
+      "path": "/settings/approval_user_groups",
+      "slug": "create-an-approval-user-group",
+      "title": "Create an approval user group",
+      "summary": "Creates an approval user group and returns it.",
+      "description": "Send the group wrapped in `approval_user_group`. `name` is required. The new group comes back under `approval_user_group`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "approval_user_group": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The group's name."
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          },
+          "required": [
+            "approval_user_group"
+          ]
+        },
+        "example": {
+          "approval_user_group": {
+            "name": "Finance approvers"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new approval user group, under `approval_user_group`.",
+          "schema": {
+            "$ref": "#/components/schemas/SettingsApprovalUserGroupResponse"
+          }
+        }
+      },
+      "example_call": {
+        "body": {
+          "approval_user_group": {
+            "name": "Finance approvers"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_approval_user_group",
+      "method": "GET",
+      "path": "/settings/approval_user_groups/{approval_user_group_id}",
+      "slug": "retrieve-an-approval-user-group",
+      "title": "Retrieve an approval user group",
+      "summary": "Retrieves one approval user group by its `aug_` id.",
+      "description": "Returns the group under `approval_user_group`. A deleted group returns `404`.",
+      "parameters": [
+        {
+          "name": "approval_user_group_id",
+          "in": "path",
+          "required": true,
+          "description": "The approval user group's `aug_` id.",
+          "schema": {
+            "type": "string",
+            "example": "aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The approval user group, under `approval_user_group`.",
+          "schema": {
+            "$ref": "#/components/schemas/SettingsApprovalUserGroupResponse"
+          }
+        },
+        "404": {
+          "description": "No approval user group has that id, or the group is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "approval_user_group_id": "aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_approval_user_group",
+      "method": "DELETE",
+      "path": "/settings/approval_user_groups/{approval_user_group_id}",
+      "slug": "delete-an-approval-user-group",
+      "title": "Delete an approval user group",
+      "summary": "Deletes an approval user group. Nothing comes back.",
+      "description": "Returns `204` with no body. A read of the group afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "approval_user_group_id",
+          "in": "path",
+          "required": true,
+          "description": "The approval user group's `aug_` id.",
+          "schema": {
+            "type": "string",
+            "example": "aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The approval user group is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "approval_user_group_id": "aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e"
+        }
+      }
+    },
+    {
+      "key": "update_settings_approval_user_group",
+      "method": "PATCH",
+      "path": "/settings/approval_user_groups/{approval_user_group_id}",
+      "slug": "update-an-approval-user-group",
+      "title": "Update an approval user group",
+      "summary": "Changes an approval user group's name, display name or description, and returns the group.",
+      "description": "Send the fields to change wrapped in `approval_user_group`. The updated group comes back under `approval_user_group`.",
+      "parameters": [
+        {
+          "name": "approval_user_group_id",
+          "in": "path",
+          "required": true,
+          "description": "The approval user group's `aug_` id.",
+          "schema": {
+            "type": "string",
+            "example": "aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "approval_user_group": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string",
+                  "description": "The name shown for the group."
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "description": "The fields to change: the name, display name or description."
+            }
+          },
+          "required": [
+            "approval_user_group"
+          ]
+        },
+        "example": {
+          "approval_user_group": {
+            "display_name": "Finance approvers team",
+            "description": "Approvers for the finance team."
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated approval user group, under `approval_user_group`.",
+          "schema": {
+            "$ref": "#/components/schemas/SettingsApprovalUserGroupResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "approval_user_group_id": "aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e"
+        },
+        "body": {
+          "approval_user_group": {
+            "display_name": "Finance approvers team",
+            "description": "Approvers for the finance team."
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "SettingsApprovalUserGroup": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The approval user group's `aug_` id."
+        },
+        "status": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "created_by": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "last_updated_by": {
+          "description": "No type is known: this field is null in every record read."
+        }
+      }
+    },
+    "SettingsApprovalUserGroupResponse": {
+      "type": "object",
+      "properties": {
+        "approval_user_group": {
+          "$ref": "#/components/schemas/SettingsApprovalUserGroup"
+        }
+      }
+    },
+    "SettingsApprovalUserGroupList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "description": "Always `list`."
+        },
+        "url": {
+          "type": "string",
+          "description": "The path this page was read from."
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/SettingsApprovalUserGroup"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/SettingsApprovalUserGroupPagination"
+        }
+      }
+    },
+    "SettingsApprovalUserGroupPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Pass as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "links": {
+          "$ref": "#/components/schemas/SettingsApprovalUserGroupPaginationLinks"
+        }
+      }
+    },
+    "SettingsApprovalUserGroupPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

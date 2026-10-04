@@ -194,6 +194,9 @@
     },
     {
       "name": "Approval profiles"
+    },
+    {
+      "name": "Approval user groups"
     }
   ],
   "paths": {
@@ -59417,6 +59420,457 @@
           }
         }
       }
+    },
+    "/settings/approval_user_groups": {
+      "get": {
+        "tags": [
+          "Approval user groups"
+        ],
+        "summary": "List approval user groups",
+        "operationId": "approval_user_groups_get_settings_approval_user_groups",
+        "description": "Returns a page of approval user groups under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of approval user groups.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsApprovalUserGroupList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/approval_user_groups?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.approval_user_groups.get_settings_approval_user_groups({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.approvalUserGroups.getSettingsApprovalUserGroups({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->approvalUserGroups->getSettingsApprovalUserGroups(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.approval_user_groups.approval_user_groups_dto.ApprovalUserGroupsDto.SettingsApprovalUserGroupList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsApprovalUserGroupList> response = client.approvalUserGroups().getSettingsApprovalUserGroups(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ApprovalUserGroups.GetSettingsApprovalUserGroupsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.approvalUserGroups\n    .getSettingsApprovalUserGroups(queryParams: {'limit': 20});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ApprovalUserGroups().GetSettingsApprovalUserGroups(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Approval user groups"
+        ],
+        "summary": "Create an approval user group",
+        "operationId": "approval_user_groups_create_settings_approval_user_group",
+        "description": "Send the group wrapped in `approval_user_group`. `name` is required. The new group comes back under `approval_user_group`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new approval user group, under `approval_user_group`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsApprovalUserGroupResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/approval_user_groups\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"approval_user_group\": {\n      \"name\": \"Finance approvers\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.approval_user_groups.create_settings_approval_user_group(\n    {\"approval_user_group\": {\"name\": \"Finance approvers\"}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.approvalUserGroups.createSettingsApprovalUserGroup({\n    approval_user_group: {name: 'Finance approvers'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->approvalUserGroups->createSettingsApprovalUserGroup([\n    'approval_user_group' => ['name' => 'Finance approvers'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.approval_user_groups.approval_user_groups_dto.ApprovalUserGroupsDto.SettingsApprovalUserGroup;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsApprovalUserGroup> response = client.approvalUserGroups().createSettingsApprovalUserGroup(\n        Map.of(\"approval_user_group\", Map.of(\"name\", \"Finance approvers\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ApprovalUserGroups.CreateSettingsApprovalUserGroupAsync(new Dictionary<string, object?>\n{\n    [\"approval_user_group\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Finance approvers\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.approvalUserGroups\n    .createSettingsApprovalUserGroup({\n      'approval_user_group': {'name': 'Finance approvers'},\n    });\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ApprovalUserGroups().CreateSettingsApprovalUserGroup(context.Background(), map[string]any{\n\t\"approval_user_group\": map[string]any{\"name\": \"Finance approvers\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "approval_user_group": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The group's name."
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ]
+                  }
+                },
+                "required": [
+                  "approval_user_group"
+                ]
+              },
+              "example": {
+                "approval_user_group": {
+                  "name": "Finance approvers"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/approval_user_groups/{approval_user_group_id}": {
+      "get": {
+        "tags": [
+          "Approval user groups"
+        ],
+        "summary": "Retrieve an approval user group",
+        "operationId": "approval_user_groups_get_settings_approval_user_group",
+        "description": "Returns the group under `approval_user_group`. A deleted group returns `404`.",
+        "parameters": [
+          {
+            "name": "approval_user_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The approval user group's `aug_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The approval user group, under `approval_user_group`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsApprovalUserGroupResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No approval user group has that id, or the group is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/approval_user_groups/aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.approval_user_groups.get_settings_approval_user_group(\n    \"aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.approvalUserGroups.getSettingsApprovalUserGroup('aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->approvalUserGroups->getSettingsApprovalUserGroup(\n    'aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.approval_user_groups.approval_user_groups_dto.ApprovalUserGroupsDto.SettingsApprovalUserGroup;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsApprovalUserGroup> response = client.approvalUserGroups().getSettingsApprovalUserGroup(\n        \"aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ApprovalUserGroups.GetSettingsApprovalUserGroupAsync(\"aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.approvalUserGroups.getSettingsApprovalUserGroup(\n  'aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ApprovalUserGroups().GetSettingsApprovalUserGroup(context.Background(), \"aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Approval user groups"
+        ],
+        "summary": "Delete an approval user group",
+        "operationId": "approval_user_groups_delete_settings_approval_user_group",
+        "description": "Returns `204` with no body. A read of the group afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "approval_user_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The approval user group's `aug_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The approval user group is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/approval_user_groups/aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.approval_user_groups.delete_settings_approval_user_group(\n    \"aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.approvalUserGroups.deleteSettingsApprovalUserGroup(\n    'aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->approvalUserGroups->deleteSettingsApprovalUserGroup(\n    'aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.approvalUserGroups().deleteSettingsApprovalUserGroup(\n        \"aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ApprovalUserGroups.DeleteSettingsApprovalUserGroupAsync(\"aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.approvalUserGroups\n    .deleteSettingsApprovalUserGroup('aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ApprovalUserGroups().DeleteSettingsApprovalUserGroup(context.Background(), \"aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Approval user groups"
+        ],
+        "summary": "Update an approval user group",
+        "operationId": "approval_user_groups_update_settings_approval_user_group",
+        "description": "Send the fields to change wrapped in `approval_user_group`. The updated group comes back under `approval_user_group`.",
+        "parameters": [
+          {
+            "name": "approval_user_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The approval user group's `aug_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated approval user group, under `approval_user_group`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsApprovalUserGroupResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/approval_user_groups/aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"approval_user_group\": {\n      \"display_name\": \"Finance approvers team\",\n      \"description\": \"Approvers for the finance team.\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.approval_user_groups.update_settings_approval_user_group(\n    \"aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e\",\n    {\n        \"approval_user_group\": {\n            \"display_name\": \"Finance approvers team\",\n            \"description\": \"Approvers for the finance team.\",\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.approvalUserGroups.updateSettingsApprovalUserGroup(\n    'aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e',\n    {approval_user_group: {display_name: 'Finance approvers team', description: 'Approvers for the finance team.'}},\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->approvalUserGroups->updateSettingsApprovalUserGroup(\n    'aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e',\n    [\n        'approval_user_group' => [\n            'display_name' => 'Finance approvers team',\n            'description' => 'Approvers for the finance team.',\n        ],\n    ],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.approval_user_groups.approval_user_groups_dto.ApprovalUserGroupsDto.SettingsApprovalUserGroup;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsApprovalUserGroup> response = client.approvalUserGroups().updateSettingsApprovalUserGroup(\n        \"aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e\",\n        Map.of(\n                \"approval_user_group\", Map.of(\n                        \"display_name\", \"Finance approvers team\",\n                        \"description\", \"Approvers for the finance team.\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ApprovalUserGroups.UpdateSettingsApprovalUserGroupAsync(\n    \"aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e\",\n    new Dictionary<string, object?>\n    {\n        [\"approval_user_group\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Finance approvers team\",\n            [\"description\"] = \"Approvers for the finance team.\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.approvalUserGroups\n    .updateSettingsApprovalUserGroup('aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e', {\n      'approval_user_group': {\n        'display_name': 'Finance approvers team',\n        'description': 'Approvers for the finance team.',\n      },\n    });\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ApprovalUserGroups().UpdateSettingsApprovalUserGroup(context.Background(), \"aug_5f7a9c1e3b2d4f6a8c0e1b3d5f7a9c2e\", map[string]any{\n\t\"approval_user_group\": map[string]any{\n\t\t\"display_name\": \"Finance approvers team\",\n\t\t\"description\":  \"Approvers for the finance team.\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "approval_user_group": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string",
+                        "description": "The name shown for the group."
+                      },
+                      "description": {
+                        "type": "string"
+                      }
+                    },
+                    "description": "The fields to change: the name, display name or description."
+                  }
+                },
+                "required": [
+                  "approval_user_group"
+                ]
+              },
+              "example": {
+                "approval_user_group": {
+                  "display_name": "Finance approvers team",
+                  "description": "Approvers for the finance team."
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -93393,6 +93847,121 @@
         }
       },
       "SettingsApprovalProfilePaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "prev": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "SettingsApprovalUserGroup": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "The approval user group's `aug_` id."
+          },
+          "status": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "created_by": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "last_updated_by": {
+            "description": "No type is known: this field is null in every record read."
+          }
+        }
+      },
+      "SettingsApprovalUserGroupResponse": {
+        "type": "object",
+        "properties": {
+          "approval_user_group": {
+            "$ref": "#/components/schemas/SettingsApprovalUserGroup"
+          }
+        }
+      },
+      "SettingsApprovalUserGroupList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "description": "Always `list`."
+          },
+          "url": {
+            "type": "string",
+            "description": "The path this page was read from."
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SettingsApprovalUserGroup"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/SettingsApprovalUserGroupPagination"
+          }
+        }
+      },
+      "SettingsApprovalUserGroupPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "links": {
+            "$ref": "#/components/schemas/SettingsApprovalUserGroupPaginationLinks"
+          }
+        }
+      },
+      "SettingsApprovalUserGroupPaginationLinks": {
         "type": "object",
         "properties": {
           "next": {
