@@ -32307,7 +32307,7 @@
         ],
         "summary": "Set a shipping rule's configuration",
         "operationId": "shipping_rules_create_settings_shipping_rule_configuration",
-        "description": "Send the configuration under `configuration`: `zones` lists each zone by its dashed uuid in `zone`, and `rate` gives the rate's `name`, `method` such as `FLAT_RATE`, `handling_cost` and `shipping_cost`.",
+        "description": "Send the configuration under `configuration`: `zones` lists each zone by its UUID with dashes in `zone`, and `rate` gives the rate's `name`, `method` such as `FLAT_RATE`, `handling_cost` and `shipping_cost`.",
         "parameters": [
           {
             "name": "shipping_rule_id",
@@ -32331,7 +32331,17 @@
             }
           },
           "400": {
-            "description": "A zone is given by its `zn_` id or as bare hex: `zone not found`.",
+            "description": "A zone is given by its `zn_` id or as its 32 hex digits alone: `zone not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "A zone is given as its UUID with dashes. This currently fails.",
             "content": {
               "application/json": {
                 "schema": {
@@ -32400,7 +32410,7 @@
                           "properties": {
                             "zone": {
                               "type": "string",
-                              "description": "The zone's dashed uuid, not its `zn_` id."
+                              "description": "The zone's UUID with dashes, not its `zn_` id."
                             }
                           },
                           "required": [
