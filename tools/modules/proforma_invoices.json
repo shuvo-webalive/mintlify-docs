@@ -5,10 +5,10 @@
   "icon": "file-invoice-dollar",
   "base": "/proforma_invoices",
   "overview_description": "List, read, delete and pay pro-forma invoices, the advance bills sent before a final invoice.",
-  "intro": "A pro-forma invoice is an advance bill that can be paid before the final invoice. This area has 4 endpoints: list pro-forma invoices, retrieve one, delete one, and record a payment against one. All seven SDKs call every one.",
+  "intro": "A pro-forma invoice is an advance bill that can be paid before the final invoice. This area has 4 endpoints: list pro-forma invoices, retrieve one, delete one, and record a payment against one. Every SDK supports all of them.",
   "warning": null,
   "notes": [
-    "**A pro-forma invoice is named by its code.** The same code comes back as both `id` and `invoice_id`.",
+    "**Identify a pro-forma invoice by its code.** The same code comes back as both `id` and `invoice_id`.",
     "**The listing shows only active ones.** Only pro-forma invoices whose invoice status is active are listed, under `data`, paged by cursor.",
     "**A paid pro-forma invoice cannot be deleted.** The delete is refused with `400` and the code `already_paid`.",
     "**Paying returns a short confirmation, not the payment.** The body under `payment` carries `object`, `payment_id` with the new payment's code, and `message`."
@@ -21,7 +21,7 @@
       "slug": "list-pro-forma-invoices",
       "title": "List pro-forma invoices",
       "summary": "Returns one page of pro-forma invoices whose invoice status is active.",
-      "description": "Lists pro-forma invoices one page at a time, under `data`, paged by cursor. Only pro-forma invoices whose invoice status is active are listed. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+      "description": "Lists pro-forma invoices one page at a time, under `data`, paged by cursor. Only pro-forma invoices whose invoice status is active are listed. To filter, add `filter_<field>=<value>`, or `filter_<field>_<operator>=<value>` with an operator such as `gte` or `contains`.",
       "parameters": [
         {
           "name": "limit",
@@ -74,7 +74,7 @@
       "slug": "retrieve-a-pro-forma-invoice",
       "title": "Retrieve a pro-forma invoice",
       "summary": "Returns one pro-forma invoice by its code.",
-      "description": "Fetches a single pro-forma invoice, named by its code.",
+      "description": "Fetches a single pro-forma invoice by its code.",
       "parameters": [
         {
           "name": "proforma_id",
@@ -143,7 +143,7 @@
       "slug": "pay-a-pro-forma-invoice",
       "title": "Pay a pro-forma invoice",
       "summary": "Records a payment against a pro-forma invoice and returns the new payment's code.",
-      "description": "Takes a payment for the pro-forma invoice from the fields under `payment`. The response is not the payment itself: it carries `object`, `payment_id` with the new payment's code, and a `message`, under `payment`.",
+      "description": "Takes a payment for the pro-forma invoice from the fields under `payment`. The fields this body takes are not documented yet; the sample shows only the required `payment` wrapper. The response is not the payment itself: it carries `object`, `payment_id` with the new payment's code, and a `message`, under `payment`.",
       "parameters": [
         {
           "name": "proforma_id",
@@ -162,7 +162,8 @@
           "properties": {
             "payment": {
               "type": "object",
-              "properties": {}
+              "properties": {},
+              "description": "The payment's fields. They are not documented yet."
             }
           },
           "required": [
@@ -186,7 +187,8 @@
         "body": {
           "payment": {}
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** The fields the `payment` body takes are not documented yet."
     }
   ],
   "schemas": {}
