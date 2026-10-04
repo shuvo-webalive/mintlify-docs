@@ -4,10 +4,10 @@ sidebarTitle: "Overview"
 description: "Record refunds from suppliers against purchase credit notes, and read, update and delete purchase refunds."
 ---
 
-A purchase refund records money a supplier pays back against a purchase credit note. These endpoints record a refund from a credit note and read, update and delete refunds. There are 5 endpoints, and all seven SDKs call every one.
+A purchase refund records money a supplier pays back against a purchase credit note. These endpoints record a refund from a credit note and read, update and delete refunds. This area has 5 endpoints, each available in all seven SDKs.
 
 <Warning>
-  **Deleting a purchase refund cannot be undone.**
+  **Deleting a purchase refund cannot be undone.** Updating a purchase refund currently returns `500`, even for a valid body such as a new `reference`.
 </Warning>
 
 ## At a glance
@@ -30,6 +30,6 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 
 - **A purchase refund is created from a purchase credit note.** Post it to `/purchase_credit_notes/{purchase_credit_note_id}/purchase_refunds`.
 - **Every write body is wrapped in `purchase_refund`.**
-- **`payment_method` is the reference of one of the supplier's payment methods.**
+- **`payment_method` is the reference of one of the supplier's payment methods.** Take it from the `reference` of an entry in the supplier account's payment methods, under `account.payment_methods`.
 - **The update takes only `alternate_date`, `reference`, `note` and `custom_attributes`.** Any other key returns `400`, and the amount cannot change.
-- **The update and delete address a refund by its code.** They match nothing else.
+- **The update and delete address a refund by its `id`.** Its `uuid` does not match.
