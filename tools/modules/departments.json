@@ -1,0 +1,235 @@
+{
+  "family": "departments",
+  "tag": "Departments",
+  "slug": "departments",
+  "icon": "sitemap",
+  "base": "/settings/departments",
+  "overview_description": "Read the departments configured in Exsited: list them a page at a time or retrieve one by its id.",
+  "intro": "Departments are the organisational units configured in your Exsited settings, each tied to a division. You can list them and retrieve one by its id. This area has 2 endpoints, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**Departments are read only here.** This area lists and retrieves departments; it has no create, update or delete call.",
+    "**Some listed departments have no id.** A department can come back with `id: null` and an `href` that ends in `/settings/departments/`, and it cannot be retrieved on its own. Pick one with an `id` to read it singly.",
+    "**Department ids start with `dept_`.** Pass that `id` as `department_id`.",
+    "**The list pages by cursor.** Records are under `data`; pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_departments",
+      "method": "GET",
+      "path": "/settings/departments",
+      "slug": "list-departments",
+      "title": "List departments",
+      "summary": "Lists the departments set up in Exsited, one page at a time.",
+      "description": "Returns one page of departments under `data`, with `pagination` for the next page. Each department carries its `code`, `name`, `display_name`, `description`, `status` and the `division` it belongs to. Some departments in the list have a null `id`; those cannot be retrieved on their own. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by; prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of departments.",
+          "schema": {
+            "$ref": "#/components/schemas/DepartmentList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_settings_department",
+      "method": "GET",
+      "path": "/settings/departments/{department_id}",
+      "slug": "retrieve-a-department",
+      "title": "Retrieve a department",
+      "summary": "Retrieves one department by its `dept_` id.",
+      "description": "Returns the department under `department`. Use the `id` from the department list; a department whose `id` is null in the list cannot be read this way.",
+      "parameters": [
+        {
+          "name": "department_id",
+          "in": "path",
+          "required": true,
+          "description": "The department's `id`, which starts with `dept_`.",
+          "schema": {
+            "type": "string",
+            "example": "dept_3c9e1f2a7b4d4e8f9a0b1c2d3e4f5a6b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The department, under `department`.",
+          "schema": {
+            "$ref": "#/components/schemas/DepartmentResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "department_id": "dept_3c9e1f2a7b4d4e8f9a0b1c2d3e4f5a6b"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "DepartmentList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Department"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/DepartmentPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "Department": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "type": "null"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "division": {
+          "$ref": "#/components/schemas/DepartmentDivision"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "type": "null"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "DepartmentDivision": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "DepartmentPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Rely on this rather than on `next_cursor`, which can still hold a value on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/DepartmentPaginationLinks"
+        }
+      }
+    },
+    "DepartmentPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "DepartmentResponse": {
+      "type": "object",
+      "properties": {
+        "department": {
+          "$ref": "#/components/schemas/Department"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+---
+title: "Departments"
+sidebarTitle: "Overview"
+description: "Read the departments configured in Exsited: list them a page at a time or retrieve one by its id."
+---
+
+Departments are the organisational units configured in your Exsited settings, each tied to a division. You can list them and retrieve one by its id. This area has 2 endpoints, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List departments](/api-reference/departments/list-departments) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/departments` | Lists the departments set up in Exsited, one page at a time. |
+| [Retrieve a department](/api-reference/departments/retrieve-a-department) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/departments/{department_id}` | Retrieves one department by its `dept_` id. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Departments are read only here.** This area lists and retrieves departments; it has no create, update or delete call.
+- **Some listed departments have no id.** A department can come back with `id: null` and an `href` that ends in `/settings/departments/`, and it cannot be retrieved on its own. Pick one with an `id` to read it singly.
+- **Department ids start with `dept_`.** Pass that `id` as `department_id`.
+- **The list pages by cursor.** Records are under `data`; pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`.
