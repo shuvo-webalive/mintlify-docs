@@ -5,14 +5,14 @@
   "icon": "rotate-left",
   "base": "/return_merchandise_authorisations",
   "overview_description": "Authorise customer returns against fulfilled invoices, approve or reject them, receive returned stock and keep notes.",
-  "intro": "A return merchandise authorisation (RMA) records the goods a customer may return from a fulfilled invoice. These endpoints create, update, approve, reject and delete RMAs, receive the returned stock, and manage the RMA's notes and attachments. The module has 19 endpoints, and all seven SDKs call every one.",
-  "warning": "**Receiving returned stock commits it, and a received RMA cannot be deleted.** Only a draft RMA can be deleted at all.",
+  "intro": "A return merchandise authorisation (RMA) records the goods a customer may return from a fulfilled invoice. These endpoints create, update, approve, reject and delete RMAs, receive the returned stock, and manage the RMA's notes. This area has 19 endpoints, each available in all seven SDKs.",
+  "warning": "**Receiving returned stock commits it, and a received RMA cannot be deleted.** Updating or deleting an RMA currently returns `500`, even for a draft RMA, and a new RMA is created as `active`, not as a draft.",
   "notes": [
     "**Writes take the RMA's `id`; the reads under it take its `code`.** Update, delete, approve, reject, receive and the note writes need the `rma_` `id` and refuse a code. The note and receipt reads resolve the RMA by `code` and return `404` for an `rma_` `id`.",
     "**An RMA needs a fulfilled invoice.** The create body names the invoice by its internal id, `inv_` followed by the invoice's `uuid` without hyphens, and each return line by a fulfilled invoice line's `id`.",
-    "**A new RMA has `status` `active` and `return_status` `pending`.** The create call returns only the new RMA's `id`, `code`, `status` and `version`; read it for the rest.",
+    "**A new RMA has `status` `active` and `return_status` `pending`.** The create call returns a short record (`id`, `code`, `status`, `version`); read the RMA for the rest.",
     "**Approve and reject take no body and can notify approvers.** Both are refused with `422` when the RMA has no pending approval.",
-    "**Notes are JSON, not forms.** Create an RMA note takes `{\"note\": {\"note\": \"...\"}}` and no attachment.",
+    "**Notes are JSON, not forms, and carry no file.** Create an RMA note takes `{\"note\": {\"note\": \"...\"}}` and no attachment. No endpoint attaches a file to an RMA note, so the note file endpoints have not been confirmed to work.",
     "**Listings page by cursor.** Pass `limit` and the previous page's `pagination.next_cursor` as `cursor`, and stop when `has_more` is `false`."
   ],
   "endpoints": [
@@ -20,8 +20,8 @@
       "key": "get_return_merchandise_authorisations",
       "method": "GET",
       "path": "/return_merchandise_authorisations",
-      "slug": "list-return-merchandise-authorisations",
-      "title": "List return merchandise authorisations",
+      "slug": "list-rmas",
+      "title": "List RMAs",
       "summary": "Lists return merchandise authorisations (RMAs), one page at a time.",
       "description": "Returns one page of RMAs under `data`. Each RMA carries its `code`, `status`, `return_status`, `item_count`, account and sale invoice. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
       "parameters": [
@@ -76,8 +76,8 @@
       "key": "create_return_merchandise_authorisation",
       "method": "POST",
       "path": "/return_merchandise_authorisations",
-      "slug": "create-a-return-merchandise-authorisation",
-      "title": "Create a return merchandise authorisation",
+      "slug": "create-an-rma",
+      "title": "Create an RMA",
       "summary": "Creates an RMA against a fulfilled invoice.",
       "description": "Send `sale_invoice.id` and the `returns` lines under `return_merchandise_authorisation`. The invoice must have fulfilled stock, and each return names a fulfilled invoice line and a quantity. The new RMA has `status` `active` and `return_status` `pending`.",
       "parameters": [],
@@ -122,7 +122,7 @@
         "example": {
           "return_merchandise_authorisation": {
             "sale_invoice": {
-              "id": "inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d"
+              "id": "INVOICE_INTERNAL_ID"
             },
             "returns": [
               {
@@ -147,7 +147,7 @@
         "body": {
           "return_merchandise_authorisation": {
             "sale_invoice": {
-              "id": "inv_3f9c1a2e7b4d4e8a9c215d6f7a8b9c0d"
+              "id": "INVOICE_INTERNAL_ID"
             },
             "returns": [
               {
@@ -163,8 +163,8 @@
       "key": "get_return_merchandise_authorisation",
       "method": "GET",
       "path": "/return_merchandise_authorisations/{rma_id}",
-      "slug": "retrieve-a-return-merchandise-authorisation",
-      "title": "Retrieve a return merchandise authorisation",
+      "slug": "retrieve-an-rma",
+      "title": "Retrieve an RMA",
       "summary": "Returns one RMA with its lines and receipts.",
       "description": "Returns the RMA under `return_merchandise_authorisation`, including its `lines` and the receipts of returned stock in `receive_rmas`.",
       "parameters": [
@@ -172,7 +172,7 @@
           "name": "rma_id",
           "in": "path",
           "required": true,
-          "description": "The RMA's `id`, which starts with `rma_`. Its `code` is refused.",
+          "description": "The RMA's `id`, which starts with `rma_`.",
           "schema": {
             "type": "string",
             "example": "RMA_ID"
@@ -199,8 +199,8 @@
       "key": "get_invoice_return_merchandise_authorisation_receive",
       "method": "GET",
       "path": "/invoices/{invoice_id}/return_merchandise_authorisations/{rma_id}/receive",
-      "slug": "list-an-invoice-rmas-receipts",
-      "title": "List an invoice RMA's receipts",
+      "slug": "list-an-rmas-receipts-through-its-invoice",
+      "title": "List an RMA's receipts through its invoice",
       "summary": "Lists the stock receipts of one RMA, found through its invoice.",
       "description": "Returns the receipts of returned stock under `data`, each with its `code`, `status` and `quantity_received`.",
       "parameters": [
@@ -246,8 +246,8 @@
       "key": "get_invoice_return_merchandise_authorisation_receive_by_uuid",
       "method": "GET",
       "path": "/invoices/{invoice_id}/return_merchandise_authorisations/{rma_id}/receive/{receive_uuid}",
-      "slug": "retrieve-an-invoice-rma-receipt",
-      "title": "Retrieve an invoice RMA receipt",
+      "slug": "retrieve-an-rma-receipt-through-its-invoice",
+      "title": "Retrieve an RMA receipt through its invoice",
       "summary": "Returns one stock receipt of an RMA, found through its invoice.",
       "description": "Returns the receipt under `receive_rma`, with its `code`, `status` and `quantity_received`.",
       "parameters": [
@@ -406,7 +406,8 @@
                     ],
                     "properties": {
                       "uuid": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "The `uuid` of the entry to receive; which record it names is not documented."
                       },
                       "rma_receive_quantity": {
                         "type": "number"
@@ -458,10 +459,11 @@
       "key": "delete_return_merchandise_authorisation",
       "method": "DELETE",
       "path": "/return_merchandise_authorisations/{rma_id}",
-      "slug": "delete-a-return-merchandise-authorisation",
-      "title": "Delete a return merchandise authorisation",
+      "slug": "delete-an-rma",
+      "title": "Delete an RMA",
       "summary": "Deletes a draft RMA and returns no body.",
-      "description": "Only a draft RMA is deleted. Any other RMA is refused with `400` and the code `stock_committed`.",
+      "description": "Only a draft RMA can be deleted. Any other RMA is refused with `400` and the code `stock_committed`.",
+      "warning": "**Deleting an RMA currently fails.** This call currently returns `500`, even for a draft RMA, and no endpoint creates an RMA as a draft.",
       "parameters": [
         {
           "name": "rma_id",
@@ -482,6 +484,9 @@
         },
         "400": {
           "description": "The RMA is not a draft (`stock_committed`)."
+        },
+        "500": {
+          "description": "Deleting an RMA currently fails, even for a draft RMA."
         }
       },
       "example_call": {
@@ -494,10 +499,11 @@
       "key": "update_return_merchandise_authorisation",
       "method": "PATCH",
       "path": "/return_merchandise_authorisations/{rma_id}",
-      "slug": "update-a-return-merchandise-authorisation",
-      "title": "Update a return merchandise authorisation",
-      "summary": "Changes an RMA's date, note or returns and returns the RMA.",
-      "description": "Send `rma_date`, `note` or `returns` under `return_merchandise_authorisation`. The RMA comes back under the same key.",
+      "slug": "update-an-rma",
+      "title": "Update an RMA",
+      "summary": "Changes an RMA's date, note or returns.",
+      "description": "Send `rma_date`, `note` or `returns` under `return_merchandise_authorisation`. The RMA comes back under the same key. The shape of a `returns` entry is not documented.",
+      "warning": "**Updating an RMA currently fails.** This call currently returns `500`, even for a draft RMA.",
       "parameters": [
         {
           "name": "rma_id",
@@ -551,6 +557,9 @@
           "schema": {
             "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationResponse"
           }
+        },
+        "500": {
+          "description": "Updating an RMA currently fails, even for a draft RMA."
         }
       },
       "example_call": {
@@ -569,8 +578,8 @@
       "key": "approve_return_merchandise_authorisation",
       "method": "POST",
       "path": "/return_merchandise_authorisations/{rma_id}/approve",
-      "slug": "approve-a-return-merchandise-authorisation",
-      "title": "Approve a return merchandise authorisation",
+      "slug": "approve-an-rma",
+      "title": "Approve an RMA",
       "summary": "Approves an RMA that is waiting for approval.",
       "description": "Send no body. The call can notify approvers. An RMA with no pending approval is refused with `422`.",
       "parameters": [
@@ -659,6 +668,7 @@
       "title": "Delete an RMA note file",
       "summary": "Deletes an attachment from an RMA note and returns no body.",
       "description": "Use the RMA's `rma_` `id` in the path, with the note's and the attachment's `id`.",
+      "warning": "**This call has not been confirmed to work.** No endpoint attaches a file to an RMA note.",
       "parameters": [
         {
           "name": "rma_id",
@@ -710,8 +720,8 @@
       "key": "reject_return_merchandise_authorisation",
       "method": "POST",
       "path": "/return_merchandise_authorisations/{rma_id}/reject",
-      "slug": "reject-a-return-merchandise-authorisation",
-      "title": "Reject a return merchandise authorisation",
+      "slug": "reject-an-rma",
+      "title": "Reject an RMA",
       "summary": "Rejects an RMA that is waiting for approval.",
       "description": "Send no body. The call can notify approvers. An RMA with no pending approval is refused with `422`.",
       "parameters": [
@@ -865,6 +875,7 @@
       "title": "List RMA note files",
       "summary": "Lists the attachments of one RMA note.",
       "description": "Returns the note's attachments under `data`. Use the RMA's `code` in the path.",
+      "warning": "**This call has not been confirmed to work.** No endpoint attaches a file to an RMA note.",
       "parameters": [
         {
           "name": "rma_code",
@@ -909,6 +920,7 @@
       "title": "Retrieve an RMA note file",
       "summary": "Returns one attachment of an RMA note under `file`.",
       "description": "Use the RMA's `code` in the path, with the note's and the attachment's `id`.",
+      "warning": "**This call has not been confirmed to work.** No endpoint attaches a file to an RMA note.",
       "parameters": [
         {
           "name": "rma_code",
@@ -1122,11 +1134,11 @@
         },
         "last_updated_by": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "last_updated_on": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "object": {
           "type": "string"
@@ -1170,11 +1182,11 @@
         },
         "last_updated_by": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "last_updated_on": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "object": {
           "type": "string"
@@ -1224,11 +1236,11 @@
         },
         "last_updated_by": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "last_updated_on": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "lines": {
           "type": "array"
@@ -1256,7 +1268,7 @@
         },
         "sale_order": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "status": {
           "type": "string"
@@ -1266,7 +1278,7 @@
         },
         "warehouse": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         }
       }
     },
@@ -1307,11 +1319,11 @@
         },
         "last_updated_by": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "last_updated_on": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "object": {
           "type": "string"
@@ -1412,11 +1424,11 @@
         },
         "last_updated_by": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "last_updated_on": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "note": {
           "type": "string"
@@ -1435,7 +1447,7 @@
         },
         "sale_order": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "status": {
           "type": "string"
@@ -1445,7 +1457,7 @@
         },
         "warehouse": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         }
       }
     },
@@ -1517,22 +1529,6 @@
         },
         "links": {
           "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationPaginationLinks"
-        },
-        "records": {
-          "type": "integer",
-          "description": "Offset pages only: total matching records, not the page's length."
-        },
-        "offset": {
-          "type": "integer",
-          "description": "Offset pages only."
-        },
-        "next_page": {
-          "type": "string",
-          "description": "Offset pages only: the literal string `NULL` at the end of a listing, not JSON null."
-        },
-        "previous_page": {
-          "type": "string",
-          "description": "Offset pages only."
         }
       }
     },
