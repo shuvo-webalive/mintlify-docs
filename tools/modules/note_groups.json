@@ -1,0 +1,599 @@
+{
+  "family": "note_groups",
+  "tag": "Note groups",
+  "slug": "note-groups",
+  "icon": "note-sticky",
+  "base": "/note_groups",
+  "overview_description": "Create, read, update and delete note groups, and list the notes each group holds.",
+  "intro": "Note groups gather notes and the users who share them. You can list, create, read, update and delete groups, and list a group's notes overall or as one user sees them. This area has 7 endpoints, and all seven Exsited SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**Writes are wrapped in `note_group`.** One group comes back under the same key.",
+    "**Users can be added at create time.** Send `note_users` with a `name` and an `email_address` for each.",
+    "**`version` counts changes.** After one update a new group reads `version` 2.",
+    "**A user's view of the notes takes a uuid or an email address.** A user the group does not hold returns `404`.",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_note_groups",
+      "method": "GET",
+      "path": "/note_groups",
+      "slug": "list-note-groups",
+      "title": "List note groups",
+      "summary": "Lists the note groups on your instance, one page at a time.",
+      "description": "Returns a page of note groups under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of note groups.",
+          "schema": {
+            "$ref": "#/components/schemas/NoteGroupList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_note_group",
+      "method": "POST",
+      "path": "/note_groups",
+      "slug": "create-a-note-group",
+      "title": "Create a note group",
+      "summary": "Creates a note group and returns it.",
+      "description": "Send the group wrapped in `note_group`, with a `name` and, optionally, `note_users` to add. The new group comes back under `note_group`, with its `activity_logs`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "note_group": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The group's name."
+                },
+                "note_users": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "email_address": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "description": "Users to add to the group."
+                }
+              }
+            }
+          },
+          "required": [
+            "note_group"
+          ]
+        },
+        "example": {
+          "note_group": {
+            "name": "Project team",
+            "note_users": [
+              {
+                "name": "Jane Citizen",
+                "email_address": "jane@example.com"
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new note group, under `note_group`.",
+          "schema": {
+            "$ref": "#/components/schemas/NoteGroupResponse"
+          }
+        }
+      },
+      "example_call": {
+        "body": {
+          "note_group": {
+            "name": "Project team",
+            "note_users": [
+              {
+                "name": "Jane Citizen",
+                "email_address": "jane@example.com"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_note_group",
+      "method": "DELETE",
+      "path": "/note_groups/{note_group_id}",
+      "slug": "delete-a-note-group",
+      "title": "Delete a note group",
+      "summary": "Deletes a note group. Nothing comes back.",
+      "description": "Returns `204` with no body. A read of the group afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "note_group_id",
+          "in": "path",
+          "required": true,
+          "description": "The note group's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The note group is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "note_group_id": "2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9"
+        }
+      }
+    },
+    {
+      "key": "get_note_group",
+      "method": "GET",
+      "path": "/note_groups/{note_group_id}",
+      "slug": "retrieve-a-note-group",
+      "title": "Retrieve a note group",
+      "summary": "Retrieves one note group by its id.",
+      "description": "Returns the note group under `note_group`. A deleted group returns `404`.",
+      "parameters": [
+        {
+          "name": "note_group_id",
+          "in": "path",
+          "required": true,
+          "description": "The note group's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The note group, under `note_group`.",
+          "schema": {
+            "$ref": "#/components/schemas/NoteGroupResponse"
+          }
+        },
+        "404": {
+          "description": "No note group has that id, or the group is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "note_group_id": "2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9"
+        }
+      }
+    },
+    {
+      "key": "update_note_group",
+      "method": "PATCH",
+      "path": "/note_groups/{note_group_id}",
+      "slug": "update-a-note-group",
+      "title": "Update a note group",
+      "summary": "Changes a note group and returns it.",
+      "description": "Send the fields to change wrapped in `note_group`. The updated group comes back under `note_group`, and its `version` goes up.",
+      "parameters": [
+        {
+          "name": "note_group_id",
+          "in": "path",
+          "required": true,
+          "description": "The note group's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "note_group": {
+              "type": "object",
+              "properties": {
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "description": "The fields to change."
+            }
+          },
+          "required": [
+            "note_group"
+          ]
+        },
+        "example": {
+          "note_group": {
+            "display_name": "Project team (Sydney)",
+            "description": "Notes for the Sydney project team."
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated note group, under `note_group`.",
+          "schema": {
+            "$ref": "#/components/schemas/NoteGroupResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "note_group_id": "2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9"
+        },
+        "body": {
+          "note_group": {
+            "display_name": "Project team (Sydney)",
+            "description": "Notes for the Sydney project team."
+          }
+        }
+      }
+    },
+    {
+      "key": "get_note_group_notes",
+      "method": "GET",
+      "path": "/note_groups/{note_group_id}/notes",
+      "slug": "list-a-note-groups-notes",
+      "title": "List a note group's notes",
+      "summary": "Lists the notes in one note group, one page at a time.",
+      "description": "Returns a page of the group's notes under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+      "parameters": [
+        {
+          "name": "note_group_id",
+          "in": "path",
+          "required": true,
+          "description": "The note group's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of the group's notes.",
+          "schema": {
+            "$ref": "#/components/schemas/NoteGroupNoteList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "note_group_id": "2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_note_group_notes_by_user",
+      "method": "GET",
+      "path": "/note_groups/{note_group_id}/notes/user/{note_user}",
+      "slug": "list-a-note-groups-notes-for-a-user",
+      "title": "List a note group's notes for a user",
+      "summary": "Lists a note group's notes as one of its users sees them.",
+      "description": "Name the user by the note user's uuid, by the uuid of the entity it stands for, or by a manual user's email address. Returns a page of notes under `data`, with cursor `pagination`. A user the group does not hold returns `404`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+      "parameters": [
+        {
+          "name": "note_group_id",
+          "in": "path",
+          "required": true,
+          "description": "The note group's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9"
+          }
+        },
+        {
+          "name": "note_user",
+          "in": "path",
+          "required": true,
+          "description": "The note user's uuid, an entity's uuid, or a manual user's email address.",
+          "schema": {
+            "type": "string",
+            "example": "jane@example.com"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of the notes the user sees.",
+          "schema": {
+            "$ref": "#/components/schemas/NoteGroupNoteList"
+          }
+        },
+        "404": {
+          "description": "The group does not hold that user."
+        }
+      },
+      "example_call": {
+        "path": {
+          "note_group_id": "2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9",
+          "note_user": "jane@example.com"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "NoteGroup": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The note group's id."
+        },
+        "status": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "created_by": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "last_updated_by": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "version": {
+          "type": "integer",
+          "description": "Counts changes: after one update a new group reads `2`."
+        },
+        "href": {
+          "type": "string"
+        },
+        "activity_logs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "Present on create and update responses."
+        }
+      }
+    },
+    "NoteGroupResponse": {
+      "type": "object",
+      "properties": {
+        "note_group": {
+          "$ref": "#/components/schemas/NoteGroup"
+        }
+      }
+    },
+    "NoteGroupList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "description": "Always `list`."
+        },
+        "url": {
+          "type": "string",
+          "description": "The path this page was read from."
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/NoteGroup"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/NoteGroupPagination"
+        }
+      }
+    },
+    "NoteGroupNoteList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "description": "Always `list`."
+        },
+        "url": {
+          "type": "string",
+          "description": "The path this page was read from."
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "The group's notes."
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/NoteGroupPagination"
+        }
+      }
+    },
+    "NoteGroupPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Pass as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "links": {
+          "$ref": "#/components/schemas/NoteGroupPaginationLinks"
+        }
+      }
+    },
+    "NoteGroupPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

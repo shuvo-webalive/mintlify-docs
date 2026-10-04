@@ -209,6 +209,9 @@
     },
     {
       "name": "Action scripts"
+    },
+    {
+      "name": "Note groups"
     }
   ],
   "paths": {
@@ -61644,6 +61647,698 @@
           }
         ]
       }
+    },
+    "/note_groups": {
+      "get": {
+        "tags": [
+          "Note groups"
+        ],
+        "summary": "List note groups",
+        "operationId": "note_groups_get_note_groups",
+        "description": "Returns a page of note groups under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of note groups.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteGroupList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/note_groups?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.note_groups.get_note_groups({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.noteGroups.getNoteGroups({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->noteGroups->getNoteGroups(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.note_groups.note_groups_dto.NoteGroupsDto.NoteGroupList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<NoteGroupList> response = client.noteGroups().getNoteGroups(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.NoteGroups.GetNoteGroupsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.noteGroups.getNoteGroups(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.NoteGroups().GetNoteGroups(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Note groups"
+        ],
+        "summary": "Create a note group",
+        "operationId": "note_groups_create_note_group",
+        "description": "Send the group wrapped in `note_group`, with a `name` and, optionally, `note_users` to add. The new group comes back under `note_group`, with its `activity_logs`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new note group, under `note_group`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteGroupResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/note_groups\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"note_group\": {\n      \"name\": \"Project team\",\n      \"note_users\": [\n        {\n          \"name\": \"Jane Citizen\",\n          \"email_address\": \"jane@example.com\"\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.note_groups.create_note_group(\n    {\n        \"note_group\": {\n            \"name\": \"Project team\",\n            \"note_users\": [\n                {\"name\": \"Jane Citizen\", \"email_address\": \"jane@example.com\"}\n            ],\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.noteGroups.createNoteGroup({\n    note_group: {name: 'Project team', note_users: [{name: 'Jane Citizen', email_address: 'jane@example.com'}]},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->noteGroups->createNoteGroup([\n    'note_group' => [\n        'name' => 'Project team',\n        'note_users' => [['name' => 'Jane Citizen', 'email_address' => 'jane@example.com']],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.note_groups.note_groups_dto.NoteGroupsDto.NoteGroup;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<NoteGroup> response = client.noteGroups().createNoteGroup(\n        Map.of(\n                \"note_group\", Map.of(\n                        \"name\", \"Project team\",\n                        \"note_users\", List.of(\n                                Map.of(\"name\", \"Jane Citizen\", \"email_address\", \"jane@example.com\")))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.NoteGroups.CreateNoteGroupAsync(new Dictionary<string, object?>\n{\n    [\"note_group\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Project team\",\n        [\"note_users\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"name\"] = \"Jane Citizen\",\n                [\"email_address\"] = \"jane@example.com\",\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.noteGroups.createNoteGroup({\n  'note_group': {\n    'name': 'Project team',\n    'note_users': [\n      {'name': 'Jane Citizen', 'email_address': 'jane@example.com'},\n    ],\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.NoteGroups().CreateNoteGroup(context.Background(), map[string]any{\n\t\"note_group\": map[string]any{\n\t\t\"name\": \"Project team\",\n\t\t\"note_users\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"name\":          \"Jane Citizen\",\n\t\t\t\t\"email_address\": \"jane@example.com\",\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "note_group": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The group's name."
+                      },
+                      "note_users": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "email_address": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "description": "Users to add to the group."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "note_group"
+                ]
+              },
+              "example": {
+                "note_group": {
+                  "name": "Project team",
+                  "note_users": [
+                    {
+                      "name": "Jane Citizen",
+                      "email_address": "jane@example.com"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/note_groups/{note_group_id}": {
+      "delete": {
+        "tags": [
+          "Note groups"
+        ],
+        "summary": "Delete a note group",
+        "operationId": "note_groups_delete_note_group",
+        "description": "Returns `204` with no body. A read of the group afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "note_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The note group's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The note group is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/note_groups/2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.note_groups.delete_note_group(\"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.noteGroups.deleteNoteGroup('2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->noteGroups->deleteNoteGroup('2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.noteGroups().deleteNoteGroup(\"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.NoteGroups.DeleteNoteGroupAsync(\"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.noteGroups.deleteNoteGroup(\n  '2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.NoteGroups().DeleteNoteGroup(context.Background(), \"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Note groups"
+        ],
+        "summary": "Retrieve a note group",
+        "operationId": "note_groups_get_note_group",
+        "description": "Returns the note group under `note_group`. A deleted group returns `404`.",
+        "parameters": [
+          {
+            "name": "note_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The note group's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note group, under `note_group`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteGroupResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No note group has that id, or the group is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/note_groups/2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.note_groups.get_note_group(\"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.noteGroups.getNoteGroup('2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->noteGroups->getNoteGroup('2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.note_groups.note_groups_dto.NoteGroupsDto.NoteGroup;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<NoteGroup> response = client.noteGroups().getNoteGroup(\"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.NoteGroups.GetNoteGroupAsync(\"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.noteGroups.getNoteGroup(\n  '2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.NoteGroups().GetNoteGroup(context.Background(), \"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Note groups"
+        ],
+        "summary": "Update a note group",
+        "operationId": "note_groups_update_note_group",
+        "description": "Send the fields to change wrapped in `note_group`. The updated group comes back under `note_group`, and its `version` goes up.",
+        "parameters": [
+          {
+            "name": "note_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The note group's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated note group, under `note_group`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteGroupResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/note_groups/2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"note_group\": {\n      \"display_name\": \"Project team (Sydney)\",\n      \"description\": \"Notes for the Sydney project team.\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.note_groups.update_note_group(\n    \"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\",\n    {\n        \"note_group\": {\n            \"display_name\": \"Project team (Sydney)\",\n            \"description\": \"Notes for the Sydney project team.\",\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.noteGroups.updateNoteGroup('2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9', {\n    note_group: {display_name: 'Project team (Sydney)', description: 'Notes for the Sydney project team.'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->noteGroups->updateNoteGroup('2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9', [\n    'note_group' => [\n        'display_name' => 'Project team (Sydney)',\n        'description' => 'Notes for the Sydney project team.',\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.note_groups.note_groups_dto.NoteGroupsDto.NoteGroup;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<NoteGroup> response = client.noteGroups().updateNoteGroup(\n        \"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\",\n        Map.of(\n                \"note_group\", Map.of(\n                        \"display_name\", \"Project team (Sydney)\",\n                        \"description\", \"Notes for the Sydney project team.\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.NoteGroups.UpdateNoteGroupAsync(\n    \"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\",\n    new Dictionary<string, object?>\n    {\n        [\"note_group\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Project team (Sydney)\",\n            [\"description\"] = \"Notes for the Sydney project team.\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.noteGroups.updateNoteGroup(\n  '2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9',\n  {\n    'note_group': {\n      'display_name': 'Project team (Sydney)',\n      'description': 'Notes for the Sydney project team.',\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.NoteGroups().UpdateNoteGroup(context.Background(), \"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\", map[string]any{\n\t\"note_group\": map[string]any{\n\t\t\"display_name\": \"Project team (Sydney)\",\n\t\t\"description\":  \"Notes for the Sydney project team.\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "note_group": {
+                    "type": "object",
+                    "properties": {
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      }
+                    },
+                    "description": "The fields to change."
+                  }
+                },
+                "required": [
+                  "note_group"
+                ]
+              },
+              "example": {
+                "note_group": {
+                  "display_name": "Project team (Sydney)",
+                  "description": "Notes for the Sydney project team."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/note_groups/{note_group_id}/notes": {
+      "get": {
+        "tags": [
+          "Note groups"
+        ],
+        "summary": "List a note group's notes",
+        "operationId": "note_groups_get_note_group_notes",
+        "description": "Returns a page of the group's notes under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+        "parameters": [
+          {
+            "name": "note_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The note group's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of the group's notes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteGroupNoteList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/note_groups/2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9/notes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.note_groups.get_note_group_notes(\n    \"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.noteGroups.getNoteGroupNotes('2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->noteGroups->getNoteGroupNotes('2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9', [\n    'limit' => 20,\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.note_groups.note_groups_dto.NoteGroupsDto.NoteGroupNotes;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<NoteGroupNotes> response = client.noteGroups().getNoteGroupNotes(\n        \"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.NoteGroups.GetNoteGroupNotesAsync(\n    \"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.noteGroups.getNoteGroupNotes(\n  '2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.NoteGroups().GetNoteGroupNotes(context.Background(), \"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/note_groups/{note_group_id}/notes/user/{note_user}": {
+      "get": {
+        "tags": [
+          "Note groups"
+        ],
+        "summary": "List a note group's notes for a user",
+        "operationId": "note_groups_get_note_group_notes_by_user",
+        "description": "Name the user by the note user's uuid, by the uuid of the entity it stands for, or by a manual user's email address. Returns a page of notes under `data`, with cursor `pagination`. A user the group does not hold returns `404`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+        "parameters": [
+          {
+            "name": "note_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The note group's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_user",
+            "in": "path",
+            "required": true,
+            "description": "The note user's uuid, an entity's uuid, or a manual user's email address.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of the notes the user sees.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteGroupNoteList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The group does not hold that user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/note_groups/2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9/notes/user/jane@example.com?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.note_groups.get_note_group_notes_by_user(\n    \"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\", \"jane@example.com\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.noteGroups.getNoteGroupNotesByUser(\n    '2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9',\n    'jane@example.com',\n    {limit: 20},\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->noteGroups->getNoteGroupNotesByUser(\n    '2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9',\n    'jane@example.com',\n    ['limit' => 20],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.noteGroups().getNoteGroupNotesByUser(\n        \"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\",\n        \"jane@example.com\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.NoteGroups.GetNoteGroupNotesByUserAsync(\n    \"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\",\n    \"jane@example.com\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.noteGroups.getNoteGroupNotesByUser(\n  '2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9',\n  'jane@example.com',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.NoteGroups().GetNoteGroupNotesByUser(context.Background(), \"2d4f6a8c-0e1b-4d3f-a5c7-e9b1d3f5a7c9\", \"jane@example.com\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -96151,6 +96846,161 @@
         }
       },
       "ActionScriptPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "prev": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "NoteGroup": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "The note group's id."
+          },
+          "status": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_by": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "last_updated_by": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "version": {
+            "type": "integer",
+            "description": "Counts changes: after one update a new group reads `2`."
+          },
+          "href": {
+            "type": "string"
+          },
+          "activity_logs": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "Present on create and update responses."
+          }
+        }
+      },
+      "NoteGroupResponse": {
+        "type": "object",
+        "properties": {
+          "note_group": {
+            "$ref": "#/components/schemas/NoteGroup"
+          }
+        }
+      },
+      "NoteGroupList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "description": "Always `list`."
+          },
+          "url": {
+            "type": "string",
+            "description": "The path this page was read from."
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NoteGroup"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/NoteGroupPagination"
+          }
+        }
+      },
+      "NoteGroupNoteList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "description": "Always `list`."
+          },
+          "url": {
+            "type": "string",
+            "description": "The path this page was read from."
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "The group's notes."
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/NoteGroupPagination"
+          }
+        }
+      },
+      "NoteGroupPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "links": {
+            "$ref": "#/components/schemas/NoteGroupPaginationLinks"
+          }
+        }
+      },
+      "NoteGroupPaginationLinks": {
         "type": "object",
         "properties": {
           "next": {
