@@ -10,9 +10,9 @@
   "notes": [
     "**`name` and `redirect_url` are required to create an application.** Send them under `application`.",
     "**Applications are identified by an `app_` id.** Use the `id` from a create or a listing as `application_id`.",
-    "**Every single record comes back under `application`.** Create, read and update all return `{\"application\": {...}}`.",
+    "**One application comes back under `application`.** Create, read and update all return `{\"application\": {...}}`.",
     "**Delete returns `204` with no body.** A read of the deleted application then returns `404`.",
-    "**The listing pages by cursor.** Records are under `data`, with `limit`, `has_more` and `next_cursor` in `pagination`."
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`."
   ],
   "endpoints": [
     {
@@ -28,7 +28,7 @@
           "name": "limit",
           "in": "query",
           "required": false,
-          "description": "The number of records per page. A `limit` of `0` returns `400`.",
+          "description": "The number of records per page.",
           "schema": {
             "type": "integer",
             "example": 20
@@ -309,12 +309,10 @@
           "type": "string"
         },
         "created_by": {
-          "type": "null",
-          "description": "Returned as `null`."
+          "description": "Can be null."
         },
         "last_updated_by": {
-          "type": "null",
-          "description": "Returned as `null`."
+          "description": "Can be null."
         },
         "href": {
           "type": "string"
