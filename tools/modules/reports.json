@@ -12,7 +12,7 @@
     "**Choose the period with `date_range`.** Send `date_range=custom` with `from` and `to` dates as `YYYY-MM-DD`; an unrecognised `date_range` returns `400`.",
     "**A report has a default period.** Called with no parameters, it gives 7 dated entries, the same count as a seven day `custom` range.",
     "**Amounts and counts are strings.** Fields such as `amount`, `count`, `net_gain` and `invoice_total` are JSON strings, not numbers.",
-    "**A report can take up to 90 seconds.** Set a client timeout above the default 30 seconds, such as 120."
+    "**A report can take up to 90 seconds.** Set `timeout_seconds` (Python), `timeoutSeconds` (JavaScript, PHP, .NET, Java, Dart) or `TimeoutSeconds` (Go) to 120 in the configuration you register, as shown in [Authentication](/authentication#set-up-a-client)."
   ],
   "endpoints": [
     {
@@ -22,7 +22,7 @@
       "slug": "retrieve-the-account-overview-report",
       "title": "Retrieve the account overview report",
       "summary": "Returns new, cancelled, reactivated and deleted account counts, with the net gain, for each dated entry in a period.",
-      "description": "The report is under `report.accounts.account_overview`, one entry per `date` with `new`, `cancelled`, `reactivated`, `deleted` and `net_gain`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+      "description": "The report is under `report.accounts.account_overview`, one entry per `date` with `new`, `cancelled`, `reactivated`, `deleted` and `net_gain`. Set `date_range` to `custom` and pass `from` and `to`; with no parameters, the report covers a default period of 7 dated entries.",
       "parameters": [
         {
           "name": "date_range",
@@ -85,7 +85,7 @@
       "slug": "retrieve-the-invoice-overview-report",
       "title": "Retrieve the invoice overview report",
       "summary": "Returns invoice totals and the amount and count of new, cancelled, reactivated, voided and amended invoices for each dated entry in a period.",
-      "description": "The report is under `report.invoices.invoice_overview`. Each entry has a `date`, an `invoice_total`, and an `amount` and `count` for `new`, `cancelled`, `reactivated`, `voided`, `amended` and `net_gain`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+      "description": "The report is under `report.invoices.invoice_overview`. Each entry has a `date`, an `invoice_total`, and an `amount` and `count` for `new`, `cancelled`, `reactivated`, `voided`, `amended` and `net_gain`. Set `date_range` to `custom` and pass `from` and `to`; with no parameters, the report covers a default period of 7 dated entries.",
       "parameters": [
         {
           "name": "date_range",
@@ -148,7 +148,7 @@
       "slug": "retrieve-the-order-overview-report",
       "title": "Retrieve the order overview report",
       "summary": "Returns order totals and the amount and count of new, cancelled, reactivated, changed and deleted orders for each dated entry in a period.",
-      "description": "The report is under `report.orders.order_overview`. Each entry has a `date`, an `order_total`, and an `amount` and `count` for `new`, `cancelled`, `reactivated`, `changed`, `deleted` and `net_gain`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+      "description": "The report is under `report.orders.order_overview`. Each entry has a `date`, an `order_total`, and an `amount` and `count` for `new`, `cancelled`, `reactivated`, `changed`, `deleted` and `net_gain`. Set `date_range` to `custom` and pass `from` and `to`; with no parameters, the report covers a default period of 7 dated entries.",
       "parameters": [
         {
           "name": "date_range",
@@ -211,7 +211,7 @@
       "slug": "retrieve-the-purchase-invoice-overview-report",
       "title": "Retrieve the purchase invoice overview report",
       "summary": "Returns purchase invoice totals and the amount and count of new, cancelled, reactivated, voided and amended purchase invoices for each dated entry in a period.",
-      "description": "The report is under `report.purchase_invoices.purchase_invoice_overview`. Each entry has a `date`, a `purchase_invoice_total`, and an `amount` and `count` for `new`, `cancelled`, `reactivated`, `voided`, `amended` and `net_gain`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+      "description": "The report is under `report.purchase_invoices.purchase_invoice_overview`. Each entry has a `date`, a `purchase_invoice_total`, and an `amount` and `count` for `new`, `cancelled`, `reactivated`, `voided`, `amended` and `net_gain`. Set `date_range` to `custom` and pass `from` and `to`; with no parameters, the report covers a default period of 7 dated entries.",
       "parameters": [
         {
           "name": "date_range",
@@ -274,7 +274,7 @@
       "slug": "retrieve-the-purchase-order-overview-report",
       "title": "Retrieve the purchase order overview report",
       "summary": "Returns purchase order totals and the amount and count of new, cancelled, reactivated, changed and deleted purchase orders for each dated entry in a period.",
-      "description": "The report is under `report.purchase_orders.purchase_order_overview`. Each entry has a `date`, a `purchase_order_total`, and an `amount` and `count` for `new`, `cancelled`, `reactivated`, `changed`, `deleted` and `net_purchases`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+      "description": "The report is under `report.purchase_orders.purchase_order_overview`. Each entry has a `date`, a `purchase_order_total`, and an `amount` and `count` for `new`, `cancelled`, `reactivated`, `changed`, `deleted` and `net_purchases`. Set `date_range` to `custom` and pass `from` and `to`; with no parameters, the report covers a default period of 7 dated entries.",
       "parameters": [
         {
           "name": "date_range",
@@ -337,7 +337,7 @@
       "slug": "retrieve-the-purchase-payment-and-refund-overview-report",
       "title": "Retrieve the purchase payment and refund overview report",
       "summary": "Returns the purchase payments and purchase refunds made and deleted for each dated entry in a period.",
-      "description": "The report is under `report.purchase_payment_and_refund_overview`, with a `purchase_payments` list and a `purchase_refunds` list. Each entry has a `date` and an `amount` and `count` for `new` and `deleted`; a purchase payment entry also has `purchase_payment_applied`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+      "description": "The report is under `report.purchase_payment_and_refund_overview`, with a `purchase_payments` list and a `purchase_refunds` list. Each entry has a `date` and an `amount` and `count` for `new` and `deleted`; a purchase payment entry also has `purchase_payment_applied`. Set `date_range` to `custom` and pass `from` and `to`; with no parameters, the report covers a default period of 7 dated entries.",
       "parameters": [
         {
           "name": "date_range",
@@ -400,7 +400,7 @@
       "slug": "retrieve-the-payment-and-refund-overview-report",
       "title": "Retrieve the payment and refund overview report",
       "summary": "Returns the payments and refunds made and deleted for each dated entry in a period.",
-      "description": "The report is under `report.payment_and_refund_overview`, with a `payments` list and a `refunds` list. Each entry has a `date` and an `amount` and `count` for `new` and `deleted`; a payment entry also has `payment_applied`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+      "description": "The report is under `report.payment_and_refund_overview`, with a `payments` list and a `refunds` list. Each entry has a `date` and an `amount` and `count` for `new` and `deleted`; a payment entry also has `payment_applied`. Set `date_range` to `custom` and pass `from` and `to`; with no parameters, the report covers a default period of 7 dated entries.",
       "parameters": [
         {
           "name": "date_range",
