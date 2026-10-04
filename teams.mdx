@@ -4,7 +4,7 @@ sidebarTitle: "Overview"
 description: "Manage teams in Exsited: list, create, retrieve, update, enable, disable and delete them."
 ---
 
-Teams group people in your Exsited settings. You can list, create, retrieve, update and delete teams, and enable or disable one through its `status`. This area has 5 endpoints, and all seven SDKs call every one.
+Teams group people in your Exsited settings. You can list, create, retrieve, update and delete teams, and enable or disable one through its `status`. This area has 5 endpoints, each available in all seven SDKs.
 
 <Warning>
   **A team with members cannot be deleted, and a delete cannot be undone.** Remove the members first; after a delete, reading the team returns `404`.
@@ -29,7 +29,7 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 ## Things to know
 
 - **Request bodies go under `team`.** Both the create and the update wrap their fields in a `team` object, and every single-team response returns it under `team`.
-- **Team ids are not uuids.** An id such as `team_00000000000000010000000000000006` encodes the parent organisation and a row number.
-- **`version` is always null on a team.** Do not rely on it for change detection.
+- **Team ids start with `team_`.** Pass that `id` as `team_id`.
+- **`version` is null on teams.** Do not rely on it for change detection.
 - **`status` takes `active` or `inactive`.** Send it in an update to enable or disable a team.
 - **`display_name` defaults to `name`.** A team created with only a `name` gets the same value as its `display_name`.
