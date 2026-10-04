@@ -89,6 +89,9 @@
     },
     {
       "name": "Zones"
+    },
+    {
+      "name": "Shipping packages"
     }
   ],
   "paths": {
@@ -30910,6 +30913,529 @@
           }
         }
       }
+    },
+    "/settings/shipping_packages": {
+      "get": {
+        "tags": [
+          "Shipping packages"
+        ],
+        "summary": "List shipping packages",
+        "operationId": "shipping_packages_get_settings_shipping_packages",
+        "description": "Returns packages under `data`, each with its name, dimensions, weight and units. Set the page size with `limit` and fetch the next page with `cursor`. Other fields filter as `filter_<field>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` to sort descending, as in `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of shipping packages, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingPackageList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/shipping_packages?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.shipping_packages.get_settings_shipping_packages({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingPackages.getSettingsShippingPackages({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->shippingPackages->getSettingsShippingPackages(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.shipping_packages.shipping_packages_dto.ShippingPackagesDto.SettingsShippingPackageList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsShippingPackageList> response = client.shippingPackages().getSettingsShippingPackages(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ShippingPackages.GetSettingsShippingPackagesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingPackages.getSettingsShippingPackages(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ShippingPackages().GetSettingsShippingPackages(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Shipping packages"
+        ],
+        "summary": "Create a shipping package",
+        "operationId": "shipping_packages_create_settings_shipping_package",
+        "description": "Send the package under `shipping_package` with its `name` and the dimensions you know. Give a unit for a dimension in its `*_uom` field as the unit's bare uuid.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new shipping package, under `shipping_package`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingPackageResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/shipping_packages\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"shipping_package\": {\n      \"name\": \"Small box\",\n      \"length\": 10,\n      \"weight\": 1.5\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.shipping_packages.create_settings_shipping_package(\n    {\"shipping_package\": {\"name\": \"Small box\", \"length\": 10, \"weight\": 1.5}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingPackages.createSettingsShippingPackage({\n    shipping_package: {name: 'Small box', length: 10, weight: 1.5},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->shippingPackages->createSettingsShippingPackage([\n    'shipping_package' => ['name' => 'Small box', 'length' => 10, 'weight' => 1.5],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.shipping_packages.shipping_packages_dto.ShippingPackagesDto.SettingsShippingPackage;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsShippingPackage> response = client.shippingPackages().createSettingsShippingPackage(\n        Map.of(\"shipping_package\", Map.of(\"name\", \"Small box\", \"length\", 10, \"weight\", 1.5)));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ShippingPackages.CreateSettingsShippingPackageAsync(new Dictionary<string, object?>\n{\n    [\"shipping_package\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Small box\",\n        [\"length\"] = 10,\n        [\"weight\"] = 1.5,\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingPackages.createSettingsShippingPackage({\n  'shipping_package': {'name': 'Small box', 'length': 10, 'weight': 1.5},\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ShippingPackages().CreateSettingsShippingPackage(context.Background(), map[string]any{\n\t\"shipping_package\": map[string]any{\n\t\t\"name\":   \"Small box\",\n\t\t\"length\": 10,\n\t\t\"weight\": 1.5,\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "shipping_package": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "length": {
+                        "type": "number"
+                      },
+                      "width": {
+                        "type": "number"
+                      },
+                      "height": {
+                        "type": "number"
+                      },
+                      "weight": {
+                        "type": "number"
+                      },
+                      "cubic": {
+                        "type": "number"
+                      },
+                      "length_uom": {
+                        "type": "string",
+                        "description": "The unit's bare uuid, not its prefixed id."
+                      },
+                      "width_uom": {
+                        "type": "string",
+                        "description": "The unit's bare uuid, not its prefixed id."
+                      },
+                      "height_uom": {
+                        "type": "string",
+                        "description": "The unit's bare uuid, not its prefixed id."
+                      },
+                      "weight_uom": {
+                        "type": "string",
+                        "description": "The unit's bare uuid, not its prefixed id."
+                      },
+                      "cubic_uom": {
+                        "type": "string",
+                        "description": "The unit's bare uuid, not its prefixed id."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "shipping_package"
+                ]
+              },
+              "example": {
+                "shipping_package": {
+                  "name": "Small box",
+                  "length": 10,
+                  "weight": 1.5
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/shipping_packages/{shipping_package_id}": {
+      "get": {
+        "tags": [
+          "Shipping packages"
+        ],
+        "summary": "Retrieve a shipping package",
+        "operationId": "shipping_packages_get_settings_shipping_package",
+        "description": "Returns the package under `shipping_package`, with its name, dimensions, weight and units.",
+        "parameters": [
+          {
+            "name": "shipping_package_id",
+            "in": "path",
+            "required": true,
+            "description": "The shipping package's `id`, from the listing.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The shipping package, under `shipping_package`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingPackageResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No shipping package has that `id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/shipping_packages/sp_2b3c4d5e6f708192a3b4c5d6e7f8091a\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.shipping_packages.get_settings_shipping_package(\n    \"sp_2b3c4d5e6f708192a3b4c5d6e7f8091a\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingPackages.getSettingsShippingPackage('sp_2b3c4d5e6f708192a3b4c5d6e7f8091a');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->shippingPackages->getSettingsShippingPackage(\n    'sp_2b3c4d5e6f708192a3b4c5d6e7f8091a',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.shipping_packages.shipping_packages_dto.ShippingPackagesDto.SettingsShippingPackage;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsShippingPackage> response = client.shippingPackages().getSettingsShippingPackage(\n        \"sp_2b3c4d5e6f708192a3b4c5d6e7f8091a\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ShippingPackages.GetSettingsShippingPackageAsync(\"sp_2b3c4d5e6f708192a3b4c5d6e7f8091a\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingPackages.getSettingsShippingPackage(\n  'sp_2b3c4d5e6f708192a3b4c5d6e7f8091a',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ShippingPackages().GetSettingsShippingPackage(context.Background(), \"sp_2b3c4d5e6f708192a3b4c5d6e7f8091a\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Shipping packages"
+        ],
+        "summary": "Delete a shipping package",
+        "operationId": "shipping_packages_delete_settings_shipping_package",
+        "description": "Deletes the package with that `id`; a later read of it returns `404`.",
+        "parameters": [
+          {
+            "name": "shipping_package_id",
+            "in": "path",
+            "required": true,
+            "description": "The shipping package's `id`, from the listing.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The shipping package is deleted. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/shipping_packages/sp_2b3c4d5e6f708192a3b4c5d6e7f8091a\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.shipping_packages.delete_settings_shipping_package(\n    \"sp_2b3c4d5e6f708192a3b4c5d6e7f8091a\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingPackages.deleteSettingsShippingPackage('sp_2b3c4d5e6f708192a3b4c5d6e7f8091a');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->shippingPackages->deleteSettingsShippingPackage(\n    'sp_2b3c4d5e6f708192a3b4c5d6e7f8091a',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.shippingPackages().deleteSettingsShippingPackage(\n        \"sp_2b3c4d5e6f708192a3b4c5d6e7f8091a\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ShippingPackages.DeleteSettingsShippingPackageAsync(\"sp_2b3c4d5e6f708192a3b4c5d6e7f8091a\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingPackages.deleteSettingsShippingPackage(\n  'sp_2b3c4d5e6f708192a3b4c5d6e7f8091a',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ShippingPackages().DeleteSettingsShippingPackage(context.Background(), \"sp_2b3c4d5e6f708192a3b4c5d6e7f8091a\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Shipping packages"
+        ],
+        "summary": "Update a shipping package",
+        "operationId": "shipping_packages_update_settings_shipping_package",
+        "description": "Send the changes under `shipping_package`, such as a new `display_name`, `description` or dimension.",
+        "parameters": [
+          {
+            "name": "shipping_package_id",
+            "in": "path",
+            "required": true,
+            "description": "The shipping package's `id`, from the listing.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated shipping package, under `shipping_package`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingPackageResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/shipping_packages/sp_2b3c4d5e6f708192a3b4c5d6e7f8091a\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"shipping_package\": {\n      \"display_name\": \"Small box\",\n      \"description\": \"Up to 2 kg\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.shipping_packages.update_settings_shipping_package(\n    \"sp_2b3c4d5e6f708192a3b4c5d6e7f8091a\",\n    {\"shipping_package\": {\"display_name\": \"Small box\", \"description\": \"Up to 2 kg\"}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingPackages.updateSettingsShippingPackage('sp_2b3c4d5e6f708192a3b4c5d6e7f8091a', {\n    shipping_package: {display_name: 'Small box', description: 'Up to 2 kg'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->shippingPackages->updateSettingsShippingPackage(\n    'sp_2b3c4d5e6f708192a3b4c5d6e7f8091a',\n    ['shipping_package' => ['display_name' => 'Small box', 'description' => 'Up to 2 kg']],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.shipping_packages.shipping_packages_dto.ShippingPackagesDto.SettingsShippingPackage;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsShippingPackage> response = client.shippingPackages().updateSettingsShippingPackage(\n        \"sp_2b3c4d5e6f708192a3b4c5d6e7f8091a\",\n        Map.of(\"shipping_package\", Map.of(\"display_name\", \"Small box\", \"description\", \"Up to 2 kg\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ShippingPackages.UpdateSettingsShippingPackageAsync(\n    \"sp_2b3c4d5e6f708192a3b4c5d6e7f8091a\",\n    new Dictionary<string, object?>\n    {\n        [\"shipping_package\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Small box\",\n            [\"description\"] = \"Up to 2 kg\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingPackages.updateSettingsShippingPackage(\n  'sp_2b3c4d5e6f708192a3b4c5d6e7f8091a',\n  {\n    'shipping_package': {\n      'display_name': 'Small box',\n      'description': 'Up to 2 kg',\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ShippingPackages().UpdateSettingsShippingPackage(context.Background(), \"sp_2b3c4d5e6f708192a3b4c5d6e7f8091a\", map[string]any{\n\t\"shipping_package\": map[string]any{\n\t\t\"display_name\": \"Small box\",\n\t\t\"description\":  \"Up to 2 kg\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "shipping_package": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "length": {
+                        "type": "number"
+                      },
+                      "width": {
+                        "type": "number"
+                      },
+                      "height": {
+                        "type": "number"
+                      },
+                      "weight": {
+                        "type": "number"
+                      },
+                      "cubic": {
+                        "type": "number"
+                      },
+                      "length_uom": {
+                        "type": "string",
+                        "description": "The unit's bare uuid, not its prefixed id."
+                      },
+                      "width_uom": {
+                        "type": "string",
+                        "description": "The unit's bare uuid, not its prefixed id."
+                      },
+                      "height_uom": {
+                        "type": "string",
+                        "description": "The unit's bare uuid, not its prefixed id."
+                      },
+                      "weight_uom": {
+                        "type": "string",
+                        "description": "The unit's bare uuid, not its prefixed id."
+                      },
+                      "cubic_uom": {
+                        "type": "string",
+                        "description": "The unit's bare uuid, not its prefixed id."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "shipping_package"
+                ]
+              },
+              "example": {
+                "shipping_package": {
+                  "display_name": "Small box",
+                  "description": "Up to 2 kg"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -45764,6 +46290,127 @@
         "properties": {
           "zone": {
             "$ref": "#/components/schemas/Zone"
+          }
+        }
+      },
+      "ShippingPackageList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShippingPackage"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/ShippingPackagePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "ShippingPackage": {
+        "type": "object",
+        "properties": {
+          "created_by": {},
+          "created_on": {
+            "type": "string"
+          },
+          "cubic": {},
+          "cubic_uom": {
+            "description": "The volume unit's bare uuid."
+          },
+          "description": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "height": {
+            "type": "number"
+          },
+          "height_uom": {
+            "description": "The height unit's bare uuid."
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "length": {
+            "type": "number"
+          },
+          "length_uom": {
+            "description": "The length unit's bare uuid."
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "weight": {
+            "type": "number"
+          },
+          "weight_uom": {
+            "description": "The weight unit's bare uuid."
+          },
+          "width": {
+            "type": "number"
+          },
+          "width_uom": {
+            "description": "The width unit's bare uuid."
+          }
+        }
+      },
+      "ShippingPackagePagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size the API applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "next": {
+                "type": "string"
+              },
+              "prev": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "ShippingPackageResponse": {
+        "type": "object",
+        "properties": {
+          "shipping_package": {
+            "$ref": "#/components/schemas/ShippingPackage"
           }
         }
       },

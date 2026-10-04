@@ -1,0 +1,30 @@
+---
+title: "Shipping packages"
+sidebarTitle: "Overview"
+description: "List, read, create, update and delete shipping packages, the boxes described by their size and weight."
+---
+
+A shipping package describes a box by its length, width, height and weight, each with an optional unit. These endpoints list, read, create, update and delete shipping packages. This area has 5 endpoints, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List shipping packages](/api-reference/shipping-packages/list-shipping-packages) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_packages` | Returns a page of shipping packages. |
+| [Create a shipping package](/api-reference/shipping-packages/create-a-shipping-package) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/shipping_packages` | Creates a shipping package and returns it under `shipping_package`. |
+| [Retrieve a shipping package](/api-reference/shipping-packages/retrieve-a-shipping-package) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_packages/{shipping_package_id}` | Returns one shipping package by its `id`. |
+| [Delete a shipping package](/api-reference/shipping-packages/delete-a-shipping-package) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/shipping_packages/{shipping_package_id}` | Deletes a shipping package. A successful call returns `204` with no body. |
+| [Update a shipping package](/api-reference/shipping-packages/update-a-shipping-package) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/shipping_packages/{shipping_package_id}` | Changes a shipping package and returns it. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Writes are wrapped in `shipping_package`, and one package comes back under `shipping_package`.** A create can send just a `name` with some dimensions.
+- **Dimensions are numbers.** `length`, `width`, `height` and `weight` take numbers such as `10` or `1.5`.
+- **A `*_uom` field takes the unit's bare uuid.** Not the unit's prefixed `id` from `GET /settings/uom`.
+- **The listing pages by cursor.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor` until `has_more` is `false`.
