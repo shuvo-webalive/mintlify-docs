@@ -4,7 +4,11 @@ sidebarTitle: "Overview"
 description: "List, read, create, update and delete the units of measurement, such as length units, that your settings define."
 ---
 
-Units of measurement are the settings records for units, each with a `type` such as `LENGTH`, a number of `decimal_places` and a `rounding` rule. These endpoints list, read, create, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.
+Units of measurement are the settings records for units, each with a `type` such as `LENGTH`, a number of `decimal_places` and a `rounding` rule. These endpoints list, read, create, update and delete them. This area has 5 endpoints, each available in all seven SDKs.
+
+<Warning>
+  **Creating a unit of measurement currently fails.** `POST /settings/uom` currently returns `400` `validation_error` without naming a field. The update and delete have not been confirmed to work, because they need an existing unit.
+</Warning>
 
 ## At a glance
 
@@ -24,8 +28,8 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 
 ## Things to know
 
-- **One unit comes back under `uom`.** The path uses `uom` for one unit and for many: `/settings/uom` lists them and `/settings/uom/{uom_id}` reads one.
+- **The path is `/settings/uom` for one unit and for many.** `/settings/uom` lists units and `/settings/uom/{uom_id}` reads one, which comes back under `uom`.
 - **Writes are wrapped in `uom`.** A create sends a `name` and a `type`, such as `LENGTH`.
 - **`status` takes `active` or `inactive`.** Send it on the update to turn a unit on or off.
-- **Shipping packages refer to a unit by its bare uuid.** A shipping package's `*_uom` fields take the unit's uuid, not its prefixed `id`.
+- **Shipping packages refer to a unit by its bare uuid.** A shipping package's `*_uom` fields take the unit's uuid, not its prefixed `id`. A unit record from `GET /settings/uom` carries only its prefixed `id`, and setting a `*_uom` field has not been confirmed to work.
 - **The listing pages by cursor.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor` until `has_more` is `false`.
