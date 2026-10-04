@@ -1,0 +1,126 @@
+{
+  "sdk": "js",
+  "module": "invoices",
+  "endpoints": {
+    "get_invoices": {
+      "function": "invoices.getInvoices",
+      "code": "const response = await client.invoices.getInvoices({limit: 20});\nconsole.log(response.data);\n"
+    },
+    "get_invoice": {
+      "function": "invoices.getInvoice",
+      "code": "const response = await client.invoices.getInvoice('INV-0001');\nconsole.log(response.data);\n"
+    },
+    "get_invoice_information": {
+      "function": "invoices.getInvoiceInformation",
+      "code": "const response = await client.invoices.getInvoiceInformation('INV-0001');\nconsole.log(response.data);\n"
+    },
+    "get_invoice_pdf": {
+      "function": "invoices.getInvoicePdf",
+      "code": "const response = await client.invoices.getInvoicePdf('INV-0001');\nconsole.log(response.data);\n"
+    },
+    "create_invoice": {
+      "function": "invoices.createInvoice",
+      "code": "const response = await client.invoices.createInvoice({\n    invoice: {\n        account_id: 'W13ZGY',\n        issue_date: '2026-10-01',\n        due_date: '2026-10-31',\n        currency: 'AUD',\n        lines: [{item_id: 'ITEM-0001', item_quantity: 1}],\n    },\n});\nconsole.log(response.data);\n"
+    },
+    "update_invoice_information": {
+      "function": "invoices.updateInvoiceInformation",
+      "code": "const response = await client.invoices.updateInvoiceInformation('INV-0001', {\n    invoice: {invoice_note: 'Deliver to the loading dock.', customer_purchase_order_id: 'PO-1001'},\n});\nconsole.log(response.data);\n"
+    },
+    "amend_invoice": {
+      "function": "invoices.amendInvoice",
+      "code": "const response = await client.invoices.amendInvoice('INV-0001', {\n    invoice: {lines: [{op: 'add', value: {item_id: 'ITEM-0001', item_price: 3, item_quantity: 1}}]},\n});\nconsole.log(response.data);\n"
+    },
+    "cancel_invoice": {
+      "function": "invoices.cancelInvoice",
+      "code": "const response = await client.invoices.cancelInvoice('INV-0001', {invoice: {}});\nconsole.log(response.data);\n"
+    },
+    "reactivate_invoice": {
+      "function": "invoices.reactivateInvoice",
+      "code": "const response = await client.invoices.reactivateInvoice('INV-0001', {invoice: {}});\nconsole.log(response.data);\n"
+    },
+    "delete_invoice": {
+      "function": "invoices.deleteInvoice",
+      "code": "const response = await client.invoices.deleteInvoice('INV-0001');\nconsole.log(response.data);\n"
+    },
+    "get_invoice_item_fulfillments": {
+      "function": "invoices.getInvoiceItemFulfillments",
+      "code": "const response = await client.invoices.getInvoiceItemFulfillments('INV-0001', {limit: 20});\nconsole.log(response.data);\n"
+    },
+    "get_invoice_item_fulfillment": {
+      "function": "invoices.getInvoiceItemFulfillment",
+      "code": "const response = await client.invoices.getInvoiceItemFulfillment('INV-0001', 'IF-0001');\nconsole.log(response.data);\n"
+    },
+    "get_invoice_rmas": {
+      "function": "invoices.getInvoiceRmas",
+      "code": "const response = await client.invoices.getInvoiceRmas('INV-0001', {limit: 20});\nconsole.log(response.data);\n"
+    },
+    "get_invoice_rma": {
+      "function": "invoices.getInvoiceRma",
+      "code": "const response = await client.invoices.getInvoiceRma('INV-0001', 'RMA-0001');\nconsole.log(response.data);\n"
+    },
+    "get_invoice_notes": {
+      "function": "invoices.getInvoiceNotes",
+      "code": "const response = await client.invoices.getInvoiceNotes('INV-0001', {limit: 20});\nconsole.log(response.data);\n"
+    },
+    "get_invoice_note": {
+      "function": "invoices.getInvoiceNote",
+      "code": "const response = await client.invoices.getInvoiceNote('INV-0001', 'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d');\nconsole.log(response.data);\n"
+    },
+    "create_invoice_note": {
+      "function": "invoices.createInvoiceNote",
+      "code": "import {readFileSync} from 'node:fs';\n\nconst response = await client.invoices.createInvoiceNote('INV-0001', 'Customer asked for a copy by post.', {\n    files: {file: ['receipt.pdf', readFileSync('receipt.pdf')]},\n});\nconsole.log(response.data);\n"
+    },
+    "delete_invoice_note": {
+      "function": "invoices.deleteInvoiceNote",
+      "code": "const response = await client.invoices.deleteInvoiceNote('INV-0001', 'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d');\nconsole.log(response.data);\n"
+    },
+    "get_invoice_note_files": {
+      "function": "invoices.getInvoiceNoteFiles",
+      "code": "const response = await client.invoices.getInvoiceNoteFiles('INV-0001', 'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d');\nconsole.log(response.data);\n"
+    },
+    "get_invoice_note_file": {
+      "function": "invoices.getInvoiceNoteFile",
+      "code": "const response = await client.invoices.getInvoiceNoteFile(\n    'INV-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n    '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nconsole.log(response.data);\n"
+    },
+    "get_order_invoices": {
+      "function": "invoices.getOrderInvoices",
+      "code": "const response = await client.invoices.getOrderInvoices('ORD-0001', {limit: 20});\nconsole.log(response.data);\n"
+    },
+    "create_order_invoice": {
+      "function": "invoices.createOrderInvoice",
+      "code": "const response = await client.invoices.createOrderInvoice('ORD-0001', {\n    invoice: {invoice_note: 'First month of service.'},\n});\nconsole.log(response.data);\n"
+    },
+    "get_invoice_kpis": {
+      "function": "invoices.getInvoiceKpis",
+      "code": "const response = await client.invoices.getInvoiceKpis('INV-0001');\nconsole.log(response.data);\n"
+    },
+    "get_invoice_lines": {
+      "function": "invoices.getInvoiceLines",
+      "code": "const response = await client.invoices.getInvoiceLines('INV-0001');\nconsole.log(response.data);\n"
+    },
+    "get_invoice_line": {
+      "function": "invoices.getInvoiceLine",
+      "code": "const response = await client.invoices.getInvoiceLine('INV-0001', '4d2e6f8a-1b3c-4d5e-9f0a-2b4c6d8e0f1a');\nconsole.log(response.data);\n"
+    },
+    "get_invoice_credit_note_application": {
+      "function": "invoices.getInvoiceCreditNoteApplication",
+      "code": "const response = await client.invoices.getInvoiceCreditNoteApplication('INV-0001', 'CNA-0001');\nconsole.log(response.data);\n"
+    },
+    "get_invoice_custom_objects": {
+      "function": "invoices.getInvoiceCustomObjects",
+      "code": "const response = await client.invoices.getInvoiceCustomObjects('INV-0001', {limit: 20});\nconsole.log(response.data);\n"
+    },
+    "get_invoice_custom_object": {
+      "function": "invoices.getInvoiceCustomObject",
+      "code": "const response = await client.invoices.getInvoiceCustomObject('INV-0001', 'CO-0001');\nconsole.log(response.data);\n"
+    },
+    "get_invoice_custom_object_instance": {
+      "function": "invoices.getInvoiceCustomObjectInstance",
+      "code": "const response = await client.invoices.getInvoiceCustomObjectInstance('INV-0001', 'CO-0001', 'COI-0001');\nconsole.log(response.data);\n"
+    },
+    "delete_invoice_note_file": {
+      "function": "invoices.deleteInvoiceNoteFile",
+      "code": "const response = await client.invoices.deleteInvoiceNoteFile(\n    'INV-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n    '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nconsole.log(response.data);\n"
+    }
+  }
+}

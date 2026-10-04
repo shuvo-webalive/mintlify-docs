@@ -1,0 +1,126 @@
+{
+  "sdk": "java",
+  "module": "invoices",
+  "endpoints": {
+    "get_invoices": {
+      "function": "invoices().getInvoices",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.InvoiceList;\nimport java.util.Map;\n\nApiResponse<InvoiceList> response = client.invoices().getInvoices(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice": {
+      "function": "invoices().getInvoice",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.Invoice;\n\nApiResponse<Invoice> response = client.invoices().getInvoice(\"INV-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice_information": {
+      "function": "invoices().getInvoiceInformation",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.Invoice;\n\nApiResponse<Invoice> response = client.invoices().getInvoiceInformation(\"INV-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice_pdf": {
+      "function": "invoices().getInvoicePdf",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.InvoicePdf;\n\nApiResponse<InvoicePdf> response = client.invoices().getInvoicePdf(\"INV-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "create_invoice": {
+      "function": "invoices().createInvoice",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.Invoice;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse<Invoice> response = client.invoices().createInvoice(\n        Map.of(\n                \"invoice\", Map.of(\n                        \"account_id\", \"W13ZGY\",\n                        \"issue_date\", \"2026-10-01\",\n                        \"due_date\", \"2026-10-31\",\n                        \"currency\", \"AUD\",\n                        \"lines\", List.of(Map.of(\"item_id\", \"ITEM-0001\", \"item_quantity\", 1)))));\nSystem.out.println(response.getMap());\n"
+    },
+    "update_invoice_information": {
+      "function": "invoices().updateInvoiceInformation",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.Invoice;\nimport java.util.Map;\n\nApiResponse<Invoice> response = client.invoices().updateInvoiceInformation(\n        \"INV-0001\",\n        Map.of(\n                \"invoice\", Map.of(\n                        \"invoice_note\", \"Deliver to the loading dock.\",\n                        \"customer_purchase_order_id\", \"PO-1001\")));\nSystem.out.println(response.getMap());\n"
+    },
+    "amend_invoice": {
+      "function": "invoices().amendInvoice",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.Invoice;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse<Invoice> response = client.invoices().amendInvoice(\n        \"INV-0001\",\n        Map.of(\n                \"invoice\", Map.of(\n                        \"lines\", List.of(\n                                Map.of(\n                                        \"op\", \"add\",\n                                        \"value\", Map.of(\n                                                \"item_id\", \"ITEM-0001\",\n                                                \"item_price\", 3,\n                                                \"item_quantity\", 1))))));\nSystem.out.println(response.getMap());\n"
+    },
+    "cancel_invoice": {
+      "function": "invoices().cancelInvoice",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.Invoice;\nimport java.util.Map;\n\nApiResponse<Invoice> response = client.invoices().cancelInvoice(\n        \"INV-0001\",\n        Map.of(\"invoice\", Map.of()));\nSystem.out.println(response.getMap());\n"
+    },
+    "reactivate_invoice": {
+      "function": "invoices().reactivateInvoice",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.Invoice;\nimport java.util.Map;\n\nApiResponse<Invoice> response = client.invoices().reactivateInvoice(\n        \"INV-0001\",\n        Map.of(\"invoice\", Map.of()));\nSystem.out.println(response.getMap());\n"
+    },
+    "delete_invoice": {
+      "function": "invoices().deleteInvoice",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.Invoice;\n\nApiResponse<Invoice> response = client.invoices().deleteInvoice(\"INV-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice_item_fulfillments": {
+      "function": "invoices().getInvoiceItemFulfillments",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.item_fulfillments.item_fulfillments_dto.ItemFulfillmentsDto.ItemFulfillmentReadList;\nimport java.util.Map;\n\nApiResponse<ItemFulfillmentReadList> response = client.invoices().getInvoiceItemFulfillments(\n        \"INV-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice_item_fulfillment": {
+      "function": "invoices().getInvoiceItemFulfillment",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.item_fulfillments.item_fulfillments_dto.ItemFulfillmentsDto.ItemFulfillmentRead;\n\nApiResponse<ItemFulfillmentRead> response = client.invoices().getInvoiceItemFulfillment(\"INV-0001\", \"IF-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice_rmas": {
+      "function": "invoices().getInvoiceReturnMerchandiseAuthorisations",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.return_merchandise_authorisations.return_merchandise_authorisations_dto.ReturnMerchandiseAuthorisationsDto.InvoiceReturnMerchandiseAuthorisations;\nimport java.util.Map;\n\nApiResponse<InvoiceReturnMerchandiseAuthorisations> response = client.invoices().getInvoiceReturnMerchandiseAuthorisations(\n        \"INV-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice_rma": {
+      "function": "invoices().getInvoiceReturnMerchandiseAuthorisation",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.return_merchandise_authorisations.return_merchandise_authorisations_dto.ReturnMerchandiseAuthorisationsDto.ReturnMerchandiseAuthorisationRead;\n\nApiResponse<ReturnMerchandiseAuthorisationRead> response = client.invoices().getInvoiceReturnMerchandiseAuthorisation(\n        \"INV-0001\",\n        \"RMA-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice_notes": {
+      "function": "invoices().getInvoiceNotes",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto;\nimport java.util.Map;\n\nApiResponse<InvoicesDto.InvoiceNoteList> response = client.invoices().getInvoiceNotes(\n        \"INV-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice_note": {
+      "function": "invoices().getInvoiceNote",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.InvoiceNote;\n\nApiResponse<InvoiceNote> response = client.invoices().getInvoiceNote(\n        \"INV-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+    },
+    "create_invoice_note": {
+      "function": "invoices().createInvoiceNote",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.RequestOptions;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.InvoiceNote;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nApiResponse<InvoiceNote> response = client.invoices().createInvoiceNote(\n        \"INV-0001\",\n        \"Customer asked for a copy by post.\",\n        Map.of(\"file\", Path.of(\"receipt.pdf\")),\n        RequestOptions.none());\nSystem.out.println(response.getMap());\n"
+    },
+    "delete_invoice_note": {
+      "function": "invoices().deleteInvoiceNote",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\n\nApiResponse<Dto> response = client.invoices().deleteInvoiceNote(\"INV-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice_note_files": {
+      "function": "invoices().getInvoiceNoteFiles",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.accounts.accounts_dto.AccountsDto.NoteFileList;\n\nApiResponse<NoteFileList> response = client.invoices().getInvoiceNoteFiles(\n        \"INV-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice_note_file": {
+      "function": "invoices().getInvoiceNoteFile",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.InvoiceNoteFile;\n\nApiResponse<InvoiceNoteFile> response = client.invoices().getInvoiceNoteFile(\n        \"INV-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n        \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_invoices": {
+      "function": "invoices().getOrderInvoices",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.InvoiceList;\nimport java.util.Map;\n\nApiResponse<InvoiceList> response = client.invoices().getOrderInvoices(\n        \"ORD-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "create_order_invoice": {
+      "function": "invoices().createOrderInvoice",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.Invoice;\nimport java.util.Map;\n\nApiResponse<Invoice> response = client.invoices().createOrderInvoice(\n        \"ORD-0001\",\n        Map.of(\"invoice\", Map.of(\"invoice_note\", \"First month of service.\")));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice_kpis": {
+      "function": "invoices().getInvoiceKpis",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.InvoiceKpisRead;\n\nApiResponse<InvoiceKpisRead> response = client.invoices().getInvoiceKpis(\"INV-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice_lines": {
+      "function": "invoices().getInvoiceLines",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.InvoiceLines;\n\nApiResponse<InvoiceLines> response = client.invoices().getInvoiceLines(\"INV-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice_line": {
+      "function": "invoices().getInvoiceLine",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.InvoiceLineRead;\n\nApiResponse<InvoiceLineRead> response = client.invoices().getInvoiceLine(\n        \"INV-0001\",\n        \"4d2e6f8a-1b3c-4d5e-9f0a-2b4c6d8e0f1a\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice_credit_note_application": {
+      "function": "invoices().getInvoiceCreditNoteApplication",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.credit_note_applications.credit_note_applications_dto.CreditNoteApplicationsDto.CreditNoteApplicationRead;\n\nApiResponse<CreditNoteApplicationRead> response = client.invoices().getInvoiceCreditNoteApplication(\n        \"INV-0001\",\n        \"CNA-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice_custom_objects": {
+      "function": "invoices().getInvoiceCustomObjects",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse<Dto> response = client.invoices().getInvoiceCustomObjects(\n        \"INV-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice_custom_object": {
+      "function": "invoices().getInvoiceCustomObject",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\n\nApiResponse<Dto> response = client.invoices().getInvoiceCustomObject(\"INV-0001\", \"CO-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice_custom_object_instance": {
+      "function": "invoices().getInvoiceCustomObjectInstance",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\n\nApiResponse<Dto> response = client.invoices().getInvoiceCustomObjectInstance(\"INV-0001\", \"CO-0001\", \"COI-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "delete_invoice_note_file": {
+      "function": "invoices().deleteInvoiceNoteFile",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\n\nApiResponse<Dto> response = client.invoices().deleteInvoiceNoteFile(\n        \"INV-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n        \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\nSystem.out.println(response.getMap());\n"
+    }
+  }
+}

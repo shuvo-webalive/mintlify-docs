@@ -1,0 +1,126 @@
+{
+  "sdk": "php",
+  "module": "invoices",
+  "endpoints": {
+    "get_invoices": {
+      "function": "getInvoices",
+      "code": "$response = $client->invoices->getInvoices(['limit' => 20]);\nprint_r($response->data);\n"
+    },
+    "get_invoice": {
+      "function": "getInvoice",
+      "code": "$response = $client->invoices->getInvoice('INV-0001');\nprint_r($response->data);\n"
+    },
+    "get_invoice_information": {
+      "function": "getInvoiceInformation",
+      "code": "$response = $client->invoices->getInvoiceInformation('INV-0001');\nprint_r($response->data);\n"
+    },
+    "get_invoice_pdf": {
+      "function": "getInvoicePdf",
+      "code": "$response = $client->invoices->getInvoicePdf('INV-0001');\nprint_r($response->data);\n"
+    },
+    "create_invoice": {
+      "function": "createInvoice",
+      "code": "$response = $client->invoices->createInvoice([\n    'invoice' => [\n        'account_id' => 'W13ZGY',\n        'issue_date' => '2026-10-01',\n        'due_date' => '2026-10-31',\n        'currency' => 'AUD',\n        'lines' => [['item_id' => 'ITEM-0001', 'item_quantity' => 1]],\n    ],\n]);\nprint_r($response->data);\n"
+    },
+    "update_invoice_information": {
+      "function": "updateInvoiceInformation",
+      "code": "$response = $client->invoices->updateInvoiceInformation('INV-0001', [\n    'invoice' => [\n        'invoice_note' => 'Deliver to the loading dock.',\n        'customer_purchase_order_id' => 'PO-1001',\n    ],\n]);\nprint_r($response->data);\n"
+    },
+    "amend_invoice": {
+      "function": "amendInvoice",
+      "code": "$response = $client->invoices->amendInvoice('INV-0001', [\n    'invoice' => [\n        'lines' => [\n            [\n                'op' => 'add',\n                'value' => ['item_id' => 'ITEM-0001', 'item_price' => 3, 'item_quantity' => 1],\n            ],\n        ],\n    ],\n]);\nprint_r($response->data);\n"
+    },
+    "cancel_invoice": {
+      "function": "cancelInvoice",
+      "code": "$response = $client->invoices->cancelInvoice('INV-0001', ['invoice' => (object) []]);\nprint_r($response->data);\n"
+    },
+    "reactivate_invoice": {
+      "function": "reactivateInvoice",
+      "code": "$response = $client->invoices->reactivateInvoice('INV-0001', ['invoice' => (object) []]);\nprint_r($response->data);\n"
+    },
+    "delete_invoice": {
+      "function": "deleteInvoice",
+      "code": "$response = $client->invoices->deleteInvoice('INV-0001');\nprint_r($response->data);\n"
+    },
+    "get_invoice_item_fulfillments": {
+      "function": "getInvoiceItemFulfillments",
+      "code": "$response = $client->invoices->getInvoiceItemFulfillments('INV-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+    },
+    "get_invoice_item_fulfillment": {
+      "function": "getInvoiceItemFulfillment",
+      "code": "$response = $client->invoices->getInvoiceItemFulfillment('INV-0001', 'IF-0001');\nprint_r($response->data);\n"
+    },
+    "get_invoice_rmas": {
+      "function": "getInvoiceReturnMerchandiseAuthorisations",
+      "code": "$response = $client->invoices->getInvoiceReturnMerchandiseAuthorisations('INV-0001', [\n    'limit' => 20,\n]);\nprint_r($response->data);\n"
+    },
+    "get_invoice_rma": {
+      "function": "getInvoiceReturnMerchandiseAuthorisation",
+      "code": "$response = $client->invoices->getInvoiceReturnMerchandiseAuthorisation('INV-0001', 'RMA-0001');\nprint_r($response->data);\n"
+    },
+    "get_invoice_notes": {
+      "function": "getInvoiceNotes",
+      "code": "$response = $client->invoices->getInvoiceNotes('INV-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+    },
+    "get_invoice_note": {
+      "function": "getInvoiceNote",
+      "code": "$response = $client->invoices->getInvoiceNote('INV-0001', 'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d');\nprint_r($response->data);\n"
+    },
+    "create_invoice_note": {
+      "function": "createInvoiceNote",
+      "code": "$response = $client->invoices->createInvoiceNote('INV-0001', 'Customer asked for a copy by post.', [\n    'file' => ['receipt.pdf', fopen('receipt.pdf', 'r')],\n]);\nprint_r($response->data);\n"
+    },
+    "delete_invoice_note": {
+      "function": "deleteInvoiceNote",
+      "code": "$response = $client->invoices->deleteInvoiceNote(\n    'INV-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint_r($response->data);\n"
+    },
+    "get_invoice_note_files": {
+      "function": "getInvoiceNoteFiles",
+      "code": "$response = $client->invoices->getInvoiceNoteFiles(\n    'INV-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint_r($response->data);\n"
+    },
+    "get_invoice_note_file": {
+      "function": "getInvoiceNoteFile",
+      "code": "$response = $client->invoices->getInvoiceNoteFile(\n    'INV-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n    '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nprint_r($response->data);\n"
+    },
+    "get_order_invoices": {
+      "function": "getOrderInvoices",
+      "code": "$response = $client->invoices->getOrderInvoices('ORD-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+    },
+    "create_order_invoice": {
+      "function": "createOrderInvoice",
+      "code": "$response = $client->invoices->createOrderInvoice('ORD-0001', [\n    'invoice' => ['invoice_note' => 'First month of service.'],\n]);\nprint_r($response->data);\n"
+    },
+    "get_invoice_kpis": {
+      "function": "getInvoiceKpis",
+      "code": "$response = $client->invoices->getInvoiceKpis('INV-0001');\nprint_r($response->data);\n"
+    },
+    "get_invoice_lines": {
+      "function": "getInvoiceLines",
+      "code": "$response = $client->invoices->getInvoiceLines('INV-0001');\nprint_r($response->data);\n"
+    },
+    "get_invoice_line": {
+      "function": "getInvoiceLine",
+      "code": "$response = $client->invoices->getInvoiceLine('INV-0001', '4d2e6f8a-1b3c-4d5e-9f0a-2b4c6d8e0f1a');\nprint_r($response->data);\n"
+    },
+    "get_invoice_credit_note_application": {
+      "function": "getInvoiceCreditNoteApplication",
+      "code": "$response = $client->invoices->getInvoiceCreditNoteApplication('INV-0001', 'CNA-0001');\nprint_r($response->data);\n"
+    },
+    "get_invoice_custom_objects": {
+      "function": "getInvoiceCustomObjects",
+      "code": "$response = $client->invoices->getInvoiceCustomObjects('INV-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+    },
+    "get_invoice_custom_object": {
+      "function": "getInvoiceCustomObject",
+      "code": "$response = $client->invoices->getInvoiceCustomObject('INV-0001', 'CO-0001');\nprint_r($response->data);\n"
+    },
+    "get_invoice_custom_object_instance": {
+      "function": "getInvoiceCustomObjectInstance",
+      "code": "$response = $client->invoices->getInvoiceCustomObjectInstance('INV-0001', 'CO-0001', 'COI-0001');\nprint_r($response->data);\n"
+    },
+    "delete_invoice_note_file": {
+      "function": "deleteInvoiceNoteFile",
+      "code": "$response = $client->invoices->deleteInvoiceNoteFile(\n    'INV-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n    '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nprint_r($response->data);\n"
+    }
+  }
+}

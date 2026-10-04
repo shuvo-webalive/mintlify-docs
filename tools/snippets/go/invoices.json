@@ -1,0 +1,126 @@
+{
+ "sdk": "go",
+ "module": "invoices",
+ "endpoints": {
+  "get_invoices": {
+   "function": "Invoices.GetInvoices",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetInvoices(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_invoice": {
+   "function": "Invoices.GetInvoice",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetInvoice(context.Background(), \"INV-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_invoice_information": {
+   "function": "Invoices.GetInvoiceInformation",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetInvoiceInformation(context.Background(), \"INV-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_invoice_pdf": {
+   "function": "Invoices.GetInvoicePDF",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetInvoicePDF(context.Background(), \"INV-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "create_invoice": {
+   "function": "Invoices.CreateInvoice",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().CreateInvoice(context.Background(), map[string]any{\n\t\"invoice\": map[string]any{\n\t\t\"account_id\": \"W13ZGY\",\n\t\t\"issue_date\": \"2026-10-01\",\n\t\t\"due_date\":   \"2026-10-31\",\n\t\t\"currency\":   \"AUD\",\n\t\t\"lines\": []any{\n\t\t\tmap[string]any{\"item_id\": \"ITEM-0001\", \"item_quantity\": 1},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "update_invoice_information": {
+   "function": "Invoices.UpdateInvoiceInformation",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().UpdateInvoiceInformation(context.Background(), \"INV-0001\", map[string]any{\n\t\"invoice\": map[string]any{\n\t\t\"invoice_note\":               \"Deliver to the loading dock.\",\n\t\t\"customer_purchase_order_id\": \"PO-1001\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "amend_invoice": {
+   "function": "Invoices.AmendInvoice",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().AmendInvoice(context.Background(), \"INV-0001\", map[string]any{\n\t\"invoice\": map[string]any{\n\t\t\"lines\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"op\": \"add\",\n\t\t\t\t\"value\": map[string]any{\n\t\t\t\t\t\"item_id\":       \"ITEM-0001\",\n\t\t\t\t\t\"item_price\":    3,\n\t\t\t\t\t\"item_quantity\": 1,\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "cancel_invoice": {
+   "function": "Invoices.CancelInvoice",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().CancelInvoice(context.Background(), \"INV-0001\", map[string]any{\"invoice\": map[string]any{}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "reactivate_invoice": {
+   "function": "Invoices.ReactivateInvoice",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().ReactivateInvoice(context.Background(), \"INV-0001\", map[string]any{\"invoice\": map[string]any{}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "delete_invoice": {
+   "function": "Invoices.DeleteInvoice",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().DeleteInvoice(context.Background(), \"INV-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_invoice_item_fulfillments": {
+   "function": "Invoices.GetInvoiceItemFulfillments",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetInvoiceItemFulfillments(context.Background(), \"INV-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_invoice_item_fulfillment": {
+   "function": "Invoices.GetInvoiceItemFulfillment",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetInvoiceItemFulfillment(context.Background(), \"INV-0001\", \"IF-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_invoice_rmas": {
+   "function": "Invoices.GetInvoiceReturnMerchandiseAuthorisations",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetInvoiceReturnMerchandiseAuthorisations(context.Background(), \"INV-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_invoice_rma": {
+   "function": "Invoices.GetInvoiceReturnMerchandiseAuthorisation",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetInvoiceReturnMerchandiseAuthorisation(context.Background(), \"INV-0001\", \"RMA-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_invoice_notes": {
+   "function": "Invoices.GetInvoiceNotes",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetInvoiceNotes(context.Background(), \"INV-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_invoice_note": {
+   "function": "Invoices.GetInvoiceNote",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetInvoiceNote(context.Background(), \"INV-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "create_invoice_note": {
+   "function": "Invoices.CreateInvoiceNote",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n)\n\nfile, err := os.ReadFile(\"receipt.pdf\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.Invoices().CreateInvoiceNote(context.Background(), \"INV-0001\", \"Customer asked for a copy by post.\", map[string]any{\"file\": []any{\"receipt.pdf\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "delete_invoice_note": {
+   "function": "Invoices.DeleteInvoiceNote",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().DeleteInvoiceNote(context.Background(), \"INV-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_invoice_note_files": {
+   "function": "Invoices.GetInvoiceNoteFiles",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetInvoiceNoteFiles(context.Background(), \"INV-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_invoice_note_file": {
+   "function": "Invoices.GetInvoiceNoteFile",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetInvoiceNoteFile(context.Background(), \"INV-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_invoices": {
+   "function": "Invoices.GetOrderInvoices",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetOrderInvoices(context.Background(), \"ORD-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "create_order_invoice": {
+   "function": "Invoices.CreateOrderInvoice",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().CreateOrderInvoice(context.Background(), \"ORD-0001\", map[string]any{\n\t\"invoice\": map[string]any{\"invoice_note\": \"First month of service.\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_invoice_kpis": {
+   "function": "Invoices.GetInvoiceKPIs",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetInvoiceKPIs(context.Background(), \"INV-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_invoice_lines": {
+   "function": "Invoices.GetInvoiceLines",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetInvoiceLines(context.Background(), \"INV-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_invoice_line": {
+   "function": "Invoices.GetInvoiceLine",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetInvoiceLine(context.Background(), \"INV-0001\", \"4d2e6f8a-1b3c-4d5e-9f0a-2b4c6d8e0f1a\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_invoice_credit_note_application": {
+   "function": "Invoices.GetInvoiceCreditNoteApplication",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetInvoiceCreditNoteApplication(context.Background(), \"INV-0001\", \"CNA-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_invoice_custom_objects": {
+   "function": "Invoices.GetInvoiceCustomObjects",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetInvoiceCustomObjects(context.Background(), \"INV-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_invoice_custom_object": {
+   "function": "Invoices.GetInvoiceCustomObject",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetInvoiceCustomObject(context.Background(), \"INV-0001\", \"CO-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_invoice_custom_object_instance": {
+   "function": "Invoices.GetInvoiceCustomObjectInstance",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().GetInvoiceCustomObjectInstance(context.Background(), \"INV-0001\", \"CO-0001\", \"COI-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "delete_invoice_note_file": {
+   "function": "Invoices.DeleteInvoiceNoteFile",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Invoices().DeleteInvoiceNoteFile(context.Background(), \"INV-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  }
+ }
+}
