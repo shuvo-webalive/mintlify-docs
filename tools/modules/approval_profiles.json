@@ -5,11 +5,10 @@
   "icon": "user-check",
   "base": "/settings/approval_profiles",
   "overview_description": "Create, read, update and delete the approval profiles that hold transactions for sign-off.",
-  "intro": "Approval profiles decide which transactions need approval and who approves them. You can list, create, read, update and delete them. This area has 5 endpoints, and all seven Exsited SDKs call every one.",
+  "intro": "Approval profiles decide which transactions need approval and who approves them. You can list, create, read, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.",
   "warning": "**An approval profile gates every matching transaction while it exists.** Create one only when those transactions should wait for approval.",
   "notes": [
     "**Five fields are required to create a profile.** `name`, `entity`, `event`, `approver_type` and `approver`.",
-    "**A profile takes effect as soon as it exists.** It gates every matching transaction until it is deleted or its status changes.",
     "**Approval profile ids start with `ap_`.** One profile comes back under `approval_profile`.",
     "**A profile in use cannot be deleted.**",
     "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`."
@@ -77,7 +76,7 @@
       "slug": "create-an-approval-profile",
       "title": "Create an approval profile",
       "summary": "Creates an approval profile that holds matching transactions for approval.",
-      "description": "`name`, `entity`, `event`, `approver_type` and `approver` are required. From the moment it exists, the profile gates every matching transaction on the instance.",
+      "description": "`name`, `entity`, `event`, `approver_type` and `approver` are required. From the moment it exists, the profile gates every matching transaction on the instance. The allowed values of `entity`, `event`, `approver_type` and `approver` are not documented yet; replace the placeholders in the samples with values from your instance.",
       "parameters": [],
       "body": {
         "schema": {
@@ -122,7 +121,7 @@
         },
         "example": {
           "approval_profile": {
-            "name": "Large order approval",
+            "name": "Account approval",
             "entity": "account",
             "event": "<event name>",
             "approver_type": "<approver type>",
@@ -139,7 +138,7 @@
       "example_call": {
         "body": {
           "approval_profile": {
-            "name": "Large order approval",
+            "name": "Account approval",
             "entity": "account",
             "event": "<event name>",
             "approver_type": "<approver type>",
