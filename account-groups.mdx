@@ -4,7 +4,11 @@ sidebarTitle: "Overview"
 description: "List, create, read, update and delete the account groups you sort accounts into."
 ---
 
-Account groups sort your accounts into sets, such as wholesale or retail customers. Here you list, create, read, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.
+Account groups sort your accounts into sets, such as wholesale or retail customers. Here you list, create, read, update and delete them. This area has 5 endpoints, and every SDK supports all of them.
+
+<Warning>
+  **Updating and deleting an account group currently fail.** `PATCH` and `DELETE /settings/account_groups/{account_group_id}` return `500`, even for a group just created, so a group you create cannot yet be changed or removed through the API.
+</Warning>
 
 ## At a glance
 
@@ -13,8 +17,8 @@ Account groups sort your accounts into sets, such as wholesale or retail custome
 | [List account groups](/api-reference/account-groups/list-account-groups) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/settings/account_groups` | Lists your account groups, a page at a time. |
 | [Create an account group](/api-reference/account-groups/create-an-account-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/settings/account_groups` | Creates an account group and returns it under `account_group`. |
 | [Retrieve an account group](/api-reference/account-groups/retrieve-an-account-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/settings/account_groups/{account_group_id}` | Returns one account group, under `account_group`. |
-| [Delete an account group](/api-reference/account-groups/delete-an-account-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `/settings/account_groups/{account_group_id}` | Deletes an account group that no account uses. |
 | [Update an account group](/api-reference/account-groups/update-an-account-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `/settings/account_groups/{account_group_id}` | Changes an account group's fields or its status. |
+| [Delete an account group](/api-reference/account-groups/delete-an-account-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `/settings/account_groups/{account_group_id}` | Deletes an account group that no account uses. |
 
 ## Before you call
 
@@ -24,8 +28,7 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 
 ## Things to know
 
-- **A group is named by its `ag_` id.** List account groups returns each group's `id`.
+- **Each group's id starts with `ag_`.** List account groups returns each group's `id`.
 - **`name` is required to create a group.** The new group comes back under `account_group`.
 - **One group comes back under `account_group`; a listing comes back under `data`.** A listing also carries `pagination`; pass `pagination.next_cursor` as `cursor` while `has_more` is `true`.
 - **Only a group no account uses can be deleted.**
-- **Updating or deleting a group can fail with `500`.** It does so even for a group just created, so a group you create may not be removable through the API.
