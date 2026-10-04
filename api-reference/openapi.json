@@ -239,6 +239,9 @@
     },
     {
       "name": "Days of the month"
+    },
+    {
+      "name": "Countries"
     }
   ],
   "paths": {
@@ -73480,6 +73483,289 @@
           }
         ]
       }
+    },
+    "/settings/countries": {
+      "get": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "List countries",
+        "operationId": "countries_get_settings_countries",
+        "description": "Lists the countries on the instance. A country's `name` holds its two letter code, such as `AU`. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results. `starting_after` is ignored.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` of the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of countries, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/countries?limit=100\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.countries.get_settings_countries({\"limit\": 100})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.countries.getSettingsCountries({limit: 100});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->countries->getSettingsCountries(['limit' => 100]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.countries.countries_dto.CountriesDto.SettingsCountryList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsCountryList> response = client.countries().getSettingsCountries(\n        Map.of(\"limit\", 100));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Countries.GetSettingsCountriesAsync(new Dictionary<string, object?> { [\"limit\"] = 100 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.countries.getSettingsCountries(\n  queryParams: {'limit': 100},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Countries().GetSettingsCountries(context.Background(), map[string]any{\"limit\": 100}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/settings/countries/{country_id}": {
+      "get": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "Retrieve a country",
+        "operationId": "countries_get_settings_country",
+        "description": "Reads the country with this `country_` `id`. The `id` is the one the listing returns.",
+        "parameters": [
+          {
+            "name": "country_id",
+            "in": "path",
+            "required": true,
+            "description": "The country's `country_` `id`, as the listing returns it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The country, under `country`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/countries/country_e909c2d7067ea37437cf97fe11d91bd0\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.countries.get_settings_country(\n    \"country_e909c2d7067ea37437cf97fe11d91bd0\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.countries.getSettingsCountry('country_e909c2d7067ea37437cf97fe11d91bd0');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->countries->getSettingsCountry('country_e909c2d7067ea37437cf97fe11d91bd0');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.countries.countries_dto.CountriesDto.SettingsCountry;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsCountry> response = client.countries().getSettingsCountry(\n        \"country_e909c2d7067ea37437cf97fe11d91bd0\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Countries.GetSettingsCountryAsync(\"country_e909c2d7067ea37437cf97fe11d91bd0\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.countries.getSettingsCountry(\n  'country_e909c2d7067ea37437cf97fe11d91bd0',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Countries().GetSettingsCountry(context.Background(), \"country_e909c2d7067ea37437cf97fe11d91bd0\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "Update a country",
+        "operationId": "countries_update_settings_country",
+        "description": "Send the fields to change under `country`. You can change `status`, `description` and the `default_*` fields such as `default_state` and `default_city`. The response holds the country's values from before the change, so read the country again to see what is stored.",
+        "parameters": [
+          {
+            "name": "country_id",
+            "in": "path",
+            "required": true,
+            "description": "The country's `country_` `id`, as the listing returns it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The country's values from before the change, under `country`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/countries/country_e909c2d7067ea37437cf97fe11d91bd0\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"country\": {\n      \"description\": \"Antarctica\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.countries.update_settings_country(\n    \"country_e909c2d7067ea37437cf97fe11d91bd0\",\n    {\"country\": {\"description\": \"Antarctica\"}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.countries.updateSettingsCountry('country_e909c2d7067ea37437cf97fe11d91bd0', {\n    country: {description: 'Antarctica'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->countries->updateSettingsCountry('country_e909c2d7067ea37437cf97fe11d91bd0', [\n    'country' => ['description' => 'Antarctica'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.countries.countries_dto.CountriesDto.SettingsCountry;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsCountry> response = client.countries().updateSettingsCountry(\n        \"country_e909c2d7067ea37437cf97fe11d91bd0\",\n        Map.of(\"country\", Map.of(\"description\", \"Antarctica\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Countries.UpdateSettingsCountryAsync(\n    \"country_e909c2d7067ea37437cf97fe11d91bd0\",\n    new Dictionary<string, object?>\n    {\n        [\"country\"] = new Dictionary<string, object?>\n        {\n            [\"description\"] = \"Antarctica\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.countries.updateSettingsCountry(\n  'country_e909c2d7067ea37437cf97fe11d91bd0',\n  {\n    'country': {'description': 'Antarctica'},\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Countries().UpdateSettingsCountry(context.Background(), \"country_e909c2d7067ea37437cf97fe11d91bd0\", map[string]any{\n\t\"country\": map[string]any{\"description\": \"Antarctica\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "country": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "default_state": {
+                        "type": "string"
+                      },
+                      "default_city": {
+                        "type": "string"
+                      },
+                      "default_post_code": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "country"
+                ]
+              },
+              "example": {
+                "country": {
+                  "description": "Antarctica"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -112783,6 +113069,124 @@
         "properties": {
           "day_of_month": {
             "$ref": "#/components/schemas/DayOfMonth"
+          }
+        }
+      },
+      "CountryList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Country"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/CountryPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "Country": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "description": "Null in every record read so far, so its type is not known."
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "default_area_code": {
+            "description": "Null in every record read so far, so its type is not known."
+          },
+          "default_city": {
+            "type": "string"
+          },
+          "default_post_code": {
+            "type": "string"
+          },
+          "default_state": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "flag_exists": {
+            "type": "boolean"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "description": "Null in every record read so far, so its type is not known."
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "CountryPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass this back as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/CountryPaginationLinks"
+          }
+        }
+      },
+      "CountryPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "CountryResponse": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "$ref": "#/components/schemas/Country"
           }
         }
       },
