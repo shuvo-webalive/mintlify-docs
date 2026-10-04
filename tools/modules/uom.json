@@ -5,13 +5,13 @@
   "icon": "ruler",
   "base": "/settings/uom",
   "overview_description": "List, read, create, update and delete the units of measurement, such as length units, that your settings define.",
-  "intro": "Units of measurement are the settings records for units, each with a `type` such as `LENGTH`, a number of `decimal_places` and a `rounding` rule. These endpoints list, read, create, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.",
-  "warning": null,
+  "intro": "Units of measurement are the settings records for units, each with a `type` such as `LENGTH`, a number of `decimal_places` and a `rounding` rule. These endpoints list, read, create, update and delete them. This area has 5 endpoints, each available in all seven SDKs.",
+  "warning": "**Creating a unit of measurement currently fails.** `POST /settings/uom` currently returns `400` `validation_error` without naming a field. The update and delete have not been confirmed to work, because they need an existing unit.",
   "notes": [
-    "**One unit comes back under `uom`.** The path uses `uom` for one unit and for many: `/settings/uom` lists them and `/settings/uom/{uom_id}` reads one.",
+    "**The path is `/settings/uom` for one unit and for many.** `/settings/uom` lists units and `/settings/uom/{uom_id}` reads one, which comes back under `uom`.",
     "**Writes are wrapped in `uom`.** A create sends a `name` and a `type`, such as `LENGTH`.",
     "**`status` takes `active` or `inactive`.** Send it on the update to turn a unit on or off.",
-    "**Shipping packages refer to a unit by its bare uuid.** A shipping package's `*_uom` fields take the unit's uuid, not its prefixed `id`.",
+    "**Shipping packages refer to a unit by its bare uuid.** A shipping package's `*_uom` fields take the unit's uuid, not its prefixed `id`. A unit record from `GET /settings/uom` carries only its prefixed `id`, and setting a `*_uom` field has not been confirmed to work.",
     "**The listing pages by cursor.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor` until `has_more` is `false`."
   ],
   "endpoints": [
@@ -78,6 +78,7 @@
       "title": "Create a unit of measurement",
       "summary": "Creates a unit of measurement and returns it under `uom`.",
       "description": "Send the unit under `uom`, with its `name` and `type`.",
+      "warning": "**This call currently fails.** It returns `400` `validation_error` without naming a field, even for a valid body such as the example.",
       "parameters": [],
       "body": {
         "schema": {
@@ -123,6 +124,9 @@
       "responses": {
         "201": {
           "description": "The new unit, under `uom`."
+        },
+        "400": {
+          "description": "Currently returned for a valid body, as `validation_error` with no field named."
         }
       },
       "example_call": {
@@ -181,6 +185,7 @@
       "title": "Delete a unit of measurement",
       "summary": "Deletes a unit of measurement. A successful call returns `204` with no body.",
       "description": "Deletes the unit with that `id`; a later read of it returns `404`.",
+      "warning": "**This call has not been confirmed to work.** Creating a unit currently fails; see [Create a unit of measurement](/api-reference/units-of-measurement/create-a-unit-of-measurement).",
       "parameters": [
         {
           "name": "uom_id",
@@ -214,6 +219,7 @@
       "title": "Update a unit of measurement",
       "summary": "Changes a unit of measurement, or turns it on or off, and returns it.",
       "description": "Send the changes under `uom`. Set `status` to `active` or `inactive` to turn the unit on or off.",
+      "warning": "**This call has not been confirmed to work.** Creating a unit currently fails; see [Create a unit of measurement](/api-reference/units-of-measurement/create-a-unit-of-measurement).",
       "parameters": [
         {
           "name": "uom_id",
