@@ -1,0 +1,54 @@
+{
+ "sdk": "go",
+ "module": "refunds",
+ "endpoints": {
+  "get_refunds": {
+   "function": "Refunds.GetRefunds",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Refunds().GetRefunds(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "delete_refund": {
+   "function": "Refunds.DeleteRefund",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Refunds().DeleteRefund(context.Background(), \"REF-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_refund": {
+   "function": "Refunds.GetRefund",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Refunds().GetRefund(context.Background(), \"REF-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "update_refund": {
+   "function": "Refunds.UpdateRefund",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Refunds().UpdateRefund(context.Background(), \"REF-0001\", map[string]any{\n\t\"refund\": map[string]any{\n\t\t\"reference\": \"BANK-REF-2001\",\n\t\t\"note\":      \"Refunded to the original card.\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "create_credit_note_refund": {
+   "function": "Refunds.CreateCreditNoteRefund",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Refunds().CreateCreditNoteRefund(context.Background(), \"CN-0001\", map[string]any{\n\t\"refund\": map[string]any{\"amount\": \"2.00\", \"payment_method\": \"Cash\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_refund_notes": {
+   "function": "Refunds.GetRefundNotes",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Refunds().GetRefundNotes(context.Background(), \"REF-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_refund_note": {
+   "function": "Refunds.GetRefundNote",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Refunds().GetRefundNote(context.Background(), \"REF-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "create_refund_note": {
+   "function": "Refunds.CreateRefundNote",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n)\n\nfile, err := os.ReadFile(\"receipt.pdf\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.Refunds().CreateRefundNote(context.Background(), \"REF-0001\", \"Customer asked for a copy by post.\", map[string]any{\"file\": []any{\"receipt.pdf\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "delete_refund_note": {
+   "function": "Refunds.DeleteRefundNote",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Refunds().DeleteRefundNote(context.Background(), \"REF-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_refund_note_files": {
+   "function": "Refunds.GetRefundNoteFiles",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Refunds().GetRefundNoteFiles(context.Background(), \"REF-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_refund_note_file": {
+   "function": "Refunds.GetRefundNoteFile",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Refunds().GetRefundNoteFile(context.Background(), \"REF-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "delete_refund_note_file": {
+   "function": "Refunds.DeleteRefundNoteFile",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Refunds().DeleteRefundNoteFile(context.Background(), \"REF-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  }
+ }
+}
