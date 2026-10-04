@@ -8,11 +8,11 @@
   "intro": "The portal endpoints act for the people who sign in to your customer portal. You can log a portal user in, change or set their password, request a reset link, reset a password with a code, and activate or validate an account with a code. This area has 7 endpoints, and all seven SDKs call every one.",
   "warning": "**Setting a portal password by email does not ask for the current password, and the old password cannot be put back.**",
   "notes": [
-    "**Every request body sits under a `portal` key.** A login, for example, sends `{\"portal\": {\"email\": \"jane@example.com\", \"password\": \"...\"}}`.",
+    "**Every request body sits under a `portal` key.** A login, for example, sends `{\"portal\": {\"email\": \"jane@example.com\", \"password\": \"current-password\"}}`.",
     "**A portal user is an account with portal access.** Create the account with `grant_portal_access` set to `true` and a `grant_portal_password`, then log in with its `email_address` and that password.",
     "**A wrong password returns `400`.** After a password change, a login with the old password is refused.",
     "**A reset link request for an unknown email returns `202`.** The call does not fail when no portal user has that email.",
-    "**Setting a password by email returns `202`.** `POST /portal/change` takes `email` and `password` only."
+    "**Setting a password by email returns `202`.** `POST /portal/change` sends `email` and `password` under `portal`."
   ],
   "endpoints": [
     {
@@ -22,7 +22,7 @@
       "slug": "activate-a-portal-account",
       "title": "Activate a portal account",
       "summary": "Activates a portal account with an activation code.",
-      "description": "Send the activation `code` under `portal`. A successful call returns `200`.",
+      "description": "Send the activation `code` under `portal`. The response for a valid code is not documented yet.",
       "parameters": [],
       "body": {
         "schema": {
@@ -51,7 +51,7 @@
       "multipart": false,
       "responses": {
         "200": {
-          "description": "The activation is accepted."
+          "description": "The code is accepted."
         }
       },
       "example_call": {
@@ -60,7 +60,8 @@
             "code": "abc123def456"
           }
         }
-      }
+      },
+      "warning": "**This call has not been confirmed with a valid code.**"
     },
     {
       "key": "create_portal_change_password",
@@ -83,10 +84,12 @@
                   "description": "The portal user's email address."
                 },
                 "current_password": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The portal user's current password."
                 },
                 "new_password": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The new password."
                 }
               }
             }
@@ -98,8 +101,8 @@
         "example": {
           "portal": {
             "email": "jane@example.com",
-            "current_password": "OldPassw0rd!",
-            "new_password": "NewPassw0rd!"
+            "current_password": "current-password",
+            "new_password": "new-password"
           }
         }
       },
@@ -116,8 +119,8 @@
         "body": {
           "portal": {
             "email": "jane@example.com",
-            "current_password": "OldPassw0rd!",
-            "new_password": "NewPassw0rd!"
+            "current_password": "current-password",
+            "new_password": "new-password"
           }
         }
       }
@@ -143,7 +146,8 @@
                   "description": "The portal user's email address."
                 },
                 "password": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The portal user's password."
                 }
               }
             }
@@ -155,7 +159,7 @@
         "example": {
           "portal": {
             "email": "jane@example.com",
-            "password": "Passw0rd!"
+            "password": "current-password"
           }
         }
       },
@@ -175,7 +179,7 @@
         "body": {
           "portal": {
             "email": "jane@example.com",
-            "password": "Passw0rd!"
+            "password": "current-password"
           }
         }
       }
@@ -187,7 +191,7 @@
       "slug": "reset-a-portal-password-with-a-code",
       "title": "Reset a portal password with a code",
       "summary": "Sets a new portal password using a reset code.",
-      "description": "Send the reset `code`, the portal user's `email` and the new `password` under `portal`. A successful call returns `200`.",
+      "description": "Send the reset `code`, the portal user's `email` and the new `password` under `portal`. The response for a valid code is not documented yet.",
       "parameters": [],
       "body": {
         "schema": {
@@ -205,7 +209,8 @@
                   "description": "The portal user's email address."
                 },
                 "password": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The new password."
                 }
               }
             }
@@ -218,14 +223,14 @@
           "portal": {
             "code": "abc123def456",
             "email": "jane@example.com",
-            "password": "NewPassw0rd!"
+            "password": "new-password"
           }
         }
       },
       "multipart": false,
       "responses": {
         "200": {
-          "description": "The reset is accepted."
+          "description": "The code is accepted."
         }
       },
       "example_call": {
@@ -233,10 +238,11 @@
           "portal": {
             "code": "abc123def456",
             "email": "jane@example.com",
-            "password": "NewPassw0rd!"
+            "password": "new-password"
           }
         }
-      }
+      },
+      "warning": "**This call has not been confirmed with a valid code.**"
     },
     {
       "key": "create_portal_reset_link",
@@ -298,7 +304,7 @@
       "slug": "validate-a-portal-account-with-a-code",
       "title": "Validate a portal account with a code",
       "summary": "Validates a portal account with a code.",
-      "description": "Send the `code` under `portal`. A successful call returns `200`.",
+      "description": "Send the `code` under `portal`. The response for a valid code is not documented yet.",
       "parameters": [],
       "body": {
         "schema": {
@@ -327,7 +333,7 @@
       "multipart": false,
       "responses": {
         "200": {
-          "description": "The validation is accepted."
+          "description": "The code is accepted."
         }
       },
       "example_call": {
@@ -336,7 +342,8 @@
             "code": "abc123def456"
           }
         }
-      }
+      },
+      "warning": "**This call has not been confirmed with a valid code.**"
     },
     {
       "key": "set_portal_password",
@@ -359,7 +366,8 @@
                   "description": "The portal user's email address."
                 },
                 "password": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The new password."
                 }
               }
             }
@@ -371,7 +379,7 @@
         "example": {
           "portal": {
             "email": "jane@example.com",
-            "password": "NewPassw0rd!"
+            "password": "new-password"
           }
         }
       },
@@ -385,7 +393,7 @@
         "body": {
           "portal": {
             "email": "jane@example.com",
-            "password": "NewPassw0rd!"
+            "password": "new-password"
           }
         }
       }
