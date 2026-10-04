@@ -53,6 +53,9 @@
     },
     {
       "name": "Sales reps"
+    },
+    {
+      "name": "Gift certificates"
     }
   ],
   "paths": {
@@ -16422,6 +16425,1194 @@
           }
         }
       }
+    },
+    "/gift_certificates": {
+      "get": {
+        "tags": [
+          "Gift certificates"
+        ],
+        "summary": "List gift certificates",
+        "operationId": "gift_certificates_get_gift_certificates",
+        "description": "The records are under `data`, and `pagination` holds the cursor for the next page. Other fields filter as `filter_<field>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` to sort in descending order.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of gift certificates, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GiftCertificateList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/gift_certificates?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.gift_certificates.get_gift_certificates({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.giftCertificates.getGiftCertificates({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->giftCertificates->getGiftCertificates(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.gift_certificates.gift_certificates_dto.GiftCertificatesDto.GiftCertificateList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<GiftCertificateList> response = client.giftCertificates().getGiftCertificates(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.GiftCertificates.GetGiftCertificatesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.giftCertificates.getGiftCertificates(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.GiftCertificates().GetGiftCertificates(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Gift certificates"
+        ],
+        "summary": "Create a gift certificate",
+        "operationId": "gift_certificates_create_gift_certificate",
+        "description": "Send `amount` and `expiry_date` under `gift_certificate`. The new certificate gets a `code`, its `remaining_balance` starts at `amount`, and its transactions start with one of type `initial`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new gift certificate, under `gift_certificate`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GiftCertificateResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/gift_certificates\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"gift_certificate\": {\n      \"amount\": \"5.00\",\n      \"expiry_date\": \"2027-10-01\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.gift_certificates.create_gift_certificate(\n    {\"gift_certificate\": {\"amount\": \"5.00\", \"expiry_date\": \"2027-10-01\"}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.giftCertificates.createGiftCertificate({\n    gift_certificate: {amount: '5.00', expiry_date: '2027-10-01'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->giftCertificates->createGiftCertificate([\n    'gift_certificate' => ['amount' => '5.00', 'expiry_date' => '2027-10-01'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.gift_certificates.gift_certificates_dto.GiftCertificatesDto.GiftCertificate;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<GiftCertificate> response = client.giftCertificates().createGiftCertificate(\n        Map.of(\"gift_certificate\", Map.of(\"amount\", \"5.00\", \"expiry_date\", \"2027-10-01\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.GiftCertificates.CreateGiftCertificateAsync(new Dictionary<string, object?>\n{\n    [\"gift_certificate\"] = new Dictionary<string, object?>\n    {\n        [\"amount\"] = \"5.00\",\n        [\"expiry_date\"] = \"2027-10-01\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.giftCertificates.createGiftCertificate({\n  'gift_certificate': {'amount': '5.00', 'expiry_date': '2027-10-01'},\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.GiftCertificates().CreateGiftCertificate(context.Background(), map[string]any{\n\t\"gift_certificate\": map[string]any{\n\t\t\"amount\":      \"5.00\",\n\t\t\"expiry_date\": \"2027-10-01\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "gift_certificate": {
+                    "type": "object",
+                    "properties": {
+                      "amount": {
+                        "type": "string",
+                        "description": "The starting balance, as a decimal string such as `5.00`."
+                      },
+                      "expiry_date": {
+                        "type": "string",
+                        "description": "The last day the certificate can be used, as `YYYY-MM-DD`."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "gift_certificate"
+                ]
+              },
+              "example": {
+                "gift_certificate": {
+                  "amount": "5.00",
+                  "expiry_date": "2027-10-01"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gift_certificates/{gc_id}": {
+      "delete": {
+        "tags": [
+          "Gift certificates"
+        ],
+        "summary": "Delete a gift certificate",
+        "operationId": "gift_certificates_delete_gift_certificate",
+        "description": "Pass the certificate's `id`. A successful delete returns `204` with an empty body, and reading the certificate afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "gc_id",
+            "in": "path",
+            "required": true,
+            "description": "The gift certificate's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The gift certificate is deleted. The body is empty."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/gift_certificates/gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.gift_certificates.delete_gift_certificate(\n    \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.giftCertificates.deleteGiftCertificate('gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->giftCertificates->deleteGiftCertificate('gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.giftCertificates().deleteGiftCertificate(\"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.GiftCertificates.DeleteGiftCertificateAsync(\"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.giftCertificates.deleteGiftCertificate(\n  'gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.GiftCertificates().DeleteGiftCertificate(context.Background(), \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Gift certificates"
+        ],
+        "summary": "Retrieve a gift certificate",
+        "operationId": "gift_certificates_get_gift_certificate",
+        "description": "Pass the certificate's `id`. The response holds its `code`, `amount`, `remaining_balance`, `used_amount`, `status`, and its `allocations` and `transactions`.",
+        "parameters": [
+          {
+            "name": "gc_id",
+            "in": "path",
+            "required": true,
+            "description": "The gift certificate's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The gift certificate, under `gift_certificate`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GiftCertificateResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No gift certificate has that `id`, for example after it is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/gift_certificates/gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.gift_certificates.get_gift_certificate(\n    \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.giftCertificates.getGiftCertificate('gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->giftCertificates->getGiftCertificate('gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.gift_certificates.gift_certificates_dto.GiftCertificatesDto.GiftCertificate;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<GiftCertificate> response = client.giftCertificates().getGiftCertificate(\n        \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.GiftCertificates.GetGiftCertificateAsync(\"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.giftCertificates.getGiftCertificate(\n  'gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.GiftCertificates().GetGiftCertificate(context.Background(), \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Gift certificates"
+        ],
+        "summary": "Update a gift certificate",
+        "operationId": "gift_certificates_update_gift_certificate",
+        "description": "Send only the fields to change under `gift_certificate`. Set `status` to `inactive` to stop the certificate being used, and back to `active` to allow it again. To change the balance, use the amend call instead.",
+        "parameters": [
+          {
+            "name": "gc_id",
+            "in": "path",
+            "required": true,
+            "description": "The gift certificate's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated gift certificate, under `gift_certificate`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GiftCertificateResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/gift_certificates/gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"gift_certificate\": {\n      \"expiry_date\": \"2027-12-31\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.gift_certificates.update_gift_certificate(\n    \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\",\n    {\"gift_certificate\": {\"expiry_date\": \"2027-12-31\"}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.giftCertificates.updateGiftCertificate('gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f', {\n    gift_certificate: {expiry_date: '2027-12-31'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->giftCertificates->updateGiftCertificate(\n    'gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f',\n    ['gift_certificate' => ['expiry_date' => '2027-12-31']],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.gift_certificates.gift_certificates_dto.GiftCertificatesDto.GiftCertificate;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<GiftCertificate> response = client.giftCertificates().updateGiftCertificate(\n        \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\",\n        Map.of(\"gift_certificate\", Map.of(\"expiry_date\", \"2027-12-31\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.GiftCertificates.UpdateGiftCertificateAsync(\n    \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\",\n    new Dictionary<string, object?>\n    {\n        [\"gift_certificate\"] = new Dictionary<string, object?>\n        {\n            [\"expiry_date\"] = \"2027-12-31\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.giftCertificates.updateGiftCertificate(\n  'gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f',\n  {\n    'gift_certificate': {'expiry_date': '2027-12-31'},\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.GiftCertificates().UpdateGiftCertificate(context.Background(), \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\", map[string]any{\n\t\"gift_certificate\": map[string]any{\"expiry_date\": \"2027-12-31\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "gift_certificate": {
+                    "type": "object",
+                    "properties": {
+                      "expiry_date": {
+                        "type": "string",
+                        "description": "As `YYYY-MM-DD`."
+                      },
+                      "status": {
+                        "type": "string",
+                        "description": "`active` or `inactive`."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "gift_certificate"
+                ]
+              },
+              "example": {
+                "gift_certificate": {
+                  "expiry_date": "2027-12-31"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gift_certificates/{gc_id}/allocations": {
+      "get": {
+        "tags": [
+          "Gift certificates"
+        ],
+        "summary": "List a gift certificate's allocations",
+        "operationId": "gift_certificates_get_gift_certificate_allocations",
+        "description": "The records are under `data`, each naming the account, the allocation `type`, its `status` and `date`. A certificate with no allocations returns an empty `data`.",
+        "parameters": [
+          {
+            "name": "gc_id",
+            "in": "path",
+            "required": true,
+            "description": "The gift certificate's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` to sort in descending order.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of allocations, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GiftCertificateAllocations"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/gift_certificates/gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f/allocations?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.gift_certificates.get_gift_certificate_allocations(\n    \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.giftCertificates.getGiftCertificateAllocations('gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f', {\n    limit: 20,\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->giftCertificates->getGiftCertificateAllocations(\n    'gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f',\n    ['limit' => 20],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.gift_certificates.gift_certificates_dto.GiftCertificatesDto.GiftCertificateAllocations;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<GiftCertificateAllocations> response = client.giftCertificates().getGiftCertificateAllocations(\n        \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.GiftCertificates.GetGiftCertificateAllocationsAsync(\n    \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.giftCertificates.getGiftCertificateAllocations(\n  'gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.GiftCertificates().GetGiftCertificateAllocations(context.Background(), \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Gift certificates"
+        ],
+        "summary": "Allocate a gift certificate to an account",
+        "operationId": "gift_certificates_allocate_gift_certificate",
+        "description": "Name the account under `gift_certificate.account`, by `code` (the account's `id`, such as `W13ZGY`). The call returns `200`, not `201`, and the certificate's `allocations` gains an entry.",
+        "parameters": [
+          {
+            "name": "gc_id",
+            "in": "path",
+            "required": true,
+            "description": "The gift certificate's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The gift certificate with its allocations, under `gift_certificate`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GiftCertificateResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`account.id` was sent with the account's `id` rather than its `acc_` uuid. Send it as `account.code` instead.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/gift_certificates/gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f/allocations\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"gift_certificate\": {\n      \"account\": {\n        \"code\": \"W13ZGY\"\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.gift_certificates.allocate_gift_certificate(\n    \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\",\n    {\"gift_certificate\": {\"account\": {\"code\": \"W13ZGY\"}}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.giftCertificates.allocateGiftCertificate('gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f', {\n    gift_certificate: {account: {code: 'W13ZGY'}},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->giftCertificates->allocateGiftCertificate(\n    'gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f',\n    ['gift_certificate' => ['account' => ['code' => 'W13ZGY']]],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.gift_certificates.gift_certificates_dto.GiftCertificatesDto.GiftCertificate;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<GiftCertificate> response = client.giftCertificates().allocateGiftCertificate(\n        \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\",\n        Map.of(\"gift_certificate\", Map.of(\"account\", Map.of(\"code\", \"W13ZGY\"))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.GiftCertificates.AllocateGiftCertificateAsync(\n    \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\",\n    new Dictionary<string, object?>\n    {\n        [\"gift_certificate\"] = new Dictionary<string, object?>\n        {\n            [\"account\"] = new Dictionary<string, object?>\n            {\n                [\"code\"] = \"W13ZGY\",\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.giftCertificates.allocateGiftCertificate(\n  'gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f',\n  {\n    'gift_certificate': {\n      'account': {'code': 'W13ZGY'},\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.GiftCertificates().AllocateGiftCertificate(context.Background(), \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\", map[string]any{\n\t\"gift_certificate\": map[string]any{\n\t\t\"account\": map[string]any{\"code\": \"W13ZGY\"},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "gift_certificate": {
+                    "type": "object",
+                    "properties": {
+                      "account": {
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "type": "string",
+                            "description": "The account's `id`, such as `W13ZGY`."
+                          },
+                          "id": {
+                            "type": "string",
+                            "description": "The account's `acc_` uuid form. The `id` from the accounts API does not work here."
+                          }
+                        },
+                        "description": "Name the account by `code` or by `id`."
+                      }
+                    },
+                    "required": [
+                      "account"
+                    ]
+                  }
+                },
+                "required": [
+                  "gift_certificate"
+                ]
+              },
+              "example": {
+                "gift_certificate": {
+                  "account": {
+                    "code": "W13ZGY"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gift_certificates/{gc_id}/transactions": {
+      "get": {
+        "tags": [
+          "Gift certificates"
+        ],
+        "summary": "List a gift certificate's transactions",
+        "operationId": "gift_certificates_get_gift_certificate_transactions",
+        "description": "The records are under `data`, each with a `type`, `amount`, `date` and `status`. A new certificate has one transaction, of type `initial`.",
+        "parameters": [
+          {
+            "name": "gc_id",
+            "in": "path",
+            "required": true,
+            "description": "The gift certificate's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` to sort in descending order.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of transactions, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GiftCertificateTransactionList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/gift_certificates/gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f/transactions?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.gift_certificates.get_gift_certificate_transactions(\n    \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.giftCertificates.getGiftCertificateTransactions('gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f', {\n    limit: 20,\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->giftCertificates->getGiftCertificateTransactions(\n    'gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f',\n    ['limit' => 20],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.gift_certificates.gift_certificates_dto.GiftCertificatesDto.GiftCertificateTransactionList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<GiftCertificateTransactionList> response = client.giftCertificates().getGiftCertificateTransactions(\n        \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.GiftCertificates.GetGiftCertificateTransactionsAsync(\n    \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.giftCertificates.getGiftCertificateTransactions(\n  'gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.GiftCertificates().GetGiftCertificateTransactions(context.Background(), \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/gift_certificates/{gc_id}/amend": {
+      "post": {
+        "tags": [
+          "Gift certificates"
+        ],
+        "summary": "Amend a gift certificate's balance",
+        "operationId": "gift_certificates_amend_gift_certificate",
+        "description": "Send `new_balance` under `gift_certificate`; it is the one field this call takes. A balance below the amount already used returns `400`.",
+        "parameters": [
+          {
+            "name": "gc_id",
+            "in": "path",
+            "required": true,
+            "description": "The gift certificate's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The gift certificate with its new balance, under `gift_certificate`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GiftCertificateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`new_balance` is below the amount already used.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/gift_certificates/gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f/amend\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"gift_certificate\": {\n      \"new_balance\": \"7.00\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.gift_certificates.amend_gift_certificate(\n    \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\", {\"gift_certificate\": {\"new_balance\": \"7.00\"}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.giftCertificates.amendGiftCertificate('gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f', {\n    gift_certificate: {new_balance: '7.00'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->giftCertificates->amendGiftCertificate('gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f', [\n    'gift_certificate' => ['new_balance' => '7.00'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.gift_certificates.gift_certificates_dto.GiftCertificatesDto.GiftCertificate;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<GiftCertificate> response = client.giftCertificates().amendGiftCertificate(\n        \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\",\n        Map.of(\"gift_certificate\", Map.of(\"new_balance\", \"7.00\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.GiftCertificates.AmendGiftCertificateAsync(\n    \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\",\n    new Dictionary<string, object?>\n    {\n        [\"gift_certificate\"] = new Dictionary<string, object?>\n        {\n            [\"new_balance\"] = \"7.00\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.giftCertificates.amendGiftCertificate(\n  'gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f',\n  {\n    'gift_certificate': {'new_balance': '7.00'},\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.GiftCertificates().AmendGiftCertificate(context.Background(), \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\", map[string]any{\n\t\"gift_certificate\": map[string]any{\"new_balance\": \"7.00\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "gift_certificate": {
+                    "type": "object",
+                    "properties": {
+                      "new_balance": {
+                        "type": "string",
+                        "description": "The balance to set, as a decimal string such as `7.00`."
+                      }
+                    },
+                    "required": [
+                      "new_balance"
+                    ]
+                  }
+                },
+                "required": [
+                  "gift_certificate"
+                ]
+              },
+              "example": {
+                "gift_certificate": {
+                  "new_balance": "7.00"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gift_certificates/{gc_id}/deallocations": {
+      "post": {
+        "tags": [
+          "Gift certificates"
+        ],
+        "summary": "Deallocate a gift certificate from an account",
+        "operationId": "gift_certificates_deallocate_gift_certificate",
+        "description": "Send the same body the allocate call takes, naming the account under `gift_certificate.account`. The allocation stays in `allocations` with a changed `type` or `status`.",
+        "parameters": [
+          {
+            "name": "gc_id",
+            "in": "path",
+            "required": true,
+            "description": "The gift certificate's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The gift certificate with its allocations, under `gift_certificate`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GiftCertificateResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/gift_certificates/gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f/deallocations\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"gift_certificate\": {\n      \"account\": {\n        \"code\": \"W13ZGY\"\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.gift_certificates.deallocate_gift_certificate(\n    \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\",\n    {\"gift_certificate\": {\"account\": {\"code\": \"W13ZGY\"}}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.giftCertificates.deallocateGiftCertificate('gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f', {\n    gift_certificate: {account: {code: 'W13ZGY'}},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->giftCertificates->deallocateGiftCertificate(\n    'gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f',\n    ['gift_certificate' => ['account' => ['code' => 'W13ZGY']]],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.gift_certificates.gift_certificates_dto.GiftCertificatesDto.GiftCertificate;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<GiftCertificate> response = client.giftCertificates().deallocateGiftCertificate(\n        \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\",\n        Map.of(\"gift_certificate\", Map.of(\"account\", Map.of(\"code\", \"W13ZGY\"))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.GiftCertificates.DeallocateGiftCertificateAsync(\n    \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\",\n    new Dictionary<string, object?>\n    {\n        [\"gift_certificate\"] = new Dictionary<string, object?>\n        {\n            [\"account\"] = new Dictionary<string, object?>\n            {\n                [\"code\"] = \"W13ZGY\",\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.giftCertificates.deallocateGiftCertificate(\n  'gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f',\n  {\n    'gift_certificate': {\n      'account': {'code': 'W13ZGY'},\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.GiftCertificates().DeallocateGiftCertificate(context.Background(), \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\", map[string]any{\n\t\"gift_certificate\": map[string]any{\n\t\t\"account\": map[string]any{\"code\": \"W13ZGY\"},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "gift_certificate": {
+                    "type": "object",
+                    "properties": {
+                      "account": {
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "type": "string",
+                            "description": "The account's `id`, such as `W13ZGY`."
+                          },
+                          "id": {
+                            "type": "string",
+                            "description": "The account's `acc_` uuid form. The `id` from the accounts API does not work here."
+                          }
+                        },
+                        "description": "Name the account by `code` or by `id`."
+                      }
+                    },
+                    "required": [
+                      "account"
+                    ]
+                  }
+                },
+                "required": [
+                  "gift_certificate"
+                ]
+              },
+              "example": {
+                "gift_certificate": {
+                  "account": {
+                    "code": "W13ZGY"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gift_certificates/{gc_id}/allocations/{allocation_id}": {
+      "get": {
+        "tags": [
+          "Gift certificates"
+        ],
+        "summary": "Retrieve a gift certificate allocation",
+        "operationId": "gift_certificates_get_gift_certificate_allocation",
+        "description": "Pass the certificate's `id` and the allocation's `id`, as the allocations listing gives it. The response holds the same fields an entry in `allocations` has.",
+        "parameters": [
+          {
+            "name": "gc_id",
+            "in": "path",
+            "required": true,
+            "description": "The gift certificate's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "allocation_id",
+            "in": "path",
+            "required": true,
+            "description": "The allocation's `id`, from the allocations listing.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The allocation, under `gift_certificate_allocation`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GiftCertificateAllocationReadResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/gift_certificates/gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f/allocations/gca_1d4f7a2c9e5b4083b6a1c2d3e4f5a6b7\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.gift_certificates.get_gift_certificate_allocation(\n    \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\", \"gca_1d4f7a2c9e5b4083b6a1c2d3e4f5a6b7\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.giftCertificates.getGiftCertificateAllocation(\n    'gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f',\n    'gca_1d4f7a2c9e5b4083b6a1c2d3e4f5a6b7',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->giftCertificates->getGiftCertificateAllocation(\n    'gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f',\n    'gca_1d4f7a2c9e5b4083b6a1c2d3e4f5a6b7',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.gift_certificates.gift_certificates_dto.GiftCertificatesDto.GiftCertificateAllocationRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<GiftCertificateAllocationRead> response = client.giftCertificates().getGiftCertificateAllocation(\n        \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\",\n        \"gca_1d4f7a2c9e5b4083b6a1c2d3e4f5a6b7\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.GiftCertificates.GetGiftCertificateAllocationAsync(\n    \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\",\n    \"gca_1d4f7a2c9e5b4083b6a1c2d3e4f5a6b7\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.giftCertificates.getGiftCertificateAllocation(\n  'gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f',\n  'gca_1d4f7a2c9e5b4083b6a1c2d3e4f5a6b7',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.GiftCertificates().GetGiftCertificateAllocation(context.Background(), \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\", \"gca_1d4f7a2c9e5b4083b6a1c2d3e4f5a6b7\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/gift_certificates/{gc_id}/transactions/{transaction_id}": {
+      "get": {
+        "tags": [
+          "Gift certificates"
+        ],
+        "summary": "Retrieve a gift certificate transaction",
+        "operationId": "gift_certificates_get_gift_certificate_transaction",
+        "description": "Pass the certificate's `id` and the transaction's `id`, as the transactions listing gives it. The response holds the same fields an entry in `transactions` has.",
+        "parameters": [
+          {
+            "name": "gc_id",
+            "in": "path",
+            "required": true,
+            "description": "The gift certificate's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "transaction_id",
+            "in": "path",
+            "required": true,
+            "description": "The transaction's `id`, from the transactions listing.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The transaction, under `gift_certificate_transaction`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GiftCertificateTransactionReadResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/gift_certificates/gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f/transactions/gct_8e2c5a9f1b7d4c6e0a3b5d7f9c1e2a4b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.gift_certificates.get_gift_certificate_transaction(\n    \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\", \"gct_8e2c5a9f1b7d4c6e0a3b5d7f9c1e2a4b\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.giftCertificates.getGiftCertificateTransaction(\n    'gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f',\n    'gct_8e2c5a9f1b7d4c6e0a3b5d7f9c1e2a4b',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->giftCertificates->getGiftCertificateTransaction(\n    'gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f',\n    'gct_8e2c5a9f1b7d4c6e0a3b5d7f9c1e2a4b',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.gift_certificates.gift_certificates_dto.GiftCertificatesDto.GiftCertificateTransactionRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<GiftCertificateTransactionRead> response = client.giftCertificates().getGiftCertificateTransaction(\n        \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\",\n        \"gct_8e2c5a9f1b7d4c6e0a3b5d7f9c1e2a4b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.GiftCertificates.GetGiftCertificateTransactionAsync(\n    \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\",\n    \"gct_8e2c5a9f1b7d4c6e0a3b5d7f9c1e2a4b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.giftCertificates.getGiftCertificateTransaction(\n  'gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f',\n  'gct_8e2c5a9f1b7d4c6e0a3b5d7f9c1e2a4b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.GiftCertificates().GetGiftCertificateTransaction(context.Background(), \"gc_5b2e8f1a7c3d4e9b0a6f2c4d8e1b3a7f\", \"gct_8e2c5a9f1b7d4c6e0a3b5d7f9c1e2a4b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -25202,6 +26393,502 @@
         }
       },
       "SalesRepPagination": {
+        "type": "object",
+        "description": "Cursor paging for the listing.",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size the API applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. `false` ends the listing even when `next_cursor` is present."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Send as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "next": {
+                "type": "string"
+              },
+              "prev": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "GiftCertificateList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GiftCertificate"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/GiftCertificatePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "GiftCertificate": {
+        "type": "object",
+        "properties": {
+          "accounting_code": {
+            "$ref": "#/components/schemas/GiftCertificateAccountingCode"
+          },
+          "activity_logs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GiftCertificateActivityLog"
+            }
+          },
+          "allocations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GiftCertificateAllocation"
+            }
+          },
+          "amount": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {},
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/GiftCertificateCurrency"
+          },
+          "expiry_date": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "linked_item": {},
+          "object": {
+            "type": "string"
+          },
+          "remaining_balance": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GiftCertificateTransaction"
+            }
+          },
+          "used_amount": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "GiftCertificateAccountingCode": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "GiftCertificateActivityLog": {
+        "type": "object",
+        "properties": {
+          "activity": {
+            "type": "string"
+          }
+        }
+      },
+      "GiftCertificateAllocation": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/GiftCertificateAllocationAccount"
+          },
+          "created_by": {},
+          "created_on": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "GiftCertificateAllocationAccount": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "GiftCertificateCurrency": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "GiftCertificateTransaction": {
+        "type": "object",
+        "properties": {
+          "accounting_code": {
+            "$ref": "#/components/schemas/GiftCertificateTransactionAccountingCode"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "created_by": {},
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/GiftCertificateTransactionCurrency"
+          },
+          "date": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "reference": {},
+          "status": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "GiftCertificateTransactionAccountingCode": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "GiftCertificateTransactionCurrency": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "GiftCertificateResponse": {
+        "type": "object",
+        "properties": {
+          "gift_certificate": {
+            "$ref": "#/components/schemas/GiftCertificate"
+          }
+        }
+      },
+      "GiftCertificateAllocations": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GiftCertificateAllocationsData"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/GiftCertificatePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "GiftCertificateAllocationsData": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/GiftCertificateAllocationsDataAccount"
+          },
+          "created_by": {},
+          "created_on": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "GiftCertificateAllocationsDataAccount": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "GiftCertificateTransactionList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GiftCertificateTransaction"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/GiftCertificatePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "GiftCertificateAllocationRead": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/GiftCertificateAllocationAccount"
+          },
+          "created_by": {},
+          "created_on": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "GiftCertificateAllocationReadResponse": {
+        "type": "object",
+        "properties": {
+          "gift_certificate_allocation": {
+            "$ref": "#/components/schemas/GiftCertificateAllocationRead"
+          }
+        }
+      },
+      "GiftCertificateTransactionRead": {
+        "type": "object",
+        "properties": {
+          "accounting_code": {
+            "$ref": "#/components/schemas/GiftCertificateTransactionAccountingCode"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "created_by": {},
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/GiftCertificateTransactionCurrency"
+          },
+          "date": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "reference": {},
+          "status": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "GiftCertificateTransactionReadResponse": {
+        "type": "object",
+        "properties": {
+          "gift_certificate_transaction": {
+            "$ref": "#/components/schemas/GiftCertificateTransactionRead"
+          }
+        }
+      },
+      "GiftCertificatePagination": {
         "type": "object",
         "description": "Cursor paging for the listing.",
         "properties": {

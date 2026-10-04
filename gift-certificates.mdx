@@ -1,0 +1,39 @@
+---
+title: "Gift certificates"
+sidebarTitle: "Overview"
+description: "Create, read, change and delete Exsited gift certificates, set balances, and allocate them to accounts."
+---
+
+A gift certificate holds a balance a customer can spend. This area creates, lists, reads, updates and deletes certificates, sets a new balance, allocates a certificate to an account or takes it back, and reads its allocations and transactions. It has 12 endpoints, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List gift certificates](/api-reference/gift-certificates/list-gift-certificates) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/gift_certificates` | Lists gift certificates, one page at a time. |
+| [Create a gift certificate](/api-reference/gift-certificates/create-a-gift-certificate) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/gift_certificates` | Creates a gift certificate with a starting amount and an expiry date and returns it under `gift_certificate`. |
+| [Delete a gift certificate](/api-reference/gift-certificates/delete-a-gift-certificate) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/gift_certificates/{gc_id}` | Deletes a gift certificate and returns no content. |
+| [Retrieve a gift certificate](/api-reference/gift-certificates/retrieve-a-gift-certificate) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/gift_certificates/{gc_id}` | Returns one gift certificate, under `gift_certificate`. |
+| [Update a gift certificate](/api-reference/gift-certificates/update-a-gift-certificate) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/gift_certificates/{gc_id}` | Changes a gift certificate's expiry date or status and returns it under `gift_certificate`. |
+| [List a gift certificate's allocations](/api-reference/gift-certificates/list-a-gift-certificates-allocations) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/gift_certificates/{gc_id}/allocations` | Lists the accounts a gift certificate has been allocated to, one page at a time. |
+| [List a gift certificate's transactions](/api-reference/gift-certificates/list-a-gift-certificates-transactions) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/gift_certificates/{gc_id}/transactions` | Lists the balance movements of a gift certificate, one page at a time. |
+| [Amend a gift certificate's balance](/api-reference/gift-certificates/amend-a-gift-certificates-balance) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/gift_certificates/{gc_id}/amend` | Sets a new remaining balance on a gift certificate and returns it under `gift_certificate`. |
+| [Allocate a gift certificate to an account](/api-reference/gift-certificates/allocate-a-gift-certificate-to-an-account) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/gift_certificates/{gc_id}/allocations` | Allocates a gift certificate to an account and returns the certificate under `gift_certificate`. |
+| [Deallocate a gift certificate from an account](/api-reference/gift-certificates/deallocate-a-gift-certificate-from-an-account) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/gift_certificates/{gc_id}/deallocations` | Takes a gift certificate's allocation back from an account and returns the certificate under `gift_certificate`. |
+| [Retrieve a gift certificate allocation](/api-reference/gift-certificates/retrieve-a-gift-certificate-allocation) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/gift_certificates/{gc_id}/allocations/{allocation_id}` | Returns one allocation of a gift certificate, under `gift_certificate_allocation`. |
+| [Retrieve a gift certificate transaction](/api-reference/gift-certificates/retrieve-a-gift-certificate-transaction) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/gift_certificates/{gc_id}/transactions/{transaction_id}` | Returns one transaction of a gift certificate, under `gift_certificate_transaction`. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Bodies sit under `gift_certificate`.** A new certificate takes `amount` and `expiry_date`; amounts and balances are decimal strings such as `5.00`.
+- **Change the balance with amend.** `POST /gift_certificates/{gc_id}/amend` takes only `new_balance`, and a balance below the amount already used returns `400`.
+- **Name the account by `code` when allocating.** Send `{"account": {"code": "W13ZGY"}}`. The `id` form wants the account's `acc_` uuid and returns `404` for the `id` the accounts API gives you.
+- **Allocate and deallocate return `200`.** Both return the certificate with its `allocations`; a deallocation changes the entry rather than removing it.
+- **`status` is `active` or `inactive`.** Set it with an update to stop a certificate being used or allow it again.
+- **Listings page by cursor.** Send `limit`, then pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`.
