@@ -1,0 +1,31 @@
+---
+title: "Custom forms"
+sidebarTitle: "Overview"
+description: "List, create, read, update and delete the custom forms in your Exsited settings."
+---
+
+Custom forms set the layout of the forms used for records such as accounts. This area has 5 endpoints to list, create, read, update and delete them, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List custom forms](/api-reference/custom-forms/list-custom-forms) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/custom_forms` | Returns one page of the custom forms in your settings. |
+| [Create a custom form](/api-reference/custom-forms/create-a-custom-form) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/custom_forms` | Creates a custom form and returns it, under `custom_form`. |
+| [Retrieve a custom form](/api-reference/custom-forms/retrieve-a-custom-form) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/custom_forms/{custom_form_id}` | Returns one custom form, under `custom_form`. |
+| [Delete a custom form](/api-reference/custom-forms/delete-a-custom-form) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/custom_forms/{custom_form_id}` | Deletes a custom form that is not system generated and returns no body. |
+| [Update a custom form](/api-reference/custom-forms/update-a-custom-form) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/custom_forms/{custom_form_id}` | Changes a custom form's name, display name, description or users and returns the form. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **A create needs `name` and `setting_group`.** `setting_group` is a setting group name such as `ACCOUNT`, and both go under `custom_form`.
+- **A custom form id starts with `cf_`.** One form comes back under `custom_form`.
+- **Only a form that is not system generated can be deleted.** `is_system_template` tells you which forms are system generated.
+- **An update changes the name, display name, description or users.** Send only the fields to change under `custom_form`.
+- **The listing pages by cursor.** Pass `limit`, then the `next_cursor` from `pagination` as `cursor` while `has_more` is true.

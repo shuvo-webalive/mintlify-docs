@@ -1,0 +1,407 @@
+{
+  "family": "custom_forms",
+  "tag": "Custom forms",
+  "slug": "custom-forms",
+  "icon": "rectangle-list",
+  "base": "/settings/custom_forms",
+  "overview_description": "List, create, read, update and delete the custom forms in your Exsited settings.",
+  "intro": "Custom forms set the layout of the forms used for records such as accounts. This area has 5 endpoints to list, create, read, update and delete them, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**A create needs `name` and `setting_group`.** `setting_group` is a setting group name such as `ACCOUNT`, and both go under `custom_form`.",
+    "**A custom form id starts with `cf_`.** One form comes back under `custom_form`.",
+    "**Only a form that is not system generated can be deleted.** `is_system_template` tells you which forms are system generated.",
+    "**An update changes the name, display name, description or users.** Send only the fields to change under `custom_form`.",
+    "**The listing pages by cursor.** Pass `limit`, then the `next_cursor` from `pagination` as `cursor` while `has_more` is true."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_custom_forms",
+      "method": "GET",
+      "path": "/settings/custom_forms",
+      "slug": "list-custom-forms",
+      "title": "List custom forms",
+      "summary": "Returns one page of the custom forms in your settings.",
+      "description": "Lists the custom forms with each one's name, status and whether it is a system or default template. Records are under `data` and paging details under `pagination`. Fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by, such as `created_on`, or `-created_on` for newest first.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of custom forms, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/CustomFormList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_custom_form",
+      "method": "POST",
+      "path": "/settings/custom_forms",
+      "slug": "create-a-custom-form",
+      "title": "Create a custom form",
+      "summary": "Creates a custom form and returns it, under `custom_form`.",
+      "description": "Creates a new custom form. Send `name` and `setting_group`, a setting group name such as `ACCOUNT`, under `custom_form`. The new form comes back with its `cf_` id.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "custom_form": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The form's name."
+                },
+                "setting_group": {
+                  "type": "string",
+                  "description": "The setting group the form belongs to, such as `ACCOUNT`."
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "setting_group"
+              ]
+            }
+          },
+          "required": [
+            "custom_form"
+          ]
+        },
+        "example": {
+          "custom_form": {
+            "name": "acme-account-form",
+            "setting_group": "ACCOUNT"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new custom form, under `custom_form`.",
+          "schema": {
+            "$ref": "#/components/schemas/CustomFormResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "custom_form": {
+            "name": "acme-account-form",
+            "setting_group": "ACCOUNT"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_custom_form",
+      "method": "GET",
+      "path": "/settings/custom_forms/{custom_form_id}",
+      "slug": "retrieve-a-custom-form",
+      "title": "Retrieve a custom form",
+      "summary": "Returns one custom form, under `custom_form`.",
+      "description": "Reads a single custom form by its `cf_` id, with its name, display name, description and template flags.",
+      "parameters": [
+        {
+          "name": "custom_form_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom form's `id`, which starts with `cf_`.",
+          "schema": {
+            "type": "string",
+            "example": "cf_8d2a4c6e0b1f4d3a9c7e5b2d1f0a8c6e"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The custom form, under `custom_form`.",
+          "schema": {
+            "$ref": "#/components/schemas/CustomFormResponse"
+          }
+        },
+        "404": {
+          "description": "No custom form has that `id`, for example because it is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "custom_form_id": "cf_8d2a4c6e0b1f4d3a9c7e5b2d1f0a8c6e"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_custom_form",
+      "method": "DELETE",
+      "path": "/settings/custom_forms/{custom_form_id}",
+      "slug": "delete-a-custom-form",
+      "title": "Delete a custom form",
+      "summary": "Deletes a custom form that is not system generated and returns no body.",
+      "description": "Removes the custom form with this `cf_` id. Only a form that is not system generated can be deleted. A successful call returns 204 with an empty body, and reading the form afterwards returns 404.",
+      "parameters": [
+        {
+          "name": "custom_form_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom form's `id`, which starts with `cf_`.",
+          "schema": {
+            "type": "string",
+            "example": "cf_8d2a4c6e0b1f4d3a9c7e5b2d1f0a8c6e"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The custom form is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "custom_form_id": "cf_8d2a4c6e0b1f4d3a9c7e5b2d1f0a8c6e"
+        }
+      }
+    },
+    {
+      "key": "update_settings_custom_form",
+      "method": "PATCH",
+      "path": "/settings/custom_forms/{custom_form_id}",
+      "slug": "update-a-custom-form",
+      "title": "Update a custom form",
+      "summary": "Changes a custom form's name, display name, description or users and returns the form.",
+      "description": "Send the fields to change under `custom_form`. You can change `name`, `display_name`, `description` and `users`. The updated form comes back under `custom_form`.",
+      "parameters": [
+        {
+          "name": "custom_form_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom form's `id`, which starts with `cf_`.",
+          "schema": {
+            "type": "string",
+            "example": "cf_8d2a4c6e0b1f4d3a9c7e5b2d1f0a8c6e"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "custom_form": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "users": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "custom_form"
+          ]
+        },
+        "example": {
+          "custom_form": {
+            "display_name": "Acme account form",
+            "description": "The form Acme Pty Ltd uses for new accounts"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated custom form, under `custom_form`.",
+          "schema": {
+            "$ref": "#/components/schemas/CustomFormResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "custom_form_id": "cf_8d2a4c6e0b1f4d3a9c7e5b2d1f0a8c6e"
+        },
+        "body": {
+          "custom_form": {
+            "display_name": "Acme account form",
+            "description": "The form Acme Pty Ltd uses for new accounts"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "CustomForm": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "is_system_template": {
+          "type": "boolean",
+          "description": "Whether the form is system generated. A system generated form cannot be deleted."
+        },
+        "for_default_template": {
+          "type": "boolean"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "created_by": {},
+        "last_updated_by": {},
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "CustomFormResponse": {
+      "type": "object",
+      "properties": {
+        "custom_form": {
+          "$ref": "#/components/schemas/CustomForm"
+        }
+      }
+    },
+    "CustomFormList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CustomForm"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/CustomFormPagination"
+        }
+      }
+    },
+    "CustomFormPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can be stale on the last page."
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "links": {
+          "$ref": "#/components/schemas/CustomFormPaginationLinks"
+        }
+      }
+    },
+    "CustomFormPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}
