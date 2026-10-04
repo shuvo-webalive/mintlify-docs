@@ -1,0 +1,3722 @@
+{
+  "family": "custom_components",
+  "tag": "Custom components",
+  "slug": "custom-components",
+  "icon": "cubes",
+  "base": "/component",
+  "overview_description": "Define custom components, then create and manage their objects, notes, activities, linked records and workflow status.",
+  "intro": "A custom component is a record type you define, such as a service contract, whose objects belong to accounts and carry their own attributes, notes, activity log and workflow. This area has 39 endpoints covering component definitions, their instances and objects, and everything attached to an object, and all seven SDKs call every one.",
+  "warning": "**Replacing an object's linked accounts or orders unlinks every record you leave out, and changing its workflow status runs the transition and its actions at once.**",
+  "notes": [
+    "**`component_uuid` takes two kinds of value.** The instance calls on `/component/{component_uuid}` and `/component/{component_uuid}/{component_object_id}` with POST, PATCH and DELETE on an instance take the component's dashed `uuid`; every other call takes the definition's `cmp_` id.",
+    "**Instance bodies use the component's name as their key.** `POST /component/{component_uuid}` and `PATCH /component/{component_uuid}/{component_object_id}` send and return the instance under the component's `name`, such as `service_contract`.",
+    "**Object calls under `/components/` use `custom_component_object`.** Objects are created, read, updated and returned under that key, and `parents` names the record that owns the object.",
+    "**Notes are sent as multipart forms, not JSON.** Put the text in the `note` field and any files beside it; a file's `uuid` in `attachments` is the `file_id` for the file calls.",
+    "**A custom object instance is created on the custom object's own path.** The create has no `instances` segment and sends `custom_object_instances`; the read, update and delete use `instances/{instance_id}`, and the update sends `custom_object_instance`.",
+    "**Listings page by cursor.** Pass `limit`, then the `next_cursor` from `pagination` as `cursor` while `has_more` is true."
+  ],
+  "endpoints": [
+    {
+      "key": "get_component",
+      "method": "GET",
+      "path": "/component",
+      "slug": "list-component-definitions",
+      "title": "List component definitions",
+      "summary": "Returns one page of the custom component definitions.",
+      "description": "Lists the component definitions with each one's `cmp_` id, name, where it is used, its relation and its forms. Records are under `data` and paging details under `pagination`. Fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by, such as `created_on`, or `-created_on` for newest first.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of component definitions, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_component_by_uuid",
+      "method": "GET",
+      "path": "/component/{component_uuid}",
+      "slug": "retrieve-a-component-definition",
+      "title": "Retrieve a component definition",
+      "summary": "Returns one component definition, under `component`.",
+      "description": "Reads a single component definition by its `cmp_` id, with its forms and the attributes laid out in each column.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The component definition, under `component`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+        }
+      }
+    },
+    {
+      "key": "create_component_by_uuid",
+      "method": "POST",
+      "path": "/component/{component_uuid}",
+      "slug": "create-a-component-instance",
+      "title": "Create a component instance",
+      "summary": "Creates an instance of a component and returns it under the component's name.",
+      "description": "Creates a new instance of the component with this dashed `uuid`. The body has one key, the component's `name`, holding the instance's fields, such as `parents` naming the account that owns it. The new instance comes back under the same key.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component's dashed `uuid`, not its `cmp_` id.",
+          "schema": {
+            "type": "string",
+            "example": "5c8e1f2a-3b4d-4e6f-9a0b-1c2d3e4f5a6b"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "description": "One key, the component's `name`, holding the instance's fields.",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "parents": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "description": "The owner's type, such as `account`."
+                    },
+                    "id": {
+                      "type": "string",
+                      "description": "The owner's `id`."
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "id"
+                  ]
+                }
+              },
+              "attributes": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "minProperties": 1,
+          "maxProperties": 1
+        },
+        "example": {
+          "service_contract": {
+            "parents": [
+              {
+                "type": "account",
+                "id": "W13ZGY"
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new instance, under the component's `name`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentInstanceResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "5c8e1f2a-3b4d-4e6f-9a0b-1c2d3e4f5a6b"
+        },
+        "body": {
+          "service_contract": {
+            "parents": [
+              {
+                "type": "account",
+                "id": "W13ZGY"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_component_by_id",
+      "method": "DELETE",
+      "path": "/component/{component_uuid}/{component_object_id}",
+      "slug": "delete-a-component-instance",
+      "title": "Delete a component instance",
+      "summary": "Deletes a component instance and returns no body.",
+      "description": "Removes the instance with this `id` from the component with this dashed `uuid`. A successful call returns 204 with an empty body; reading or deleting the instance again returns 404.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component's dashed `uuid`, not its `cmp_` id.",
+          "schema": {
+            "type": "string",
+            "example": "5c8e1f2a-3b4d-4e6f-9a0b-1c2d3e4f5a6b"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component instance's `id`, as returned when it is created.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The instance is deleted. No body."
+        },
+        "404": {
+          "description": "No instance has that `id`, for example because it is already deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "5c8e1f2a-3b4d-4e6f-9a0b-1c2d3e4f5a6b",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+        }
+      }
+    },
+    {
+      "key": "update_component_by_id",
+      "method": "PATCH",
+      "path": "/component/{component_uuid}/{component_object_id}",
+      "slug": "update-a-component-instance",
+      "title": "Update a component instance",
+      "summary": "Changes a component instance and returns it under the component's name, with status 202.",
+      "description": "Updates the instance with this `id` in the component with this dashed `uuid`. The body has one key, the component's `name`, holding the fields to change, such as `attributes`. The updated instance comes back under the same key with a new `version`.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component's dashed `uuid`, not its `cmp_` id.",
+          "schema": {
+            "type": "string",
+            "example": "5c8e1f2a-3b4d-4e6f-9a0b-1c2d3e4f5a6b"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component instance's `id`, as returned when it is created.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "description": "One key, the component's `name`, holding the fields to change.",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "parents": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "description": "The owner's type, such as `account`."
+                    },
+                    "id": {
+                      "type": "string",
+                      "description": "The owner's `id`."
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "id"
+                  ]
+                }
+              },
+              "attributes": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "minProperties": 1,
+          "maxProperties": 1
+        },
+        "example": {
+          "service_contract": {
+            "attributes": []
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "202": {
+          "description": "The updated instance, under the component's `name`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentInstanceResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "5c8e1f2a-3b4d-4e6f-9a0b-1c2d3e4f5a6b",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+        },
+        "body": {
+          "service_contract": {
+            "attributes": []
+          }
+        }
+      }
+    },
+    {
+      "key": "get_component_objects",
+      "method": "GET",
+      "path": "/components/{component_uuid}/objects",
+      "slug": "list-component-objects",
+      "title": "List component objects",
+      "summary": "Returns one page of a component's objects.",
+      "description": "Lists the objects of the component with this `cmp_` id, with each object's owner in `parents`, its attributes, its workflow state and the accounts, items, orders and quotes linked to it. Records are under `data` and paging details under `pagination`. Fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by, such as `created_on`, or `-created_on` for newest first.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of component objects, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentObjectList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_component_object",
+      "method": "GET",
+      "path": "/components/{component_uuid}/objects/{component_object_id}",
+      "slug": "retrieve-a-component-object",
+      "title": "Retrieve a component object",
+      "summary": "Returns one component object, under `custom_component_object`.",
+      "description": "Reads a single object of the component with this `cmp_` id, with its owner, attributes, workflow state and linked accounts, items, orders and quotes.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The component object, under `custom_component_object`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentObjectResponse"
+          }
+        },
+        "404": {
+          "description": "No object has that `id`, for example because it is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+        }
+      }
+    },
+    {
+      "key": "get_component_object_activity",
+      "method": "GET",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/activity",
+      "slug": "list-a-component-objects-activity",
+      "title": "List a component object's activity",
+      "summary": "Returns the activity log of a component object.",
+      "description": "Lists the activities logged on the object. Entries are under `data` and paging details under `pagination`.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The object's activity log, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentObjectActivityList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+        }
+      }
+    },
+    {
+      "key": "get_component_object_custom_objects",
+      "method": "GET",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/custom_objects",
+      "slug": "list-a-component-objects-custom-objects",
+      "title": "List a component object's custom objects",
+      "summary": "Returns one page of the custom objects linked to a component object.",
+      "description": "Lists the custom objects linked to the object. Entries are under `data` and paging details under `pagination`. Fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by, such as `created_on`, or `-created_on` for newest first.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of linked custom objects, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentObjectCustomObjectList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_component_object_pdf",
+      "method": "GET",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/pdf",
+      "slug": "retrieve-a-component-objects-pdf",
+      "title": "Retrieve a component object's PDF",
+      "summary": "Returns the PDF details of a component object.",
+      "description": "Reads the PDF of the object with this `id` in the component with this `cmp_` id.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The object's PDF details."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+        }
+      }
+    },
+    {
+      "key": "create_component",
+      "method": "POST",
+      "path": "/component",
+      "slug": "create-a-component-definition",
+      "title": "Create a component definition",
+      "summary": "Creates a component definition and returns it, under `component`.",
+      "description": "Defines a new component. Send its fields under `component`; `name` is required and is an identifier written with underscores. If you send `use_in`, send `relation` with it. The new definition comes back with its `cmp_` id and an empty `activity_logs`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "component": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The component's name, an identifier written with underscores, such as `service_contract`."
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "use_in": {
+                  "type": "string",
+                  "description": "Where the component is used. Send `relation` with it."
+                },
+                "relation": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          },
+          "required": [
+            "component"
+          ]
+        },
+        "example": {
+          "component": {
+            "name": "service_contract",
+            "description": "Support contracts"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new component definition, under `component`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "component": {
+            "name": "service_contract",
+            "description": "Support contracts"
+          }
+        }
+      }
+    },
+    {
+      "key": "update_component",
+      "method": "PATCH",
+      "path": "/component/{component_uuid}",
+      "slug": "update-a-component-definition",
+      "title": "Update a component definition",
+      "summary": "Changes a component definition and returns it, under `component`.",
+      "description": "Send the fields to change under `component`, such as `description`. The updated definition comes back under `component`.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "component": {
+              "type": "object",
+              "properties": {
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "component"
+          ]
+        },
+        "example": {
+          "component": {
+            "description": "Support contracts held by Acme Pty Ltd"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated component definition, under `component`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+        },
+        "body": {
+          "component": {
+            "description": "Support contracts held by Acme Pty Ltd"
+          }
+        }
+      }
+    },
+    {
+      "key": "create_component_object",
+      "method": "POST",
+      "path": "/components/{component_uuid}/objects",
+      "slug": "create-a-component-object",
+      "title": "Create a component object",
+      "summary": "Creates an object in a component and returns it, under `custom_component_object`.",
+      "description": "Creates a new object in the component with this `cmp_` id. Send its fields under `custom_component_object`; every key is optional, and `parents` names the record that owns it, such as an account. The new object comes back with its `id` and `activity_logs`.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "custom_component_object": {
+              "type": "object",
+              "properties": {
+                "parents": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "The owner's type, such as `account`."
+                      },
+                      "id": {
+                        "type": "string",
+                        "description": "The owner's `id`."
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "id"
+                    ]
+                  },
+                  "description": "The record that owns the object, such as an account."
+                },
+                "attributes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "custom_component_object"
+          ]
+        },
+        "example": {
+          "custom_component_object": {
+            "parents": [
+              {
+                "type": "account",
+                "id": "W13ZGY"
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new component object, under `custom_component_object`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentObjectRecordResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+        },
+        "body": {
+          "custom_component_object": {
+            "parents": [
+              {
+                "type": "account",
+                "id": "W13ZGY"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "update_component_object",
+      "method": "PATCH",
+      "path": "/components/{component_uuid}/objects/{component_object_id}",
+      "slug": "update-a-component-object",
+      "title": "Update a component object",
+      "summary": "Changes a component object and returns it, under `custom_component_object`.",
+      "description": "Send the fields to change under `custom_component_object`, such as `attributes`. If you send `version_id`, it must match the object's current version. `code`, `parents` and `custom_form` cannot be changed and are refused. Each update raises the object's `version` by one.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "custom_component_object": {
+              "type": "object",
+              "properties": {
+                "attributes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "version_id": {
+                  "type": "string",
+                  "description": "When sent, must match the object's current version."
+                }
+              }
+            }
+          },
+          "required": [
+            "custom_component_object"
+          ]
+        },
+        "example": {
+          "custom_component_object": {
+            "attributes": []
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated component object, under `custom_component_object`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentObjectRecordResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+        },
+        "body": {
+          "custom_component_object": {
+            "attributes": []
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_component_object",
+      "method": "DELETE",
+      "path": "/components/{component_uuid}/objects/{component_object_id}",
+      "slug": "delete-a-component-object",
+      "title": "Delete a component object",
+      "summary": "Deletes a component object and returns no body.",
+      "description": "Removes the object with this `id` from the component with this `cmp_` id. A successful call returns 204 with an empty body; reading or deleting the object again returns 404.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The component object is deleted. No body."
+        },
+        "404": {
+          "description": "No object has that `id`, for example because it is already deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+        }
+      }
+    },
+    {
+      "key": "create_component_object_activity",
+      "method": "POST",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/activity",
+      "slug": "log-an-activity-on-a-component-object",
+      "title": "Log an activity on a component object",
+      "summary": "Logs an activity on a component object and returns it, under `custom_component_object_activity`.",
+      "description": "Adds an entry to the object's activity log. Send `type`, `message` and `user_name` under `custom_component_object_activity`. There is no call to delete an activity; it goes when its object is deleted.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "custom_component_object_activity": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "user_name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type",
+                "message",
+                "user_name"
+              ]
+            }
+          },
+          "required": [
+            "custom_component_object_activity"
+          ]
+        },
+        "example": {
+          "custom_component_object_activity": {
+            "type": "call",
+            "message": "Called Acme Pty Ltd about the renewal",
+            "user_name": "Jane Smith"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new activity, under `custom_component_object_activity`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentObjectActivityResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+        },
+        "body": {
+          "custom_component_object_activity": {
+            "type": "call",
+            "message": "Called Acme Pty Ltd about the renewal",
+            "user_name": "Jane Smith"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_component_object_activity_by_id",
+      "method": "GET",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/activity/{activity_id}",
+      "slug": "retrieve-a-component-object-activity",
+      "title": "Retrieve a component object activity",
+      "summary": "Returns one activity of a component object, under `custom_component_object_activity`.",
+      "description": "Reads a single activity by its `id`, with its type, message and the user name it is logged under.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        },
+        {
+          "name": "activity_id",
+          "in": "path",
+          "required": true,
+          "description": "The activity's `id`, as returned when it is logged.",
+          "schema": {
+            "type": "string",
+            "example": "c2e4a6b8d0f14a3c5e7b9d1f3a5c7e9b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The activity, under `custom_component_object_activity`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentObjectActivityResponse"
+          }
+        },
+        "404": {
+          "description": "No activity has that `id`, for example because its object is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e",
+          "activity_id": "c2e4a6b8d0f14a3c5e7b9d1f3a5c7e9b"
+        }
+      }
+    },
+    {
+      "key": "get_component_object_milestones",
+      "method": "GET",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/milestones",
+      "slug": "list-a-component-objects-workflow-milestones",
+      "title": "List a component object's workflow milestones",
+      "summary": "Returns one page of a component object's workflow milestones.",
+      "description": "Lists the workflow milestones of the object. Entries are under `data` and paging details under `pagination`. Fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by, such as `created_on`, or `-created_on` for newest first.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of workflow milestones, under `data`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_component_object_milestone",
+      "method": "GET",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/milestones/{milestone_id}",
+      "slug": "retrieve-a-component-objects-workflow-milestone",
+      "title": "Retrieve a component object's workflow milestone",
+      "summary": "Returns one workflow milestone of a component object.",
+      "description": "Reads a single workflow milestone by its `wfm_` id.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        },
+        {
+          "name": "milestone_id",
+          "in": "path",
+          "required": true,
+          "description": "The workflow milestone's `id`, which starts with `wfm_`.",
+          "schema": {
+            "type": "string",
+            "example": "wfm_6d8f0a2c4e1b4d3f5a7c9e0b2d4f6a8c"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The workflow milestone."
+        },
+        "404": {
+          "description": "No milestone has that `id`. The error code is `resource_not_found`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e",
+          "milestone_id": "wfm_6d8f0a2c4e1b4d3f5a7c9e0b2d4f6a8c"
+        }
+      }
+    },
+    {
+      "key": "get_component_object_history",
+      "method": "GET",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/history",
+      "slug": "list-a-component-objects-workflow-history",
+      "title": "List a component object's workflow history",
+      "summary": "Returns one page of a component object's workflow history.",
+      "description": "Lists the workflow history entries of the object. The path segment is singular, `history`. Entries are under `data` and paging details under `pagination`. Fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by, such as `created_on`, or `-created_on` for newest first.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of workflow history entries, under `data`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_component_object_history_by_id",
+      "method": "GET",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/history/{history_id}",
+      "slug": "retrieve-a-component-objects-workflow-history-entry",
+      "title": "Retrieve a component object's workflow history entry",
+      "summary": "Returns one workflow history entry of a component object.",
+      "description": "Reads a single workflow history entry by its `wfh_` id.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        },
+        {
+          "name": "history_id",
+          "in": "path",
+          "required": true,
+          "description": "The workflow history entry's `id`, which starts with `wfh_`.",
+          "schema": {
+            "type": "string",
+            "example": "wfh_3a5c7e9b1d0f4a2c6e8b0d2f4a6c8e1b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The workflow history entry."
+        },
+        "404": {
+          "description": "No history entry has that `id`. The error code is `resource_not_found`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e",
+          "history_id": "wfh_3a5c7e9b1d0f4a2c6e8b0d2f4a6c8e1b"
+        }
+      }
+    },
+    {
+      "key": "get_component_object_notes",
+      "method": "GET",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/notes",
+      "slug": "list-a-component-objects-notes",
+      "title": "List a component object's notes",
+      "summary": "Returns one page of the notes on a component object.",
+      "description": "Lists the notes on the object, each with its content, attachments and author. Notes are under `data` and paging details under `pagination`. Fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by, such as `created_on`, or `-created_on` for newest first.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of notes, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentObjectNoteList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_component_object_note",
+      "method": "GET",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/notes/{note_id}",
+      "slug": "retrieve-a-component-object-note",
+      "title": "Retrieve a component object note",
+      "summary": "Returns one note on a component object, under `note`.",
+      "description": "Reads a single note by its `id`, with its content, attachments, author and the object it belongs to.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "e7f9a1b3c5d74e9f8a2b4c6d8e0f1a3b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The note, under `note`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentObjectNoteResponse"
+          }
+        },
+        "404": {
+          "description": "No note has that `id`, for example because it is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e",
+          "note_id": "e7f9a1b3c5d74e9f8a2b4c6d8e0f1a3b"
+        }
+      }
+    },
+    {
+      "key": "get_component_object_note_files",
+      "method": "GET",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/notes/{note_id}/files",
+      "slug": "list-a-component-object-notes-files",
+      "title": "List a component object note's files",
+      "summary": "Returns the files attached to a note on a component object.",
+      "description": "Lists the files attached to the note, each with its `uuid`, file name, content type and size. Files are under `data`; `pagination` carries `has_more` only.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "e7f9a1b3c5d74e9f8a2b4c6d8e0f1a3b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The note's files, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentObjectNoteFileList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e",
+          "note_id": "e7f9a1b3c5d74e9f8a2b4c6d8e0f1a3b"
+        }
+      }
+    },
+    {
+      "key": "get_component_object_note_file",
+      "method": "GET",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/notes/{note_id}/files/{file_id}",
+      "slug": "retrieve-a-component-object-note-file",
+      "title": "Retrieve a component object note file",
+      "summary": "Returns the details of one file attached to a note, under `file`.",
+      "description": "Reads one attachment of the note by its `uuid`, with its file name, content type, size and link.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "e7f9a1b3c5d74e9f8a2b4c6d8e0f1a3b"
+          }
+        },
+        {
+          "name": "file_id",
+          "in": "path",
+          "required": true,
+          "description": "The attachment's `uuid`, from the note's `attachments`.",
+          "schema": {
+            "type": "string",
+            "example": "9b2e4c6a-1d3f-4a5b-8c7d-0e1f2a3b4c5d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The file's details, under `file`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentObjectNoteFileResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e",
+          "note_id": "e7f9a1b3c5d74e9f8a2b4c6d8e0f1a3b",
+          "file_id": "9b2e4c6a-1d3f-4a5b-8c7d-0e1f2a3b4c5d"
+        }
+      }
+    },
+    {
+      "key": "create_component_object_note",
+      "method": "POST",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/notes",
+      "slug": "create-a-component-object-note",
+      "title": "Create a component object note",
+      "summary": "Adds a note, with optional files, to a component object and returns it, under `note`.",
+      "description": "Send a multipart form with the note's text in the `note` field and any files beside it. The new note comes back with its `id`, its content and one entry in `attachments` for each file.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "note": {
+              "type": "string",
+              "description": "The note's text. HTML such as `<p>...</p>` is kept as sent."
+            },
+            "file": {
+              "type": "string",
+              "format": "binary",
+              "description": "A file to attach. Optional."
+            }
+          },
+          "required": [
+            "note"
+          ]
+        },
+        "example": {
+          "note": "<p>Renewal call booked for next week.</p>"
+        }
+      },
+      "multipart": true,
+      "responses": {
+        "201": {
+          "description": "The new note, under `note`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentObjectNoteResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+        },
+        "note": "<p>Renewal call booked for next week.</p>",
+        "file": "renewal-terms.pdf"
+      }
+    },
+    {
+      "key": "update_component_object_note",
+      "method": "PATCH",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/notes/{note_id}",
+      "slug": "update-a-component-object-note",
+      "title": "Update a component object note",
+      "summary": "Changes a note's text, with optional files, and returns the note, under `note`.",
+      "description": "Send a multipart form, as for the create, with the new text in the `note` field and any files beside it. The updated note comes back with its `version` raised by one.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "e7f9a1b3c5d74e9f8a2b4c6d8e0f1a3b"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "note": {
+              "type": "string",
+              "description": "The note's text. HTML such as `<p>...</p>` is kept as sent."
+            },
+            "file": {
+              "type": "string",
+              "format": "binary",
+              "description": "A file to attach. Optional."
+            }
+          },
+          "required": [
+            "note"
+          ]
+        },
+        "example": {
+          "note": "<p>Renewal call moved to Friday.</p>"
+        }
+      },
+      "multipart": true,
+      "responses": {
+        "200": {
+          "description": "The updated note, under `note`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentObjectNoteResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e",
+          "note_id": "e7f9a1b3c5d74e9f8a2b4c6d8e0f1a3b"
+        },
+        "note": "<p>Renewal call moved to Friday.</p>"
+      }
+    },
+    {
+      "key": "delete_component_object_note",
+      "method": "DELETE",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/notes/{note_id}",
+      "slug": "delete-a-component-object-note",
+      "title": "Delete a component object note",
+      "summary": "Deletes a note from a component object and returns no body.",
+      "description": "Removes the note with this `id`. A successful call returns 204 with an empty body, and reading the note afterwards returns 404.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "e7f9a1b3c5d74e9f8a2b4c6d8e0f1a3b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The note is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e",
+          "note_id": "e7f9a1b3c5d74e9f8a2b4c6d8e0f1a3b"
+        }
+      }
+    },
+    {
+      "key": "delete_component_object_note_file",
+      "method": "DELETE",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/notes/{note_id}/files/{file_id}",
+      "slug": "delete-a-component-object-note-file",
+      "title": "Delete a component object note file",
+      "summary": "Deletes one file from a note and returns no body.",
+      "description": "Removes the attachment with this `uuid` from the note. A successful call returns 204 with an empty body, and the note's files listing no longer shows it.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "e7f9a1b3c5d74e9f8a2b4c6d8e0f1a3b"
+          }
+        },
+        {
+          "name": "file_id",
+          "in": "path",
+          "required": true,
+          "description": "The attachment's `uuid`, from the note's `attachments`.",
+          "schema": {
+            "type": "string",
+            "example": "9b2e4c6a-1d3f-4a5b-8c7d-0e1f2a3b4c5d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The file is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e",
+          "note_id": "e7f9a1b3c5d74e9f8a2b4c6d8e0f1a3b",
+          "file_id": "9b2e4c6a-1d3f-4a5b-8c7d-0e1f2a3b4c5d"
+        }
+      }
+    },
+    {
+      "key": "get_component_object_custom_object",
+      "method": "GET",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/custom_objects/{custom_object_id}",
+      "slug": "retrieve-a-component-objects-custom-object",
+      "title": "Retrieve a component object's custom object",
+      "summary": "Returns one custom object schema of a component object, with its instances.",
+      "description": "Reads the custom object schema with this `co_` id on the object, together with its instances.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        },
+        {
+          "name": "custom_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom object schema's `id`, which starts with `co_`.",
+          "schema": {
+            "type": "string",
+            "example": "co_7e9b1d3f5a2c4e6b8d0f2a4c6e8b1d3f"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The custom object schema with its instances."
+        },
+        "404": {
+          "description": "No custom object has that `id`. The error code is `resource_not_found`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e",
+          "custom_object_id": "co_7e9b1d3f5a2c4e6b8d0f2a4c6e8b1d3f"
+        }
+      }
+    },
+    {
+      "key": "create_component_object_custom_object_instance",
+      "method": "POST",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/custom_objects/{custom_object_id}",
+      "slug": "create-a-custom-object-instance-on-a-component-object",
+      "title": "Create a custom object instance on a component object",
+      "summary": "Creates an instance of a custom object on a component object.",
+      "description": "Creates a new instance of the custom object with this `co_` id. The path ends at the custom object, with no `instances` segment. Send the instance's `attributes` list under `custom_object_instances`, a plural key over one instance.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        },
+        {
+          "name": "custom_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom object schema's `id`, which starts with `co_`.",
+          "schema": {
+            "type": "string",
+            "example": "co_7e9b1d3f5a2c4e6b8d0f2a4c6e8b1d3f"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "custom_object_instances": {
+              "type": "object",
+              "properties": {
+                "attributes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              },
+              "required": [
+                "attributes"
+              ]
+            }
+          },
+          "required": [
+            "custom_object_instances"
+          ]
+        },
+        "example": {
+          "custom_object_instances": {
+            "attributes": []
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new custom object instance."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e",
+          "custom_object_id": "co_7e9b1d3f5a2c4e6b8d0f2a4c6e8b1d3f"
+        },
+        "body": {
+          "custom_object_instances": {
+            "attributes": []
+          }
+        }
+      }
+    },
+    {
+      "key": "get_component_object_custom_object_instance",
+      "method": "GET",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/custom_objects/{custom_object_id}/instances/{instance_id}",
+      "slug": "retrieve-a-custom-object-instance-on-a-component-object",
+      "title": "Retrieve a custom object instance on a component object",
+      "summary": "Returns one custom object instance on a component object.",
+      "description": "Reads the instance with this `coi_` id of the custom object with this `co_` id.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        },
+        {
+          "name": "custom_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom object schema's `id`, which starts with `co_`.",
+          "schema": {
+            "type": "string",
+            "example": "co_7e9b1d3f5a2c4e6b8d0f2a4c6e8b1d3f"
+          }
+        },
+        {
+          "name": "instance_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom object instance's `id`, which starts with `coi_`.",
+          "schema": {
+            "type": "string",
+            "example": "coi_2c4e6a8b0d1f4a3c5e7b9d0f2a4c6e8b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The custom object instance."
+        },
+        "404": {
+          "description": "No instance has that `id`. The error code is `resource_not_found`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e",
+          "custom_object_id": "co_7e9b1d3f5a2c4e6b8d0f2a4c6e8b1d3f",
+          "instance_id": "coi_2c4e6a8b0d1f4a3c5e7b9d0f2a4c6e8b"
+        }
+      }
+    },
+    {
+      "key": "update_component_object_custom_object_instance",
+      "method": "PATCH",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/custom_objects/{custom_object_id}/instances/{instance_id}",
+      "slug": "update-a-custom-object-instance-on-a-component-object",
+      "title": "Update a custom object instance on a component object",
+      "summary": "Changes a custom object instance on a component object.",
+      "description": "Send the instance's `attributes` list under `custom_object_instance`, the singular key.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        },
+        {
+          "name": "custom_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom object schema's `id`, which starts with `co_`.",
+          "schema": {
+            "type": "string",
+            "example": "co_7e9b1d3f5a2c4e6b8d0f2a4c6e8b1d3f"
+          }
+        },
+        {
+          "name": "instance_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom object instance's `id`, which starts with `coi_`.",
+          "schema": {
+            "type": "string",
+            "example": "coi_2c4e6a8b0d1f4a3c5e7b9d0f2a4c6e8b"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "custom_object_instance": {
+              "type": "object",
+              "properties": {
+                "attributes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              },
+              "required": [
+                "attributes"
+              ]
+            }
+          },
+          "required": [
+            "custom_object_instance"
+          ]
+        },
+        "example": {
+          "custom_object_instance": {
+            "attributes": []
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated custom object instance."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e",
+          "custom_object_id": "co_7e9b1d3f5a2c4e6b8d0f2a4c6e8b1d3f",
+          "instance_id": "coi_2c4e6a8b0d1f4a3c5e7b9d0f2a4c6e8b"
+        },
+        "body": {
+          "custom_object_instance": {
+            "attributes": []
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_component_object_custom_object_instance",
+      "method": "DELETE",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/custom_objects/{custom_object_id}/instances/{instance_id}",
+      "slug": "delete-a-custom-object-instance-on-a-component-object",
+      "title": "Delete a custom object instance on a component object",
+      "summary": "Deletes a custom object instance on a component object and returns no body.",
+      "description": "Removes the instance with this `coi_` id from the custom object with this `co_` id. A successful call returns 204 with an empty body.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        },
+        {
+          "name": "custom_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom object schema's `id`, which starts with `co_`.",
+          "schema": {
+            "type": "string",
+            "example": "co_7e9b1d3f5a2c4e6b8d0f2a4c6e8b1d3f"
+          }
+        },
+        {
+          "name": "instance_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom object instance's `id`, which starts with `coi_`.",
+          "schema": {
+            "type": "string",
+            "example": "coi_2c4e6a8b0d1f4a3c5e7b9d0f2a4c6e8b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The custom object instance is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e",
+          "custom_object_id": "co_7e9b1d3f5a2c4e6b8d0f2a4c6e8b1d3f",
+          "instance_id": "coi_2c4e6a8b0d1f4a3c5e7b9d0f2a4c6e8b"
+        }
+      }
+    },
+    {
+      "key": "link_component_object_domains",
+      "method": "POST",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/link_domains",
+      "slug": "link-accounts-or-orders-to-a-component-object",
+      "title": "Link accounts or orders to a component object",
+      "summary": "Links accounts or orders to a component object and returns the object.",
+      "description": "Send `domain_type`, `account` or `order`, and the records to link as `domains[].domain_id`, under `custom_component_object`. The object comes back under `custom_component_object`, and its `accounts` then include the linked accounts.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "custom_component_object": {
+              "type": "object",
+              "properties": {
+                "domain_type": {
+                  "type": "string",
+                  "description": "`account` or `order`."
+                },
+                "domains": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "domain_id": {
+                        "type": "string",
+                        "description": "The account's or order's `id`."
+                      }
+                    },
+                    "required": [
+                      "domain_id"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "domain_type",
+                "domains"
+              ]
+            }
+          },
+          "required": [
+            "custom_component_object"
+          ]
+        },
+        "example": {
+          "custom_component_object": {
+            "domain_type": "account",
+            "domains": [
+              {
+                "domain_id": "W13ZGY"
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The component object, under `custom_component_object`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentObjectRecordResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+        },
+        "body": {
+          "custom_component_object": {
+            "domain_type": "account",
+            "domains": [
+              {
+                "domain_id": "W13ZGY"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "update_component_object_domains",
+      "method": "PATCH",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/link_domains",
+      "slug": "replace-the-accounts-or-orders-linked-to-a-component-object",
+      "title": "Replace the accounts or orders linked to a component object",
+      "summary": "Replaces the set of accounts or orders linked to a component object and returns the object.",
+      "description": "Send the full set under `custom_component_object`, as for the link call. A record left out of `domains` is unlinked, so afterwards the object is linked to exactly the records you sent.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "custom_component_object": {
+              "type": "object",
+              "properties": {
+                "domain_type": {
+                  "type": "string",
+                  "description": "`account` or `order`."
+                },
+                "domains": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "domain_id": {
+                        "type": "string",
+                        "description": "The account's or order's `id`."
+                      }
+                    },
+                    "required": [
+                      "domain_id"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "domain_type",
+                "domains"
+              ]
+            }
+          },
+          "required": [
+            "custom_component_object"
+          ]
+        },
+        "example": {
+          "custom_component_object": {
+            "domain_type": "account",
+            "domains": [
+              {
+                "domain_id": "W13ZGY"
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The component object, under `custom_component_object`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentObjectRecordResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+        },
+        "body": {
+          "custom_component_object": {
+            "domain_type": "account",
+            "domains": [
+              {
+                "domain_id": "W13ZGY"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "unlink_component_object_domains",
+      "method": "POST",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/unlink_domains",
+      "slug": "unlink-accounts-or-orders-from-a-component-object",
+      "title": "Unlink accounts or orders from a component object",
+      "summary": "Unlinks accounts or orders from a component object and returns the object.",
+      "description": "Send `domain_type` and the records to unlink as `domains[].domain_id`, under `custom_component_object`. A record that is not linked is refused. The object comes back under `custom_component_object`.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "custom_component_object": {
+              "type": "object",
+              "properties": {
+                "domain_type": {
+                  "type": "string",
+                  "description": "`account` or `order`."
+                },
+                "domains": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "domain_id": {
+                        "type": "string",
+                        "description": "The account's or order's `id`."
+                      }
+                    },
+                    "required": [
+                      "domain_id"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "domain_type",
+                "domains"
+              ]
+            }
+          },
+          "required": [
+            "custom_component_object"
+          ]
+        },
+        "example": {
+          "custom_component_object": {
+            "domain_type": "account",
+            "domains": [
+              {
+                "domain_id": "W13ZGY"
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The component object, under `custom_component_object`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentObjectRecordResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+        },
+        "body": {
+          "custom_component_object": {
+            "domain_type": "account",
+            "domains": [
+              {
+                "domain_id": "W13ZGY"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "change_component_object_status",
+      "method": "POST",
+      "path": "/components/{component_uuid}/objects/{component_object_id}/change_status",
+      "slug": "change-a-component-objects-workflow-status",
+      "title": "Change a component object's workflow status",
+      "summary": "Moves a component object to another workflow status and returns the object.",
+      "description": "Send the target `workflow_status` under `custom_component_object`. The transition runs at once, including any actions the workflow carries. The object comes back under `custom_component_object`.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component object's `id`, as returned when it is created or listed.",
+          "schema": {
+            "type": "string",
+            "example": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "custom_component_object": {
+              "type": "object",
+              "properties": {
+                "workflow_status": {
+                  "type": "string",
+                  "description": "The workflow status to move the object to."
+                }
+              },
+              "required": [
+                "workflow_status"
+              ]
+            }
+          },
+          "required": [
+            "custom_component_object"
+          ]
+        },
+        "example": {
+          "custom_component_object": {
+            "workflow_status": "Approved"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The component object, under `custom_component_object`.",
+          "schema": {
+            "$ref": "#/components/schemas/ComponentObjectRecordResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d",
+          "component_object_id": "a1c3e5f7b9d24f6a8c0e2b4d6f8a0c2e"
+        },
+        "body": {
+          "custom_component_object": {
+            "workflow_status": "Approved"
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_component",
+      "method": "DELETE",
+      "path": "/component/{component_uuid}",
+      "slug": "delete-a-component-definition",
+      "title": "Delete a component definition",
+      "summary": "Deletes a component definition and returns no body.",
+      "description": "Removes the component definition with this `cmp_` id. A successful call returns 204 with an empty body, and deleting it again returns 404.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component definition's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The component definition is deleted. No body."
+        },
+        "404": {
+          "description": "No component definition has that `id`, for example because it is already deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "Component": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The component definition's `cmp_` id."
+        },
+        "status": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "use_in": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "relation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "custom_component": {},
+        "custom_objects": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "custom_forms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ComponentCustomForm"
+          }
+        },
+        "child_custom_components": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "activity_logs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "Present on the create response only."
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "created_by": {},
+        "last_updated_by": {},
+        "version": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "ComponentCustomForm": {
+      "type": "object",
+      "properties": {
+        "column_count": {
+          "type": "integer"
+        },
+        "data": {
+          "$ref": "#/components/schemas/ComponentCustomFormData"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "template_name": {
+          "type": "string"
+        }
+      }
+    },
+    "ComponentCustomFormData": {
+      "type": "object",
+      "properties": {
+        "firstColumnAttribute": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ComponentCustomFormFirstColumnAttribute"
+          }
+        },
+        "secondColumnAttribute": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ComponentCustomFormSecondColumnAttribute"
+          }
+        },
+        "thirdColumnAttribute": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "ComponentCustomFormFirstColumnAttribute": {
+      "type": "object",
+      "properties": {
+        "canEncrypt": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "encryptData": {
+          "type": "boolean"
+        },
+        "entity": {},
+        "fieldRequired": {
+          "type": "boolean"
+        },
+        "formMaxLengthInputed": {
+          "type": "boolean"
+        },
+        "formMinLengthInputed": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "ids": {
+          "type": "integer"
+        },
+        "isRequired": {
+          "type": "boolean"
+        },
+        "isUnique": {
+          "type": "boolean"
+        },
+        "maxLength": {},
+        "metaData": {
+          "type": "string"
+        },
+        "minLength": {},
+        "name": {
+          "type": "string"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ComponentCustomFormAttributeOption"
+          }
+        },
+        "position": {
+          "type": "string"
+        },
+        "showInListView": {
+          "type": "boolean"
+        },
+        "timeFormat": {},
+        "type": {
+          "type": "string"
+        },
+        "typeValue": {
+          "type": "string"
+        },
+        "validationMessage": {
+          "type": "string"
+        },
+        "validationMessageRequired": {
+          "type": "boolean"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "ComponentCustomFormSecondColumnAttribute": {
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string"
+        },
+        "fieldEnabled": {
+          "type": "boolean"
+        },
+        "fieldRequired": {
+          "type": "boolean"
+        },
+        "ids": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "showInListView": {
+          "type": "boolean"
+        },
+        "type": {
+          "type": "string"
+        },
+        "typeActual": {
+          "$ref": "#/components/schemas/ComponentCustomFormAttributeTypeActual"
+        },
+        "validationMessageRequired": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ComponentCustomFormAttributeOption": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "ComponentCustomFormAttributeTypeActual": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "ComponentResponse": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "$ref": "#/components/schemas/Component"
+        }
+      }
+    },
+    "ComponentList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Component"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ComponentPagination"
+        }
+      }
+    },
+    "ComponentInstance": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "parents": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "custom_form": {
+          "type": "object"
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "attribute_groups": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "custom_objects": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "restrictions": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "activity_logs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "created_by": {
+          "type": "string"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "ComponentInstanceResponse": {
+      "type": "object",
+      "description": "One key, the component's `name`, holding the instance.",
+      "additionalProperties": {
+        "$ref": "#/components/schemas/ComponentInstance"
+      }
+    },
+    "ComponentObject": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "component": {
+          "$ref": "#/components/schemas/ComponentObjectComponent"
+        },
+        "custom_form": {
+          "$ref": "#/components/schemas/ComponentObjectCustomForm"
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "attribute_groups": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "restrictions": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "parents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ComponentObjectParent"
+          }
+        },
+        "workflow_status": {},
+        "workflow_status_uuid": {},
+        "workflow_stage": {},
+        "workflow_data": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "custom_objects": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "accounts": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "orders": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "quotes": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "created_by": {},
+        "last_updated_by": {},
+        "version": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "ComponentObjectRecord": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "component": {
+          "$ref": "#/components/schemas/ComponentObjectComponent"
+        },
+        "custom_form": {
+          "$ref": "#/components/schemas/ComponentObjectCustomForm"
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "attribute_groups": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "restrictions": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "parents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ComponentObjectParent"
+          }
+        },
+        "workflow_status": {},
+        "workflow_status_uuid": {},
+        "workflow_stage": {},
+        "workflow_data": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "custom_objects": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "accounts": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "orders": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "quotes": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "created_by": {},
+        "last_updated_by": {},
+        "version": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string"
+        },
+        "activity_logs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ComponentObjectActivityLog"
+          }
+        }
+      }
+    },
+    "ComponentObjectComponent": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ComponentObjectCustomForm": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ComponentObjectParent": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "ComponentObjectActivityLog": {
+      "type": "object",
+      "properties": {
+        "activity": {
+          "type": "string"
+        }
+      }
+    },
+    "ComponentObjectResponse": {
+      "type": "object",
+      "properties": {
+        "custom_component_object": {
+          "$ref": "#/components/schemas/ComponentObject"
+        }
+      }
+    },
+    "ComponentObjectRecordResponse": {
+      "type": "object",
+      "properties": {
+        "custom_component_object": {
+          "$ref": "#/components/schemas/ComponentObjectRecord"
+        }
+      }
+    },
+    "ComponentObjectList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ComponentObject"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ComponentPagination"
+        }
+      }
+    },
+    "ComponentObjectActivityList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ComponentPagination"
+        }
+      }
+    },
+    "ComponentObjectCustomObjectList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ComponentPagination"
+        }
+      }
+    },
+    "ComponentObjectActivity": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "user_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "created_by": {},
+        "version": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "ComponentObjectActivityResponse": {
+      "type": "object",
+      "properties": {
+        "custom_component_object_activity": {
+          "$ref": "#/components/schemas/ComponentObjectActivity"
+        }
+      }
+    },
+    "ComponentObjectNote": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "custom_component_object": {
+          "$ref": "#/components/schemas/ComponentObjectNoteOwner"
+        },
+        "group": {},
+        "user": {},
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ComponentObjectNoteFile"
+          }
+        },
+        "watchers": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/ComponentObjectNoteAuthor"
+        },
+        "last_updated_by": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/ComponentObjectNoteAuthor"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Set once the note is updated."
+        },
+        "version": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "ComponentObjectNoteOwner": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      },
+      "description": "The component object the note belongs to."
+    },
+    "ComponentObjectNoteAuthor": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ComponentObjectNoteFile": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "description": "The file's id, used as `file_id`."
+        },
+        "filename": {
+          "type": "string"
+        },
+        "content_type": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "ComponentObjectNoteResponse": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "$ref": "#/components/schemas/ComponentObjectNote"
+        }
+      }
+    },
+    "ComponentObjectNoteList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ComponentObjectNote"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ComponentPagination"
+        }
+      }
+    },
+    "ComponentObjectNoteFileList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ComponentObjectNoteFile"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ComponentPagination"
+        }
+      }
+    },
+    "ComponentObjectNoteFileResponse": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "$ref": "#/components/schemas/ComponentObjectNoteFile"
+        }
+      }
+    },
+    "ComponentPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can be stale on the last page."
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "links": {
+          "$ref": "#/components/schemas/ComponentPaginationLinks"
+        }
+      }
+    },
+    "ComponentPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}
