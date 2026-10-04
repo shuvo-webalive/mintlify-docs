@@ -16856,7 +16856,7 @@
         ],
         "summary": "List gift certificates",
         "operationId": "gift_certificates_get_gift_certificates",
-        "description": "The records are under `data`, and `pagination` holds the cursor for the next page. Other fields filter as `filter_<field>`.",
+        "description": "The records are under `data`, and `pagination` holds the cursor for the next page. To filter, add `filter_<field>=<value>`.",
         "parameters": [
           {
             "name": "limit",
@@ -16949,7 +16949,7 @@
         ],
         "summary": "Create a gift certificate",
         "operationId": "gift_certificates_create_gift_certificate",
-        "description": "Send `amount` and `expiry_date` under `gift_certificate`. The new certificate gets a `code`, its `remaining_balance` starts at `amount`, and its transactions start with one of type `initial`.",
+        "description": "Send `amount` and `expiry_date` under `gift_certificate`. The new certificate gets a `code`, and its transactions start with one of type `initial`.",
         "parameters": [],
         "responses": {
           "201": {
@@ -17407,7 +17407,7 @@
         ],
         "summary": "Allocate a gift certificate to an account",
         "operationId": "gift_certificates_allocate_gift_certificate",
-        "description": "Name the account under `gift_certificate.account`, by `code` (the account's `id`, such as `W13ZGY`). The call returns `200`, not `201`, and the certificate's `allocations` gains an entry.",
+        "description": "Name the account in `gift_certificate.account.code`, using the account's `id` from the accounts API, such as `W13ZGY`. The call returns `200`, not `201`, and the certificate's `allocations` gains an entry.",
         "parameters": [
           {
             "name": "gc_id",
@@ -17431,7 +17431,7 @@
             }
           },
           "404": {
-            "description": "`account.id` was sent with the account's `id` rather than its `acc_` uuid. Send it as `account.code` instead.",
+            "description": "`account.id` held the account's `id`, such as `W13ZGY`, instead of its `acc_` uuid. Send that value as `account.code` instead.",
             "content": {
               "application/json": {
                 "schema": {
