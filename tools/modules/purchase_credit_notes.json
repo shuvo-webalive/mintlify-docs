@@ -5,8 +5,8 @@
   "icon": "file-circle-minus",
   "base": "/purchase_credit_notes",
   "overview_description": "Create, read, update, apply and delete purchase credit notes, the credit a supplier owes you, and add or remove their notes.",
-  "intro": "A purchase credit note is credit a supplier owes you, raised when a payment exceeds its invoices or created against a purchase invoice. These endpoints create, read, update, apply and delete purchase credit notes and add or remove their notes. There are 8 endpoints, and all seven SDKs call every one.",
-  "warning": "**Applying a purchase credit note records a purchase payment, and deleting one cannot be undone.**",
+  "intro": "A purchase credit note is credit a supplier owes you, raised when a payment exceeds its invoices or created against a purchase invoice. These endpoints create, read, update, apply and delete purchase credit notes and add or remove their notes. This area has 8 endpoints, each available in all seven SDKs.",
+  "warning": "**Creating a purchase credit note cannot be reversed.** The credit note cannot be deleted without the permission to delete purchase credit notes, and the payment it draws on can no longer be deleted. Applying a purchase credit note records a purchase payment, and deleting a purchase credit note cannot be undone.",
   "notes": [
     "**Every write body is wrapped in `purchase_credit_note`.** The note create is a multipart form instead.",
     "**The create takes `purchase_invoice_id` and `amount`.** The credit is drawn from that invoice's payments.",
@@ -85,7 +85,7 @@
           "name": "purchase_credit_note_id",
           "in": "path",
           "required": true,
-          "description": "The purchase credit note's `id`, such as `pcn_...`. The reads also accept its code.",
+          "description": "The purchase credit note's `id`, such as `pcn_...`. Its code also works here.",
           "schema": {
             "type": "string",
             "example": "pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b"
@@ -115,13 +115,13 @@
       "slug": "update-a-purchase-credit-note",
       "title": "Update a purchase credit note",
       "summary": "Changes fields of a purchase credit note, such as its custom attributes, and returns it under `purchase_credit_note`.",
-      "description": "Updates the purchase credit note, wrapped in `purchase_credit_note`, for example its `custom_attributes`. The updated credit note comes back under `purchase_credit_note`.",
+      "description": "Updates the purchase credit note, wrapped in `purchase_credit_note`, for example its `custom_attributes`. The updated credit note comes back under `purchase_credit_note`. An empty `custom_attributes` list, as in the example, removes all custom attributes.",
       "parameters": [
         {
           "name": "purchase_credit_note_id",
           "in": "path",
           "required": true,
-          "description": "The purchase credit note's `id`, such as `pcn_...`. The reads also accept its code.",
+          "description": "The purchase credit note's `id`, such as `pcn_...`.",
           "schema": {
             "type": "string",
             "example": "pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b"
@@ -190,6 +190,7 @@
       "title": "Create a purchase credit note",
       "summary": "Credits a purchase invoice and returns the new credit note under `purchase_credit_note`.",
       "description": "Creates a purchase credit note against a purchase invoice, wrapped in `purchase_credit_note` with the invoice's `purchase_invoice_id` and the `amount`. The credit is drawn from the invoice's payments. The response is shorter than a read, and its `status` is an object with `key` and `value`.",
+      "warning": "**This call has not been confirmed to work.** Once created, a purchase credit note cannot be removed without extra permission, and the payment it draws on can no longer be deleted.",
       "parameters": [],
       "body": {
         "schema": {
@@ -247,6 +248,7 @@
       "title": "Delete a purchase credit note",
       "summary": "Deletes a purchase credit note. Nothing comes back.",
       "description": "Deletes the purchase credit note, addressed by its `pcn_` id only. The call returns `204` with no body. It needs the permission to delete purchase credit notes.",
+      "warning": "**This call has not been confirmed to work.** It needs the permission to delete purchase credit notes; without it the call returns `403`.",
       "parameters": [
         {
           "name": "purchase_credit_note_id",
@@ -283,6 +285,7 @@
       "title": "Apply a purchase credit note to purchase invoices",
       "summary": "Spends a purchase credit note on one or more purchase invoices and returns the credit note under `purchase_credit_note`.",
       "description": "Applies the credit to purchase invoices, listed under `purchase_credit_note.purchase_invoices`. Each entry takes `purchase_invoice_id` and `amount` and nothing else. Applying the credit records a purchase payment. Address the credit note by its `pcn_` id.",
+      "warning": "**This call has not been confirmed to work.** Applying the credit records a purchase payment.",
       "parameters": [
         {
           "name": "purchase_credit_note_id",
@@ -371,10 +374,11 @@
       "key": "create_purchase_credit_note_note",
       "method": "POST",
       "path": "/purchase_credit_notes/{purchase_credit_note_id}/notes",
-      "slug": "create-a-purchase-credit-note-note",
-      "title": "Create a purchase credit note note",
+      "slug": "add-a-note-to-a-purchase-credit-note",
+      "title": "Add a note to a purchase credit note",
       "summary": "Attaches a note, with an optional file, to a purchase credit note.",
       "description": "Adds a note to the purchase credit note. Send a multipart form with the text as the `note` field and, optionally, a file to attach. Address the credit note by its `pcn_` id. It needs the permission to create purchase credit note notes.",
+      "warning": "**This call has not been confirmed to work.** It needs the permission to create purchase credit note notes; without it the call returns `403`.",
       "parameters": [
         {
           "name": "purchase_credit_note_id",
@@ -406,7 +410,7 @@
           }
         },
         "example": {
-          "note": "<p>Goods received in full.</p>",
+          "note": "<p>Credit agreed with supplier.</p>",
           "file": "delivery-note.pdf"
         }
       },
@@ -426,7 +430,7 @@
         "path": {
           "purchase_credit_note_id": "pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b"
         },
-        "note": "<p>Goods received in full.</p>",
+        "note": "<p>Credit agreed with supplier.</p>",
         "file": "delivery-note.pdf"
       }
     },
@@ -434,10 +438,11 @@
       "key": "delete_purchase_credit_note_note",
       "method": "DELETE",
       "path": "/purchase_credit_notes/{purchase_credit_note_id}/notes/{note_id}",
-      "slug": "delete-a-purchase-credit-note-note",
-      "title": "Delete a purchase credit note note",
+      "slug": "delete-a-note-from-a-purchase-credit-note",
+      "title": "Delete a note from a purchase credit note",
       "summary": "Deletes one note from a purchase credit note. Nothing comes back.",
       "description": "Deletes the note, addressed by the credit note's `pcn_` id and the note's `note_` id. The call returns `204` with no body.",
+      "warning": "**This call has not been confirmed to work.** It needs a note on the purchase credit note, and adding one needs extra permission.",
       "parameters": [
         {
           "name": "purchase_credit_note_id",
