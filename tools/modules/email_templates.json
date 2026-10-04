@@ -9,9 +9,9 @@
   "warning": null,
   "notes": [
     "**`name` is required on a create.** Send it, and usually a `subject`, under `email_template`.",
-    "**`cc` and `bcc` are lists of addresses.** Send each as an array of strings, not one comma separated string.",
+    "**`cc` and `bcc` take lists of addresses.** Send each as an array of strings.",
     "**An email template `id` starts with `et_`.**",
-    "**Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true.",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.",
     "**A delete returns `204` with no body.** Reading the email template afterwards returns `404`."
   ],
   "endpoints": [
@@ -152,7 +152,7 @@
       "slug": "retrieve-an-email-template",
       "title": "Retrieve an email template",
       "summary": "Returns one email template by its `id`, under `email_template`.",
-      "description": "Reads the email template with this `et_` `id`. The `id` is the one a listing or a create returns.",
+      "description": "Reads the email template with this `et_` `id`.",
       "parameters": [
         {
           "name": "email_template_id",
@@ -224,7 +224,7 @@
       "slug": "update-an-email-template",
       "title": "Update an email template",
       "summary": "Changes the fields you send on an email template and returns it under `email_template`.",
-      "description": "Send the fields to change under `email_template`. You can change its fields or its content.",
+      "description": "Send the fields to change under `email_template`, such as `display_name` and `description`.",
       "parameters": [
         {
           "name": "email_template_id",
@@ -311,7 +311,7 @@
       "type": "object",
       "properties": {
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -323,7 +323,7 @@
           "type": "string"
         },
         "entity": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "href": {
           "type": "string"
@@ -338,7 +338,7 @@
           "type": "boolean"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -350,16 +350,16 @@
           "type": "string"
         },
         "reply_address": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "rich_editor": {
           "type": "boolean"
         },
         "sender_address": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "sender_name": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "status": {
           "type": "string"
