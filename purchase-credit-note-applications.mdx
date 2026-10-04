@@ -1,0 +1,27 @@
+---
+title: "Purchase credit note applications"
+sidebarTitle: "Overview"
+description: "List and read purchase credit note applications: each time a purchase credit note is spent on a purchase invoice."
+---
+
+A purchase credit note application records a purchase credit note spent on a purchase invoice, through a purchase payment. These endpoints list and read applications; they are created by spending a credit note in a purchase payment. There are 2 endpoints, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List purchase credit note applications](/api-reference/purchase-credit-note-applications/list-purchase-credit-note-applications) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/purchase_credit_note_applications` | Returns one page of purchase credit note applications. |
+| [Retrieve a purchase credit note application](/api-reference/purchase-credit-note-applications/retrieve-a-purchase-credit-note-application) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/purchase_credit_note_applications/{purchase_credit_note_application_id}` | Returns one purchase credit note application under `purchase_credit_note_application`. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Applications are read only here.** One is created when a purchase payment spends a purchase credit note through `credit_note_applications`.
+- **Each application links a credit note to a payment.** It carries `purchase_credit_note`, `purchase_payment`, `amount` and `remaining_balance`.
+- **One application comes back under `purchase_credit_note_application`.**
+- **Listings page by cursor.** Records are under `data`; pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`.

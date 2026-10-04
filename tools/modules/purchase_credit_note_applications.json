@@ -1,0 +1,367 @@
+{
+  "family": "purchase_credit_note_applications",
+  "tag": "Purchase credit note applications",
+  "slug": "purchase-credit-note-applications",
+  "icon": "link",
+  "base": "/purchase_credit_note_applications",
+  "overview_description": "List and read purchase credit note applications: each time a purchase credit note is spent on a purchase invoice.",
+  "intro": "A purchase credit note application records a purchase credit note spent on a purchase invoice, through a purchase payment. These endpoints list and read applications; they are created by spending a credit note in a purchase payment. There are 2 endpoints, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**Applications are read only here.** One is created when a purchase payment spends a purchase credit note through `credit_note_applications`.",
+    "**Each application links a credit note to a payment.** It carries `purchase_credit_note`, `purchase_payment`, `amount` and `remaining_balance`.",
+    "**One application comes back under `purchase_credit_note_application`.**",
+    "**Listings page by cursor.** Records are under `data`; pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_purchase_credit_note_applications",
+      "method": "GET",
+      "path": "/purchase_credit_note_applications",
+      "slug": "list-purchase-credit-note-applications",
+      "title": "List purchase credit note applications",
+      "summary": "Returns one page of purchase credit note applications.",
+      "description": "Lists every time a purchase credit note is spent on a purchase invoice, one page at a time, under `data`. Each shows the credit note, the payment that spent it, the amount and the remaining balance. Other fields filter the list as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of purchase credit note applications.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseCreditNoteApplicationList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_purchase_credit_note_application",
+      "method": "GET",
+      "path": "/purchase_credit_note_applications/{purchase_credit_note_application_id}",
+      "slug": "retrieve-a-purchase-credit-note-application",
+      "title": "Retrieve a purchase credit note application",
+      "summary": "Returns one purchase credit note application under `purchase_credit_note_application`.",
+      "description": "Returns the application with its credit note, payment, amount and remaining balance under `purchase_credit_note_application`.",
+      "parameters": [
+        {
+          "name": "purchase_credit_note_application_id",
+          "in": "path",
+          "required": true,
+          "description": "The application's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PCNA-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The application, under `purchase_credit_note_application`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseCreditNoteApplicationResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_credit_note_application_id": "PCNA-0001"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "PurchaseCreditNoteApplication": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteApplicationCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "credit_note_id": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "payment_id": {
+          "type": "string"
+        },
+        "purchase_credit_note": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteApplicationDetail"
+        },
+        "purchase_payment": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteApplicationPurchasePayment"
+        },
+        "remaining_balance": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchaseCreditNoteApplicationCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteApplicationDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteApplicationPurchasePayment": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteApplicationPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteApplicationPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size the API applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can be set on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": "string",
+          "description": "The cursor of the previous page."
+        },
+        "links": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteApplicationPaginationLinks"
+        }
+      }
+    },
+    "PurchaseCreditNoteApplicationList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseCreditNoteApplication"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteApplicationPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteApplicationRead": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteApplicationReadCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "purchase_credit_note": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteApplicationReadDetail"
+        },
+        "purchase_payment": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteApplicationReadPurchasePayment"
+        },
+        "remaining_balance": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchaseCreditNoteApplicationReadCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteApplicationReadDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteApplicationReadPurchasePayment": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteApplicationResponse": {
+      "type": "object",
+      "properties": {
+        "purchase_credit_note_application": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteApplicationRead"
+        }
+      }
+    }
+  }
+}

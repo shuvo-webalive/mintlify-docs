@@ -131,6 +131,9 @@
     },
     {
       "name": "Purchase credit notes"
+    },
+    {
+      "name": "Purchase credit note applications"
     }
   ],
   "paths": {
@@ -47901,6 +47904,176 @@
           }
         ]
       }
+    },
+    "/purchase_credit_note_applications": {
+      "get": {
+        "tags": [
+          "Purchase credit note applications"
+        ],
+        "summary": "List purchase credit note applications",
+        "operationId": "purchase_credit_note_applications_get_purchase_credit_note_applications",
+        "description": "Lists every time a purchase credit note is spent on a purchase invoice, one page at a time, under `data`. Each shows the credit note, the payment that spent it, the amount and the remaining balance. Other fields filter the list as `filter_<field>` or `filter_<field>_<operator>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of purchase credit note applications.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseCreditNoteApplicationList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_credit_note_applications?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = (\n    client.purchase_credit_note_applications.get_purchase_credit_note_applications(\n        {\"limit\": 20}\n    )\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseCreditNoteApplications.getPurchaseCreditNoteApplications({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseCreditNoteApplications->getPurchaseCreditNoteApplications([\n    'limit' => 20,\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_credit_note_applications.purchase_credit_note_applications_dto.PurchaseCreditNoteApplicationsDto.PurchaseCreditNoteApplicationList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseCreditNoteApplicationList> response = client.purchaseCreditNoteApplications().getPurchaseCreditNoteApplications(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseCreditNoteApplications.GetPurchaseCreditNoteApplicationsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseCreditNoteApplications\n    .getPurchaseCreditNoteApplications(queryParams: {'limit': 20});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseCreditNoteApplications().GetPurchaseCreditNoteApplications(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_credit_note_applications/{purchase_credit_note_application_id}": {
+      "get": {
+        "tags": [
+          "Purchase credit note applications"
+        ],
+        "summary": "Retrieve a purchase credit note application",
+        "operationId": "purchase_credit_note_applications_get_purchase_credit_note_application",
+        "description": "Returns the application with its credit note, payment, amount and remaining balance under `purchase_credit_note_application`.",
+        "parameters": [
+          {
+            "name": "purchase_credit_note_application_id",
+            "in": "path",
+            "required": true,
+            "description": "The application's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The application, under `purchase_credit_note_application`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseCreditNoteApplicationResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_credit_note_applications/PCNA-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = (\n    client.purchase_credit_note_applications.get_purchase_credit_note_application(\n        \"PCNA-0001\"\n    )\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseCreditNoteApplications.getPurchaseCreditNoteApplication('PCNA-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseCreditNoteApplications->getPurchaseCreditNoteApplication('PCNA-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_credit_note_applications.purchase_credit_note_applications_dto.PurchaseCreditNoteApplicationsDto.PurchaseCreditNoteApplicationRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseCreditNoteApplicationRead> response = client.purchaseCreditNoteApplications().getPurchaseCreditNoteApplication(\n        \"PCNA-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseCreditNoteApplications.GetPurchaseCreditNoteApplicationAsync(\"PCNA-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseCreditNoteApplications\n    .getPurchaseCreditNoteApplication('PCNA-0001');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseCreditNoteApplications().GetPurchaseCreditNoteApplication(context.Background(), \"PCNA-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -76783,6 +76956,261 @@
         "properties": {
           "purchase_credit_note": {
             "$ref": "#/components/schemas/PurchaseCreditNoteCreated"
+          }
+        }
+      },
+      "PurchaseCreditNoteApplication": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseCreditNoteApplicationCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "credit_note_id": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "payment_id": {
+            "type": "string"
+          },
+          "purchase_credit_note": {
+            "$ref": "#/components/schemas/PurchaseCreditNoteApplicationDetail"
+          },
+          "purchase_payment": {
+            "$ref": "#/components/schemas/PurchaseCreditNoteApplicationPurchasePayment"
+          },
+          "remaining_balance": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchaseCreditNoteApplicationCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseCreditNoteApplicationDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseCreditNoteApplicationPurchasePayment": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseCreditNoteApplicationPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseCreditNoteApplicationPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size the API applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can be set on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": "string",
+            "description": "The cursor of the previous page."
+          },
+          "links": {
+            "$ref": "#/components/schemas/PurchaseCreditNoteApplicationPaginationLinks"
+          }
+        }
+      },
+      "PurchaseCreditNoteApplicationList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseCreditNoteApplication"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PurchaseCreditNoteApplicationPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseCreditNoteApplicationRead": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseCreditNoteApplicationReadCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "purchase_credit_note": {
+            "$ref": "#/components/schemas/PurchaseCreditNoteApplicationReadDetail"
+          },
+          "purchase_payment": {
+            "$ref": "#/components/schemas/PurchaseCreditNoteApplicationReadPurchasePayment"
+          },
+          "remaining_balance": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchaseCreditNoteApplicationReadCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseCreditNoteApplicationReadDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseCreditNoteApplicationReadPurchasePayment": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseCreditNoteApplicationResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_credit_note_application": {
+            "$ref": "#/components/schemas/PurchaseCreditNoteApplicationRead"
           }
         }
       },
