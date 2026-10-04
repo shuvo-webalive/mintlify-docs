@@ -5,11 +5,10 @@
   "icon": "circle-check",
   "base": "/approvals",
   "overview_description": "List account and sale order approvals, read one, and approve or reject a pending approval.",
-  "intro": "Approvals hold an action until someone signs it off. You can list account and sale order approvals, read one account approval, and approve or reject a pending one. This area has 5 endpoints, and all seven Exsited SDKs call every one.",
+  "intro": "Approvals hold an action until someone signs it off. You can list account and sale order approvals, read one account approval, and approve or reject a pending one. This area has 5 endpoints, and all seven SDKs call every one.",
   "warning": "**Approving or rejecting takes effect at once.** An approve runs the held action, and both send notifications.",
   "notes": [
-    "**Approve and reject name the record in the body.** Send `{\"approval\": {\"entity\", \"resource_id\", \"note\"}}`; the same two routes serve all 16 entities.",
-    "**A decision takes effect at once.** Approving runs the held action, and both decisions send notifications.",
+    "**Approve and reject name the record in the body.** Send `{\"approval\": {\"entity\": \"account\", \"resource_id\": \"W13ZGY\", \"note\": \"Checked.\"}}`; the same two routes serve every entity that can need approval.",
     "**The sale order listing path is camel case.** It is `/approvals/saleOrder`, not `sale_order`.",
     "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`."
   ],
@@ -131,7 +130,7 @@
       "slug": "retrieve-an-account-approval",
       "title": "Retrieve an account approval",
       "summary": "Retrieves one account approval.",
-      "description": "Name the approval by the `id` an entry of the account approvals listing carries.",
+      "description": "Pass the `id` of an entry from the account approvals listing.",
       "parameters": [
         {
           "name": "account_uuid",
@@ -175,7 +174,7 @@
               "properties": {
                 "entity": {
                   "type": "string",
-                  "description": "The kind of record the approval is for. One route serves all 16 entities."
+                  "description": "The kind of record, such as `account`."
                 },
                 "resource_id": {
                   "type": "string",
@@ -234,7 +233,7 @@
               "properties": {
                 "entity": {
                   "type": "string",
-                  "description": "The kind of record the approval is for. One route serves all 16 entities."
+                  "description": "The kind of record, such as `account`."
                 },
                 "resource_id": {
                   "type": "string",
