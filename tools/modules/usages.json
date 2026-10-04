@@ -5,13 +5,13 @@
   "icon": "gauge",
   "base": "/usages",
   "overview_description": "Record, list, read, change and delete the usage that Exsited bills on metered order lines.",
-  "intro": "A usage records how much of a metered item a customer used in a billing period, against one order line. This area records usages one at a time or several at once, and lists, reads, changes and deletes them. It has 6 endpoints, and all seven SDKs call every one.",
+  "intro": "A usage records how much of a metered item a customer used in a billing period, against one order line. This area records usages one at a time or several at once, and lists, reads, changes and deletes them. It has 6 endpoints, and every SDK supports all of them.",
   "warning": null,
   "notes": [
     "**A usage belongs to a metered order line.** `charge_item_id` is the `id` of an order line whose item is charged as `METERED`.",
     "**`charging_period` is two dates joined by a hyphen.** It runs from the order's `order_start_date` to the day before its `next_billing_from_date`, such as `2026-10-01-2026-10-31`.",
     "**One usage goes under `usage`, several under `usages`.** A list sent under `usage` returns `400`. For several, the response lists each one under `usages.success` or `usages.failed`.",
-    "**Updates return a reference, not the usage.** `update_usage` and `replace_usage` return the usage's `id` and `href` under `usage`; read it again for the new values.",
+    "**Updates return a reference, not the usage.** [Update a usage](/api-reference/usages/update-a-usage) and [Replace a usage](/api-reference/usages/replace-a-usage) return only the usage's `id` and `href` under `usage`; retrieve the usage again to see the new values.",
     "**The listing pages by cursor.** Send `limit`, then pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`."
   ],
   "endpoints": [
@@ -22,7 +22,7 @@
       "slug": "list-usages",
       "title": "List usages",
       "summary": "Lists recorded usages, one page at a time.",
-      "description": "The records are under `data`, and `pagination` holds the cursor for the next page. Other fields filter as `filter_<field>`.",
+      "description": "The records are under `data`, and `pagination` holds the cursor for the next page. To filter, add `filter_<field>=<value>`.",
       "parameters": [
         {
           "name": "limit",
@@ -573,80 +573,20 @@
     "UsageCreated": {
       "type": "object",
       "properties": {
-        "activity_logs": {
-          "type": "array"
-        },
-        "charge_item_name": {
-          "type": "string"
-        },
-        "charge_item_uuid": {
-          "type": "string"
-        },
-        "charge_status": {
-          "type": "string"
-        },
-        "charging_period": {
-          "type": "string"
-        },
-        "created_by": {
-          "type": "string"
-        },
-        "created_on": {
-          "type": "string"
-        },
-        "custom_attributes": {
-          "type": "array"
-        },
-        "end_time": {
-          "type": "string"
-        },
-        "event_id": {
-          "type": "string"
-        },
-        "failed": {
-          "type": "array"
-        },
-        "href": {
+        "object": {
           "type": "string"
         },
         "id": {
           "type": "string"
         },
-        "last_updated_by": {
+        "event_id": {
           "type": "string"
         },
-        "last_updated_on": {
+        "href": {
           "type": "string"
         },
-        "object": {
-          "type": "string"
-        },
-        "quantity": {
-          "type": "string"
-        },
-        "source": {
-          "type": "string"
-        },
-        "start_time": {
-          "type": "string"
-        },
-        "success": {
+        "activity_logs": {
           "type": "array"
-        },
-        "type": {
-          "type": "string"
-        },
-        "uom": {
-          "type": "string"
-        },
-        "usages": {
-          "$ref": "#/components/schemas/UsageBatch"
-        },
-        "uuid": {
-          "type": "string"
-        },
-        "version": {
-          "type": "string"
         }
       }
     },
@@ -713,12 +653,6 @@
     "UsageUpdated": {
       "type": "object",
       "properties": {
-        "note": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        },
         "usage": {
           "$ref": "#/components/schemas/UsageUpdatedDetail"
         }
