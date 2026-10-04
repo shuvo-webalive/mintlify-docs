@@ -1,0 +1,38 @@
+---
+title: "Refunds"
+sidebarTitle: "Overview"
+description: "Create refunds from credit notes, read, update and delete them, and manage the notes and files on them."
+---
+
+A refund pays money back to an account out of a credit note. This area has 12 endpoints: create a refund from a credit note, read, update and delete refunds, and manage their notes and files. All seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List refunds](/api-reference/refunds/list-refunds) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/refunds` | Returns one page of refunds. |
+| [Delete a refund](/api-reference/refunds/delete-a-refund) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/refunds/{refund_id}` | Deletes a refund. |
+| [Retrieve a refund](/api-reference/refunds/retrieve-a-refund) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/refunds/{refund_id}` | Returns one refund by its code. |
+| [Update a refund](/api-reference/refunds/update-a-refund) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/refunds/{refund_id}` | Changes a refund's reference or note and returns the refund. |
+| [Create a refund from a credit note](/api-reference/refunds/create-a-refund-from-a-credit-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/credit_notes/{credit_note_id}…/refunds` | Refunds part or all of a credit note and returns the new refund. |
+| [List a refund's notes](/api-reference/refunds/list-a-refunds-notes) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/refunds/{refund_id}/notes` | Returns one page of the notes on a refund. |
+| [Retrieve a refund note](/api-reference/refunds/retrieve-a-refund-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/refunds/{refund_id}/notes/{note_id}` | Returns one note on a refund. |
+| [Create a refund note](/api-reference/refunds/create-a-refund-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/refunds/{refund_id}/notes` | Adds a note, and optionally a file, to a refund and returns the note. |
+| [Delete a refund note](/api-reference/refunds/delete-a-refund-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/refunds/{refund_id}/notes/{note_id}` | Deletes a note from a refund. |
+| [List a refund note's files](/api-reference/refunds/list-a-refund-notes-files) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/refunds/{refund_id}/notes/{note_id}/files` | Returns the files attached to a note on a refund. |
+| [Retrieve a refund note file](/api-reference/refunds/retrieve-a-refund-note-file) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/refunds/{refund_id}/notes/{note_id}/files/{file_id}` | Returns the details of one file attached to a refund note, not the file's contents. |
+| [Delete a refund note file](/api-reference/refunds/delete-a-refund-note-file) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/refunds/{refund_id}/notes/{note_id}/files/{file_id}` | Deletes one file from a note on a refund. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **A refund is named by its code.** `{refund_id}` is the code the refunds listing returns as `id`.
+- **A refund comes from a credit note.** Create one under the credit note, named by its `code`, with `amount` and `payment_method` under `refund`.
+- **Amounts are strings.** A refund's `amount` reads like `"2.00"`.
+- **Note deletes check the create permission.** Deleting a refund note or its file needs `CREATE_REFUND_NOTE`.
+- **Listings page by cursor.** Records are under `data`. Pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is `true`.

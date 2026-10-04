@@ -1,0 +1,54 @@
+{
+  "sdk": "java",
+  "module": "refunds",
+  "endpoints": {
+    "get_refunds": {
+      "function": "refunds().getRefunds",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.refunds.refunds_dto.RefundsDto.RefundList;\nimport java.util.Map;\n\nApiResponse<RefundList> response = client.refunds().getRefunds(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "delete_refund": {
+      "function": "refunds().deleteRefund",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\n\nApiResponse<Dto> response = client.refunds().deleteRefund(\"REF-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_refund": {
+      "function": "refunds().getRefund",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.refunds.refunds_dto.RefundsDto.Refund;\n\nApiResponse<Refund> response = client.refunds().getRefund(\"REF-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "update_refund": {
+      "function": "refunds().updateRefund",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.refunds.refunds_dto.RefundsDto.RefundUpdated;\nimport java.util.Map;\n\nApiResponse<RefundUpdated> response = client.refunds().updateRefund(\n        \"REF-0001\",\n        Map.of(\n                \"refund\", Map.of(\n                        \"reference\", \"BANK-REF-2001\",\n                        \"note\", \"Refunded to the original card.\")));\nSystem.out.println(response.getMap());\n"
+    },
+    "create_credit_note_refund": {
+      "function": "refunds().createCreditNoteRefund",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.refunds.refunds_dto.RefundsDto.RefundUpdated;\nimport java.util.Map;\n\nApiResponse<RefundUpdated> response = client.refunds().createCreditNoteRefund(\n        \"CN-0001\",\n        Map.of(\"refund\", Map.of(\"amount\", \"2.00\", \"payment_method\", \"Cash\")));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_refund_notes": {
+      "function": "refunds().getRefundNotes",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.refunds.refunds_dto.RefundsDto.RefundNoteList;\nimport java.util.Map;\n\nApiResponse<RefundNoteList> response = client.refunds().getRefundNotes(\n        \"REF-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_refund_note": {
+      "function": "refunds().getRefundNote",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.refunds.refunds_dto.RefundsDto.RefundNote;\n\nApiResponse<RefundNote> response = client.refunds().getRefundNote(\"REF-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+    },
+    "create_refund_note": {
+      "function": "refunds().createRefundNote",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.RequestOptions;\nimport com.exsited.sdk.resources.refunds.refunds_dto.RefundsDto.RefundNote;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nApiResponse<RefundNote> response = client.refunds().createRefundNote(\n        \"REF-0001\",\n        \"Customer asked for a copy by post.\",\n        Map.of(\"file\", Path.of(\"receipt.pdf\")),\n        RequestOptions.none());\nSystem.out.println(response.getMap());\n"
+    },
+    "delete_refund_note": {
+      "function": "refunds().deleteRefundNote",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\n\nApiResponse<Dto> response = client.refunds().deleteRefundNote(\"REF-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_refund_note_files": {
+      "function": "refunds().getRefundNoteFiles",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.accounts.accounts_dto.AccountsDto.NoteFileList;\n\nApiResponse<NoteFileList> response = client.refunds().getRefundNoteFiles(\n        \"REF-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_refund_note_file": {
+      "function": "refunds().getRefundNoteFile",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.refunds.refunds_dto.RefundsDto.RefundNoteFile;\n\nApiResponse<RefundNoteFile> response = client.refunds().getRefundNoteFile(\n        \"REF-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n        \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\nSystem.out.println(response.getMap());\n"
+    },
+    "delete_refund_note_file": {
+      "function": "refunds().deleteRefundNoteFile",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\n\nApiResponse<Dto> response = client.refunds().deleteRefundNoteFile(\n        \"REF-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n        \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\nSystem.out.println(response.getMap());\n"
+    }
+  }
+}

@@ -65,6 +65,9 @@
     },
     {
       "name": "Payments"
+    },
+    {
+      "name": "Refunds"
     }
   ],
   "paths": {
@@ -22195,6 +22198,1107 @@
           }
         ]
       }
+    },
+    "/refunds": {
+      "get": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "List refunds",
+        "operationId": "refunds_get_refunds",
+        "description": "Lists every refund, one page at a time, under `data`. Each record carries its `amount` as a string, the `payment_method`, the `reconcile_status`, and the account and credit note it belongs to. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of refunds, under `data`, with `pagination`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/refunds?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.refunds.get_refunds({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.refunds.getRefunds({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->refunds->getRefunds(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.refunds.refunds_dto.RefundsDto.RefundList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<RefundList> response = client.refunds().getRefunds(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Refunds.GetRefundsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.refunds.getRefunds(queryParams: {'limit': 20});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Refunds().GetRefunds(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/refunds/{refund_id}": {
+      "delete": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Delete a refund",
+        "operationId": "refunds_delete_refund",
+        "description": "Deletes the refund. Afterwards a read of the same refund returns `404`.",
+        "parameters": [
+          {
+            "name": "refund_id",
+            "in": "path",
+            "required": true,
+            "description": "The refund's code, which the refunds listing returns as `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The refund is deleted. The response has no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/refunds/REF-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.refunds.delete_refund(\"REF-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.refunds.deleteRefund('REF-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->refunds->deleteRefund('REF-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.refunds().deleteRefund(\"REF-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Refunds.DeleteRefundAsync(\"REF-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.refunds.deleteRefund('REF-0001');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Refunds().DeleteRefund(context.Background(), \"REF-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Retrieve a refund",
+        "operationId": "refunds_get_refund",
+        "description": "Fetches a single refund with its amount, payment method, reference, note, account and credit note.",
+        "parameters": [
+          {
+            "name": "refund_id",
+            "in": "path",
+            "required": true,
+            "description": "The refund's code, which the refunds listing returns as `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The refund, under `refund`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No refund has that code.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/refunds/REF-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.refunds.get_refund(\"REF-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.refunds.getRefund('REF-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->refunds->getRefund('REF-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.refunds.refunds_dto.RefundsDto.Refund;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Refund> response = client.refunds().getRefund(\"REF-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Refunds.GetRefundAsync(\"REF-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.refunds.getRefund('REF-0001');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Refunds().GetRefund(context.Background(), \"REF-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Update a refund",
+        "operationId": "refunds_update_refund",
+        "description": "Updates the fields sent under `refund`, such as `reference` and `note`. The refund's `version` goes up.",
+        "parameters": [
+          {
+            "name": "refund_id",
+            "in": "path",
+            "required": true,
+            "description": "The refund's code, which the refunds listing returns as `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated refund, under `refund`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundUpdatedResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/refunds/REF-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"refund\": {\n      \"reference\": \"BANK-REF-2001\",\n      \"note\": \"Refunded to the original card.\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.refunds.update_refund(\n    \"REF-0001\",\n    {\n        \"refund\": {\n            \"reference\": \"BANK-REF-2001\",\n            \"note\": \"Refunded to the original card.\",\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.refunds.updateRefund('REF-0001', {\n    refund: {reference: 'BANK-REF-2001', note: 'Refunded to the original card.'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->refunds->updateRefund('REF-0001', [\n    'refund' => ['reference' => 'BANK-REF-2001', 'note' => 'Refunded to the original card.'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.refunds.refunds_dto.RefundsDto.RefundUpdated;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<RefundUpdated> response = client.refunds().updateRefund(\n        \"REF-0001\",\n        Map.of(\n                \"refund\", Map.of(\n                        \"reference\", \"BANK-REF-2001\",\n                        \"note\", \"Refunded to the original card.\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Refunds.UpdateRefundAsync(\n    \"REF-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"refund\"] = new Dictionary<string, object?>\n        {\n            [\"reference\"] = \"BANK-REF-2001\",\n            [\"note\"] = \"Refunded to the original card.\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.refunds.updateRefund('REF-0001', {\n  'refund': {\n    'reference': 'BANK-REF-2001',\n    'note': 'Refunded to the original card.',\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Refunds().UpdateRefund(context.Background(), \"REF-0001\", map[string]any{\n\t\"refund\": map[string]any{\n\t\t\"reference\": \"BANK-REF-2001\",\n\t\t\"note\":      \"Refunded to the original card.\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refund": {
+                    "type": "object",
+                    "properties": {
+                      "reference": {
+                        "type": "string"
+                      },
+                      "note": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "refund"
+                ]
+              },
+              "example": {
+                "refund": {
+                  "reference": "BANK-REF-2001",
+                  "note": "Refunded to the original card."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credit_notes/{credit_note_id}/refunds": {
+      "post": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Create a refund from a credit note",
+        "operationId": "refunds_create_credit_note_refund",
+        "description": "Creates a refund against the credit note from the fields under `refund`: the `amount` and the `payment_method` to refund through. The credit note's `refund_amount` goes up by the amount.",
+        "parameters": [
+          {
+            "name": "credit_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The credit note's `code`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The new refund, under `refund`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundUpdatedResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/credit_notes/CN-0001/refunds\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"refund\": {\n      \"amount\": \"2.00\",\n      \"payment_method\": \"Cash\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.refunds.create_credit_note_refund(\n    \"CN-0001\", {\"refund\": {\"amount\": \"2.00\", \"payment_method\": \"Cash\"}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.refunds.createCreditNoteRefund('CN-0001', {\n    refund: {amount: '2.00', payment_method: 'Cash'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->refunds->createCreditNoteRefund('CN-0001', [\n    'refund' => ['amount' => '2.00', 'payment_method' => 'Cash'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.refunds.refunds_dto.RefundsDto.RefundUpdated;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<RefundUpdated> response = client.refunds().createCreditNoteRefund(\n        \"CN-0001\",\n        Map.of(\"refund\", Map.of(\"amount\", \"2.00\", \"payment_method\", \"Cash\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Refunds.CreateCreditNoteRefundAsync(\n    \"CN-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"refund\"] = new Dictionary<string, object?>\n        {\n            [\"amount\"] = \"2.00\",\n            [\"payment_method\"] = \"Cash\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.refunds.createCreditNoteRefund('CN-0001', {\n  'refund': {'amount': '2.00', 'payment_method': 'Cash'},\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Refunds().CreateCreditNoteRefund(context.Background(), \"CN-0001\", map[string]any{\n\t\"refund\": map[string]any{\"amount\": \"2.00\", \"payment_method\": \"Cash\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refund": {
+                    "type": "object",
+                    "properties": {
+                      "amount": {
+                        "type": "string",
+                        "description": "The amount to refund, such as `\"2.00\"`."
+                      },
+                      "payment_method": {
+                        "type": "string",
+                        "description": "The payment method to refund through, as the original payment's `payment_applied` entry names it in `method`."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "refund"
+                ]
+              },
+              "example": {
+                "refund": {
+                  "amount": "2.00",
+                  "payment_method": "Cash"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/refunds/{refund_id}/notes": {
+      "get": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "List a refund's notes",
+        "operationId": "refunds_get_refund_notes",
+        "description": "Lists the refund's notes, one page at a time, under `data`.",
+        "parameters": [
+          {
+            "name": "refund_id",
+            "in": "path",
+            "required": true,
+            "description": "The refund's code, which the refunds listing returns as `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of notes, under `data`, with `pagination`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundNoteList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/refunds/REF-0001/notes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.refunds.get_refund_notes(\"REF-0001\", {\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.refunds.getRefundNotes('REF-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->refunds->getRefundNotes('REF-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.refunds.refunds_dto.RefundsDto.RefundNoteList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<RefundNoteList> response = client.refunds().getRefundNotes(\n        \"REF-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Refunds.GetRefundNotesAsync(\n    \"REF-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.refunds.getRefundNotes(\n  'REF-0001',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Refunds().GetRefundNotes(context.Background(), \"REF-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Create a refund note",
+        "operationId": "refunds_create_refund_note",
+        "description": "Sends a multipart form: the text as the `note` field and any attachment as `file`. Deleting the note later needs the `CREATE_REFUND_NOTE` permission.",
+        "parameters": [
+          {
+            "name": "refund_id",
+            "in": "path",
+            "required": true,
+            "description": "The refund's code, which the refunds listing returns as `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The new note, under `note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundNoteResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/refunds/REF-0001/notes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -F \"file=@receipt.pdf\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.refunds.create_refund_note(\n    \"REF-0001\",\n    \"Customer asked for a copy by post.\",\n    files={\"file\": open(\"receipt.pdf\", \"rb\")},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {readFileSync} from 'node:fs';\nimport {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.refunds.createRefundNote('REF-0001', 'Customer asked for a copy by post.', {\n    files: {file: ['receipt.pdf', readFileSync('receipt.pdf')]},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->refunds->createRefundNote('REF-0001', 'Customer asked for a copy by post.', [\n    'file' => ['receipt.pdf', fopen('receipt.pdf', 'r')],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.client.RequestOptions;\nimport com.exsited.sdk.resources.refunds.refunds_dto.RefundsDto.RefundNote;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<RefundNote> response = client.refunds().createRefundNote(\n        \"REF-0001\",\n        \"Customer asked for a copy by post.\",\n        Map.of(\"file\", Path.of(\"receipt.pdf\")),\n        RequestOptions.none());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Refunds.CreateRefundNoteAsync(\n    \"REF-0001\",\n    \"Customer asked for a copy by post.\",\n    new Dictionary<string, object?> { [\"file\"] = new object?[] { \"receipt.pdf\", File.ReadAllBytes(\"receipt.pdf\") } });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'dart:io';\n\nimport 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.refunds.createRefundNote(\n  'REF-0001',\n  'Customer asked for a copy by post.',\n  files: {\n    'file': ['receipt.pdf', File('receipt.pdf').readAsBytesSync()],\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nfile, err := os.ReadFile(\"receipt.pdf\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.Refunds().CreateRefundNote(context.Background(), \"REF-0001\", \"Customer asked for a copy by post.\", map[string]any{\"file\": []any{\"receipt.pdf\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "note"
+                ],
+                "properties": {
+                  "note": {
+                    "type": "string",
+                    "description": "The note text."
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "An optional file to attach to the note."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/refunds/{refund_id}/notes/{note_id}": {
+      "get": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Retrieve a refund note",
+        "operationId": "refunds_get_refund_note",
+        "description": "Fetches a single note by its `note_` id.",
+        "parameters": [
+          {
+            "name": "refund_id",
+            "in": "path",
+            "required": true,
+            "description": "The refund's code, which the refunds listing returns as `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, which starts with `note_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note, under `note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundNoteResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/refunds/REF-0001/notes/note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.refunds.get_refund_note(\n    \"REF-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.refunds.getRefundNote('REF-0001', 'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->refunds->getRefundNote('REF-0001', 'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.refunds.refunds_dto.RefundsDto.RefundNote;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<RefundNote> response = client.refunds().getRefundNote(\"REF-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Refunds.GetRefundNoteAsync(\n    \"REF-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.refunds.getRefundNote(\n  'REF-0001',\n  'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Refunds().GetRefundNote(context.Background(), \"REF-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Delete a refund note",
+        "operationId": "refunds_delete_refund_note",
+        "description": "Deletes the note. The server checks the `CREATE_REFUND_NOTE` permission here, not a delete permission.",
+        "parameters": [
+          {
+            "name": "refund_id",
+            "in": "path",
+            "required": true,
+            "description": "The refund's code, which the refunds listing returns as `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, which starts with `note_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The note is deleted. The response has no body."
+          },
+          "403": {
+            "description": "Your API client does not have the `CREATE_REFUND_NOTE` permission.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/refunds/REF-0001/notes/note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.refunds.delete_refund_note(\n    \"REF-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.refunds.deleteRefundNote('REF-0001', 'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->refunds->deleteRefundNote('REF-0001', 'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.refunds().deleteRefundNote(\"REF-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Refunds.DeleteRefundNoteAsync(\n    \"REF-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.refunds.deleteRefundNote(\n  'REF-0001',\n  'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Refunds().DeleteRefundNote(context.Background(), \"REF-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/refunds/{refund_id}/notes/{note_id}/files": {
+      "get": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "List a refund note's files",
+        "operationId": "refunds_get_refund_note_files",
+        "description": "Lists the note's attachments under `data`, each with its `uuid`, `filename`, `content_type`, `size` and `href`.",
+        "parameters": [
+          {
+            "name": "refund_id",
+            "in": "path",
+            "required": true,
+            "description": "The refund's code, which the refunds listing returns as `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, which starts with `note_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note's files, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundNoteFileList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/refunds/REF-0001/notes/note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d/files\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.refunds.get_refund_note_files(\n    \"REF-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.refunds.getRefundNoteFiles('REF-0001', 'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->refunds->getRefundNoteFiles(\n    'REF-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.accounts.accounts_dto.AccountsDto.NoteFileList;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<NoteFileList> response = client.refunds().getRefundNoteFiles(\n        \"REF-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Refunds.GetRefundNoteFilesAsync(\n    \"REF-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.refunds.getRefundNoteFiles(\n  'REF-0001',\n  'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Refunds().GetRefundNoteFiles(context.Background(), \"REF-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/refunds/{refund_id}/notes/{note_id}/files/{file_id}": {
+      "get": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Retrieve a refund note file",
+        "operationId": "refunds_get_refund_note_file",
+        "description": "Fetches a JSON description of the attachment, named by its `uuid`, under `file`.",
+        "parameters": [
+          {
+            "name": "refund_id",
+            "in": "path",
+            "required": true,
+            "description": "The refund's code, which the refunds listing returns as `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, which starts with `note_`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The attachment's `uuid`, from the note's `attachments`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file's details, under `file`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundNoteFileResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/refunds/REF-0001/notes/note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d/files/6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.refunds.get_refund_note_file(\n    \"REF-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n    \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\",\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.refunds.getRefundNoteFile(\n    'REF-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n    '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->refunds->getRefundNoteFile(\n    'REF-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n    '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.refunds.refunds_dto.RefundsDto.RefundNoteFile;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<RefundNoteFile> response = client.refunds().getRefundNoteFile(\n        \"REF-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n        \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Refunds.GetRefundNoteFileAsync(\n    \"REF-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n    \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.refunds.getRefundNoteFile(\n  'REF-0001',\n  'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n  '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Refunds().GetRefundNoteFile(context.Background(), \"REF-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Delete a refund note file",
+        "operationId": "refunds_delete_refund_note_file",
+        "description": "Deletes the attachment, named by its `uuid`. The server checks the `CREATE_REFUND_NOTE` permission.",
+        "parameters": [
+          {
+            "name": "refund_id",
+            "in": "path",
+            "required": true,
+            "description": "The refund's code, which the refunds listing returns as `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, which starts with `note_`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The attachment's `uuid`, from the note's `attachments`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The file is deleted. The response has no body."
+          },
+          "403": {
+            "description": "Your API client does not have the `CREATE_REFUND_NOTE` permission.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/refunds/REF-0001/notes/note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d/files/6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.refunds.delete_refund_note_file(\n    \"REF-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n    \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\",\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.refunds.deleteRefundNoteFile(\n    'REF-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n    '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->refunds->deleteRefundNoteFile(\n    'REF-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n    '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.refunds().deleteRefundNoteFile(\n        \"REF-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n        \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Refunds.DeleteRefundNoteFileAsync(\n    \"REF-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n    \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.refunds.deleteRefundNoteFile(\n  'REF-0001',\n  'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n  '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Refunds().DeleteRefundNoteFile(context.Background(), \"REF-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -33907,6 +35011,495 @@
           },
           "href": {
             "type": "string"
+          }
+        }
+      },
+      "RefundList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Refund"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/RefundPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "Refund": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/RefundAccount"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "credit_note": {
+            "$ref": "#/components/schemas/RefundCreditNote"
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {}
+          },
+          "gateway_response": {},
+          "id": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "note": {},
+          "object": {
+            "type": "string"
+          },
+          "payment_method": {
+            "type": "string"
+          },
+          "payment_processor": {
+            "type": "string"
+          },
+          "reconcile_status": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "RefundAccount": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "RefundCreditNote": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "RefundPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can be stale on the last page."
+          },
+          "next_cursor": {
+            "type": "string"
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/RefundPaginationLinks"
+          },
+          "records": {
+            "type": "integer",
+            "description": "The total number of matching records, not the length of this page."
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "next_page": {
+            "type": "string",
+            "description": "On the last page this is the string `NULL`, not JSON null."
+          },
+          "previous_page": {
+            "type": "string"
+          },
+          "has_next": {
+            "type": "boolean"
+          },
+          "has_prev": {
+            "type": "boolean"
+          },
+          "per_page": {
+            "type": "integer"
+          }
+        }
+      },
+      "RefundPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "RefundResponse": {
+        "type": "object",
+        "properties": {
+          "refund": {
+            "$ref": "#/components/schemas/Refund"
+          }
+        }
+      },
+      "RefundUpdated": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/RefundUpdatedAccount"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "credit_note": {
+            "$ref": "#/components/schemas/RefundUpdatedCreditNote"
+          },
+          "credit_note_id": {
+            "type": "string"
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {}
+          },
+          "gateway_response": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "payment_method": {
+            "type": "string"
+          },
+          "payment_processor": {
+            "type": "string"
+          },
+          "reconcile_status": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "RefundUpdatedAccount": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "RefundUpdatedCreditNote": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "RefundUpdatedResponse": {
+        "type": "object",
+        "properties": {
+          "refund": {
+            "$ref": "#/components/schemas/RefundUpdated"
+          }
+        }
+      },
+      "RefundNoteList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RefundNote"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/RefundPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "RefundNote": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RefundNoteAttachment"
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/RefundNoteCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "group": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "refund": {
+            "$ref": "#/components/schemas/RefundNoteDetail"
+          },
+          "user": {},
+          "version": {
+            "type": "integer"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RefundNoteWatcher"
+            }
+          }
+        }
+      },
+      "RefundNoteAttachment": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "RefundNoteCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "RefundNoteDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "RefundNoteWatcher": {
+        "type": "object",
+        "properties": {
+          "email": {},
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "RefundNoteResponse": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "$ref": "#/components/schemas/RefundNote"
+          }
+        }
+      },
+      "RefundNoteFileList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RefundNoteFileEntry"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/RefundPagination"
+          }
+        }
+      },
+      "RefundNoteFileEntry": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "content_type": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "href": {
+            "type": "string"
+          }
+        }
+      },
+      "RefundNoteFile": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "RefundNoteFileResponse": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "$ref": "#/components/schemas/RefundNoteFile"
           }
         }
       },
