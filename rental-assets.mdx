@@ -1,0 +1,41 @@
+---
+title: "Rental assets"
+sidebarTitle: "Overview"
+description: "Manage rental assets, the profiles that price them and the hours they are available."
+---
+
+Rental assets are the things customers can hire, each priced and scheduled by a rental asset profile. These endpoints list, create, update, cancel, reactivate and delete assets and profiles, and read and set each asset's availability. The module has 14 endpoints, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List rental asset availability](/api-reference/rental-assets/list-rental-asset-availability) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/rental_asset_availability` | Lists each rental asset with its schedule, one page at a time. |
+| [Update rental asset availability](/api-reference/rental-assets/update-rental-asset-availability) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `/rental_asset_availability` | Sets the weekly or custom hours of one or more rental assets. |
+| [List rental asset profiles](/api-reference/rental-assets/list-rental-asset-profiles) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/rental_asset_profiles` | Lists rental asset profiles, one page at a time. |
+| [Create a rental asset profile](/api-reference/rental-assets/create-a-rental-asset-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/rental_asset_profiles` | Creates a rental asset profile and returns it under `rental_asset_profile`. |
+| [List rental assets](/api-reference/rental-assets/list-rental-assets) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/rental_assets` | Lists rental assets, one page at a time. |
+| [Create a rental asset](/api-reference/rental-assets/create-a-rental-asset) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/rental_assets` | Creates a rental asset and returns it under `rental_asset`. |
+| [Retrieve a rental asset profile](/api-reference/rental-assets/retrieve-a-rental-asset-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/rental_asset_profiles/{rental_asset_profile_id}` | Returns one rental asset profile under `rental_asset_profile`. |
+| [Update a rental asset profile](/api-reference/rental-assets/update-a-rental-asset-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `/rental_asset_profiles/{rental_asset_profile_id}` | Changes a rental asset profile. |
+| [Delete a rental asset profile](/api-reference/rental-assets/delete-a-rental-asset-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `/rental_asset_profiles/{rental_asset_profile_id}` | Deletes a rental asset profile. |
+| [Update a rental asset](/api-reference/rental-assets/update-a-rental-asset) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/rental_assets/{rental_asset_uuid}` | Changes a rental asset and returns it under `rental_asset`. |
+| [Delete a rental asset](/api-reference/rental-assets/delete-a-rental-asset) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/rental_assets/{rental_asset_uuid}` | Deletes a rental asset and returns no body. |
+| [Retrieve a rental asset](/api-reference/rental-assets/retrieve-a-rental-asset) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/rental_assets/{rental_asset_uuid}` | Returns one rental asset under `rental_asset`. |
+| [Cancel a rental asset](/api-reference/rental-assets/cancel-a-rental-asset) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/rental_assets/{rental_asset_id}/cancel` | Cancels a rental asset, setting its `status` to `inactive`. |
+| [Reactivate a rental asset](/api-reference/rental-assets/reactivate-a-rental-asset) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/rental_assets/{rental_asset_id}/reactivate` | Reactivates a cancelled rental asset, setting its `status` to `active`. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Single records come back under `rental_asset` or `rental_asset_profile`.** Listings put their records under `data`.
+- **`rental_asset_uuid` and `rental_asset_id` take the same value.** Both are the rental asset's `id`; the cancel and reactivate paths name it `rental_asset_id`.
+- **Every session of a new profile needs a price.** A session with no `rental_asset_profile_session_prices` is refused with `400`.
+- **Update rental asset availability takes a list and returns no body.** It returns `204`; read the asset to see the stored hours.
+- **Cancel sets `status` to `inactive` and reactivate sets it to `active`.** Both take an empty object as the body, and cancelling an already cancelled asset is refused.
+- **Listings page by cursor.** Pass `limit` and the previous page's `pagination.next_cursor` as `cursor`, and stop when `has_more` is `false`.

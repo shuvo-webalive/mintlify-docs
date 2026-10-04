@@ -110,6 +110,9 @@
     },
     {
       "name": "Bookings"
+    },
+    {
+      "name": "Rental assets"
     }
   ],
   "paths": {
@@ -37525,6 +37528,1406 @@
           }
         ]
       }
+    },
+    "/rental_asset_availability": {
+      "get": {
+        "tags": [
+          "Rental assets"
+        ],
+        "summary": "List rental asset availability",
+        "operationId": "rental_assets_get_rental_asset_availability",
+        "description": "Returns one page under `data`, one row per rental asset, with its profile, `session_list`, `schedule_list` and the available and unavailable times. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, as in `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of availability rows under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RentalAssetAvailabilityList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/rental_asset_availability?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.rental_assets.get_rental_asset_availability({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.rentalAssets.getRentalAssetAvailability({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->rentalAssets->getRentalAssetAvailability(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.rental_assets.rental_assets_dto.RentalAssetsDto.RentalAssetAvailabilityList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<RentalAssetAvailabilityList> response = client.rentalAssets().getRentalAssetAvailability(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.RentalAssets.GetRentalAssetAvailabilityAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.rentalAssets.getRentalAssetAvailability(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.RentalAssets().GetRentalAssetAvailability(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Rental assets"
+        ],
+        "summary": "Update rental asset availability",
+        "operationId": "rental_assets_update_rental_asset_availability",
+        "description": "Send a `rental_assets` list. Each entry names an asset by `id` and carries `rental_asset_availability` for weekly hours or `rental_asset_custom_availability` for custom hours. An entry with only the `id` is accepted. In the tested flow, the asset's `use_custom_availability` is set to `true` before custom hours are sent.",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "The hours are saved. There is no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/rental_asset_availability\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"rental_assets\": [\n      {\n        \"id\": \"RENTAL_ASSET_ID\",\n        \"rental_asset_custom_availability\": [\n          {\n            \"preferred_day\": \"Wednesday\",\n            \"available\": true,\n            \"start_time\": \"08:00\",\n            \"end_time\": \"12:00\"\n          }\n        ]\n      }\n    ]\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.rental_assets.update_rental_asset_availability(\n    {\n        \"rental_assets\": [\n            {\n                \"id\": \"RENTAL_ASSET_ID\",\n                \"rental_asset_custom_availability\": [\n                    {\n                        \"preferred_day\": \"Wednesday\",\n                        \"available\": True,\n                        \"start_time\": \"08:00\",\n                        \"end_time\": \"12:00\",\n                    }\n                ],\n            }\n        ]\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.rentalAssets.updateRentalAssetAvailability({\n    rental_assets: [\n        {\n            id: 'RENTAL_ASSET_ID',\n            rental_asset_custom_availability: [\n                {preferred_day: 'Wednesday', available: true, start_time: '08:00', end_time: '12:00'},\n            ],\n        },\n    ],\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->rentalAssets->updateRentalAssetAvailability([\n    'rental_assets' => [\n        [\n            'id' => 'RENTAL_ASSET_ID',\n            'rental_asset_custom_availability' => [\n                [\n                    'preferred_day' => 'Wednesday',\n                    'available' => true,\n                    'start_time' => '08:00',\n                    'end_time' => '12:00',\n                ],\n            ],\n        ],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.rentalAssets().updateRentalAssetAvailability(\n        Map.of(\n                \"rental_assets\", List.of(\n                        Map.of(\n                                \"id\", \"RENTAL_ASSET_ID\",\n                                \"rental_asset_custom_availability\", List.of(\n                                        Map.of(\n                                                \"preferred_day\", \"Wednesday\",\n                                                \"available\", true,\n                                                \"start_time\", \"08:00\",\n                                                \"end_time\", \"12:00\"))))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.RentalAssets.UpdateRentalAssetAvailabilityAsync(new Dictionary<string, object?>\n{\n    [\"rental_assets\"] = new List<object?>\n    {\n        new Dictionary<string, object?>\n        {\n            [\"id\"] = \"RENTAL_ASSET_ID\",\n            [\"rental_asset_custom_availability\"] = new List<object?>\n            {\n                new Dictionary<string, object?>\n                {\n                    [\"preferred_day\"] = \"Wednesday\",\n                    [\"available\"] = true,\n                    [\"start_time\"] = \"08:00\",\n                    [\"end_time\"] = \"12:00\",\n                },\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.rentalAssets.updateRentalAssetAvailability({\n  'rental_assets': [\n    {\n      'id': 'RENTAL_ASSET_ID',\n      'rental_asset_custom_availability': [\n        {\n          'preferred_day': 'Wednesday',\n          'available': true,\n          'start_time': '08:00',\n          'end_time': '12:00',\n        },\n      ],\n    },\n  ],\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.RentalAssets().UpdateRentalAssetAvailability(context.Background(), map[string]any{\n\t\"rental_assets\": []any{\n\t\tmap[string]any{\n\t\t\t\"id\": \"RENTAL_ASSET_ID\",\n\t\t\t\"rental_asset_custom_availability\": []any{\n\t\t\t\tmap[string]any{\n\t\t\t\t\t\"preferred_day\": \"Wednesday\",\n\t\t\t\t\t\"available\":     true,\n\t\t\t\t\t\"start_time\":    \"08:00\",\n\t\t\t\t\t\"end_time\":      \"12:00\",\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "rental_assets"
+                ],
+                "properties": {
+                  "rental_assets": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "The rental asset's `id`."
+                        },
+                        "rental_asset_availability": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "preferred_day": {
+                                "type": "string",
+                                "example": "Monday"
+                              },
+                              "available": {
+                                "type": "boolean"
+                              },
+                              "start_time": {
+                                "type": "string",
+                                "example": "09:00"
+                              },
+                              "end_time": {
+                                "type": "string",
+                                "example": "17:00"
+                              }
+                            }
+                          },
+                          "description": "Weekly hours of the asset."
+                        },
+                        "rental_asset_custom_availability": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "preferred_day": {
+                                "type": "string",
+                                "example": "Monday"
+                              },
+                              "available": {
+                                "type": "boolean"
+                              },
+                              "start_time": {
+                                "type": "string",
+                                "example": "09:00"
+                              },
+                              "end_time": {
+                                "type": "string",
+                                "example": "17:00"
+                              }
+                            }
+                          },
+                          "description": "Custom hours of the asset."
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "rental_assets": [
+                  {
+                    "id": "RENTAL_ASSET_ID",
+                    "rental_asset_custom_availability": [
+                      {
+                        "preferred_day": "Wednesday",
+                        "available": true,
+                        "start_time": "08:00",
+                        "end_time": "12:00"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rental_asset_profiles": {
+      "get": {
+        "tags": [
+          "Rental assets"
+        ],
+        "summary": "List rental asset profiles",
+        "operationId": "rental_assets_get_rental_asset_profiles",
+        "description": "Returns one page of profiles under `data`. Each profile carries its currency, sessions with prices and hours, and the rental assets that use it. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, as in `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of profiles under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RentalAssetProfileList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/rental_asset_profiles?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.rental_assets.get_rental_asset_profiles({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.rentalAssets.getRentalAssetProfiles({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->rentalAssets->getRentalAssetProfiles(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.rental_assets.rental_assets_dto.RentalAssetsDto.RentalAssetProfileList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<RentalAssetProfileList> response = client.rentalAssets().getRentalAssetProfiles(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.RentalAssets.GetRentalAssetProfilesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.rentalAssets.getRentalAssetProfiles(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.RentalAssets().GetRentalAssetProfiles(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Rental assets"
+        ],
+        "summary": "Create a rental asset profile",
+        "operationId": "rental_assets_create_rental_asset_profile",
+        "description": "Send the profile under `rental_asset_profile`: `name`, `display_name`, `currency` and `rental_asset_profile_sessions`. Each session needs at least one price in `rental_asset_profile_session_prices`; a session without one is refused with `400`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new profile, under `rental_asset_profile`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RentalAssetProfileResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A session has no price.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/rental_asset_profiles\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"rental_asset_profile\": {\n      \"name\": \"Standard daily rate\",\n      \"display_name\": \"Standard daily rate\",\n      \"currency\": \"AUD\",\n      \"rental_asset_profile_sessions\": [\n        {\n          \"name\": \"Spring season\",\n          \"start_date\": \"2026-10-05\",\n          \"end_date\": \"2026-12-30\",\n          \"rental_asset_profile_session_prices\": [\n            {\n              \"price\": 1.0,\n              \"price_type\": \"DAILY\",\n              \"enabled_pro_rata\": false\n            }\n          ],\n          \"rental_asset_profile_session_availability\": [\n            {\n              \"preferred_day\": \"Monday\",\n              \"available\": true,\n              \"start_time\": \"09:00\",\n              \"end_time\": \"17:00\"\n            }\n          ]\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.rental_assets.create_rental_asset_profile(\n    {\n        \"rental_asset_profile\": {\n            \"name\": \"Standard daily rate\",\n            \"display_name\": \"Standard daily rate\",\n            \"currency\": \"AUD\",\n            \"rental_asset_profile_sessions\": [\n                {\n                    \"name\": \"Spring season\",\n                    \"start_date\": \"2026-10-05\",\n                    \"end_date\": \"2026-12-30\",\n                    \"rental_asset_profile_session_prices\": [\n                        {\"price\": 1.0, \"price_type\": \"DAILY\", \"enabled_pro_rata\": False}\n                    ],\n                    \"rental_asset_profile_session_availability\": [\n                        {\n                            \"preferred_day\": \"Monday\",\n                            \"available\": True,\n                            \"start_time\": \"09:00\",\n                            \"end_time\": \"17:00\",\n                        }\n                    ],\n                }\n            ],\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.rentalAssets.createRentalAssetProfile({\n    rental_asset_profile: {\n        name: 'Standard daily rate',\n        display_name: 'Standard daily rate',\n        currency: 'AUD',\n        rental_asset_profile_sessions: [\n            {\n                name: 'Spring season',\n                start_date: '2026-10-05',\n                end_date: '2026-12-30',\n                rental_asset_profile_session_prices: [{price: 1.0, price_type: 'DAILY', enabled_pro_rata: false}],\n                rental_asset_profile_session_availability: [\n                    {preferred_day: 'Monday', available: true, start_time: '09:00', end_time: '17:00'},\n                ],\n            },\n        ],\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->rentalAssets->createRentalAssetProfile([\n    'rental_asset_profile' => [\n        'name' => 'Standard daily rate',\n        'display_name' => 'Standard daily rate',\n        'currency' => 'AUD',\n        'rental_asset_profile_sessions' => [\n            [\n                'name' => 'Spring season',\n                'start_date' => '2026-10-05',\n                'end_date' => '2026-12-30',\n                'rental_asset_profile_session_prices' => [\n                    ['price' => 1.0, 'price_type' => 'DAILY', 'enabled_pro_rata' => false],\n                ],\n                'rental_asset_profile_session_availability' => [\n                    [\n                        'preferred_day' => 'Monday',\n                        'available' => true,\n                        'start_time' => '09:00',\n                        'end_time' => '17:00',\n                    ],\n                ],\n            ],\n        ],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.rental_assets.rental_assets_dto.RentalAssetsDto.RentalAssetProfileView;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<RentalAssetProfileView> response = client.rentalAssets().createRentalAssetProfile(\n        Map.of(\n                \"rental_asset_profile\", Map.of(\n                        \"name\", \"Standard daily rate\",\n                        \"display_name\", \"Standard daily rate\",\n                        \"currency\", \"AUD\",\n                        \"rental_asset_profile_sessions\", List.of(\n                                Map.of(\n                                        \"name\", \"Spring season\",\n                                        \"start_date\", \"2026-10-05\",\n                                        \"end_date\", \"2026-12-30\",\n                                        \"rental_asset_profile_session_prices\", List.of(\n                                                Map.of(\n                                                        \"price\", 1.0,\n                                                        \"price_type\", \"DAILY\",\n                                                        \"enabled_pro_rata\", false)),\n                                        \"rental_asset_profile_session_availability\", List.of(\n                                                Map.of(\n                                                        \"preferred_day\", \"Monday\",\n                                                        \"available\", true,\n                                                        \"start_time\", \"09:00\",\n                                                        \"end_time\", \"17:00\")))))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.RentalAssets.CreateRentalAssetProfileAsync(new Dictionary<string, object?>\n{\n    [\"rental_asset_profile\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Standard daily rate\",\n        [\"display_name\"] = \"Standard daily rate\",\n        [\"currency\"] = \"AUD\",\n        [\"rental_asset_profile_sessions\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"name\"] = \"Spring season\",\n                [\"start_date\"] = \"2026-10-05\",\n                [\"end_date\"] = \"2026-12-30\",\n                [\"rental_asset_profile_session_prices\"] = new List<object?>\n                {\n                    new Dictionary<string, object?>\n                    {\n                        [\"price\"] = 1.0,\n                        [\"price_type\"] = \"DAILY\",\n                        [\"enabled_pro_rata\"] = false,\n                    },\n                },\n                [\"rental_asset_profile_session_availability\"] = new List<object?>\n                {\n                    new Dictionary<string, object?>\n                    {\n                        [\"preferred_day\"] = \"Monday\",\n                        [\"available\"] = true,\n                        [\"start_time\"] = \"09:00\",\n                        [\"end_time\"] = \"17:00\",\n                    },\n                },\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.rentalAssets.createRentalAssetProfile({\n  'rental_asset_profile': {\n    'name': 'Standard daily rate',\n    'display_name': 'Standard daily rate',\n    'currency': 'AUD',\n    'rental_asset_profile_sessions': [\n      {\n        'name': 'Spring season',\n        'start_date': '2026-10-05',\n        'end_date': '2026-12-30',\n        'rental_asset_profile_session_prices': [\n          {'price': 1.0, 'price_type': 'DAILY', 'enabled_pro_rata': false},\n        ],\n        'rental_asset_profile_session_availability': [\n          {\n            'preferred_day': 'Monday',\n            'available': true,\n            'start_time': '09:00',\n            'end_time': '17:00',\n          },\n        ],\n      },\n    ],\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.RentalAssets().CreateRentalAssetProfile(context.Background(), map[string]any{\n\t\"rental_asset_profile\": map[string]any{\n\t\t\"name\":         \"Standard daily rate\",\n\t\t\"display_name\": \"Standard daily rate\",\n\t\t\"currency\":     \"AUD\",\n\t\t\"rental_asset_profile_sessions\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"name\":       \"Spring season\",\n\t\t\t\t\"start_date\": \"2026-10-05\",\n\t\t\t\t\"end_date\":   \"2026-12-30\",\n\t\t\t\t\"rental_asset_profile_session_prices\": []any{\n\t\t\t\t\tmap[string]any{\n\t\t\t\t\t\t\"price\":            1.0,\n\t\t\t\t\t\t\"price_type\":       \"DAILY\",\n\t\t\t\t\t\t\"enabled_pro_rata\": false,\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\t\"rental_asset_profile_session_availability\": []any{\n\t\t\t\t\tmap[string]any{\n\t\t\t\t\t\t\"preferred_day\": \"Monday\",\n\t\t\t\t\t\t\"available\":     true,\n\t\t\t\t\t\t\"start_time\":    \"09:00\",\n\t\t\t\t\t\t\"end_time\":      \"17:00\",\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "rental_asset_profile"
+                ],
+                "properties": {
+                  "rental_asset_profile": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "currency": {
+                        "type": "string",
+                        "example": "AUD"
+                      },
+                      "rental_asset_profile_sessions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "rental_asset_profile_session_prices"
+                          ],
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "start_date": {
+                              "type": "string",
+                              "format": "date"
+                            },
+                            "end_date": {
+                              "type": "string",
+                              "format": "date"
+                            },
+                            "rental_asset_profile_session_prices": {
+                              "type": "array",
+                              "description": "A session without a price is refused with `400`.",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "price": {
+                                    "type": "number"
+                                  },
+                                  "price_type": {
+                                    "type": "string",
+                                    "example": "DAILY"
+                                  },
+                                  "enabled_pro_rata": {
+                                    "type": "boolean"
+                                  }
+                                }
+                              }
+                            },
+                            "rental_asset_profile_session_availability": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "preferred_day": {
+                                    "type": "string",
+                                    "example": "Monday"
+                                  },
+                                  "available": {
+                                    "type": "boolean"
+                                  },
+                                  "start_time": {
+                                    "type": "string",
+                                    "example": "09:00"
+                                  },
+                                  "end_time": {
+                                    "type": "string",
+                                    "example": "17:00"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "rental_asset_profile": {
+                  "name": "Standard daily rate",
+                  "display_name": "Standard daily rate",
+                  "currency": "AUD",
+                  "rental_asset_profile_sessions": [
+                    {
+                      "name": "Spring season",
+                      "start_date": "2026-10-05",
+                      "end_date": "2026-12-30",
+                      "rental_asset_profile_session_prices": [
+                        {
+                          "price": 1.0,
+                          "price_type": "DAILY",
+                          "enabled_pro_rata": false
+                        }
+                      ],
+                      "rental_asset_profile_session_availability": [
+                        {
+                          "preferred_day": "Monday",
+                          "available": true,
+                          "start_time": "09:00",
+                          "end_time": "17:00"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rental_assets": {
+      "get": {
+        "tags": [
+          "Rental assets"
+        ],
+        "summary": "List rental assets",
+        "operationId": "rental_assets_get_rental_assets",
+        "description": "Returns one page of rental assets under `data`, each with its profile, status and availability. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, as in `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of rental assets under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RentalAssetList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/rental_assets?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.rental_assets.get_rental_assets({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.rentalAssets.getRentalAssets({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->rentalAssets->getRentalAssets(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.rental_assets.rental_assets_dto.RentalAssetsDto.RentalAssetList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<RentalAssetList> response = client.rentalAssets().getRentalAssets(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.RentalAssets.GetRentalAssetsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.rentalAssets.getRentalAssets(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.RentalAssets().GetRentalAssets(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Rental assets"
+        ],
+        "summary": "Create a rental asset",
+        "operationId": "rental_assets_create_rental_asset",
+        "description": "Send the asset under `rental_asset` with its `name` and the `id` of its `rental_asset_profile`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new rental asset, under `rental_asset`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RentalAssetResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/rental_assets\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"rental_asset\": {\n      \"name\": \"Projector 1\",\n      \"rental_asset_profile\": \"RENTAL_ASSET_PROFILE_ID\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.rental_assets.create_rental_asset(\n    {\n        \"rental_asset\": {\n            \"name\": \"Projector 1\",\n            \"rental_asset_profile\": \"RENTAL_ASSET_PROFILE_ID\",\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.rentalAssets.createRentalAsset({\n    rental_asset: {name: 'Projector 1', rental_asset_profile: 'RENTAL_ASSET_PROFILE_ID'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->rentalAssets->createRentalAsset([\n    'rental_asset' => ['name' => 'Projector 1', 'rental_asset_profile' => 'RENTAL_ASSET_PROFILE_ID'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.rental_assets.rental_assets_dto.RentalAssetsDto.RentalAsset;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<RentalAsset> response = client.rentalAssets().createRentalAsset(\n        Map.of(\n                \"rental_asset\", Map.of(\n                        \"name\", \"Projector 1\",\n                        \"rental_asset_profile\", \"RENTAL_ASSET_PROFILE_ID\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.RentalAssets.CreateRentalAssetAsync(new Dictionary<string, object?>\n{\n    [\"rental_asset\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Projector 1\",\n        [\"rental_asset_profile\"] = \"RENTAL_ASSET_PROFILE_ID\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.rentalAssets.createRentalAsset({\n  'rental_asset': {\n    'name': 'Projector 1',\n    'rental_asset_profile': 'RENTAL_ASSET_PROFILE_ID',\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.RentalAssets().CreateRentalAsset(context.Background(), map[string]any{\n\t\"rental_asset\": map[string]any{\n\t\t\"name\":                 \"Projector 1\",\n\t\t\"rental_asset_profile\": \"RENTAL_ASSET_PROFILE_ID\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "rental_asset"
+                ],
+                "properties": {
+                  "rental_asset": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "rental_asset_profile": {
+                        "type": "string",
+                        "description": "The rental asset profile's `id`."
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "rental_asset": {
+                  "name": "Projector 1",
+                  "rental_asset_profile": "RENTAL_ASSET_PROFILE_ID"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rental_asset_profiles/{rental_asset_profile_id}": {
+      "get": {
+        "tags": [
+          "Rental assets"
+        ],
+        "summary": "Retrieve a rental asset profile",
+        "operationId": "rental_assets_get_rental_asset_profile",
+        "description": "Returns the profile with its currency, sessions, prices, hours and rental assets.",
+        "parameters": [
+          {
+            "name": "rental_asset_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The rental asset profile's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The profile, under `rental_asset_profile`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RentalAssetProfileResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No profile has that `id`, for example after it is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/rental_asset_profiles/RENTAL_ASSET_PROFILE_ID\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.rental_assets.get_rental_asset_profile(\"RENTAL_ASSET_PROFILE_ID\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.rentalAssets.getRentalAssetProfile('RENTAL_ASSET_PROFILE_ID');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->rentalAssets->getRentalAssetProfile('RENTAL_ASSET_PROFILE_ID');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.rental_assets.rental_assets_dto.RentalAssetsDto.RentalAssetProfileView;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<RentalAssetProfileView> response = client.rentalAssets().getRentalAssetProfile(\"RENTAL_ASSET_PROFILE_ID\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.RentalAssets.GetRentalAssetProfileAsync(\"RENTAL_ASSET_PROFILE_ID\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.rentalAssets.getRentalAssetProfile(\n  'RENTAL_ASSET_PROFILE_ID',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.RentalAssets().GetRentalAssetProfile(context.Background(), \"RENTAL_ASSET_PROFILE_ID\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Rental assets"
+        ],
+        "summary": "Update a rental asset profile",
+        "operationId": "rental_assets_update_rental_asset_profile",
+        "description": "Send the fields to change under `rental_asset_profile`, such as `display_name`. Read the profile afterwards to see the stored values.",
+        "parameters": [
+          {
+            "name": "rental_asset_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The rental asset profile's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The profile is updated."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/rental_asset_profiles/RENTAL_ASSET_PROFILE_ID\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"rental_asset_profile\": {\n      \"display_name\": \"Standard daily rate, weekdays\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.rental_assets.update_rental_asset_profile(\n    \"RENTAL_ASSET_PROFILE_ID\",\n    {\"rental_asset_profile\": {\"display_name\": \"Standard daily rate, weekdays\"}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.rentalAssets.updateRentalAssetProfile('RENTAL_ASSET_PROFILE_ID', {\n    rental_asset_profile: {display_name: 'Standard daily rate, weekdays'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->rentalAssets->updateRentalAssetProfile('RENTAL_ASSET_PROFILE_ID', [\n    'rental_asset_profile' => ['display_name' => 'Standard daily rate, weekdays'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.rentalAssets().updateRentalAssetProfile(\n        \"RENTAL_ASSET_PROFILE_ID\",\n        Map.of(\"rental_asset_profile\", Map.of(\"display_name\", \"Standard daily rate, weekdays\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.RentalAssets.UpdateRentalAssetProfileAsync(\n    \"RENTAL_ASSET_PROFILE_ID\",\n    new Dictionary<string, object?>\n    {\n        [\"rental_asset_profile\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Standard daily rate, weekdays\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.rentalAssets.updateRentalAssetProfile(\n  'RENTAL_ASSET_PROFILE_ID',\n  {\n    'rental_asset_profile': {'display_name': 'Standard daily rate, weekdays'},\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.RentalAssets().UpdateRentalAssetProfile(context.Background(), \"RENTAL_ASSET_PROFILE_ID\", map[string]any{\n\t\"rental_asset_profile\": map[string]any{\n\t\t\"display_name\": \"Standard daily rate, weekdays\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "rental_asset_profile"
+                ],
+                "properties": {
+                  "rental_asset_profile": {
+                    "type": "object",
+                    "properties": {
+                      "display_name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "rental_asset_profile": {
+                  "display_name": "Standard daily rate, weekdays"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Rental assets"
+        ],
+        "summary": "Delete a rental asset profile",
+        "operationId": "rental_assets_delete_rental_asset_profile",
+        "description": "Deletes the profile. Reading it afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "rental_asset_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The rental asset profile's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The profile is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/rental_asset_profiles/RENTAL_ASSET_PROFILE_ID\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.rental_assets.delete_rental_asset_profile(\"RENTAL_ASSET_PROFILE_ID\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.rentalAssets.deleteRentalAssetProfile('RENTAL_ASSET_PROFILE_ID');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->rentalAssets->deleteRentalAssetProfile('RENTAL_ASSET_PROFILE_ID');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.rentalAssets().deleteRentalAssetProfile(\"RENTAL_ASSET_PROFILE_ID\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.RentalAssets.DeleteRentalAssetProfileAsync(\"RENTAL_ASSET_PROFILE_ID\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.rentalAssets.deleteRentalAssetProfile(\n  'RENTAL_ASSET_PROFILE_ID',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.RentalAssets().DeleteRentalAssetProfile(context.Background(), \"RENTAL_ASSET_PROFILE_ID\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/rental_assets/{rental_asset_uuid}": {
+      "patch": {
+        "tags": [
+          "Rental assets"
+        ],
+        "summary": "Update a rental asset",
+        "operationId": "rental_assets_update_rental_asset",
+        "description": "Send the fields to change under `rental_asset`, such as `description` or `use_custom_availability`. The updated asset comes back with a higher `version`.",
+        "parameters": [
+          {
+            "name": "rental_asset_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The rental asset's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated rental asset, under `rental_asset`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RentalAssetResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/rental_assets/RENTAL_ASSET_ID\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"rental_asset\": {\n      \"description\": \"Ceiling mounted projector\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.rental_assets.update_rental_asset(\n    \"RENTAL_ASSET_ID\", {\"rental_asset\": {\"description\": \"Ceiling mounted projector\"}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.rentalAssets.updateRentalAsset('RENTAL_ASSET_ID', {\n    rental_asset: {description: 'Ceiling mounted projector'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->rentalAssets->updateRentalAsset('RENTAL_ASSET_ID', [\n    'rental_asset' => ['description' => 'Ceiling mounted projector'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.rental_assets.rental_assets_dto.RentalAssetsDto.RentalAsset;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<RentalAsset> response = client.rentalAssets().updateRentalAsset(\n        \"RENTAL_ASSET_ID\",\n        Map.of(\"rental_asset\", Map.of(\"description\", \"Ceiling mounted projector\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.RentalAssets.UpdateRentalAssetAsync(\n    \"RENTAL_ASSET_ID\",\n    new Dictionary<string, object?>\n    {\n        [\"rental_asset\"] = new Dictionary<string, object?>\n        {\n            [\"description\"] = \"Ceiling mounted projector\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.rentalAssets.updateRentalAsset(\n  'RENTAL_ASSET_ID',\n  {\n    'rental_asset': {'description': 'Ceiling mounted projector'},\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.RentalAssets().UpdateRentalAsset(context.Background(), \"RENTAL_ASSET_ID\", map[string]any{\n\t\"rental_asset\": map[string]any{\"description\": \"Ceiling mounted projector\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "rental_asset"
+                ],
+                "properties": {
+                  "rental_asset": {
+                    "type": "object",
+                    "properties": {
+                      "description": {
+                        "type": "string"
+                      },
+                      "use_custom_availability": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "rental_asset": {
+                  "description": "Ceiling mounted projector"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Rental assets"
+        ],
+        "summary": "Delete a rental asset",
+        "operationId": "rental_assets_delete_rental_asset",
+        "description": "Deletes the asset. Reading it afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "rental_asset_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The rental asset's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The rental asset is deleted. There is no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/rental_assets/RENTAL_ASSET_ID\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.rental_assets.delete_rental_asset(\"RENTAL_ASSET_ID\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.rentalAssets.deleteRentalAsset('RENTAL_ASSET_ID');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->rentalAssets->deleteRentalAsset('RENTAL_ASSET_ID');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.rentalAssets().deleteRentalAsset(\"RENTAL_ASSET_ID\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.RentalAssets.DeleteRentalAssetAsync(\"RENTAL_ASSET_ID\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.rentalAssets.deleteRentalAsset(\n  'RENTAL_ASSET_ID',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.RentalAssets().DeleteRentalAsset(context.Background(), \"RENTAL_ASSET_ID\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Rental assets"
+        ],
+        "summary": "Retrieve a rental asset",
+        "operationId": "rental_assets_get_rental_asset",
+        "description": "Returns the asset with its profile, status, weekly and custom hours, and custom attributes.",
+        "parameters": [
+          {
+            "name": "rental_asset_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The rental asset's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The rental asset, under `rental_asset`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RentalAssetResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No rental asset has that `id`, for example after it is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/rental_assets/RENTAL_ASSET_ID\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.rental_assets.get_rental_asset(\"RENTAL_ASSET_ID\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.rentalAssets.getRentalAsset('RENTAL_ASSET_ID');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->rentalAssets->getRentalAsset('RENTAL_ASSET_ID');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.rental_assets.rental_assets_dto.RentalAssetsDto.RentalAsset;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<RentalAsset> response = client.rentalAssets().getRentalAsset(\"RENTAL_ASSET_ID\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.RentalAssets.GetRentalAssetAsync(\"RENTAL_ASSET_ID\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.rentalAssets.getRentalAsset('RENTAL_ASSET_ID');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.RentalAssets().GetRentalAsset(context.Background(), \"RENTAL_ASSET_ID\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/rental_assets/{rental_asset_id}/cancel": {
+      "post": {
+        "tags": [
+          "Rental assets"
+        ],
+        "summary": "Cancel a rental asset",
+        "operationId": "rental_assets_cancel_rental_asset",
+        "description": "Send an empty object as the body. The asset comes back under `rental_asset`, and its `status` reads `inactive`. Cancelling an asset that is already cancelled is refused with a `4xx` status.",
+        "parameters": [
+          {
+            "name": "rental_asset_id",
+            "in": "path",
+            "required": true,
+            "description": "The rental asset's `id`. The same value as `rental_asset_uuid` in the other paths.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The cancelled rental asset, under `rental_asset`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RentalAssetResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/rental_assets/RENTAL_ASSET_ID/cancel\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{}'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.rental_assets.cancel_rental_asset(\"RENTAL_ASSET_ID\", {})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.rentalAssets.cancelRentalAsset('RENTAL_ASSET_ID', {});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->rentalAssets->cancelRentalAsset('RENTAL_ASSET_ID', '{}');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.rental_assets.rental_assets_dto.RentalAssetsDto.RentalAsset;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<RentalAsset> response = client.rentalAssets().cancelRentalAsset(\n        \"RENTAL_ASSET_ID\",\n        Map.of());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.RentalAssets.CancelRentalAssetAsync(\n    \"RENTAL_ASSET_ID\",\n    new Dictionary<string, object?>());\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.rentalAssets.cancelRentalAsset(\n  'RENTAL_ASSET_ID',\n  {},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.RentalAssets().CancelRentalAsset(context.Background(), \"RENTAL_ASSET_ID\", map[string]any{}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "An empty object."
+              },
+              "example": {}
+            }
+          }
+        }
+      }
+    },
+    "/rental_assets/{rental_asset_id}/reactivate": {
+      "post": {
+        "tags": [
+          "Rental assets"
+        ],
+        "summary": "Reactivate a rental asset",
+        "operationId": "rental_assets_reactivate_rental_asset",
+        "description": "Send an empty object as the body. The asset comes back under `rental_asset`, and its `status` reads `active`.",
+        "parameters": [
+          {
+            "name": "rental_asset_id",
+            "in": "path",
+            "required": true,
+            "description": "The rental asset's `id`. The same value as `rental_asset_uuid` in the other paths.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The reactivated rental asset, under `rental_asset`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RentalAssetResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/rental_assets/RENTAL_ASSET_ID/reactivate\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{}'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.rental_assets.reactivate_rental_asset(\"RENTAL_ASSET_ID\", {})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.rentalAssets.reactivateRentalAsset('RENTAL_ASSET_ID', {});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->rentalAssets->reactivateRentalAsset('RENTAL_ASSET_ID', '{}');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.rental_assets.rental_assets_dto.RentalAssetsDto.RentalAsset;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<RentalAsset> response = client.rentalAssets().reactivateRentalAsset(\n        \"RENTAL_ASSET_ID\",\n        Map.of());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.RentalAssets.ReactivateRentalAssetAsync(\n    \"RENTAL_ASSET_ID\",\n    new Dictionary<string, object?>());\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.rentalAssets.reactivateRentalAsset(\n  'RENTAL_ASSET_ID',\n  {},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.RentalAssets().ReactivateRentalAsset(context.Background(), \"RENTAL_ASSET_ID\", map[string]any{}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "An empty object."
+              },
+              "example": {}
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -56914,6 +58317,941 @@
         "properties": {
           "order": {
             "$ref": "#/components/schemas/BookingQuotePartialInvoices"
+          }
+        }
+      },
+      "RentalAssetProfileView": {
+        "type": "object",
+        "properties": {
+          "activity_logs": {
+            "type": "array"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/RentalAssetProfileViewCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/RentalAssetProfileViewCurrency"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_tax_inclusive": {
+            "type": "boolean"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/RentalAssetProfileViewLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "max_booking_limit": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "rental_asset_profile_sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalAssetProfileViewRentalAssetProfileSession"
+            }
+          },
+          "rental_assets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalAssetProfileViewRow"
+            }
+          },
+          "status": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "RentalAssetProfileViewRow": {
+        "type": "object",
+        "properties": {
+          "display_name": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "image_name": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "use_custom_availability": {
+            "type": "boolean"
+          }
+        }
+      },
+      "RentalAssetProfileViewRentalAssetProfileSession": {
+        "type": "object",
+        "properties": {
+          "end_date": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "rental_asset_profile_session_availability": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalAssetProfileViewRentalAssetProfileSessionRentalAssetProfileSessionAvailability"
+            }
+          },
+          "rental_asset_profile_session_prices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalAssetProfileViewRentalAssetProfileSessionRentalAssetProfileSessionPrice"
+            }
+          },
+          "rental_asset_profile_session_working_hours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalAssetProfileViewRentalAssetProfileSessionRentalAssetProfileSessionWorkingHour"
+            }
+          },
+          "start_date": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetProfileViewRentalAssetProfileSessionRentalAssetProfileSessionWorkingHour": {
+        "type": "object",
+        "properties": {
+          "end_time": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetProfileViewRentalAssetProfileSessionRentalAssetProfileSessionPrice": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "is_enabled_pro_rata": {
+            "type": "boolean"
+          },
+          "object": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "price_type": {
+            "type": "string"
+          },
+          "pricing_level": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "rental_asset_profile_session_price_hours": {
+            "type": "array"
+          },
+          "rental_asset_profile_session_price_peak_hourly": {
+            "type": "array"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetProfileViewRentalAssetProfileSessionRentalAssetProfileSessionAvailability": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "end_time": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "preferred_day": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetProfileViewLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetProfileViewCurrency": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetProfileViewCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAsset": {
+        "type": "object",
+        "properties": {
+          "activity_logs": {
+            "type": "array"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/RentalAssetCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "custom_attributes": {
+            "type": "array"
+          },
+          "custom_form": {
+            "$ref": "#/components/schemas/RentalAssetCustomForm"
+          },
+          "description": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "image_name": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "item": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/RentalAssetLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "rental_asset_availability": {
+            "type": "array"
+          },
+          "rental_asset_custom_availability": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalAssetRentalAssetCustomAvailability"
+            }
+          },
+          "rental_asset_profile": {
+            "$ref": "#/components/schemas/RentalAssetRentalAssetProfile"
+          },
+          "status": {
+            "type": "string"
+          },
+          "use_custom_availability": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "RentalAssetRentalAssetProfile": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetRentalAssetCustomAvailability": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "end_time": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "preferred_day": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetCustomForm": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalAsset"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/RentalAssetPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetProfileList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalAssetProfile"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/RentalAssetPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetProfile": {
+        "type": "object",
+        "properties": {
+          "created_by": {
+            "$ref": "#/components/schemas/RentalAssetProfileCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/RentalAssetProfileCurrency"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_tax_inclusive": {
+            "type": "boolean"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/RentalAssetProfileLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "max_booking_limit": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "rental_asset_profile_sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalAssetProfileRentalAssetProfileSession"
+            }
+          },
+          "rental_assets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalAssetProfileRow"
+            }
+          },
+          "status": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "RentalAssetProfileRow": {
+        "type": "object",
+        "properties": {
+          "display_name": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "image_name": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "use_custom_availability": {
+            "type": "boolean"
+          }
+        }
+      },
+      "RentalAssetProfileRentalAssetProfileSession": {
+        "type": "object",
+        "properties": {
+          "end_date": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "rental_asset_profile_session_availability": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalAssetProfileRentalAssetProfileSessionRentalAssetProfileSessionAvailability"
+            }
+          },
+          "rental_asset_profile_session_prices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalAssetProfileRentalAssetProfileSessionRentalAssetProfileSessionPrice"
+            }
+          },
+          "rental_asset_profile_session_working_hours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalAssetProfileRentalAssetProfileSessionRentalAssetProfileSessionWorkingHour"
+            }
+          },
+          "start_date": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetProfileRentalAssetProfileSessionRentalAssetProfileSessionWorkingHour": {
+        "type": "object",
+        "properties": {
+          "end_time": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetProfileRentalAssetProfileSessionRentalAssetProfileSessionPrice": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "is_enabled_pro_rata": {
+            "type": "boolean"
+          },
+          "object": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "price_type": {
+            "type": "string"
+          },
+          "pricing_level": {
+            "type": "null",
+            "description": "Null in every response read."
+          },
+          "rental_asset_profile_session_price_hours": {
+            "type": "array"
+          },
+          "rental_asset_profile_session_price_peak_hourly": {
+            "type": "array"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetProfileRentalAssetProfileSessionRentalAssetProfileSessionAvailability": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "end_time": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "preferred_day": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetProfileLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetProfileCurrency": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetProfileCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetAvailabilityList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalAssetAvailability"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/RentalAssetPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetAvailability": {
+        "type": "object",
+        "properties": {
+          "available_list": {
+            "type": "array"
+          },
+          "code": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "processed_schedule_list": {
+            "type": "object"
+          },
+          "rental_asset_profile": {
+            "$ref": "#/components/schemas/RentalAssetAvailabilityRentalAssetProfile"
+          },
+          "schedule_list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalAssetAvailabilityScheduleList"
+            }
+          },
+          "session_list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalAssetAvailabilitySessionList"
+            }
+          },
+          "status": {
+            "type": "string"
+          },
+          "unavailable_list": {
+            "type": "array"
+          },
+          "use_custom_availability": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "RentalAssetAvailabilitySessionList": {
+        "type": "object",
+        "properties": {
+          "end_date": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "processed_schedule_list": {
+            "type": "object"
+          },
+          "schedule_list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalAssetAvailabilitySessionListScheduleList"
+            }
+          },
+          "start_date": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetAvailabilitySessionListScheduleList": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "string"
+          },
+          "end_time": {
+            "type": "string"
+          },
+          "preferred_day": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetAvailabilityScheduleList": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "string"
+          },
+          "end_time": {
+            "type": "string"
+          },
+          "preferred_day": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetAvailabilityRentalAssetProfile": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Send as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/RentalAssetPaginationLinks"
+          },
+          "records": {
+            "type": "integer",
+            "description": "Offset pages only: total matching records, not the page's length."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset pages only."
+          },
+          "next_page": {
+            "type": "string",
+            "description": "Offset pages only: the literal string `NULL` at the end of a listing, not JSON null."
+          },
+          "previous_page": {
+            "type": "string",
+            "description": "Offset pages only."
+          }
+        }
+      },
+      "RentalAssetPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalAssetResponse": {
+        "type": "object",
+        "required": [
+          "rental_asset"
+        ],
+        "properties": {
+          "rental_asset": {
+            "$ref": "#/components/schemas/RentalAsset"
+          }
+        }
+      },
+      "RentalAssetProfileResponse": {
+        "type": "object",
+        "required": [
+          "rental_asset_profile"
+        ],
+        "properties": {
+          "rental_asset_profile": {
+            "$ref": "#/components/schemas/RentalAssetProfileView"
           }
         }
       },

@@ -1,0 +1,1831 @@
+{
+  "family": "rental_assets",
+  "tag": "Rental assets",
+  "slug": "rental-assets",
+  "icon": "calendar-days",
+  "base": "/rental_assets",
+  "overview_description": "Manage rental assets, the profiles that price them and the hours they are available.",
+  "intro": "Rental assets are the things customers can hire, each priced and scheduled by a rental asset profile. These endpoints list, create, update, cancel, reactivate and delete assets and profiles, and read and set each asset's availability. The module has 14 endpoints, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**Single records come back under `rental_asset` or `rental_asset_profile`.** Listings put their records under `data`.",
+    "**`rental_asset_uuid` and `rental_asset_id` take the same value.** Both are the rental asset's `id`; the cancel and reactivate paths name it `rental_asset_id`.",
+    "**Every session of a new profile needs a price.** A session with no `rental_asset_profile_session_prices` is refused with `400`.",
+    "**Update rental asset availability takes a list and returns no body.** It returns `204`; read the asset to see the stored hours.",
+    "**Cancel sets `status` to `inactive` and reactivate sets it to `active`.** Both take an empty object as the body, and cancelling an already cancelled asset is refused.",
+    "**Listings page by cursor.** Pass `limit` and the previous page's `pagination.next_cursor` as `cursor`, and stop when `has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_rental_asset_availability",
+      "method": "GET",
+      "path": "/rental_asset_availability",
+      "slug": "list-rental-asset-availability",
+      "title": "List rental asset availability",
+      "summary": "Lists each rental asset with its schedule, one page at a time.",
+      "description": "Returns one page under `data`, one row per rental asset, with its profile, `session_list`, `schedule_list` and the available and unavailable times. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of availability rows under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/RentalAssetAvailabilityList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "update_rental_asset_availability",
+      "method": "PATCH",
+      "path": "/rental_asset_availability",
+      "slug": "update-rental-asset-availability",
+      "title": "Update rental asset availability",
+      "summary": "Sets the weekly or custom hours of one or more rental assets.",
+      "description": "Send a `rental_assets` list. Each entry names an asset by `id` and carries `rental_asset_availability` for weekly hours or `rental_asset_custom_availability` for custom hours. An entry with only the `id` is accepted. In the tested flow, the asset's `use_custom_availability` is set to `true` before custom hours are sent.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "rental_assets"
+          ],
+          "properties": {
+            "rental_assets": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "The rental asset's `id`."
+                  },
+                  "rental_asset_availability": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "preferred_day": {
+                          "type": "string",
+                          "example": "Monday"
+                        },
+                        "available": {
+                          "type": "boolean"
+                        },
+                        "start_time": {
+                          "type": "string",
+                          "example": "09:00"
+                        },
+                        "end_time": {
+                          "type": "string",
+                          "example": "17:00"
+                        }
+                      }
+                    },
+                    "description": "Weekly hours of the asset."
+                  },
+                  "rental_asset_custom_availability": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "preferred_day": {
+                          "type": "string",
+                          "example": "Monday"
+                        },
+                        "available": {
+                          "type": "boolean"
+                        },
+                        "start_time": {
+                          "type": "string",
+                          "example": "09:00"
+                        },
+                        "end_time": {
+                          "type": "string",
+                          "example": "17:00"
+                        }
+                      }
+                    },
+                    "description": "Custom hours of the asset."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "rental_assets": [
+            {
+              "id": "RENTAL_ASSET_ID",
+              "rental_asset_custom_availability": [
+                {
+                  "preferred_day": "Wednesday",
+                  "available": true,
+                  "start_time": "08:00",
+                  "end_time": "12:00"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The hours are saved. There is no body."
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "rental_assets": [
+            {
+              "id": "RENTAL_ASSET_ID",
+              "rental_asset_custom_availability": [
+                {
+                  "preferred_day": "Wednesday",
+                  "available": true,
+                  "start_time": "08:00",
+                  "end_time": "12:00"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "key": "get_rental_asset_profiles",
+      "method": "GET",
+      "path": "/rental_asset_profiles",
+      "slug": "list-rental-asset-profiles",
+      "title": "List rental asset profiles",
+      "summary": "Lists rental asset profiles, one page at a time.",
+      "description": "Returns one page of profiles under `data`. Each profile carries its currency, sessions with prices and hours, and the rental assets that use it. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of profiles under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/RentalAssetProfileList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_rental_asset_profile",
+      "method": "POST",
+      "path": "/rental_asset_profiles",
+      "slug": "create-a-rental-asset-profile",
+      "title": "Create a rental asset profile",
+      "summary": "Creates a rental asset profile and returns it under `rental_asset_profile`.",
+      "description": "Send the profile under `rental_asset_profile`: `name`, `display_name`, `currency` and `rental_asset_profile_sessions`. Each session needs at least one price in `rental_asset_profile_session_prices`; a session without one is refused with `400`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "rental_asset_profile"
+          ],
+          "properties": {
+            "rental_asset_profile": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "currency": {
+                  "type": "string",
+                  "example": "AUD"
+                },
+                "rental_asset_profile_sessions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "rental_asset_profile_session_prices"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "start_date": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "end_date": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "rental_asset_profile_session_prices": {
+                        "type": "array",
+                        "description": "A session without a price is refused with `400`.",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "price": {
+                              "type": "number"
+                            },
+                            "price_type": {
+                              "type": "string",
+                              "example": "DAILY"
+                            },
+                            "enabled_pro_rata": {
+                              "type": "boolean"
+                            }
+                          }
+                        }
+                      },
+                      "rental_asset_profile_session_availability": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "preferred_day": {
+                              "type": "string",
+                              "example": "Monday"
+                            },
+                            "available": {
+                              "type": "boolean"
+                            },
+                            "start_time": {
+                              "type": "string",
+                              "example": "09:00"
+                            },
+                            "end_time": {
+                              "type": "string",
+                              "example": "17:00"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "rental_asset_profile": {
+            "name": "Standard daily rate",
+            "display_name": "Standard daily rate",
+            "currency": "AUD",
+            "rental_asset_profile_sessions": [
+              {
+                "name": "Spring season",
+                "start_date": "2026-10-05",
+                "end_date": "2026-12-30",
+                "rental_asset_profile_session_prices": [
+                  {
+                    "price": 1.0,
+                    "price_type": "DAILY",
+                    "enabled_pro_rata": false
+                  }
+                ],
+                "rental_asset_profile_session_availability": [
+                  {
+                    "preferred_day": "Monday",
+                    "available": true,
+                    "start_time": "09:00",
+                    "end_time": "17:00"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new profile, under `rental_asset_profile`.",
+          "schema": {
+            "$ref": "#/components/schemas/RentalAssetProfileResponse"
+          }
+        },
+        "400": {
+          "description": "A session has no price."
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "rental_asset_profile": {
+            "name": "Standard daily rate",
+            "display_name": "Standard daily rate",
+            "currency": "AUD",
+            "rental_asset_profile_sessions": [
+              {
+                "name": "Spring season",
+                "start_date": "2026-10-05",
+                "end_date": "2026-12-30",
+                "rental_asset_profile_session_prices": [
+                  {
+                    "price": 1.0,
+                    "price_type": "DAILY",
+                    "enabled_pro_rata": false
+                  }
+                ],
+                "rental_asset_profile_session_availability": [
+                  {
+                    "preferred_day": "Monday",
+                    "available": true,
+                    "start_time": "09:00",
+                    "end_time": "17:00"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "get_rental_assets",
+      "method": "GET",
+      "path": "/rental_assets",
+      "slug": "list-rental-assets",
+      "title": "List rental assets",
+      "summary": "Lists rental assets, one page at a time.",
+      "description": "Returns one page of rental assets under `data`, each with its profile, status and availability. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of rental assets under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/RentalAssetList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_rental_asset",
+      "method": "POST",
+      "path": "/rental_assets",
+      "slug": "create-a-rental-asset",
+      "title": "Create a rental asset",
+      "summary": "Creates a rental asset and returns it under `rental_asset`.",
+      "description": "Send the asset under `rental_asset` with its `name` and the `id` of its `rental_asset_profile`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "rental_asset"
+          ],
+          "properties": {
+            "rental_asset": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "rental_asset_profile": {
+                  "type": "string",
+                  "description": "The rental asset profile's `id`."
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "rental_asset": {
+            "name": "Projector 1",
+            "rental_asset_profile": "RENTAL_ASSET_PROFILE_ID"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new rental asset, under `rental_asset`.",
+          "schema": {
+            "$ref": "#/components/schemas/RentalAssetResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "rental_asset": {
+            "name": "Projector 1",
+            "rental_asset_profile": "RENTAL_ASSET_PROFILE_ID"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_rental_asset_profile",
+      "method": "GET",
+      "path": "/rental_asset_profiles/{rental_asset_profile_id}",
+      "slug": "retrieve-a-rental-asset-profile",
+      "title": "Retrieve a rental asset profile",
+      "summary": "Returns one rental asset profile under `rental_asset_profile`.",
+      "description": "Returns the profile with its currency, sessions, prices, hours and rental assets.",
+      "parameters": [
+        {
+          "name": "rental_asset_profile_id",
+          "in": "path",
+          "required": true,
+          "description": "The rental asset profile's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "RENTAL_ASSET_PROFILE_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The profile, under `rental_asset_profile`.",
+          "schema": {
+            "$ref": "#/components/schemas/RentalAssetProfileResponse"
+          }
+        },
+        "404": {
+          "description": "No profile has that `id`, for example after it is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rental_asset_profile_id": "RENTAL_ASSET_PROFILE_ID"
+        }
+      }
+    },
+    {
+      "key": "update_rental_asset_profile",
+      "method": "PATCH",
+      "path": "/rental_asset_profiles/{rental_asset_profile_id}",
+      "slug": "update-a-rental-asset-profile",
+      "title": "Update a rental asset profile",
+      "summary": "Changes a rental asset profile.",
+      "description": "Send the fields to change under `rental_asset_profile`, such as `display_name`. Read the profile afterwards to see the stored values.",
+      "parameters": [
+        {
+          "name": "rental_asset_profile_id",
+          "in": "path",
+          "required": true,
+          "description": "The rental asset profile's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "RENTAL_ASSET_PROFILE_ID"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "rental_asset_profile"
+          ],
+          "properties": {
+            "rental_asset_profile": {
+              "type": "object",
+              "properties": {
+                "display_name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "rental_asset_profile": {
+            "display_name": "Standard daily rate, weekdays"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The profile is updated."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rental_asset_profile_id": "RENTAL_ASSET_PROFILE_ID"
+        },
+        "body": {
+          "rental_asset_profile": {
+            "display_name": "Standard daily rate, weekdays"
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_rental_asset_profile",
+      "method": "DELETE",
+      "path": "/rental_asset_profiles/{rental_asset_profile_id}",
+      "slug": "delete-a-rental-asset-profile",
+      "title": "Delete a rental asset profile",
+      "summary": "Deletes a rental asset profile.",
+      "description": "Deletes the profile. Reading it afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "rental_asset_profile_id",
+          "in": "path",
+          "required": true,
+          "description": "The rental asset profile's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "RENTAL_ASSET_PROFILE_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The profile is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rental_asset_profile_id": "RENTAL_ASSET_PROFILE_ID"
+        }
+      }
+    },
+    {
+      "key": "update_rental_asset",
+      "method": "PATCH",
+      "path": "/rental_assets/{rental_asset_uuid}",
+      "slug": "update-a-rental-asset",
+      "title": "Update a rental asset",
+      "summary": "Changes a rental asset and returns it under `rental_asset`.",
+      "description": "Send the fields to change under `rental_asset`, such as `description` or `use_custom_availability`. The updated asset comes back with a higher `version`.",
+      "parameters": [
+        {
+          "name": "rental_asset_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The rental asset's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "RENTAL_ASSET_ID"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "rental_asset"
+          ],
+          "properties": {
+            "rental_asset": {
+              "type": "object",
+              "properties": {
+                "description": {
+                  "type": "string"
+                },
+                "use_custom_availability": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "rental_asset": {
+            "description": "Ceiling mounted projector"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated rental asset, under `rental_asset`.",
+          "schema": {
+            "$ref": "#/components/schemas/RentalAssetResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "rental_asset_uuid": "RENTAL_ASSET_ID"
+        },
+        "body": {
+          "rental_asset": {
+            "description": "Ceiling mounted projector"
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_rental_asset",
+      "method": "DELETE",
+      "path": "/rental_assets/{rental_asset_uuid}",
+      "slug": "delete-a-rental-asset",
+      "title": "Delete a rental asset",
+      "summary": "Deletes a rental asset and returns no body.",
+      "description": "Deletes the asset. Reading it afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "rental_asset_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The rental asset's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "RENTAL_ASSET_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The rental asset is deleted. There is no body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rental_asset_uuid": "RENTAL_ASSET_ID"
+        }
+      }
+    },
+    {
+      "key": "get_rental_asset",
+      "method": "GET",
+      "path": "/rental_assets/{rental_asset_uuid}",
+      "slug": "retrieve-a-rental-asset",
+      "title": "Retrieve a rental asset",
+      "summary": "Returns one rental asset under `rental_asset`.",
+      "description": "Returns the asset with its profile, status, weekly and custom hours, and custom attributes.",
+      "parameters": [
+        {
+          "name": "rental_asset_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The rental asset's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "RENTAL_ASSET_ID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The rental asset, under `rental_asset`.",
+          "schema": {
+            "$ref": "#/components/schemas/RentalAssetResponse"
+          }
+        },
+        "404": {
+          "description": "No rental asset has that `id`, for example after it is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rental_asset_uuid": "RENTAL_ASSET_ID"
+        }
+      }
+    },
+    {
+      "key": "cancel_rental_asset",
+      "method": "POST",
+      "path": "/rental_assets/{rental_asset_id}/cancel",
+      "slug": "cancel-a-rental-asset",
+      "title": "Cancel a rental asset",
+      "summary": "Cancels a rental asset, setting its `status` to `inactive`.",
+      "description": "Send an empty object as the body. The asset comes back under `rental_asset`, and its `status` reads `inactive`. Cancelling an asset that is already cancelled is refused with a `4xx` status.",
+      "parameters": [
+        {
+          "name": "rental_asset_id",
+          "in": "path",
+          "required": true,
+          "description": "The rental asset's `id`. The same value as `rental_asset_uuid` in the other paths.",
+          "schema": {
+            "type": "string",
+            "example": "RENTAL_ASSET_ID"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "description": "An empty object."
+        },
+        "example": {}
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The cancelled rental asset, under `rental_asset`.",
+          "schema": {
+            "$ref": "#/components/schemas/RentalAssetResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "rental_asset_id": "RENTAL_ASSET_ID"
+        },
+        "body": {}
+      }
+    },
+    {
+      "key": "reactivate_rental_asset",
+      "method": "POST",
+      "path": "/rental_assets/{rental_asset_id}/reactivate",
+      "slug": "reactivate-a-rental-asset",
+      "title": "Reactivate a rental asset",
+      "summary": "Reactivates a cancelled rental asset, setting its `status` to `active`.",
+      "description": "Send an empty object as the body. The asset comes back under `rental_asset`, and its `status` reads `active`.",
+      "parameters": [
+        {
+          "name": "rental_asset_id",
+          "in": "path",
+          "required": true,
+          "description": "The rental asset's `id`. The same value as `rental_asset_uuid` in the other paths.",
+          "schema": {
+            "type": "string",
+            "example": "RENTAL_ASSET_ID"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "description": "An empty object."
+        },
+        "example": {}
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The reactivated rental asset, under `rental_asset`.",
+          "schema": {
+            "$ref": "#/components/schemas/RentalAssetResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "rental_asset_id": "RENTAL_ASSET_ID"
+        },
+        "body": {}
+      }
+    }
+  ],
+  "schemas": {
+    "RentalAssetProfileView": {
+      "type": "object",
+      "properties": {
+        "activity_logs": {
+          "type": "array"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/RentalAssetProfileViewCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/RentalAssetProfileViewCurrency"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "is_tax_inclusive": {
+          "type": "boolean"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/RentalAssetProfileViewLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "max_booking_limit": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "rental_asset_profile_sessions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RentalAssetProfileViewRentalAssetProfileSession"
+          }
+        },
+        "rental_assets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RentalAssetProfileViewRow"
+          }
+        },
+        "status": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "RentalAssetProfileViewRow": {
+      "type": "object",
+      "properties": {
+        "display_name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "image_name": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "use_custom_availability": {
+          "type": "boolean"
+        }
+      }
+    },
+    "RentalAssetProfileViewRentalAssetProfileSession": {
+      "type": "object",
+      "properties": {
+        "end_date": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "rental_asset_profile_session_availability": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RentalAssetProfileViewRentalAssetProfileSessionRentalAssetProfileSessionAvailability"
+          }
+        },
+        "rental_asset_profile_session_prices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RentalAssetProfileViewRentalAssetProfileSessionRentalAssetProfileSessionPrice"
+          }
+        },
+        "rental_asset_profile_session_working_hours": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RentalAssetProfileViewRentalAssetProfileSessionRentalAssetProfileSessionWorkingHour"
+          }
+        },
+        "start_date": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetProfileViewRentalAssetProfileSessionRentalAssetProfileSessionWorkingHour": {
+      "type": "object",
+      "properties": {
+        "end_time": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetProfileViewRentalAssetProfileSessionRentalAssetProfileSessionPrice": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "is_enabled_pro_rata": {
+          "type": "boolean"
+        },
+        "object": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        },
+        "price_type": {
+          "type": "string"
+        },
+        "pricing_level": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "rental_asset_profile_session_price_hours": {
+          "type": "array"
+        },
+        "rental_asset_profile_session_price_peak_hourly": {
+          "type": "array"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetProfileViewRentalAssetProfileSessionRentalAssetProfileSessionAvailability": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "preferred_day": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetProfileViewLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetProfileViewCurrency": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetProfileViewCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAsset": {
+      "type": "object",
+      "properties": {
+        "activity_logs": {
+          "type": "array"
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/RentalAssetCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "custom_attributes": {
+          "type": "array"
+        },
+        "custom_form": {
+          "$ref": "#/components/schemas/RentalAssetCustomForm"
+        },
+        "description": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "image_name": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "item": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/RentalAssetLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "rental_asset_availability": {
+          "type": "array"
+        },
+        "rental_asset_custom_availability": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RentalAssetRentalAssetCustomAvailability"
+          }
+        },
+        "rental_asset_profile": {
+          "$ref": "#/components/schemas/RentalAssetRentalAssetProfile"
+        },
+        "status": {
+          "type": "string"
+        },
+        "use_custom_availability": {
+          "type": "boolean"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "RentalAssetRentalAssetProfile": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetRentalAssetCustomAvailability": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "preferred_day": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetCustomForm": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RentalAsset"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/RentalAssetPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetProfileList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RentalAssetProfile"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/RentalAssetPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetProfile": {
+      "type": "object",
+      "properties": {
+        "created_by": {
+          "$ref": "#/components/schemas/RentalAssetProfileCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/RentalAssetProfileCurrency"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "is_tax_inclusive": {
+          "type": "boolean"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/RentalAssetProfileLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "max_booking_limit": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "rental_asset_profile_sessions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RentalAssetProfileRentalAssetProfileSession"
+          }
+        },
+        "rental_assets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RentalAssetProfileRow"
+          }
+        },
+        "status": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "RentalAssetProfileRow": {
+      "type": "object",
+      "properties": {
+        "display_name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "image_name": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "use_custom_availability": {
+          "type": "boolean"
+        }
+      }
+    },
+    "RentalAssetProfileRentalAssetProfileSession": {
+      "type": "object",
+      "properties": {
+        "end_date": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "rental_asset_profile_session_availability": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RentalAssetProfileRentalAssetProfileSessionRentalAssetProfileSessionAvailability"
+          }
+        },
+        "rental_asset_profile_session_prices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RentalAssetProfileRentalAssetProfileSessionRentalAssetProfileSessionPrice"
+          }
+        },
+        "rental_asset_profile_session_working_hours": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RentalAssetProfileRentalAssetProfileSessionRentalAssetProfileSessionWorkingHour"
+          }
+        },
+        "start_date": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetProfileRentalAssetProfileSessionRentalAssetProfileSessionWorkingHour": {
+      "type": "object",
+      "properties": {
+        "end_time": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetProfileRentalAssetProfileSessionRentalAssetProfileSessionPrice": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "is_enabled_pro_rata": {
+          "type": "boolean"
+        },
+        "object": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        },
+        "price_type": {
+          "type": "string"
+        },
+        "pricing_level": {
+          "type": "null",
+          "description": "Null in every response read."
+        },
+        "rental_asset_profile_session_price_hours": {
+          "type": "array"
+        },
+        "rental_asset_profile_session_price_peak_hourly": {
+          "type": "array"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetProfileRentalAssetProfileSessionRentalAssetProfileSessionAvailability": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "preferred_day": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetProfileLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetProfileCurrency": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetProfileCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetAvailabilityList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RentalAssetAvailability"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/RentalAssetPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetAvailability": {
+      "type": "object",
+      "properties": {
+        "available_list": {
+          "type": "array"
+        },
+        "code": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "processed_schedule_list": {
+          "type": "object"
+        },
+        "rental_asset_profile": {
+          "$ref": "#/components/schemas/RentalAssetAvailabilityRentalAssetProfile"
+        },
+        "schedule_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RentalAssetAvailabilityScheduleList"
+          }
+        },
+        "session_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RentalAssetAvailabilitySessionList"
+          }
+        },
+        "status": {
+          "type": "string"
+        },
+        "unavailable_list": {
+          "type": "array"
+        },
+        "use_custom_availability": {
+          "type": "boolean"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "RentalAssetAvailabilitySessionList": {
+      "type": "object",
+      "properties": {
+        "end_date": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "processed_schedule_list": {
+          "type": "object"
+        },
+        "schedule_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RentalAssetAvailabilitySessionListScheduleList"
+          }
+        },
+        "start_date": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetAvailabilitySessionListScheduleList": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "string"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "preferred_day": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetAvailabilityScheduleList": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "string"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "preferred_day": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetAvailabilityRentalAssetProfile": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Send as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/RentalAssetPaginationLinks"
+        },
+        "records": {
+          "type": "integer",
+          "description": "Offset pages only: total matching records, not the page's length."
+        },
+        "offset": {
+          "type": "integer",
+          "description": "Offset pages only."
+        },
+        "next_page": {
+          "type": "string",
+          "description": "Offset pages only: the literal string `NULL` at the end of a listing, not JSON null."
+        },
+        "previous_page": {
+          "type": "string",
+          "description": "Offset pages only."
+        }
+      }
+    },
+    "RentalAssetPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "RentalAssetResponse": {
+      "type": "object",
+      "required": [
+        "rental_asset"
+      ],
+      "properties": {
+        "rental_asset": {
+          "$ref": "#/components/schemas/RentalAsset"
+        }
+      }
+    },
+    "RentalAssetProfileResponse": {
+      "type": "object",
+      "required": [
+        "rental_asset_profile"
+      ],
+      "properties": {
+        "rental_asset_profile": {
+          "$ref": "#/components/schemas/RentalAssetProfileView"
+        }
+      }
+    }
+  }
+}
