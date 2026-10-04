@@ -1,0 +1,1044 @@
+{
+  "family": "purchase_credit_notes",
+  "tag": "Purchase credit notes",
+  "slug": "purchase-credit-notes",
+  "icon": "file-circle-minus",
+  "base": "/purchase_credit_notes",
+  "overview_description": "Create, read, update, apply and delete purchase credit notes, the credit a supplier owes you, and add or remove their notes.",
+  "intro": "A purchase credit note is credit a supplier owes you, raised when a payment exceeds its invoices or created against a purchase invoice. These endpoints create, read, update, apply and delete purchase credit notes and add or remove their notes. There are 8 endpoints, and all seven SDKs call every one.",
+  "warning": "**Applying a purchase credit note records a purchase payment, and deleting one cannot be undone.**",
+  "notes": [
+    "**Every write body is wrapped in `purchase_credit_note`.** The note create is a multipart form instead.",
+    "**The create takes `purchase_invoice_id` and `amount`.** The credit is drawn from that invoice's payments.",
+    "**The apply, note and delete calls take the `pcn_` id only.** A code returns `400` there, while the reads accept either.",
+    "**The create and apply responses are shorter than a read.** Their `status` is an object with `key` and `value`, where a read sends a string.",
+    "**The delete and the note create need extra permissions.** A client without them gets `403`.",
+    "**Listings page by cursor.** Records are under `data`; pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_purchase_credit_notes",
+      "method": "GET",
+      "path": "/purchase_credit_notes",
+      "slug": "list-purchase-credit-notes",
+      "title": "List purchase credit notes",
+      "summary": "Returns one page of purchase credit notes.",
+      "description": "Lists the purchase credit notes, one page at a time, under `data`. Each shows the payment that raised it and the amounts left to spend or refund. Other fields filter the list as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of purchase credit notes.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseCreditNoteList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_purchase_credit_note",
+      "method": "GET",
+      "path": "/purchase_credit_notes/{purchase_credit_note_id}",
+      "slug": "retrieve-a-purchase-credit-note",
+      "title": "Retrieve a purchase credit note",
+      "summary": "Returns one purchase credit note under `purchase_credit_note`.",
+      "description": "Returns the purchase credit note with its supplier, the payment that raised it, its rows and the initial, remaining and refunded amounts, under `purchase_credit_note`.",
+      "parameters": [
+        {
+          "name": "purchase_credit_note_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase credit note's `id`, such as `pcn_...`. The reads also accept its code.",
+          "schema": {
+            "type": "string",
+            "example": "pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The purchase credit note, under `purchase_credit_note`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseCreditNoteResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_credit_note_id": "pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b"
+        }
+      }
+    },
+    {
+      "key": "update_purchase_credit_note",
+      "method": "PATCH",
+      "path": "/purchase_credit_notes/{purchase_credit_note_id}",
+      "slug": "update-a-purchase-credit-note",
+      "title": "Update a purchase credit note",
+      "summary": "Changes fields of a purchase credit note, such as its custom attributes, and returns it under `purchase_credit_note`.",
+      "description": "Updates the purchase credit note, wrapped in `purchase_credit_note`, for example its `custom_attributes`. The updated credit note comes back under `purchase_credit_note`.",
+      "parameters": [
+        {
+          "name": "purchase_credit_note_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase credit note's `id`, such as `pcn_...`. The reads also accept its code.",
+          "schema": {
+            "type": "string",
+            "example": "pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "purchase_credit_note": {
+              "type": "object",
+              "properties": {
+                "custom_attributes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "purchase_credit_note"
+          ]
+        },
+        "example": {
+          "purchase_credit_note": {
+            "custom_attributes": []
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated purchase credit note, under `purchase_credit_note`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseCreditNoteResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_credit_note_id": "pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b"
+        },
+        "body": {
+          "purchase_credit_note": {
+            "custom_attributes": []
+          }
+        }
+      }
+    },
+    {
+      "key": "create_purchase_credit_note",
+      "method": "POST",
+      "path": "/purchase_credit_notes",
+      "slug": "create-a-purchase-credit-note",
+      "title": "Create a purchase credit note",
+      "summary": "Credits a purchase invoice and returns the new credit note under `purchase_credit_note`.",
+      "description": "Creates a purchase credit note against a purchase invoice, wrapped in `purchase_credit_note` with the invoice's `purchase_invoice_id` and the `amount`. The credit is drawn from the invoice's payments. The response is shorter than a read, and its `status` is an object with `key` and `value`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "purchase_credit_note": {
+              "type": "object",
+              "properties": {
+                "purchase_invoice_id": {
+                  "type": "string",
+                  "description": "The `id` of the purchase invoice to credit."
+                },
+                "amount": {
+                  "type": "string",
+                  "description": "The amount to credit, as a decimal string."
+                }
+              }
+            }
+          },
+          "required": [
+            "purchase_credit_note"
+          ]
+        },
+        "example": {
+          "purchase_credit_note": {
+            "purchase_invoice_id": "PI-0001",
+            "amount": "1.00"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new purchase credit note, under `purchase_credit_note`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseCreditNoteCreatedResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "purchase_credit_note": {
+            "purchase_invoice_id": "PI-0001",
+            "amount": "1.00"
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_purchase_credit_note",
+      "method": "DELETE",
+      "path": "/purchase_credit_notes/{purchase_credit_note_id}",
+      "slug": "delete-a-purchase-credit-note",
+      "title": "Delete a purchase credit note",
+      "summary": "Deletes a purchase credit note. Nothing comes back.",
+      "description": "Deletes the purchase credit note, addressed by its `pcn_` id only. The call returns `204` with no body. It needs the permission to delete purchase credit notes.",
+      "parameters": [
+        {
+          "name": "purchase_credit_note_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase credit note's `pcn_` id. A code returns `400`.",
+          "schema": {
+            "type": "string",
+            "example": "pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The purchase credit note is deleted."
+        },
+        "403": {
+          "description": "The client lacks the permission to delete purchase credit notes."
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_credit_note_id": "pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b"
+        }
+      }
+    },
+    {
+      "key": "apply_purchase_credit_note",
+      "method": "POST",
+      "path": "/purchase_credit_notes/{purchase_credit_note_id}/apply",
+      "slug": "apply-a-purchase-credit-note-to-purchase-invoices",
+      "title": "Apply a purchase credit note to purchase invoices",
+      "summary": "Spends a purchase credit note on one or more purchase invoices and returns the credit note under `purchase_credit_note`.",
+      "description": "Applies the credit to purchase invoices, listed under `purchase_credit_note.purchase_invoices`. Each entry takes `purchase_invoice_id` and `amount` and nothing else. Applying the credit records a purchase payment. Address the credit note by its `pcn_` id.",
+      "parameters": [
+        {
+          "name": "purchase_credit_note_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase credit note's `pcn_` id. A code returns `400`.",
+          "schema": {
+            "type": "string",
+            "example": "pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "purchase_credit_note": {
+              "type": "object",
+              "properties": {
+                "purchase_invoices": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "purchase_invoice_id": {
+                        "type": "string"
+                      },
+                      "amount": {
+                        "type": "string",
+                        "description": "The amount to apply, as a decimal string."
+                      }
+                    }
+                  },
+                  "description": "The purchase invoices to apply the credit to."
+                }
+              },
+              "required": [
+                "purchase_invoices"
+              ]
+            }
+          },
+          "required": [
+            "purchase_credit_note"
+          ]
+        },
+        "example": {
+          "purchase_credit_note": {
+            "purchase_invoices": [
+              {
+                "purchase_invoice_id": "PI-0001",
+                "amount": "1.00"
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The purchase credit note, under `purchase_credit_note`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseCreditNoteCreatedResponse"
+          }
+        },
+        "400": {
+          "description": "The credit note is addressed by its code rather than its `pcn_` id."
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_credit_note_id": "pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b"
+        },
+        "body": {
+          "purchase_credit_note": {
+            "purchase_invoices": [
+              {
+                "purchase_invoice_id": "PI-0001",
+                "amount": "1.00"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "create_purchase_credit_note_note",
+      "method": "POST",
+      "path": "/purchase_credit_notes/{purchase_credit_note_id}/notes",
+      "slug": "create-a-purchase-credit-note-note",
+      "title": "Create a purchase credit note note",
+      "summary": "Attaches a note, with an optional file, to a purchase credit note.",
+      "description": "Adds a note to the purchase credit note. Send a multipart form with the text as the `note` field and, optionally, a file to attach. Address the credit note by its `pcn_` id. It needs the permission to create purchase credit note notes.",
+      "parameters": [
+        {
+          "name": "purchase_credit_note_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase credit note's `pcn_` id. A code returns `400`.",
+          "schema": {
+            "type": "string",
+            "example": "pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "note"
+          ],
+          "properties": {
+            "note": {
+              "type": "string",
+              "description": "The note text. HTML is accepted."
+            },
+            "file": {
+              "type": "string",
+              "format": "binary",
+              "description": "An optional file to attach to the note."
+            }
+          }
+        },
+        "example": {
+          "note": "<p>Goods received in full.</p>",
+          "file": "delivery-note.pdf"
+        }
+      },
+      "multipart": true,
+      "responses": {
+        "201": {
+          "description": "The note is created."
+        },
+        "400": {
+          "description": "The credit note is addressed by its code rather than its `pcn_` id."
+        },
+        "403": {
+          "description": "The client lacks the permission to create purchase credit note notes."
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_credit_note_id": "pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b"
+        },
+        "note": "<p>Goods received in full.</p>",
+        "file": "delivery-note.pdf"
+      }
+    },
+    {
+      "key": "delete_purchase_credit_note_note",
+      "method": "DELETE",
+      "path": "/purchase_credit_notes/{purchase_credit_note_id}/notes/{note_id}",
+      "slug": "delete-a-purchase-credit-note-note",
+      "title": "Delete a purchase credit note note",
+      "summary": "Deletes one note from a purchase credit note. Nothing comes back.",
+      "description": "Deletes the note, addressed by the credit note's `pcn_` id and the note's `note_` id. The call returns `204` with no body.",
+      "parameters": [
+        {
+          "name": "purchase_credit_note_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase credit note's `pcn_` id. A code returns `400`.",
+          "schema": {
+            "type": "string",
+            "example": "pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `note_` id.",
+          "schema": {
+            "type": "string",
+            "example": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The note is deleted."
+        },
+        "400": {
+          "description": "The credit note is addressed by its code rather than its `pcn_` id."
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_credit_note_id": "pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b",
+          "note_id": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "PurchaseCreditNote": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteAccount"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteCurrency"
+        },
+        "custom_attributes": {
+          "type": "array",
+          "items": {}
+        },
+        "date": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "initial_amount": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "payment_id": {
+          "type": "string"
+        },
+        "purchase_credit_note_rows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseCreditNotePurchaseCreditNoteRow"
+          }
+        },
+        "purchase_payment": {
+          "$ref": "#/components/schemas/PurchaseCreditNotePurchasePayment"
+        },
+        "refund_amount": {
+          "type": "string"
+        },
+        "refundable": {
+          "type": "boolean"
+        },
+        "remaining_amount": {
+          "type": "string"
+        },
+        "remaining_balance": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchaseCreditNoteAccount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNotePurchaseCreditNoteRow": {
+      "type": "object",
+      "properties": {
+        "credit_note_from_blank_method": {
+          "type": "string"
+        },
+        "credit_note_from_credit_note": {
+          "type": "string"
+        },
+        "credit_note_from_payment_method": {
+          "type": "string"
+        },
+        "credit_note_total": {
+          "type": "string"
+        },
+        "payment_method": {
+          "$ref": "#/components/schemas/PurchaseCreditNotePurchaseCreditNoteRowPaymentMethod"
+        },
+        "payment_processor": {
+          "$ref": "#/components/schemas/PurchaseCreditNotePurchaseCreditNoteRowPaymentProcessor"
+        },
+        "refund_from_blank_method": {
+          "type": "string"
+        },
+        "refund_from_credit_note": {
+          "type": "string"
+        },
+        "refund_from_payment_method": {
+          "type": "string"
+        },
+        "refund_total": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNotePurchaseCreditNoteRowPaymentMethod": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNotePurchaseCreditNoteRowPaymentProcessor": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNotePurchasePayment": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNotePaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNotePagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size the API applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can be set on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": "string",
+          "description": "The cursor of the previous page."
+        },
+        "links": {
+          "$ref": "#/components/schemas/PurchaseCreditNotePaginationLinks"
+        }
+      }
+    },
+    "PurchaseCreditNoteList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseCreditNote"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/PurchaseCreditNotePagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteRead": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteReadAccount"
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteReadCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteReadCurrency"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "initial_amount": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteReadLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "purchase_credit_note_rows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseCreditNoteReadPurchaseCreditNoteRow"
+          }
+        },
+        "purchase_payment": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteReadPurchasePayment"
+        },
+        "refund_amount": {
+          "type": "string"
+        },
+        "refundable": {
+          "type": "boolean"
+        },
+        "remaining_amount": {
+          "type": "string"
+        },
+        "status": {},
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchaseCreditNoteReadAccount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteReadCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteReadCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteReadLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteReadPurchaseCreditNoteRow": {
+      "type": "object",
+      "properties": {
+        "credit_note_from_blank_method": {
+          "type": "string"
+        },
+        "credit_note_from_credit_note": {
+          "type": "string"
+        },
+        "credit_note_from_payment_method": {
+          "type": "string"
+        },
+        "credit_note_total": {
+          "type": "string"
+        },
+        "payment_method": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteReadPurchaseCreditNoteRowPaymentMethod"
+        },
+        "payment_processor": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteReadPurchaseCreditNoteRowPaymentProcessor"
+        },
+        "refund_from_blank_method": {
+          "type": "string"
+        },
+        "refund_from_credit_note": {
+          "type": "string"
+        },
+        "refund_from_payment_method": {
+          "type": "string"
+        },
+        "refund_total": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteReadPurchaseCreditNoteRowPaymentMethod": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteReadPurchaseCreditNoteRowPaymentProcessor": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteReadPurchasePayment": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteResponse": {
+      "type": "object",
+      "properties": {
+        "purchase_credit_note": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteRead"
+        }
+      }
+    },
+    "PurchaseCreditNoteCreated": {
+      "type": "object",
+      "properties": {
+        "activity_logs": {
+          "type": "array",
+          "items": {}
+        },
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "initial_amount": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "remaining_amount": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteCreatedStatus"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchaseCreditNoteCreatedStatus": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseCreditNoteCreatedResponse": {
+      "type": "object",
+      "properties": {
+        "purchase_credit_note": {
+          "$ref": "#/components/schemas/PurchaseCreditNoteCreated"
+        }
+      }
+    }
+  }
+}

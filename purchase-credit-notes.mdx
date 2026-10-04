@@ -1,0 +1,39 @@
+---
+title: "Purchase credit notes"
+sidebarTitle: "Overview"
+description: "Create, read, update, apply and delete purchase credit notes, the credit a supplier owes you, and add or remove their notes."
+---
+
+A purchase credit note is credit a supplier owes you, raised when a payment exceeds its invoices or created against a purchase invoice. These endpoints create, read, update, apply and delete purchase credit notes and add or remove their notes. There are 8 endpoints, and all seven SDKs call every one.
+
+<Warning>
+  **Applying a purchase credit note records a purchase payment, and deleting one cannot be undone.**
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List purchase credit notes](/api-reference/purchase-credit-notes/list-purchase-credit-notes) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/purchase_credit_notes` | Returns one page of purchase credit notes. |
+| [Retrieve a purchase credit note](/api-reference/purchase-credit-notes/retrieve-a-purchase-credit-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/purchase_credit_notes/{purchase_credit_note_id}` | Returns one purchase credit note under `purchase_credit_note`. |
+| [Update a purchase credit note](/api-reference/purchase-credit-notes/update-a-purchase-credit-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/purchase_credit_notes/{purchase_credit_note_id}` | Changes fields of a purchase credit note, such as its custom attributes, and returns it under `purchase_credit_note`. |
+| [Create a purchase credit note](/api-reference/purchase-credit-notes/create-a-purchase-credit-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/purchase_credit_notes` | Credits a purchase invoice and returns the new credit note under `purchase_credit_note`. |
+| [Delete a purchase credit note](/api-reference/purchase-credit-notes/delete-a-purchase-credit-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/purchase_credit_notes/{purchase_credit_note_id}` | Deletes a purchase credit note. Nothing comes back. |
+| [Apply a purchase credit note to purchase invoices](/api-reference/purchase-credit-notes/apply-a-purchase-credit-note-to-purchase-invoices) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/purchase_credit_notes/{purchase_credit_note_id}/apply` | Spends a purchase credit note on one or more purchase invoices and returns the credit note under `purchase_credit_note`. |
+| [Create a purchase credit note note](/api-reference/purchase-credit-notes/create-a-purchase-credit-note-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/purchase_credit_notes/{purchase_credit_note_id}/notes` | Attaches a note, with an optional file, to a purchase credit note. |
+| [Delete a purchase credit note note](/api-reference/purchase-credit-notes/delete-a-purchase-credit-note-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/purchase_credit_notes/{purchase_credit_note_id}/notes/{note_id}` | Deletes one note from a purchase credit note. Nothing comes back. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Every write body is wrapped in `purchase_credit_note`.** The note create is a multipart form instead.
+- **The create takes `purchase_invoice_id` and `amount`.** The credit is drawn from that invoice's payments.
+- **The apply, note and delete calls take the `pcn_` id only.** A code returns `400` there, while the reads accept either.
+- **The create and apply responses are shorter than a read.** Their `status` is an object with `key` and `value`, where a read sends a string.
+- **The delete and the note create need extra permissions.** A client without them gets `403`.
+- **Listings page by cursor.** Records are under `data`; pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`.
