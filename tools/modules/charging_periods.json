@@ -1,0 +1,408 @@
+{
+  "family": "charging_periods",
+  "tag": "Charging periods",
+  "slug": "charging-periods",
+  "icon": "calendar-days",
+  "base": "/settings/charging_periods",
+  "overview_description": "List, create, read, update and delete charging periods, each linked to a time period by its tp_ id.",
+  "intro": "A charging period is a settings record linked to a time period. You can list, create, read, update and delete charging periods. This area has 5 endpoints, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**`name`, `display_name` and `time_period` are required on a create.** `time_period` is the time period's `tp_` id.",
+    "**A read returns `time_period` as an object.** It holds the time period's `id`, `name`, `object` and `href`.",
+    "**A charging period `id` starts with `cp_`.**",
+    "**Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true.",
+    "**A delete returns `204` with no body.** Reading the charging period afterwards returns `404`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_charging_periods",
+      "method": "GET",
+      "path": "/settings/charging_periods",
+      "slug": "list-charging-periods",
+      "title": "List charging periods",
+      "summary": "Returns a page of charging periods under `data`, with paging details under `pagination`.",
+      "description": "Lists the charging periods on the instance. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of charging periods, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/ChargingPeriodList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_charging_period",
+      "method": "POST",
+      "path": "/settings/charging_periods",
+      "slug": "create-a-charging-period",
+      "title": "Create a charging period",
+      "summary": "Creates a charging period and returns it under `charging_period`.",
+      "description": "Send the new charging period under `charging_period`. `name`, `display_name` and `time_period` are required, and `time_period` is the time period's `tp_` id.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "charging_period": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The charging period's name."
+                },
+                "display_name": {
+                  "type": "string",
+                  "description": "The name shown for the charging period."
+                },
+                "time_period": {
+                  "type": "string",
+                  "description": "The time period's `tp_` id."
+                }
+              },
+              "required": [
+                "name",
+                "display_name",
+                "time_period"
+              ]
+            }
+          },
+          "required": [
+            "charging_period"
+          ]
+        },
+        "example": {
+          "charging_period": {
+            "name": "Monthly charge",
+            "display_name": "Monthly charge",
+            "time_period": "tp_580762f904bd2bd26d3d7e71ae87aa72"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new charging period, under `charging_period`.",
+          "schema": {
+            "$ref": "#/components/schemas/ChargingPeriodResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "charging_period": {
+            "name": "Monthly charge",
+            "display_name": "Monthly charge",
+            "time_period": "tp_580762f904bd2bd26d3d7e71ae87aa72"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_charging_period",
+      "method": "GET",
+      "path": "/settings/charging_periods/{charging_period_id}",
+      "slug": "retrieve-a-charging-period",
+      "title": "Retrieve a charging period",
+      "summary": "Returns one charging period by its `id`, under `charging_period`.",
+      "description": "Reads the charging period with this `cp_` `id`. The `id` is the one a listing or a create returns.",
+      "parameters": [
+        {
+          "name": "charging_period_id",
+          "in": "path",
+          "required": true,
+          "description": "The charging period's `cp_` `id`, as a listing or a create returns it.",
+          "schema": {
+            "type": "string",
+            "example": "cp_9f0bc3f22319e31c7b8b622f97f8b37d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The charging period, under `charging_period`.",
+          "schema": {
+            "$ref": "#/components/schemas/ChargingPeriodResponse"
+          }
+        },
+        "404": {
+          "description": "No charging period has that `id`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "charging_period_id": "cp_9f0bc3f22319e31c7b8b622f97f8b37d"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_charging_period",
+      "method": "DELETE",
+      "path": "/settings/charging_periods/{charging_period_id}",
+      "slug": "delete-a-charging-period",
+      "title": "Delete a charging period",
+      "summary": "Deletes a charging period. The response has no body.",
+      "description": "Deletes the charging period with this `id`. Reading the same `id` afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "charging_period_id",
+          "in": "path",
+          "required": true,
+          "description": "The charging period's `cp_` `id`, as a listing or a create returns it.",
+          "schema": {
+            "type": "string",
+            "example": "cp_9f0bc3f22319e31c7b8b622f97f8b37d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The charging period is deleted. The response has no body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "charging_period_id": "cp_9f0bc3f22319e31c7b8b622f97f8b37d"
+        }
+      }
+    },
+    {
+      "key": "update_settings_charging_period",
+      "method": "PATCH",
+      "path": "/settings/charging_periods/{charging_period_id}",
+      "slug": "update-a-charging-period",
+      "title": "Update a charging period",
+      "summary": "Changes the fields you send on a charging period and returns it under `charging_period`.",
+      "description": "Send the fields to change under `charging_period`. You can change its fields or its `status`.",
+      "parameters": [
+        {
+          "name": "charging_period_id",
+          "in": "path",
+          "required": true,
+          "description": "The charging period's `cp_` `id`, as a listing or a create returns it.",
+          "schema": {
+            "type": "string",
+            "example": "cp_9f0bc3f22319e31c7b8b622f97f8b37d"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "charging_period": {
+              "type": "object",
+              "properties": {
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "charging_period"
+          ]
+        },
+        "example": {
+          "charging_period": {
+            "display_name": "Monthly charge (AU)",
+            "description": "Charges once a month"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated charging period, under `charging_period`.",
+          "schema": {
+            "$ref": "#/components/schemas/ChargingPeriodResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "charging_period_id": "cp_9f0bc3f22319e31c7b8b622f97f8b37d"
+        },
+        "body": {
+          "charging_period": {
+            "display_name": "Monthly charge (AU)",
+            "description": "Charges once a month"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "ChargingPeriodList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ChargingPeriod"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ChargingPeriodPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "ChargingPeriod": {
+      "type": "object",
+      "properties": {
+        "created_by": {
+          "description": "Null in every record read so far, so its type is not known."
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "description": "Null in every record read so far, so its type is not known."
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "time_period": {
+          "$ref": "#/components/schemas/ChargingPeriodTimePeriod"
+        }
+      }
+    },
+    "ChargingPeriodTimePeriod": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ChargingPeriodPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass this back as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/ChargingPeriodPaginationLinks"
+        }
+      }
+    },
+    "ChargingPeriodPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "ChargingPeriodResponse": {
+      "type": "object",
+      "properties": {
+        "charging_period": {
+          "$ref": "#/components/schemas/ChargingPeriod"
+        }
+      }
+    }
+  }
+}
