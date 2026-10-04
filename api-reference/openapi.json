@@ -56,6 +56,9 @@
     },
     {
       "name": "Gift certificates"
+    },
+    {
+      "name": "Invoices"
     }
   ],
   "paths": {
@@ -17613,6 +17616,2793 @@
           }
         ]
       }
+    },
+    "/invoices": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "List invoices",
+        "operationId": "invoices_get_invoices",
+        "description": "Lists every invoice you can see, one page at a time. The records are under `data` and the paging details under `pagination`. A listed invoice does not include its `lines`; retrieve the invoice to get them. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of invoices, under `data`, with `pagination`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_invoices({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getInvoices({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getInvoices(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.InvoiceList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<InvoiceList> response = client.invoices().getInvoices(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetInvoicesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.getInvoices(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetInvoices(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Create an invoice",
+        "operationId": "invoices_create_invoice",
+        "description": "Creates an invoice from the fields under `invoice`. A new invoice has `status` `active` and `payment_status` `unpaid`. Send `price_tax_inclusive` as a JSON boolean.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new invoice, under `invoice`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/invoices\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"invoice\": {\n      \"account_id\": \"W13ZGY\",\n      \"issue_date\": \"2026-10-01\",\n      \"due_date\": \"2026-10-31\",\n      \"currency\": \"AUD\",\n      \"lines\": [\n        {\n          \"item_id\": \"ITEM-0001\",\n          \"item_quantity\": 1\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.create_invoice(\n    {\n        \"invoice\": {\n            \"account_id\": \"W13ZGY\",\n            \"issue_date\": \"2026-10-01\",\n            \"due_date\": \"2026-10-31\",\n            \"currency\": \"AUD\",\n            \"lines\": [{\"item_id\": \"ITEM-0001\", \"item_quantity\": 1}],\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.createInvoice({\n    invoice: {\n        account_id: 'W13ZGY',\n        issue_date: '2026-10-01',\n        due_date: '2026-10-31',\n        currency: 'AUD',\n        lines: [{item_id: 'ITEM-0001', item_quantity: 1}],\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->createInvoice([\n    'invoice' => [\n        'account_id' => 'W13ZGY',\n        'issue_date' => '2026-10-01',\n        'due_date' => '2026-10-31',\n        'currency' => 'AUD',\n        'lines' => [['item_id' => 'ITEM-0001', 'item_quantity' => 1]],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.Invoice;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Invoice> response = client.invoices().createInvoice(\n        Map.of(\n                \"invoice\", Map.of(\n                        \"account_id\", \"W13ZGY\",\n                        \"issue_date\", \"2026-10-01\",\n                        \"due_date\", \"2026-10-31\",\n                        \"currency\", \"AUD\",\n                        \"lines\", List.of(Map.of(\"item_id\", \"ITEM-0001\", \"item_quantity\", 1)))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.CreateInvoiceAsync(new Dictionary<string, object?>\n{\n    [\"invoice\"] = new Dictionary<string, object?>\n    {\n        [\"account_id\"] = \"W13ZGY\",\n        [\"issue_date\"] = \"2026-10-01\",\n        [\"due_date\"] = \"2026-10-31\",\n        [\"currency\"] = \"AUD\",\n        [\"lines\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"item_id\"] = \"ITEM-0001\",\n                [\"item_quantity\"] = 1,\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.createInvoice({\n  'invoice': {\n    'account_id': 'W13ZGY',\n    'issue_date': '2026-10-01',\n    'due_date': '2026-10-31',\n    'currency': 'AUD',\n    'lines': [\n      {'item_id': 'ITEM-0001', 'item_quantity': 1},\n    ],\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().CreateInvoice(context.Background(), map[string]any{\n\t\"invoice\": map[string]any{\n\t\t\"account_id\": \"W13ZGY\",\n\t\t\"issue_date\": \"2026-10-01\",\n\t\t\"due_date\":   \"2026-10-31\",\n\t\t\"currency\":   \"AUD\",\n\t\t\"lines\": []any{\n\t\t\tmap[string]any{\"item_id\": \"ITEM-0001\", \"item_quantity\": 1},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "invoice": {
+                    "type": "object",
+                    "properties": {
+                      "account_id": {
+                        "type": "string",
+                        "description": "The `id` of the account to bill."
+                      },
+                      "issue_date": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "due_date": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "currency": {
+                        "type": "string",
+                        "description": "A currency code, such as `AUD`."
+                      },
+                      "lines": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "item_id": {
+                              "type": "string",
+                              "description": "The item's `id`."
+                            },
+                            "item_quantity": {
+                              "type": "number"
+                            }
+                          }
+                        }
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "invoice_note": {
+                        "type": "string"
+                      },
+                      "origin": {
+                        "type": "string"
+                      },
+                      "price_tax_inclusive": {
+                        "type": "boolean",
+                        "description": "Send a JSON boolean."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "invoice"
+                ]
+              },
+              "example": {
+                "invoice": {
+                  "account_id": "W13ZGY",
+                  "issue_date": "2026-10-01",
+                  "due_date": "2026-10-31",
+                  "currency": "AUD",
+                  "lines": [
+                    {
+                      "item_id": "ITEM-0001",
+                      "item_quantity": 1
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoices/{invoice_id}": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Retrieve an invoice",
+        "operationId": "invoices_get_invoice",
+        "description": "Fetches a single invoice. Unlike a listing entry, the result carries the invoice's `lines`. Amounts such as `total` are strings.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The invoice, under `invoice`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No invoice has that `id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_invoice(\"INV-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getInvoice('INV-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getInvoice('INV-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.Invoice;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Invoice> response = client.invoices().getInvoice(\"INV-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetInvoiceAsync(\"INV-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.getInvoice('INV-0001');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetInvoice(context.Background(), \"INV-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Delete an invoice",
+        "operationId": "invoices_delete_invoice",
+        "description": "Deletes the invoice. Afterwards a read of the same `id` returns `404`.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The invoice is deleted. The response has no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.delete_invoice(\"INV-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.deleteInvoice('INV-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->deleteInvoice('INV-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.Invoice;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Invoice> response = client.invoices().deleteInvoice(\"INV-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.DeleteInvoiceAsync(\"INV-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.deleteInvoice('INV-0001');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().DeleteInvoice(context.Background(), \"INV-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/invoices/{invoice_id}/information": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Retrieve an invoice's information",
+        "operationId": "invoices_get_invoice_information",
+        "description": "Fetches the invoice's header details: status, dates, totals, account, currency and custom attributes. Use it when you do not need the lines.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The invoice's information, under `invoice`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/information\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_invoice_information(\"INV-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getInvoiceInformation('INV-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getInvoiceInformation('INV-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.Invoice;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Invoice> response = client.invoices().getInvoiceInformation(\"INV-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetInvoiceInformationAsync(\"INV-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.getInvoiceInformation('INV-0001');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetInvoiceInformation(context.Background(), \"INV-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Update an invoice's information",
+        "operationId": "invoices_update_invoice_information",
+        "description": "Updates the invoice's header fields sent under `invoice`, such as `invoice_note` and `customer_purchase_order_id`. Fields you leave out keep their values.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated invoice, under `invoice`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/information\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"invoice\": {\n      \"invoice_note\": \"Deliver to the loading dock.\",\n      \"customer_purchase_order_id\": \"PO-1001\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.update_invoice_information(\n    \"INV-0001\",\n    {\n        \"invoice\": {\n            \"invoice_note\": \"Deliver to the loading dock.\",\n            \"customer_purchase_order_id\": \"PO-1001\",\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.updateInvoiceInformation('INV-0001', {\n    invoice: {invoice_note: 'Deliver to the loading dock.', customer_purchase_order_id: 'PO-1001'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->updateInvoiceInformation('INV-0001', [\n    'invoice' => [\n        'invoice_note' => 'Deliver to the loading dock.',\n        'customer_purchase_order_id' => 'PO-1001',\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.Invoice;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Invoice> response = client.invoices().updateInvoiceInformation(\n        \"INV-0001\",\n        Map.of(\n                \"invoice\", Map.of(\n                        \"invoice_note\", \"Deliver to the loading dock.\",\n                        \"customer_purchase_order_id\", \"PO-1001\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.UpdateInvoiceInformationAsync(\n    \"INV-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"invoice\"] = new Dictionary<string, object?>\n        {\n            [\"invoice_note\"] = \"Deliver to the loading dock.\",\n            [\"customer_purchase_order_id\"] = \"PO-1001\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.updateInvoiceInformation('INV-0001', {\n  'invoice': {\n    'invoice_note': 'Deliver to the loading dock.',\n    'customer_purchase_order_id': 'PO-1001',\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().UpdateInvoiceInformation(context.Background(), \"INV-0001\", map[string]any{\n\t\"invoice\": map[string]any{\n\t\t\"invoice_note\":               \"Deliver to the loading dock.\",\n\t\t\"customer_purchase_order_id\": \"PO-1001\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "invoice": {
+                    "type": "object",
+                    "properties": {
+                      "invoice_note": {
+                        "type": "string"
+                      },
+                      "customer_purchase_order_id": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "invoice"
+                ]
+              },
+              "example": {
+                "invoice": {
+                  "invoice_note": "Deliver to the loading dock.",
+                  "customer_purchase_order_id": "PO-1001"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoices/{invoice_id}/pdf": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Retrieve an invoice's PDF links",
+        "operationId": "invoices_get_invoice_pdf",
+        "description": "Returns a small JSON description of the invoice's PDF under `invoice.pdf`, with a `preview_url`, a `download_url` and the `file_size`. Fetch `download_url` to get the file.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The PDF details, under `invoice.pdf`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoicePdfResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/pdf\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_invoice_pdf(\"INV-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getInvoicePdf('INV-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getInvoicePdf('INV-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.InvoicePdf;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<InvoicePdf> response = client.invoices().getInvoicePdf(\"INV-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetInvoicePdfAsync(\"INV-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.getInvoicePdf('INV-0001');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetInvoicePDF(context.Background(), \"INV-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/invoices/{invoice_id}/amend": {
+      "post": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Amend an invoice",
+        "operationId": "invoices_amend_invoice",
+        "description": "Amends the invoice's lines. Each entry of `invoice.lines` names an `op`: `add` with the new line under `value`, `change` with the line's `id` as `charge_item_uuid` and the new price or quantity, or `remove` with the line's `id` as `charge_item_uuid`. Each amendment raises the invoice's `version` by one. The body is optional.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The amended invoice, under `invoice`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/amend\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"invoice\": {\n      \"lines\": [\n        {\n          \"op\": \"add\",\n          \"value\": {\n            \"item_id\": \"ITEM-0001\",\n            \"item_price\": 3,\n            \"item_quantity\": 1\n          }\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.amend_invoice(\n    \"INV-0001\",\n    {\n        \"invoice\": {\n            \"lines\": [\n                {\n                    \"op\": \"add\",\n                    \"value\": {\n                        \"item_id\": \"ITEM-0001\",\n                        \"item_price\": 3,\n                        \"item_quantity\": 1,\n                    },\n                }\n            ]\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.amendInvoice('INV-0001', {\n    invoice: {lines: [{op: 'add', value: {item_id: 'ITEM-0001', item_price: 3, item_quantity: 1}}]},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->amendInvoice('INV-0001', [\n    'invoice' => [\n        'lines' => [\n            [\n                'op' => 'add',\n                'value' => ['item_id' => 'ITEM-0001', 'item_price' => 3, 'item_quantity' => 1],\n            ],\n        ],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.Invoice;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Invoice> response = client.invoices().amendInvoice(\n        \"INV-0001\",\n        Map.of(\n                \"invoice\", Map.of(\n                        \"lines\", List.of(\n                                Map.of(\n                                        \"op\", \"add\",\n                                        \"value\", Map.of(\n                                                \"item_id\", \"ITEM-0001\",\n                                                \"item_price\", 3,\n                                                \"item_quantity\", 1))))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.AmendInvoiceAsync(\n    \"INV-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"invoice\"] = new Dictionary<string, object?>\n        {\n            [\"lines\"] = new List<object?>\n            {\n                new Dictionary<string, object?>\n                {\n                    [\"op\"] = \"add\",\n                    [\"value\"] = new Dictionary<string, object?>\n                    {\n                        [\"item_id\"] = \"ITEM-0001\",\n                        [\"item_price\"] = 3,\n                        [\"item_quantity\"] = 1,\n                    },\n                },\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.amendInvoice('INV-0001', {\n  'invoice': {\n    'lines': [\n      {\n        'op': 'add',\n        'value': {\n          'item_id': 'ITEM-0001',\n          'item_price': 3,\n          'item_quantity': 1,\n        },\n      },\n    ],\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().AmendInvoice(context.Background(), \"INV-0001\", map[string]any{\n\t\"invoice\": map[string]any{\n\t\t\"lines\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"op\": \"add\",\n\t\t\t\t\"value\": map[string]any{\n\t\t\t\t\t\"item_id\":       \"ITEM-0001\",\n\t\t\t\t\t\"item_price\":    3,\n\t\t\t\t\t\"item_quantity\": 1,\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "invoice": {
+                    "type": "object",
+                    "properties": {
+                      "lines": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "op": {
+                              "type": "string",
+                              "enum": [
+                                "add",
+                                "change",
+                                "remove"
+                              ]
+                            },
+                            "value": {
+                              "type": "object",
+                              "description": "For `add`: the new line.",
+                              "properties": {
+                                "item_id": {
+                                  "type": "string"
+                                },
+                                "item_price": {
+                                  "type": "number"
+                                },
+                                "item_quantity": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "charge_item_uuid": {
+                              "type": "string",
+                              "description": "For `change` and `remove`: the `id` of the invoice line."
+                            },
+                            "item_price": {
+                              "type": "number",
+                              "description": "For `change`."
+                            },
+                            "item_order_quantity": {
+                              "type": "number",
+                              "description": "For `change`."
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "invoice": {
+                  "lines": [
+                    {
+                      "op": "add",
+                      "value": {
+                        "item_id": "ITEM-0001",
+                        "item_price": 3,
+                        "item_quantity": 1
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoices/{invoice_id}/cancel": {
+      "post": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Cancel an invoice",
+        "operationId": "invoices_cancel_invoice",
+        "description": "Cancels the invoice. An empty `invoice` object is enough, and the body is optional. Cancelling an invoice that is already cancelled returns a client error.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The cancelled invoice, under `invoice`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/cancel\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"invoice\": {}\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.cancel_invoice(\"INV-0001\", {\"invoice\": {}})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.cancelInvoice('INV-0001', {invoice: {}});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->cancelInvoice('INV-0001', ['invoice' => (object) []]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.Invoice;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Invoice> response = client.invoices().cancelInvoice(\n        \"INV-0001\",\n        Map.of(\"invoice\", Map.of()));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.CancelInvoiceAsync(\n    \"INV-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"invoice\"] = new Dictionary<string, object?>(),\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.cancelInvoice('INV-0001', {\n  'invoice': {},\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().CancelInvoice(context.Background(), \"INV-0001\", map[string]any{\"invoice\": map[string]any{}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "invoice": {
+                    "type": "object",
+                    "properties": {
+                      "effective_date": {
+                        "type": "string",
+                        "format": "date"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "invoice": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoices/{invoice_id}/reactivate": {
+      "post": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Reactivate an invoice",
+        "operationId": "invoices_reactivate_invoice",
+        "description": "Brings a cancelled invoice back to `active`. An empty `invoice` object is enough, and the body is optional.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The reactivated invoice, under `invoice`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/reactivate\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"invoice\": {}\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.reactivate_invoice(\"INV-0001\", {\"invoice\": {}})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.reactivateInvoice('INV-0001', {invoice: {}});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->reactivateInvoice('INV-0001', ['invoice' => (object) []]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.Invoice;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Invoice> response = client.invoices().reactivateInvoice(\n        \"INV-0001\",\n        Map.of(\"invoice\", Map.of()));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.ReactivateInvoiceAsync(\n    \"INV-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"invoice\"] = new Dictionary<string, object?>(),\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.reactivateInvoice('INV-0001', {\n  'invoice': {},\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().ReactivateInvoice(context.Background(), \"INV-0001\", map[string]any{\"invoice\": map[string]any{}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "invoice": {
+                    "type": "object",
+                    "properties": {}
+                  }
+                }
+              },
+              "example": {
+                "invoice": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoices/{invoice_id}/item_fulfillments": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "List an invoice's item fulfillments",
+        "operationId": "invoices_get_invoice_item_fulfillments",
+        "description": "Lists the fulfillments against the invoice, one page at a time, under `data`. The path is spelled `item_fulfillments`.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of item fulfillments, under `data`, with `pagination`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceItemFulfillmentReadList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/item_fulfillments?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_invoice_item_fulfillments(\"INV-0001\", {\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getInvoiceItemFulfillments('INV-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getInvoiceItemFulfillments('INV-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.item_fulfillments.item_fulfillments_dto.ItemFulfillmentsDto.ItemFulfillmentReadList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ItemFulfillmentReadList> response = client.invoices().getInvoiceItemFulfillments(\n        \"INV-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetInvoiceItemFulfillmentsAsync(\n    \"INV-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.getInvoiceItemFulfillments(\n  'INV-0001',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetInvoiceItemFulfillments(context.Background(), \"INV-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/invoices/{invoice_id}/item_fulfillments/{fulfillment_id}": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Retrieve an invoice's item fulfillment",
+        "operationId": "invoices_get_invoice_item_fulfillment",
+        "description": "Fetches a single fulfillment of the invoice. A fulfillment that belongs to a different invoice returns `404`.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fulfillment_id",
+            "in": "path",
+            "required": true,
+            "description": "The item fulfillment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The item fulfillment, under `item_fulfillment`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceItemFulfillmentReadResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The fulfillment does not belong to this invoice, or does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/item_fulfillments/IF-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_invoice_item_fulfillment(\"INV-0001\", \"IF-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getInvoiceItemFulfillment('INV-0001', 'IF-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getInvoiceItemFulfillment('INV-0001', 'IF-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.item_fulfillments.item_fulfillments_dto.ItemFulfillmentsDto.ItemFulfillmentRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ItemFulfillmentRead> response = client.invoices().getInvoiceItemFulfillment(\"INV-0001\", \"IF-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetInvoiceItemFulfillmentAsync(\"INV-0001\", \"IF-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.getInvoiceItemFulfillment(\n  'INV-0001',\n  'IF-0001',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetInvoiceItemFulfillment(context.Background(), \"INV-0001\", \"IF-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/invoices/{invoice_id}/return_merchandise_authorisations": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "List an invoice's return merchandise authorisations",
+        "operationId": "invoices_get_invoice_rmas",
+        "description": "Lists the invoice's return merchandise authorisations, one page at a time, under `data`. The path uses the British spelling `authorisations`; the spelling with a `z` returns `404`.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of return merchandise authorisations, under `data`, with `pagination`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceRmaList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/return_merchandise_authorisations?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_invoice_rmas(\"INV-0001\", {\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getInvoiceRmas('INV-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getInvoiceReturnMerchandiseAuthorisations('INV-0001', [\n    'limit' => 20,\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.return_merchandise_authorisations.return_merchandise_authorisations_dto.ReturnMerchandiseAuthorisationsDto.InvoiceReturnMerchandiseAuthorisations;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<InvoiceReturnMerchandiseAuthorisations> response = client.invoices().getInvoiceReturnMerchandiseAuthorisations(\n        \"INV-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetInvoiceReturnMerchandiseAuthorisationsAsync(\n    \"INV-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices\n    .getInvoiceReturnMerchandiseAuthorisations(\n      'INV-0001',\n      queryParams: {'limit': 20},\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetInvoiceReturnMerchandiseAuthorisations(context.Background(), \"INV-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/invoices/{invoice_id}/return_merchandise_authorisations/{rma_id}": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Retrieve an invoice's return merchandise authorisation",
+        "operationId": "invoices_get_invoice_rma",
+        "description": "Fetches a single return merchandise authorisation of the invoice, with its lines. One that belongs to a different invoice returns `404`.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "rma_id",
+            "in": "path",
+            "required": true,
+            "description": "The return merchandise authorisation's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The return merchandise authorisation, under `return_merchandise_authorisation`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationReadResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The return merchandise authorisation does not belong to this invoice, or does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/return_merchandise_authorisations/RMA-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_invoice_rma(\"INV-0001\", \"RMA-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getInvoiceRma('INV-0001', 'RMA-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getInvoiceReturnMerchandiseAuthorisation('INV-0001', 'RMA-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.return_merchandise_authorisations.return_merchandise_authorisations_dto.ReturnMerchandiseAuthorisationsDto.ReturnMerchandiseAuthorisationRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReturnMerchandiseAuthorisationRead> response = client.invoices().getInvoiceReturnMerchandiseAuthorisation(\n        \"INV-0001\",\n        \"RMA-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetInvoiceReturnMerchandiseAuthorisationAsync(\n    \"INV-0001\",\n    \"RMA-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices\n    .getInvoiceReturnMerchandiseAuthorisation('INV-0001', 'RMA-0001');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetInvoiceReturnMerchandiseAuthorisation(context.Background(), \"INV-0001\", \"RMA-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/invoices/{invoice_id}/notes": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "List an invoice's notes",
+        "operationId": "invoices_get_invoice_notes",
+        "description": "Lists the invoice's notes, one page at a time, under `data`. Each note carries its `content`, its `attachments` and who created it.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of notes, under `data`, with `pagination`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceNoteList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/notes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_invoice_notes(\"INV-0001\", {\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getInvoiceNotes('INV-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getInvoiceNotes('INV-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<InvoicesDto.InvoiceNoteList> response = client.invoices().getInvoiceNotes(\n        \"INV-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetInvoiceNotesAsync(\n    \"INV-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.getInvoiceNotes(\n  'INV-0001',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetInvoiceNotes(context.Background(), \"INV-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Create an invoice note",
+        "operationId": "invoices_create_invoice_note",
+        "description": "Sends a multipart form: the text as the `note` field and any attachment as `file`. The new note comes back with its `id` and the `uuid` of each attachment.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The new note, under `note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceNoteResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/notes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -F \"file=@receipt.pdf\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.create_invoice_note(\n    \"INV-0001\",\n    \"Customer asked for a copy by post.\",\n    files={\"file\": open(\"receipt.pdf\", \"rb\")},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {readFileSync} from 'node:fs';\nimport {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.createInvoiceNote('INV-0001', 'Customer asked for a copy by post.', {\n    files: {file: ['receipt.pdf', readFileSync('receipt.pdf')]},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->createInvoiceNote('INV-0001', 'Customer asked for a copy by post.', [\n    'file' => ['receipt.pdf', fopen('receipt.pdf', 'r')],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.client.RequestOptions;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.InvoiceNote;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<InvoiceNote> response = client.invoices().createInvoiceNote(\n        \"INV-0001\",\n        \"Customer asked for a copy by post.\",\n        Map.of(\"file\", Path.of(\"receipt.pdf\")),\n        RequestOptions.none());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.CreateInvoiceNoteAsync(\n    \"INV-0001\",\n    \"Customer asked for a copy by post.\",\n    new Dictionary<string, object?> { [\"file\"] = new object?[] { \"receipt.pdf\", File.ReadAllBytes(\"receipt.pdf\") } });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'dart:io';\n\nimport 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.createInvoiceNote(\n  'INV-0001',\n  'Customer asked for a copy by post.',\n  files: {\n    'file': ['receipt.pdf', File('receipt.pdf').readAsBytesSync()],\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nfile, err := os.ReadFile(\"receipt.pdf\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.Invoices().CreateInvoiceNote(context.Background(), \"INV-0001\", \"Customer asked for a copy by post.\", map[string]any{\"file\": []any{\"receipt.pdf\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "note"
+                ],
+                "properties": {
+                  "note": {
+                    "type": "string",
+                    "description": "The note text."
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "An optional file to attach to the note."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoices/{invoice_id}/notes/{note_id}": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Retrieve an invoice note",
+        "operationId": "invoices_get_invoice_note",
+        "description": "Fetches a single note by the `id` the notes listing gives it.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, as the invoice's notes listing returns it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note, under `note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceNoteResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/notes/note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_invoice_note(\n    \"INV-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getInvoiceNote('INV-0001', 'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getInvoiceNote('INV-0001', 'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.InvoiceNote;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<InvoiceNote> response = client.invoices().getInvoiceNote(\n        \"INV-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetInvoiceNoteAsync(\n    \"INV-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.getInvoiceNote(\n  'INV-0001',\n  'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetInvoiceNote(context.Background(), \"INV-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Delete an invoice note",
+        "operationId": "invoices_delete_invoice_note",
+        "description": "Deletes the note. Afterwards a read of the same note returns `404`.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, as the invoice's notes listing returns it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The note is deleted. The response has no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/notes/note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.delete_invoice_note(\n    \"INV-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.deleteInvoiceNote('INV-0001', 'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->deleteInvoiceNote(\n    'INV-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.invoices().deleteInvoiceNote(\"INV-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.DeleteInvoiceNoteAsync(\n    \"INV-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.deleteInvoiceNote(\n  'INV-0001',\n  'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().DeleteInvoiceNote(context.Background(), \"INV-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/invoices/{invoice_id}/notes/{note_id}/files": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "List an invoice note's files",
+        "operationId": "invoices_get_invoice_note_files",
+        "description": "Lists the note's attachments under `data`, each with its `uuid`, `filename`, `content_type`, `size` and `href`.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, as the invoice's notes listing returns it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note's files, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceNoteFileList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/notes/note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d/files\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_invoice_note_files(\n    \"INV-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getInvoiceNoteFiles('INV-0001', 'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getInvoiceNoteFiles(\n    'INV-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.accounts.accounts_dto.AccountsDto.NoteFileList;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<NoteFileList> response = client.invoices().getInvoiceNoteFiles(\n        \"INV-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetInvoiceNoteFilesAsync(\n    \"INV-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.getInvoiceNoteFiles(\n  'INV-0001',\n  'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetInvoiceNoteFiles(context.Background(), \"INV-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/invoices/{invoice_id}/notes/{note_id}/files/{file_id}": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Retrieve an invoice note file",
+        "operationId": "invoices_get_invoice_note_file",
+        "description": "Fetches a JSON description of the attachment under `file`: its `uuid`, `filename`, `content_type`, `size` and `href`.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, as the invoice's notes listing returns it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The attachment's `uuid`, from the note's `attachments`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file's details, under `file`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceNoteFileResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/notes/note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d/files/6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_invoice_note_file(\n    \"INV-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n    \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\",\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getInvoiceNoteFile(\n    'INV-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n    '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getInvoiceNoteFile(\n    'INV-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n    '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.InvoiceNoteFile;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<InvoiceNoteFile> response = client.invoices().getInvoiceNoteFile(\n        \"INV-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n        \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetInvoiceNoteFileAsync(\n    \"INV-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n    \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.getInvoiceNoteFile(\n  'INV-0001',\n  'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n  '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetInvoiceNoteFile(context.Background(), \"INV-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Delete an invoice note file",
+        "operationId": "invoices_delete_invoice_note_file",
+        "description": "Deletes the attachment by its `uuid`. The server can return `404` with `attachment not found` even for a file the note's files listing shows.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, as the invoice's notes listing returns it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The attachment's `uuid`, from the note's `attachments`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The file is deleted. The response has no body."
+          },
+          "404": {
+            "description": "The attachment is not deleted. This can happen even for a file the note's files listing shows.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/notes/note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d/files/6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.delete_invoice_note_file(\n    \"INV-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n    \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\",\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.deleteInvoiceNoteFile(\n    'INV-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n    '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->deleteInvoiceNoteFile(\n    'INV-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n    '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.invoices().deleteInvoiceNoteFile(\n        \"INV-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n        \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.DeleteInvoiceNoteFileAsync(\n    \"INV-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n    \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.deleteInvoiceNoteFile(\n  'INV-0001',\n  'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n  '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().DeleteInvoiceNoteFile(context.Background(), \"INV-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/orders/{order_id}/invoices": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "List an order's invoices",
+        "operationId": "invoices_get_order_invoices",
+        "description": "Lists the invoices of one order, one page at a time, under `data`. Each record has the same fields as an entry of the invoice listing.",
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "description": "The order's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of the order's invoices, under `data`, with `pagination`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/orders/ORD-0001/invoices?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_order_invoices(\"ORD-0001\", {\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getOrderInvoices('ORD-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getOrderInvoices('ORD-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.InvoiceList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<InvoiceList> response = client.invoices().getOrderInvoices(\n        \"ORD-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetOrderInvoicesAsync(\n    \"ORD-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.getOrderInvoices(\n  'ORD-0001',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetOrderInvoices(context.Background(), \"ORD-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Create an invoice for an order",
+        "operationId": "invoices_create_order_invoice",
+        "description": "Creates an invoice for the order's lines. The body is optional; send fields such as `invoice_note` under `invoice`.",
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "description": "The order's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The new invoice, under `invoice`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/orders/ORD-0001/invoices\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"invoice\": {\n      \"invoice_note\": \"First month of service.\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.create_order_invoice(\n    \"ORD-0001\", {\"invoice\": {\"invoice_note\": \"First month of service.\"}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.createOrderInvoice('ORD-0001', {\n    invoice: {invoice_note: 'First month of service.'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->createOrderInvoice('ORD-0001', [\n    'invoice' => ['invoice_note' => 'First month of service.'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.Invoice;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Invoice> response = client.invoices().createOrderInvoice(\n        \"ORD-0001\",\n        Map.of(\"invoice\", Map.of(\"invoice_note\", \"First month of service.\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.CreateOrderInvoiceAsync(\n    \"ORD-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"invoice\"] = new Dictionary<string, object?>\n        {\n            [\"invoice_note\"] = \"First month of service.\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.createOrderInvoice('ORD-0001', {\n  'invoice': {'invoice_note': 'First month of service.'},\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().CreateOrderInvoice(context.Background(), \"ORD-0001\", map[string]any{\n\t\"invoice\": map[string]any{\"invoice_note\": \"First month of service.\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "invoice": {
+                    "type": "object",
+                    "properties": {
+                      "invoice_note": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "invoice": {
+                  "invoice_note": "First month of service."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoices/{invoice_id}/kpis": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Retrieve an invoice's KPIs",
+        "operationId": "invoices_get_invoice_kpis",
+        "description": "Fetches the invoice's KPI block under `invoice_kpis`, the same block a retrieved invoice carries as `kpis`. Amounts such as `payment_applied` are strings.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The KPIs, under `invoice_kpis`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceKpisReadResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/kpis\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_invoice_kpis(\"INV-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getInvoiceKpis('INV-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getInvoiceKpis('INV-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.InvoiceKpisRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<InvoiceKpisRead> response = client.invoices().getInvoiceKpis(\"INV-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetInvoiceKpisAsync(\"INV-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.getInvoiceKpis('INV-0001');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetInvoiceKPIs(context.Background(), \"INV-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/invoices/{invoice_id}/lines": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "List an invoice's lines",
+        "operationId": "invoices_get_invoice_lines",
+        "description": "Fetches the invoice's lines under `invoice.lines`. This is not a paged listing: every line comes back at once.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The lines, under `invoice.lines`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceLinesResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/lines\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_invoice_lines(\"INV-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getInvoiceLines('INV-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getInvoiceLines('INV-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.InvoiceLines;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<InvoiceLines> response = client.invoices().getInvoiceLines(\"INV-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetInvoiceLinesAsync(\"INV-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.getInvoiceLines('INV-0001');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetInvoiceLines(context.Background(), \"INV-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/invoices/{invoice_id}/lines/{line_id}": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Retrieve an invoice line",
+        "operationId": "invoices_get_invoice_line",
+        "description": "Fetches a line under `invoice.line`. The server ignores `line_id` and always returns the invoice's first line, so use the lines endpoint to find a specific one.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "line_id",
+            "in": "path",
+            "required": true,
+            "description": "The line's `id`. The server ignores it and returns the invoice's first line.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The line, under `invoice.line`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceLineReadResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/lines/4d2e6f8a-1b3c-4d5e-9f0a-2b4c6d8e0f1a\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_invoice_line(\n    \"INV-0001\", \"4d2e6f8a-1b3c-4d5e-9f0a-2b4c6d8e0f1a\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getInvoiceLine('INV-0001', '4d2e6f8a-1b3c-4d5e-9f0a-2b4c6d8e0f1a');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getInvoiceLine('INV-0001', '4d2e6f8a-1b3c-4d5e-9f0a-2b4c6d8e0f1a');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoices.invoices_dto.InvoicesDto.InvoiceLineRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<InvoiceLineRead> response = client.invoices().getInvoiceLine(\n        \"INV-0001\",\n        \"4d2e6f8a-1b3c-4d5e-9f0a-2b4c6d8e0f1a\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetInvoiceLineAsync(\n    \"INV-0001\",\n    \"4d2e6f8a-1b3c-4d5e-9f0a-2b4c6d8e0f1a\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.getInvoiceLine(\n  'INV-0001',\n  '4d2e6f8a-1b3c-4d5e-9f0a-2b4c6d8e0f1a',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetInvoiceLine(context.Background(), \"INV-0001\", \"4d2e6f8a-1b3c-4d5e-9f0a-2b4c6d8e0f1a\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/invoices/{invoice_id}/credit_note_applications/{credit_note_application_id}": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Retrieve a credit note application through an invoice",
+        "operationId": "invoices_get_invoice_credit_note_application",
+        "description": "Fetches a credit note application under `credit_note_application`. The server does not check that the application belongs to the invoice: any application is returned under any invoice that exists.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "credit_note_application_id",
+            "in": "path",
+            "required": true,
+            "description": "The credit note application's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The credit note application, under `credit_note_application`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceCreditNoteApplicationReadResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/credit_note_applications/CNA-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_invoice_credit_note_application(\"INV-0001\", \"CNA-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getInvoiceCreditNoteApplication('INV-0001', 'CNA-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getInvoiceCreditNoteApplication('INV-0001', 'CNA-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.credit_note_applications.credit_note_applications_dto.CreditNoteApplicationsDto.CreditNoteApplicationRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<CreditNoteApplicationRead> response = client.invoices().getInvoiceCreditNoteApplication(\n        \"INV-0001\",\n        \"CNA-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetInvoiceCreditNoteApplicationAsync(\"INV-0001\", \"CNA-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.getInvoiceCreditNoteApplication(\n  'INV-0001',\n  'CNA-0001',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetInvoiceCreditNoteApplication(context.Background(), \"INV-0001\", \"CNA-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/invoices/{invoice_id}/custom_objects": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "List an invoice's custom objects",
+        "operationId": "invoices_get_invoice_custom_objects",
+        "description": "Lists the custom objects defined for invoices, one page at a time, under `data`.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of custom objects, under `data`, with `pagination`."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/custom_objects?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_invoice_custom_objects(\"INV-0001\", {\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getInvoiceCustomObjects('INV-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getInvoiceCustomObjects('INV-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.invoices().getInvoiceCustomObjects(\n        \"INV-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetInvoiceCustomObjectsAsync(\n    \"INV-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.getInvoiceCustomObjects(\n  'INV-0001',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetInvoiceCustomObjects(context.Background(), \"INV-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/invoices/{invoice_id}/custom_objects/{custom_object_id}": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Retrieve an invoice's custom object",
+        "operationId": "invoices_get_invoice_custom_object",
+        "description": "Fetches a custom object defined for invoices, together with the instances of it that belong to this invoice.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "custom_object_id",
+            "in": "path",
+            "required": true,
+            "description": "The custom object's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The custom object and this invoice's instances of it."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/custom_objects/CO-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_invoice_custom_object(\"INV-0001\", \"CO-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getInvoiceCustomObject('INV-0001', 'CO-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getInvoiceCustomObject('INV-0001', 'CO-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.invoices().getInvoiceCustomObject(\"INV-0001\", \"CO-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetInvoiceCustomObjectAsync(\"INV-0001\", \"CO-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.getInvoiceCustomObject(\n  'INV-0001',\n  'CO-0001',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetInvoiceCustomObject(context.Background(), \"INV-0001\", \"CO-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/invoices/{invoice_id}/custom_objects/{custom_object_id}/instances/{instance_id}": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Retrieve an invoice's custom object instance",
+        "operationId": "invoices_get_invoice_custom_object_instance",
+        "description": "Fetches a single instance of a custom object that belongs to this invoice.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "custom_object_id",
+            "in": "path",
+            "required": true,
+            "description": "The custom object's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "instance_id",
+            "in": "path",
+            "required": true,
+            "description": "The custom object instance's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The custom object instance."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/custom_objects/CO-0001/instances/COI-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoices.get_invoice_custom_object_instance(\n    \"INV-0001\", \"CO-0001\", \"COI-0001\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoices.getInvoiceCustomObjectInstance('INV-0001', 'CO-0001', 'COI-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoices->getInvoiceCustomObjectInstance('INV-0001', 'CO-0001', 'COI-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.invoices().getInvoiceCustomObjectInstance(\"INV-0001\", \"CO-0001\", \"COI-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Invoices.GetInvoiceCustomObjectInstanceAsync(\n    \"INV-0001\",\n    \"CO-0001\",\n    \"COI-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoices.getInvoiceCustomObjectInstance(\n  'INV-0001',\n  'CO-0001',\n  'COI-0001',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Invoices().GetInvoiceCustomObjectInstance(context.Background(), \"INV-0001\", \"CO-0001\", \"COI-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -26917,6 +29707,1552 @@
                 "type": "string"
               }
             }
+          }
+        }
+      },
+      "InvoiceList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Invoice"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/InvoicePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "Invoice": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "payment_status": {
+            "type": "string"
+          },
+          "account_id": {
+            "type": "string"
+          },
+          "account_name": {
+            "type": "string"
+          },
+          "order_id": {
+            "type": "string"
+          },
+          "customer_purchase_order_id": {
+            "type": "string"
+          },
+          "invoice_note": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "due_date": {
+            "type": "string"
+          },
+          "alternate_issue_date": {
+            "type": "string"
+          },
+          "alternate_due_date": {
+            "type": "string"
+          },
+          "billing_start_date": {
+            "type": "string"
+          },
+          "billing_end_date": {
+            "type": "string"
+          },
+          "alternate_billing_start_date": {
+            "type": "string"
+          },
+          "alternate_billing_end_date": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "string"
+          },
+          "tax_total": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "due": {
+            "type": "string"
+          },
+          "paid": {
+            "type": "string"
+          },
+          "discount_amount": {
+            "type": "number"
+          },
+          "shipping_cost": {
+            "type": "string"
+          },
+          "credit_applied": {
+            "type": "string"
+          },
+          "credit_issued": {
+            "type": "string"
+          },
+          "payment_applied": {
+            "type": "string"
+          },
+          "outstanding": {
+            "type": "string"
+          },
+          "price_tax_inclusive": {
+            "type": "boolean"
+          },
+          "recurring_rate_count": {
+            "type": "string"
+          },
+          "usage_rate_count": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/InvoiceCurrency"
+          },
+          "custom_form": {
+            "$ref": "#/components/schemas/InvoiceCustomForm"
+          },
+          "kpis": {
+            "$ref": "#/components/schemas/InvoiceKpis"
+          },
+          "last_payment": {
+            "$ref": "#/components/schemas/InvoiceLastPayment"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/InvoiceCreatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/InvoiceLastUpdatedBy"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceLine"
+            }
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceCustomAttribute"
+            }
+          },
+          "custom_objects": {
+            "type": "array",
+            "items": {}
+          },
+          "activity_logs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceActivityLog"
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceNote"
+            }
+          },
+          "item_fulfillments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceItemFulfillment"
+            }
+          },
+          "return_merchandise_authorisations": {
+            "type": "array",
+            "items": {}
+          },
+          "account": {
+            "$ref": "#/components/schemas/InvoiceAccount"
+          },
+          "object": {
+            "type": "string"
+          },
+          "order": {
+            "$ref": "#/components/schemas/InvoiceOrder"
+          }
+        }
+      },
+      "InvoiceCurrency": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceCustomForm": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceKpis": {
+        "type": "object",
+        "properties": {
+          "credit_applied": {
+            "type": "string"
+          },
+          "credit_issued": {
+            "type": "string"
+          },
+          "payment_applied": {
+            "type": "string"
+          },
+          "last_payment_date": {
+            "type": "string"
+          },
+          "last_amended_on": {
+            "type": "string"
+          },
+          "last_cancelled_on": {
+            "type": "string"
+          },
+          "last_reactivated_on": {
+            "type": "string"
+          },
+          "deleted_on": {
+            "type": "string"
+          },
+          "voided_on": {
+            "type": "string"
+          },
+          "outstanding": {
+            "type": [
+              "string",
+              "integer"
+            ]
+          },
+          "overdue": {
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        }
+      },
+      "InvoiceLastPayment": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "created_on": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceLine": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "item": {
+            "$ref": "#/components/schemas/InvoiceLineItem",
+            "description": "A reference to the item, with `object`, `id`, `name` and `href`."
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "item_uuid": {
+            "type": "string"
+          },
+          "item_name": {
+            "type": "string"
+          },
+          "item_uom": {
+            "type": "string"
+          },
+          "item_warehouse": {
+            "type": "string"
+          },
+          "item_serial_or_batch_number": {
+            "type": "string"
+          },
+          "item_order_quantity": {
+            "type": "integer"
+          },
+          "item_charge_type": {
+            "type": "string"
+          },
+          "item_custom_attributes": {
+            "type": "array",
+            "items": {}
+          },
+          "pricing_snapshot_price": {
+            "type": "number"
+          },
+          "pricing_snapshot_uuid": {
+            "type": "string"
+          },
+          "charging_start_date": {
+            "type": "string"
+          },
+          "charging_end_date": {
+            "type": "string"
+          },
+          "alternate_charging_start_date": {
+            "type": "string"
+          },
+          "alternate_charging_end_date": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "tax": {
+            "$ref": "#/components/schemas/InvoiceLineTax"
+          },
+          "accounting_code": {
+            "$ref": "#/components/schemas/InvoiceAccountingCode"
+          }
+        }
+      },
+      "InvoiceLineItem": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceLineTax": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "rate": {
+            "type": "number"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceAccountingCode": {
+        "type": "object",
+        "properties": {
+          "sales_revenue": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceCustomAttribute": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {}
+        }
+      },
+      "InvoiceActivityLog": {
+        "type": "object",
+        "properties": {
+          "activity": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceNote": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "invoice": {
+            "$ref": "#/components/schemas/InvoiceNoteDetail"
+          },
+          "group": {},
+          "user": {},
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceNoteAttachment"
+            }
+          },
+          "watchers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceNoteWatcher"
+            },
+            "description": "The people watching the note."
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/InvoiceNoteCreatedBy"
+          },
+          "last_updated_on": {},
+          "last_updated_by": {}
+        }
+      },
+      "InvoiceNoteDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceNoteAttachment": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceNoteWatcher": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceNoteCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceItemFulfillment": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "invoice_id": {
+            "type": "string"
+          },
+          "order_id": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "tracking_number": {
+            "type": "string"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "type": "string"
+          },
+          "fulfillments": {
+            "type": "array",
+            "items": {}
+          }
+        }
+      },
+      "InvoiceAccount": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceOrder": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoicePagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can be stale on the last page."
+          },
+          "next_cursor": {
+            "type": "string"
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/InvoicePaginationLinks"
+          },
+          "records": {
+            "type": "integer",
+            "description": "The total number of matching records, not the length of this page."
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "next_page": {
+            "type": "string",
+            "description": "On the last page this is the string `NULL`, not JSON null."
+          },
+          "previous_page": {
+            "type": "string"
+          },
+          "has_next": {
+            "type": "boolean"
+          },
+          "has_prev": {
+            "type": "boolean"
+          },
+          "per_page": {
+            "type": "integer"
+          }
+        }
+      },
+      "InvoicePaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceResponse": {
+        "type": "object",
+        "properties": {
+          "invoice": {
+            "$ref": "#/components/schemas/Invoice"
+          }
+        }
+      },
+      "InvoicePdf": {
+        "type": "object",
+        "properties": {
+          "pdf": {
+            "$ref": "#/components/schemas/InvoicePdfDetail"
+          }
+        }
+      },
+      "InvoicePdfDetail": {
+        "type": "object",
+        "properties": {
+          "download_url": {
+            "type": "string"
+          },
+          "file_size": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "preview_url": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoicePdfResponse": {
+        "type": "object",
+        "properties": {
+          "invoice": {
+            "$ref": "#/components/schemas/InvoicePdf"
+          }
+        }
+      },
+      "InvoiceItemFulfillmentReadList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceItemFulfillmentRead"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/InvoicePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceItemFulfillmentRead": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/InvoiceItemFulfillmentReadAccount"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/InvoiceItemFulfillmentReadCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "custom_attributes": {
+            "type": "object"
+          },
+          "delivery_status": {},
+          "fulfillment_completed": {
+            "type": "boolean"
+          },
+          "fulfillment_date": {
+            "type": "string"
+          },
+          "fulfillment_note": {
+            "type": "string"
+          },
+          "fulfillment_status": {
+            "type": "string"
+          },
+          "fulfillments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceItemFulfillmentReadRow"
+            }
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "invoice": {
+            "$ref": "#/components/schemas/InvoiceItemFulfillmentReadInvoice"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/InvoiceItemFulfillmentReadLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "order": {},
+          "status": {
+            "type": "string"
+          },
+          "tracking_number": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "InvoiceItemFulfillmentReadAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceItemFulfillmentReadCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceItemFulfillmentReadRow": {
+        "type": "object",
+        "properties": {
+          "fulfillment_index": {
+            "type": "integer"
+          },
+          "fulfillment_qty": {
+            "type": "number"
+          },
+          "fulfillment_sent_qty": {
+            "type": "number"
+          },
+          "id": {
+            "type": "string"
+          },
+          "inventory_tracking": {},
+          "item": {
+            "$ref": "#/components/schemas/InvoiceItemFulfillmentReadRowItem"
+          },
+          "object": {
+            "type": "string"
+          },
+          "pending_return": {
+            "type": "number"
+          },
+          "returned": {
+            "type": "number"
+          },
+          "serving_status": {
+            "type": "string"
+          },
+          "uom": {
+            "type": "string"
+          },
+          "uom_precision": {
+            "type": "integer"
+          }
+        }
+      },
+      "InvoiceItemFulfillmentReadRowItem": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceItemFulfillmentReadInvoice": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceItemFulfillmentReadLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceItemFulfillmentReadResponse": {
+        "type": "object",
+        "properties": {
+          "item_fulfillment": {
+            "$ref": "#/components/schemas/InvoiceItemFulfillmentRead"
+          }
+        }
+      },
+      "InvoiceRmaList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisation"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/InvoicePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceReturnMerchandiseAuthorisation": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationAccount"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "item_count": {
+            "type": "integer"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "note": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "return_status": {
+            "type": "string"
+          },
+          "rma_date": {
+            "type": "string"
+          },
+          "sale_invoice": {
+            "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationSaleInvoice"
+          },
+          "sale_order": {},
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "warehouse": {}
+        }
+      },
+      "InvoiceReturnMerchandiseAuthorisationAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceReturnMerchandiseAuthorisationCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceReturnMerchandiseAuthorisationSaleInvoice": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceReturnMerchandiseAuthorisationRead": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationReadAccount"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationReadCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "item_count": {
+            "type": "integer"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "lines": {
+            "type": "array",
+            "items": {}
+          },
+          "note": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "receive_rmas": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationReadReceiveRma"
+            }
+          },
+          "return_status": {
+            "type": "string"
+          },
+          "rma_date": {
+            "type": "string"
+          },
+          "sale_invoice": {
+            "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationReadSaleInvoice"
+          },
+          "sale_order": {},
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "warehouse": {}
+        }
+      },
+      "InvoiceReturnMerchandiseAuthorisationReadAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceReturnMerchandiseAuthorisationReadCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceReturnMerchandiseAuthorisationReadReceiveRma": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationReadReceiveRmaCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "quantity_received": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceReturnMerchandiseAuthorisationReadReceiveRmaCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceReturnMerchandiseAuthorisationReadSaleInvoice": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceReturnMerchandiseAuthorisationReadResponse": {
+        "type": "object",
+        "properties": {
+          "return_merchandise_authorisation": {
+            "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationRead"
+          }
+        }
+      },
+      "InvoiceNoteList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceNote"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/InvoicePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceNoteResponse": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "$ref": "#/components/schemas/InvoiceNote"
+          }
+        }
+      },
+      "InvoiceNoteFileList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceNoteFileEntry"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/InvoicePagination"
+          }
+        }
+      },
+      "InvoiceNoteFileEntry": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "content_type": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "href": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceNoteFile": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceNoteFileResponse": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "$ref": "#/components/schemas/InvoiceNoteFile"
+          }
+        }
+      },
+      "InvoiceKpisRead": {
+        "type": "object",
+        "properties": {
+          "credit_applied": {
+            "type": "string"
+          },
+          "credit_issued": {
+            "type": "string"
+          },
+          "payment_applied": {
+            "type": "string"
+          },
+          "last_payment_date": {
+            "type": "string"
+          },
+          "last_amended_on": {
+            "type": "string"
+          },
+          "last_cancelled_on": {
+            "type": "string"
+          },
+          "last_reactivated_on": {
+            "type": "string"
+          },
+          "deleted_on": {
+            "type": "string"
+          },
+          "voided_on": {
+            "type": "string"
+          },
+          "outstanding": {},
+          "overdue": {},
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceKpisReadResponse": {
+        "type": "object",
+        "properties": {
+          "invoice_kpis": {
+            "$ref": "#/components/schemas/InvoiceKpisRead"
+          }
+        }
+      },
+      "InvoiceLines": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceLine"
+            }
+          }
+        }
+      },
+      "InvoiceLinesResponse": {
+        "type": "object",
+        "properties": {
+          "invoice": {
+            "$ref": "#/components/schemas/InvoiceLines"
+          }
+        }
+      },
+      "InvoiceLineRead": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "line": {
+            "$ref": "#/components/schemas/InvoiceLine"
+          }
+        }
+      },
+      "InvoiceLineReadResponse": {
+        "type": "object",
+        "properties": {
+          "invoice": {
+            "$ref": "#/components/schemas/InvoiceLineRead"
+          }
+        }
+      },
+      "InvoiceCreditNoteApplicationRead": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/InvoiceCreditNoteApplicationReadCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "credit_note": {
+            "$ref": "#/components/schemas/InvoiceCreditNoteApplicationReadDetail"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "payment": {
+            "$ref": "#/components/schemas/InvoiceCreditNoteApplicationReadPayment"
+          },
+          "primaryId": {
+            "type": "integer"
+          },
+          "refund": {
+            "$ref": "#/components/schemas/InvoiceCreditNoteApplicationReadRefund"
+          },
+          "remaining_balance": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "InvoiceCreditNoteApplicationReadCreatedBy": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceCreditNoteApplicationReadDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceCreditNoteApplicationReadPayment": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceCreditNoteApplicationReadRefund": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceCreditNoteApplicationReadResponse": {
+        "type": "object",
+        "properties": {
+          "credit_note_application": {
+            "$ref": "#/components/schemas/InvoiceCreditNoteApplicationRead"
           }
         }
       },

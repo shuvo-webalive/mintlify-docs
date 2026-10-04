@@ -1,0 +1,3243 @@
+{
+  "family": "invoices",
+  "tag": "Invoices",
+  "slug": "invoices",
+  "icon": "file-invoice",
+  "base": "/invoices",
+  "overview_description": "Create, read, amend, cancel, reactivate and delete invoices, and reach their lines, notes, files, fulfillments and returns.",
+  "intro": "An invoice bills an account for items, either on its own or raised from an order. This area has 30 endpoints: create, read, amend, cancel, reactivate and delete invoices, and read their lines, KPIs, PDF links, notes, files, fulfillments, return merchandise authorisations and custom objects. All seven SDKs call every one.",
+  "warning": "**`GET /invoices/{invoice_id}/lines/{line_id}` ignores `line_id` and always returns the invoice's first line.**",
+  "notes": [
+    "**Pass an invoice's `id`, never its `uuid`.** Every `{invoice_id}` is the invoice's `id`, such as `INV-0001`.",
+    "**Write bodies go under an `invoice` key.** Create, update, amend, cancel and reactivate all wrap their fields in `invoice`. Amend, cancel, reactivate and creating an invoice for an order also work with no body.",
+    "**Money comes back as text.** Amounts such as `total`, `subtotal` and `due` are strings like `\"12.00\"`. `discount_amount` and a line's tax `rate` are numbers.",
+    "**The invoice listing pages by cursor.** Records are under `data`. Pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is `true`.",
+    "**Only a single read carries the lines.** A listing entry has no `lines`; retrieve the invoice, or list its lines, to see them.",
+    "**Some reads under an invoice do not check the invoice.** The credit note application read returns any application under any invoice that exists."
+  ],
+  "endpoints": [
+    {
+      "key": "get_invoices",
+      "method": "GET",
+      "path": "/invoices",
+      "slug": "list-invoices",
+      "title": "List invoices",
+      "summary": "Returns one page of invoices, with a cursor for the next page.",
+      "description": "Lists every invoice you can see, one page at a time. The records are under `data` and the paging details under `pagination`. A listed invoice does not include its `lines`; retrieve the invoice to get them. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of invoices, under `data`, with `pagination`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_invoice",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}",
+      "slug": "retrieve-an-invoice",
+      "title": "Retrieve an invoice",
+      "summary": "Returns one invoice by its `id`, including its lines.",
+      "description": "Fetches a single invoice. Unlike a listing entry, the result carries the invoice's `lines`. Amounts such as `total` are strings.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The invoice, under `invoice`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceResponse"
+          }
+        },
+        "404": {
+          "description": "No invoice has that `id`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001"
+        }
+      }
+    },
+    {
+      "key": "get_invoice_information",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/information",
+      "slug": "retrieve-an-invoices-information",
+      "title": "Retrieve an invoice's information",
+      "summary": "Returns an invoice's core information, without its lines.",
+      "description": "Fetches the invoice's header details: status, dates, totals, account, currency and custom attributes. Use it when you do not need the lines.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The invoice's information, under `invoice`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001"
+        }
+      }
+    },
+    {
+      "key": "get_invoice_pdf",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/pdf",
+      "slug": "retrieve-an-invoices-pdf-links",
+      "title": "Retrieve an invoice's PDF links",
+      "summary": "Returns links to the invoice's PDF, not the PDF file itself.",
+      "description": "Returns a small JSON description of the invoice's PDF under `invoice.pdf`, with a `preview_url`, a `download_url` and the `file_size`. Fetch `download_url` to get the file.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The PDF details, under `invoice.pdf`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoicePdfResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001"
+        }
+      }
+    },
+    {
+      "key": "create_invoice",
+      "method": "POST",
+      "path": "/invoices",
+      "slug": "create-an-invoice",
+      "title": "Create an invoice",
+      "summary": "Creates an invoice for an account and returns it.",
+      "description": "Creates an invoice from the fields under `invoice`. A new invoice has `status` `active` and `payment_status` `unpaid`. Send `price_tax_inclusive` as a JSON boolean.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "invoice": {
+              "type": "object",
+              "properties": {
+                "account_id": {
+                  "type": "string",
+                  "description": "The `id` of the account to bill."
+                },
+                "issue_date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "due_date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "currency": {
+                  "type": "string",
+                  "description": "A currency code, such as `AUD`."
+                },
+                "lines": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "item_id": {
+                        "type": "string",
+                        "description": "The item's `id`."
+                      },
+                      "item_quantity": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                },
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "invoice_note": {
+                  "type": "string"
+                },
+                "origin": {
+                  "type": "string"
+                },
+                "price_tax_inclusive": {
+                  "type": "boolean",
+                  "description": "Send a JSON boolean."
+                }
+              }
+            }
+          },
+          "required": [
+            "invoice"
+          ]
+        },
+        "example": {
+          "invoice": {
+            "account_id": "W13ZGY",
+            "issue_date": "2026-10-01",
+            "due_date": "2026-10-31",
+            "currency": "AUD",
+            "lines": [
+              {
+                "item_id": "ITEM-0001",
+                "item_quantity": 1
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new invoice, under `invoice`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "invoice": {
+            "account_id": "W13ZGY",
+            "issue_date": "2026-10-01",
+            "due_date": "2026-10-31",
+            "currency": "AUD",
+            "lines": [
+              {
+                "item_id": "ITEM-0001",
+                "item_quantity": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "update_invoice_information",
+      "method": "PATCH",
+      "path": "/invoices/{invoice_id}/information",
+      "slug": "update-an-invoices-information",
+      "title": "Update an invoice's information",
+      "summary": "Changes an invoice's note or customer purchase order number and returns the invoice.",
+      "description": "Updates the invoice's header fields sent under `invoice`, such as `invoice_note` and `customer_purchase_order_id`. Fields you leave out keep their values.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "invoice": {
+              "type": "object",
+              "properties": {
+                "invoice_note": {
+                  "type": "string"
+                },
+                "customer_purchase_order_id": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "invoice"
+          ]
+        },
+        "example": {
+          "invoice": {
+            "invoice_note": "Deliver to the loading dock.",
+            "customer_purchase_order_id": "PO-1001"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated invoice, under `invoice`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001"
+        },
+        "body": {
+          "invoice": {
+            "invoice_note": "Deliver to the loading dock.",
+            "customer_purchase_order_id": "PO-1001"
+          }
+        }
+      }
+    },
+    {
+      "key": "amend_invoice",
+      "method": "POST",
+      "path": "/invoices/{invoice_id}/amend",
+      "slug": "amend-an-invoice",
+      "title": "Amend an invoice",
+      "summary": "Adds, changes or removes invoice lines and returns the invoice.",
+      "description": "Amends the invoice's lines. Each entry of `invoice.lines` names an `op`: `add` with the new line under `value`, `change` with the line's `id` as `charge_item_uuid` and the new price or quantity, or `remove` with the line's `id` as `charge_item_uuid`. Each amendment raises the invoice's `version` by one. The body is optional.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "invoice": {
+              "type": "object",
+              "properties": {
+                "lines": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "op": {
+                        "type": "string",
+                        "enum": [
+                          "add",
+                          "change",
+                          "remove"
+                        ]
+                      },
+                      "value": {
+                        "type": "object",
+                        "description": "For `add`: the new line.",
+                        "properties": {
+                          "item_id": {
+                            "type": "string"
+                          },
+                          "item_price": {
+                            "type": "number"
+                          },
+                          "item_quantity": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      "charge_item_uuid": {
+                        "type": "string",
+                        "description": "For `change` and `remove`: the `id` of the invoice line."
+                      },
+                      "item_price": {
+                        "type": "number",
+                        "description": "For `change`."
+                      },
+                      "item_order_quantity": {
+                        "type": "number",
+                        "description": "For `change`."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "invoice": {
+            "lines": [
+              {
+                "op": "add",
+                "value": {
+                  "item_id": "ITEM-0001",
+                  "item_price": 3,
+                  "item_quantity": 1
+                }
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The amended invoice, under `invoice`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001"
+        },
+        "body": {
+          "invoice": {
+            "lines": [
+              {
+                "op": "add",
+                "value": {
+                  "item_id": "ITEM-0001",
+                  "item_price": 3,
+                  "item_quantity": 1
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "cancel_invoice",
+      "method": "POST",
+      "path": "/invoices/{invoice_id}/cancel",
+      "slug": "cancel-an-invoice",
+      "title": "Cancel an invoice",
+      "summary": "Cancels an invoice and returns it with `status` `inactive`.",
+      "description": "Cancels the invoice. An empty `invoice` object is enough, and the body is optional. Cancelling an invoice that is already cancelled returns a client error.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "invoice": {
+              "type": "object",
+              "properties": {
+                "effective_date": {
+                  "type": "string",
+                  "format": "date"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "invoice": {}
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The cancelled invoice, under `invoice`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001"
+        },
+        "body": {
+          "invoice": {}
+        }
+      }
+    },
+    {
+      "key": "reactivate_invoice",
+      "method": "POST",
+      "path": "/invoices/{invoice_id}/reactivate",
+      "slug": "reactivate-an-invoice",
+      "title": "Reactivate an invoice",
+      "summary": "Reactivates a cancelled invoice and returns it with `status` `active`.",
+      "description": "Brings a cancelled invoice back to `active`. An empty `invoice` object is enough, and the body is optional.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "invoice": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        },
+        "example": {
+          "invoice": {}
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The reactivated invoice, under `invoice`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001"
+        },
+        "body": {
+          "invoice": {}
+        }
+      }
+    },
+    {
+      "key": "delete_invoice",
+      "method": "DELETE",
+      "path": "/invoices/{invoice_id}",
+      "slug": "delete-an-invoice",
+      "title": "Delete an invoice",
+      "summary": "Deletes an invoice.",
+      "description": "Deletes the invoice. Afterwards a read of the same `id` returns `404`.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The invoice is deleted. The response has no body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001"
+        }
+      }
+    },
+    {
+      "key": "get_invoice_item_fulfillments",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/item_fulfillments",
+      "slug": "list-an-invoices-item-fulfillments",
+      "title": "List an invoice's item fulfillments",
+      "summary": "Returns one page of the item fulfillments recorded against an invoice.",
+      "description": "Lists the fulfillments against the invoice, one page at a time, under `data`. The path is spelled `item_fulfillments`.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of item fulfillments, under `data`, with `pagination`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceItemFulfillmentReadList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_invoice_item_fulfillment",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/item_fulfillments/{fulfillment_id}",
+      "slug": "retrieve-an-invoices-item-fulfillment",
+      "title": "Retrieve an invoice's item fulfillment",
+      "summary": "Returns one item fulfillment recorded against an invoice.",
+      "description": "Fetches a single fulfillment of the invoice. A fulfillment that belongs to a different invoice returns `404`.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        },
+        {
+          "name": "fulfillment_id",
+          "in": "path",
+          "required": true,
+          "description": "The item fulfillment's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "IF-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The item fulfillment, under `item_fulfillment`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceItemFulfillmentReadResponse"
+          }
+        },
+        "404": {
+          "description": "The fulfillment does not belong to this invoice, or does not exist."
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001",
+          "fulfillment_id": "IF-0001"
+        }
+      }
+    },
+    {
+      "key": "get_invoice_rmas",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/return_merchandise_authorisations",
+      "slug": "list-an-invoices-return-merchandise-authorisations",
+      "title": "List an invoice's return merchandise authorisations",
+      "summary": "Returns one page of the return merchandise authorisations raised against an invoice.",
+      "description": "Lists the invoice's return merchandise authorisations, one page at a time, under `data`. The path uses the British spelling `authorisations`; the spelling with a `z` returns `404`.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of return merchandise authorisations, under `data`, with `pagination`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceRmaList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_invoice_rma",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/return_merchandise_authorisations/{rma_id}",
+      "slug": "retrieve-an-invoices-return-merchandise-authorisation",
+      "title": "Retrieve an invoice's return merchandise authorisation",
+      "summary": "Returns one return merchandise authorisation raised against an invoice.",
+      "description": "Fetches a single return merchandise authorisation of the invoice, with its lines. One that belongs to a different invoice returns `404`.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        },
+        {
+          "name": "rma_id",
+          "in": "path",
+          "required": true,
+          "description": "The return merchandise authorisation's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "RMA-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The return merchandise authorisation, under `return_merchandise_authorisation`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationReadResponse"
+          }
+        },
+        "404": {
+          "description": "The return merchandise authorisation does not belong to this invoice, or does not exist."
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001",
+          "rma_id": "RMA-0001"
+        }
+      }
+    },
+    {
+      "key": "get_invoice_notes",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/notes",
+      "slug": "list-an-invoices-notes",
+      "title": "List an invoice's notes",
+      "summary": "Returns one page of the notes on an invoice.",
+      "description": "Lists the invoice's notes, one page at a time, under `data`. Each note carries its `content`, its `attachments` and who created it.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of notes, under `data`, with `pagination`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceNoteList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_invoice_note",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/notes/{note_id}",
+      "slug": "retrieve-an-invoice-note",
+      "title": "Retrieve an invoice note",
+      "summary": "Returns one note on an invoice.",
+      "description": "Fetches a single note by the `id` the notes listing gives it.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, as the invoice's notes listing returns it.",
+          "schema": {
+            "type": "string",
+            "example": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The note, under `note`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceNoteResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001",
+          "note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
+        }
+      }
+    },
+    {
+      "key": "create_invoice_note",
+      "method": "POST",
+      "path": "/invoices/{invoice_id}/notes",
+      "slug": "create-an-invoice-note",
+      "title": "Create an invoice note",
+      "summary": "Adds a note, and optionally a file, to an invoice and returns the note.",
+      "description": "Sends a multipart form: the text as the `note` field and any attachment as `file`. The new note comes back with its `id` and the `uuid` of each attachment.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "note"
+          ],
+          "properties": {
+            "note": {
+              "type": "string",
+              "description": "The note text."
+            },
+            "file": {
+              "type": "string",
+              "format": "binary",
+              "description": "An optional file to attach to the note."
+            }
+          }
+        },
+        "example": {
+          "note": "Customer asked for a copy by post."
+        }
+      },
+      "multipart": true,
+      "responses": {
+        "201": {
+          "description": "The new note, under `note`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceNoteResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001"
+        },
+        "file": "receipt.pdf",
+        "note": "Customer asked for a copy by post."
+      }
+    },
+    {
+      "key": "delete_invoice_note",
+      "method": "DELETE",
+      "path": "/invoices/{invoice_id}/notes/{note_id}",
+      "slug": "delete-an-invoice-note",
+      "title": "Delete an invoice note",
+      "summary": "Deletes a note from an invoice.",
+      "description": "Deletes the note. Afterwards a read of the same note returns `404`.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, as the invoice's notes listing returns it.",
+          "schema": {
+            "type": "string",
+            "example": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The note is deleted. The response has no body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001",
+          "note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
+        }
+      }
+    },
+    {
+      "key": "get_invoice_note_files",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/notes/{note_id}/files",
+      "slug": "list-an-invoice-notes-files",
+      "title": "List an invoice note's files",
+      "summary": "Returns the files attached to a note on an invoice.",
+      "description": "Lists the note's attachments under `data`, each with its `uuid`, `filename`, `content_type`, `size` and `href`.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, as the invoice's notes listing returns it.",
+          "schema": {
+            "type": "string",
+            "example": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The note's files, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceNoteFileList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001",
+          "note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
+        }
+      }
+    },
+    {
+      "key": "get_invoice_note_file",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/notes/{note_id}/files/{file_id}",
+      "slug": "retrieve-an-invoice-note-file",
+      "title": "Retrieve an invoice note file",
+      "summary": "Returns the details of one file attached to a note, not the file's contents.",
+      "description": "Fetches a JSON description of the attachment under `file`: its `uuid`, `filename`, `content_type`, `size` and `href`.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, as the invoice's notes listing returns it.",
+          "schema": {
+            "type": "string",
+            "example": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
+          }
+        },
+        {
+          "name": "file_id",
+          "in": "path",
+          "required": true,
+          "description": "The attachment's `uuid`, from the note's `attachments`.",
+          "schema": {
+            "type": "string",
+            "example": "6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The file's details, under `file`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceNoteFileResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001",
+          "note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d",
+          "file_id": "6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f"
+        }
+      }
+    },
+    {
+      "key": "get_order_invoices",
+      "method": "GET",
+      "path": "/orders/{order_id}/invoices",
+      "slug": "list-an-orders-invoices",
+      "title": "List an order's invoices",
+      "summary": "Returns one page of the invoices raised for an order.",
+      "description": "Lists the invoices of one order, one page at a time, under `data`. Each record has the same fields as an entry of the invoice listing.",
+      "parameters": [
+        {
+          "name": "order_id",
+          "in": "path",
+          "required": true,
+          "description": "The order's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "ORD-0001"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of the order's invoices, under `data`, with `pagination`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "order_id": "ORD-0001"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_order_invoice",
+      "method": "POST",
+      "path": "/orders/{order_id}/invoices",
+      "slug": "create-an-invoice-for-an-order",
+      "title": "Create an invoice for an order",
+      "summary": "Raises an invoice against an order and returns it.",
+      "description": "Creates an invoice for the order's lines. The body is optional; send fields such as `invoice_note` under `invoice`.",
+      "parameters": [
+        {
+          "name": "order_id",
+          "in": "path",
+          "required": true,
+          "description": "The order's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "ORD-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "invoice": {
+              "type": "object",
+              "properties": {
+                "invoice_note": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "invoice": {
+            "invoice_note": "First month of service."
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new invoice, under `invoice`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "order_id": "ORD-0001"
+        },
+        "body": {
+          "invoice": {
+            "invoice_note": "First month of service."
+          }
+        }
+      }
+    },
+    {
+      "key": "get_invoice_kpis",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/kpis",
+      "slug": "retrieve-an-invoices-kpis",
+      "title": "Retrieve an invoice's KPIs",
+      "summary": "Returns an invoice's key figures, such as payment applied and amount outstanding.",
+      "description": "Fetches the invoice's KPI block under `invoice_kpis`, the same block a retrieved invoice carries as `kpis`. Amounts such as `payment_applied` are strings.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The KPIs, under `invoice_kpis`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceKpisReadResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001"
+        }
+      }
+    },
+    {
+      "key": "get_invoice_lines",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/lines",
+      "slug": "list-an-invoices-lines",
+      "title": "List an invoice's lines",
+      "summary": "Returns all the lines of an invoice.",
+      "description": "Fetches the invoice's lines under `invoice.lines`. This is not a paged listing: every line comes back at once.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The lines, under `invoice.lines`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceLinesResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001"
+        }
+      }
+    },
+    {
+      "key": "get_invoice_line",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/lines/{line_id}",
+      "slug": "retrieve-an-invoice-line",
+      "title": "Retrieve an invoice line",
+      "summary": "Returns one line of an invoice.",
+      "description": "Fetches a line under `invoice.line`. The server ignores `line_id` and always returns the invoice's first line, so use the lines endpoint to find a specific one.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        },
+        {
+          "name": "line_id",
+          "in": "path",
+          "required": true,
+          "description": "The line's `id`. The server ignores it and returns the invoice's first line.",
+          "schema": {
+            "type": "string",
+            "example": "4d2e6f8a-1b3c-4d5e-9f0a-2b4c6d8e0f1a"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The line, under `invoice.line`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceLineReadResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001",
+          "line_id": "4d2e6f8a-1b3c-4d5e-9f0a-2b4c6d8e0f1a"
+        }
+      }
+    },
+    {
+      "key": "get_invoice_credit_note_application",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/credit_note_applications/{credit_note_application_id}",
+      "slug": "retrieve-a-credit-note-application-through-an-invoice",
+      "title": "Retrieve a credit note application through an invoice",
+      "summary": "Returns one credit note application by its `id`.",
+      "description": "Fetches a credit note application under `credit_note_application`. The server does not check that the application belongs to the invoice: any application is returned under any invoice that exists.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        },
+        {
+          "name": "credit_note_application_id",
+          "in": "path",
+          "required": true,
+          "description": "The credit note application's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "CNA-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The credit note application, under `credit_note_application`.",
+          "schema": {
+            "$ref": "#/components/schemas/InvoiceCreditNoteApplicationReadResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001",
+          "credit_note_application_id": "CNA-0001"
+        }
+      }
+    },
+    {
+      "key": "get_invoice_custom_objects",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/custom_objects",
+      "slug": "list-an-invoices-custom-objects",
+      "title": "List an invoice's custom objects",
+      "summary": "Returns one page of the custom objects defined for invoices.",
+      "description": "Lists the custom objects defined for invoices, one page at a time, under `data`.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of custom objects, under `data`, with `pagination`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_invoice_custom_object",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/custom_objects/{custom_object_id}",
+      "slug": "retrieve-an-invoices-custom-object",
+      "title": "Retrieve an invoice's custom object",
+      "summary": "Returns one custom object with this invoice's instances of it.",
+      "description": "Fetches a custom object defined for invoices, together with the instances of it that belong to this invoice.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        },
+        {
+          "name": "custom_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom object's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "CO-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The custom object and this invoice's instances of it."
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001",
+          "custom_object_id": "CO-0001"
+        }
+      }
+    },
+    {
+      "key": "get_invoice_custom_object_instance",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/custom_objects/{custom_object_id}/instances/{instance_id}",
+      "slug": "retrieve-an-invoices-custom-object-instance",
+      "title": "Retrieve an invoice's custom object instance",
+      "summary": "Returns one instance of a custom object on an invoice.",
+      "description": "Fetches a single instance of a custom object that belongs to this invoice.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        },
+        {
+          "name": "custom_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom object's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "CO-0001"
+          }
+        },
+        {
+          "name": "instance_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom object instance's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "COI-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The custom object instance."
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001",
+          "custom_object_id": "CO-0001",
+          "instance_id": "COI-0001"
+        }
+      }
+    },
+    {
+      "key": "delete_invoice_note_file",
+      "method": "DELETE",
+      "path": "/invoices/{invoice_id}/notes/{note_id}/files/{file_id}",
+      "slug": "delete-an-invoice-note-file",
+      "title": "Delete an invoice note file",
+      "summary": "Deletes one file from a note on an invoice.",
+      "description": "Deletes the attachment by its `uuid`. The server can return `404` with `attachment not found` even for a file the note's files listing shows.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, as the invoice's notes listing returns it.",
+          "schema": {
+            "type": "string",
+            "example": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
+          }
+        },
+        {
+          "name": "file_id",
+          "in": "path",
+          "required": true,
+          "description": "The attachment's `uuid`, from the note's `attachments`.",
+          "schema": {
+            "type": "string",
+            "example": "6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The file is deleted. The response has no body."
+        },
+        "404": {
+          "description": "The attachment is not deleted. This can happen even for a file the note's files listing shows."
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001",
+          "note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d",
+          "file_id": "6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "InvoiceList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Invoice"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/InvoicePagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "Invoice": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "status": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "payment_status": {
+          "type": "string"
+        },
+        "account_id": {
+          "type": "string"
+        },
+        "account_name": {
+          "type": "string"
+        },
+        "order_id": {
+          "type": "string"
+        },
+        "customer_purchase_order_id": {
+          "type": "string"
+        },
+        "invoice_note": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "due_date": {
+          "type": "string"
+        },
+        "alternate_issue_date": {
+          "type": "string"
+        },
+        "alternate_due_date": {
+          "type": "string"
+        },
+        "billing_start_date": {
+          "type": "string"
+        },
+        "billing_end_date": {
+          "type": "string"
+        },
+        "alternate_billing_start_date": {
+          "type": "string"
+        },
+        "alternate_billing_end_date": {
+          "type": "string"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "string"
+        },
+        "tax_total": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        },
+        "due": {
+          "type": "string"
+        },
+        "paid": {
+          "type": "string"
+        },
+        "discount_amount": {
+          "type": "number"
+        },
+        "shipping_cost": {
+          "type": "string"
+        },
+        "credit_applied": {
+          "type": "string"
+        },
+        "credit_issued": {
+          "type": "string"
+        },
+        "payment_applied": {
+          "type": "string"
+        },
+        "outstanding": {
+          "type": "string"
+        },
+        "price_tax_inclusive": {
+          "type": "boolean"
+        },
+        "recurring_rate_count": {
+          "type": "string"
+        },
+        "usage_rate_count": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/InvoiceCurrency"
+        },
+        "custom_form": {
+          "$ref": "#/components/schemas/InvoiceCustomForm"
+        },
+        "kpis": {
+          "$ref": "#/components/schemas/InvoiceKpis"
+        },
+        "last_payment": {
+          "$ref": "#/components/schemas/InvoiceLastPayment"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/InvoiceCreatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/InvoiceLastUpdatedBy"
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/InvoiceLine"
+          }
+        },
+        "custom_attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/InvoiceCustomAttribute"
+          }
+        },
+        "custom_objects": {
+          "type": "array",
+          "items": {}
+        },
+        "activity_logs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/InvoiceActivityLog"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/InvoiceNote"
+          }
+        },
+        "item_fulfillments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/InvoiceItemFulfillment"
+          }
+        },
+        "return_merchandise_authorisations": {
+          "type": "array",
+          "items": {}
+        },
+        "account": {
+          "$ref": "#/components/schemas/InvoiceAccount"
+        },
+        "object": {
+          "type": "string"
+        },
+        "order": {
+          "$ref": "#/components/schemas/InvoiceOrder"
+        }
+      }
+    },
+    "InvoiceCurrency": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceCustomForm": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceKpis": {
+      "type": "object",
+      "properties": {
+        "credit_applied": {
+          "type": "string"
+        },
+        "credit_issued": {
+          "type": "string"
+        },
+        "payment_applied": {
+          "type": "string"
+        },
+        "last_payment_date": {
+          "type": "string"
+        },
+        "last_amended_on": {
+          "type": "string"
+        },
+        "last_cancelled_on": {
+          "type": "string"
+        },
+        "last_reactivated_on": {
+          "type": "string"
+        },
+        "deleted_on": {
+          "type": "string"
+        },
+        "voided_on": {
+          "type": "string"
+        },
+        "outstanding": {
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "overdue": {
+          "type": [
+            "integer",
+            "string"
+          ]
+        }
+      }
+    },
+    "InvoiceLastPayment": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "created_on": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceLine": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "item": {
+          "$ref": "#/components/schemas/InvoiceLineItem",
+          "description": "A reference to the item, with `object`, `id`, `name` and `href`."
+        },
+        "item_id": {
+          "type": "string"
+        },
+        "item_uuid": {
+          "type": "string"
+        },
+        "item_name": {
+          "type": "string"
+        },
+        "item_uom": {
+          "type": "string"
+        },
+        "item_warehouse": {
+          "type": "string"
+        },
+        "item_serial_or_batch_number": {
+          "type": "string"
+        },
+        "item_order_quantity": {
+          "type": "integer"
+        },
+        "item_charge_type": {
+          "type": "string"
+        },
+        "item_custom_attributes": {
+          "type": "array",
+          "items": {}
+        },
+        "pricing_snapshot_price": {
+          "type": "number"
+        },
+        "pricing_snapshot_uuid": {
+          "type": "string"
+        },
+        "charging_start_date": {
+          "type": "string"
+        },
+        "charging_end_date": {
+          "type": "string"
+        },
+        "alternate_charging_start_date": {
+          "type": "string"
+        },
+        "alternate_charging_end_date": {
+          "type": "string"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        },
+        "tax": {
+          "$ref": "#/components/schemas/InvoiceLineTax"
+        },
+        "accounting_code": {
+          "$ref": "#/components/schemas/InvoiceAccountingCode"
+        }
+      }
+    },
+    "InvoiceLineItem": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceLineTax": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "rate": {
+          "type": "number"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceAccountingCode": {
+      "type": "object",
+      "properties": {
+        "sales_revenue": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceCustomAttribute": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {}
+      }
+    },
+    "InvoiceActivityLog": {
+      "type": "object",
+      "properties": {
+        "activity": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceNote": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "invoice": {
+          "$ref": "#/components/schemas/InvoiceNoteDetail"
+        },
+        "group": {},
+        "user": {},
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/InvoiceNoteAttachment"
+          }
+        },
+        "watchers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/InvoiceNoteWatcher"
+          },
+          "description": "The people watching the note."
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/InvoiceNoteCreatedBy"
+        },
+        "last_updated_on": {},
+        "last_updated_by": {}
+      }
+    },
+    "InvoiceNoteDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceNoteAttachment": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceNoteWatcher": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceNoteCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceItemFulfillment": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "invoice_id": {
+          "type": "string"
+        },
+        "order_id": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "tracking_number": {
+          "type": "string"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "created_by": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "type": "string"
+        },
+        "fulfillments": {
+          "type": "array",
+          "items": {}
+        }
+      }
+    },
+    "InvoiceAccount": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceOrder": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoicePagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can be stale on the last page."
+        },
+        "next_cursor": {
+          "type": "string"
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/InvoicePaginationLinks"
+        },
+        "records": {
+          "type": "integer",
+          "description": "The total number of matching records, not the length of this page."
+        },
+        "offset": {
+          "type": "integer"
+        },
+        "next_page": {
+          "type": "string",
+          "description": "On the last page this is the string `NULL`, not JSON null."
+        },
+        "previous_page": {
+          "type": "string"
+        },
+        "has_next": {
+          "type": "boolean"
+        },
+        "has_prev": {
+          "type": "boolean"
+        },
+        "per_page": {
+          "type": "integer"
+        }
+      }
+    },
+    "InvoicePaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceResponse": {
+      "type": "object",
+      "properties": {
+        "invoice": {
+          "$ref": "#/components/schemas/Invoice"
+        }
+      }
+    },
+    "InvoicePdf": {
+      "type": "object",
+      "properties": {
+        "pdf": {
+          "$ref": "#/components/schemas/InvoicePdfDetail"
+        }
+      }
+    },
+    "InvoicePdfDetail": {
+      "type": "object",
+      "properties": {
+        "download_url": {
+          "type": "string"
+        },
+        "file_size": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "preview_url": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoicePdfResponse": {
+      "type": "object",
+      "properties": {
+        "invoice": {
+          "$ref": "#/components/schemas/InvoicePdf"
+        }
+      }
+    },
+    "InvoiceItemFulfillmentReadList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/InvoiceItemFulfillmentRead"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/InvoicePagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceItemFulfillmentRead": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/InvoiceItemFulfillmentReadAccount"
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/InvoiceItemFulfillmentReadCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "custom_attributes": {
+          "type": "object"
+        },
+        "delivery_status": {},
+        "fulfillment_completed": {
+          "type": "boolean"
+        },
+        "fulfillment_date": {
+          "type": "string"
+        },
+        "fulfillment_note": {
+          "type": "string"
+        },
+        "fulfillment_status": {
+          "type": "string"
+        },
+        "fulfillments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/InvoiceItemFulfillmentReadRow"
+          }
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "invoice": {
+          "$ref": "#/components/schemas/InvoiceItemFulfillmentReadInvoice"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/InvoiceItemFulfillmentReadLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "order": {},
+        "status": {
+          "type": "string"
+        },
+        "tracking_number": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "InvoiceItemFulfillmentReadAccount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceItemFulfillmentReadCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceItemFulfillmentReadRow": {
+      "type": "object",
+      "properties": {
+        "fulfillment_index": {
+          "type": "integer"
+        },
+        "fulfillment_qty": {
+          "type": "number"
+        },
+        "fulfillment_sent_qty": {
+          "type": "number"
+        },
+        "id": {
+          "type": "string"
+        },
+        "inventory_tracking": {},
+        "item": {
+          "$ref": "#/components/schemas/InvoiceItemFulfillmentReadRowItem"
+        },
+        "object": {
+          "type": "string"
+        },
+        "pending_return": {
+          "type": "number"
+        },
+        "returned": {
+          "type": "number"
+        },
+        "serving_status": {
+          "type": "string"
+        },
+        "uom": {
+          "type": "string"
+        },
+        "uom_precision": {
+          "type": "integer"
+        }
+      }
+    },
+    "InvoiceItemFulfillmentReadRowItem": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceItemFulfillmentReadInvoice": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceItemFulfillmentReadLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceItemFulfillmentReadResponse": {
+      "type": "object",
+      "properties": {
+        "item_fulfillment": {
+          "$ref": "#/components/schemas/InvoiceItemFulfillmentRead"
+        }
+      }
+    },
+    "InvoiceRmaList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisation"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/InvoicePagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceReturnMerchandiseAuthorisation": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationAccount"
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "item_count": {
+          "type": "integer"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {},
+        "note": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "return_status": {
+          "type": "string"
+        },
+        "rma_date": {
+          "type": "string"
+        },
+        "sale_invoice": {
+          "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationSaleInvoice"
+        },
+        "sale_order": {},
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "warehouse": {}
+      }
+    },
+    "InvoiceReturnMerchandiseAuthorisationAccount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceReturnMerchandiseAuthorisationCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceReturnMerchandiseAuthorisationSaleInvoice": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceReturnMerchandiseAuthorisationRead": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationReadAccount"
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationReadCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "item_count": {
+          "type": "integer"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {},
+        "lines": {
+          "type": "array",
+          "items": {}
+        },
+        "note": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "receive_rmas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationReadReceiveRma"
+          }
+        },
+        "return_status": {
+          "type": "string"
+        },
+        "rma_date": {
+          "type": "string"
+        },
+        "sale_invoice": {
+          "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationReadSaleInvoice"
+        },
+        "sale_order": {},
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "warehouse": {}
+      }
+    },
+    "InvoiceReturnMerchandiseAuthorisationReadAccount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceReturnMerchandiseAuthorisationReadCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceReturnMerchandiseAuthorisationReadReceiveRma": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationReadReceiveRmaCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {},
+        "object": {
+          "type": "string"
+        },
+        "quantity_received": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceReturnMerchandiseAuthorisationReadReceiveRmaCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceReturnMerchandiseAuthorisationReadSaleInvoice": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceReturnMerchandiseAuthorisationReadResponse": {
+      "type": "object",
+      "properties": {
+        "return_merchandise_authorisation": {
+          "$ref": "#/components/schemas/InvoiceReturnMerchandiseAuthorisationRead"
+        }
+      }
+    },
+    "InvoiceNoteList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/InvoiceNote"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/InvoicePagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceNoteResponse": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "$ref": "#/components/schemas/InvoiceNote"
+        }
+      }
+    },
+    "InvoiceNoteFileList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/InvoiceNoteFileEntry"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/InvoicePagination"
+        }
+      }
+    },
+    "InvoiceNoteFileEntry": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "content_type": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceNoteFile": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceNoteFileResponse": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "$ref": "#/components/schemas/InvoiceNoteFile"
+        }
+      }
+    },
+    "InvoiceKpisRead": {
+      "type": "object",
+      "properties": {
+        "credit_applied": {
+          "type": "string"
+        },
+        "credit_issued": {
+          "type": "string"
+        },
+        "payment_applied": {
+          "type": "string"
+        },
+        "last_payment_date": {
+          "type": "string"
+        },
+        "last_amended_on": {
+          "type": "string"
+        },
+        "last_cancelled_on": {
+          "type": "string"
+        },
+        "last_reactivated_on": {
+          "type": "string"
+        },
+        "deleted_on": {
+          "type": "string"
+        },
+        "voided_on": {
+          "type": "string"
+        },
+        "outstanding": {},
+        "overdue": {},
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceKpisReadResponse": {
+      "type": "object",
+      "properties": {
+        "invoice_kpis": {
+          "$ref": "#/components/schemas/InvoiceKpisRead"
+        }
+      }
+    },
+    "InvoiceLines": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/InvoiceLine"
+          }
+        }
+      }
+    },
+    "InvoiceLinesResponse": {
+      "type": "object",
+      "properties": {
+        "invoice": {
+          "$ref": "#/components/schemas/InvoiceLines"
+        }
+      }
+    },
+    "InvoiceLineRead": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "line": {
+          "$ref": "#/components/schemas/InvoiceLine"
+        }
+      }
+    },
+    "InvoiceLineReadResponse": {
+      "type": "object",
+      "properties": {
+        "invoice": {
+          "$ref": "#/components/schemas/InvoiceLineRead"
+        }
+      }
+    },
+    "InvoiceCreditNoteApplicationRead": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/InvoiceCreditNoteApplicationReadCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "credit_note": {
+          "$ref": "#/components/schemas/InvoiceCreditNoteApplicationReadDetail"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "payment": {
+          "$ref": "#/components/schemas/InvoiceCreditNoteApplicationReadPayment"
+        },
+        "primaryId": {
+          "type": "integer"
+        },
+        "refund": {
+          "$ref": "#/components/schemas/InvoiceCreditNoteApplicationReadRefund"
+        },
+        "remaining_balance": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "InvoiceCreditNoteApplicationReadCreatedBy": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceCreditNoteApplicationReadDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceCreditNoteApplicationReadPayment": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceCreditNoteApplicationReadRefund": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "InvoiceCreditNoteApplicationReadResponse": {
+      "type": "object",
+      "properties": {
+        "credit_note_application": {
+          "$ref": "#/components/schemas/InvoiceCreditNoteApplicationRead"
+        }
+      }
+    }
+  }
+}

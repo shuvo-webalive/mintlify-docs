@@ -1,0 +1,126 @@
+{
+  "sdk": "dotnet",
+  "module": "invoices",
+  "endpoints": {
+    "get_invoices": {
+      "function": "Invoices.GetInvoicesAsync",
+      "code": "var response = await client.Invoices.GetInvoicesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_invoice": {
+      "function": "Invoices.GetInvoiceAsync",
+      "code": "var response = await client.Invoices.GetInvoiceAsync(\"INV-0001\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_invoice_information": {
+      "function": "Invoices.GetInvoiceInformationAsync",
+      "code": "var response = await client.Invoices.GetInvoiceInformationAsync(\"INV-0001\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_invoice_pdf": {
+      "function": "Invoices.GetInvoicePdfAsync",
+      "code": "var response = await client.Invoices.GetInvoicePdfAsync(\"INV-0001\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "create_invoice": {
+      "function": "Invoices.CreateInvoiceAsync",
+      "code": "var response = await client.Invoices.CreateInvoiceAsync(new Dictionary<string, object?>\n{\n    [\"invoice\"] = new Dictionary<string, object?>\n    {\n        [\"account_id\"] = \"W13ZGY\",\n        [\"issue_date\"] = \"2026-10-01\",\n        [\"due_date\"] = \"2026-10-31\",\n        [\"currency\"] = \"AUD\",\n        [\"lines\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"item_id\"] = \"ITEM-0001\",\n                [\"item_quantity\"] = 1,\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "update_invoice_information": {
+      "function": "Invoices.UpdateInvoiceInformationAsync",
+      "code": "var response = await client.Invoices.UpdateInvoiceInformationAsync(\n    \"INV-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"invoice\"] = new Dictionary<string, object?>\n        {\n            [\"invoice_note\"] = \"Deliver to the loading dock.\",\n            [\"customer_purchase_order_id\"] = \"PO-1001\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "amend_invoice": {
+      "function": "Invoices.AmendInvoiceAsync",
+      "code": "var response = await client.Invoices.AmendInvoiceAsync(\n    \"INV-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"invoice\"] = new Dictionary<string, object?>\n        {\n            [\"lines\"] = new List<object?>\n            {\n                new Dictionary<string, object?>\n                {\n                    [\"op\"] = \"add\",\n                    [\"value\"] = new Dictionary<string, object?>\n                    {\n                        [\"item_id\"] = \"ITEM-0001\",\n                        [\"item_price\"] = 3,\n                        [\"item_quantity\"] = 1,\n                    },\n                },\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "cancel_invoice": {
+      "function": "Invoices.CancelInvoiceAsync",
+      "code": "var response = await client.Invoices.CancelInvoiceAsync(\n    \"INV-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"invoice\"] = new Dictionary<string, object?>(),\n    });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "reactivate_invoice": {
+      "function": "Invoices.ReactivateInvoiceAsync",
+      "code": "var response = await client.Invoices.ReactivateInvoiceAsync(\n    \"INV-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"invoice\"] = new Dictionary<string, object?>(),\n    });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "delete_invoice": {
+      "function": "Invoices.DeleteInvoiceAsync",
+      "code": "var response = await client.Invoices.DeleteInvoiceAsync(\"INV-0001\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_invoice_item_fulfillments": {
+      "function": "Invoices.GetInvoiceItemFulfillmentsAsync",
+      "code": "var response = await client.Invoices.GetInvoiceItemFulfillmentsAsync(\n    \"INV-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_invoice_item_fulfillment": {
+      "function": "Invoices.GetInvoiceItemFulfillmentAsync",
+      "code": "var response = await client.Invoices.GetInvoiceItemFulfillmentAsync(\"INV-0001\", \"IF-0001\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_invoice_rmas": {
+      "function": "Invoices.GetInvoiceReturnMerchandiseAuthorisationsAsync",
+      "code": "var response = await client.Invoices.GetInvoiceReturnMerchandiseAuthorisationsAsync(\n    \"INV-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_invoice_rma": {
+      "function": "Invoices.GetInvoiceReturnMerchandiseAuthorisationAsync",
+      "code": "var response = await client.Invoices.GetInvoiceReturnMerchandiseAuthorisationAsync(\n    \"INV-0001\",\n    \"RMA-0001\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_invoice_notes": {
+      "function": "Invoices.GetInvoiceNotesAsync",
+      "code": "var response = await client.Invoices.GetInvoiceNotesAsync(\n    \"INV-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_invoice_note": {
+      "function": "Invoices.GetInvoiceNoteAsync",
+      "code": "var response = await client.Invoices.GetInvoiceNoteAsync(\n    \"INV-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "create_invoice_note": {
+      "function": "Invoices.CreateInvoiceNoteAsync",
+      "code": "var response = await client.Invoices.CreateInvoiceNoteAsync(\n    \"INV-0001\",\n    \"Customer asked for a copy by post.\",\n    new Dictionary<string, object?> { [\"file\"] = new object?[] { \"receipt.pdf\", File.ReadAllBytes(\"receipt.pdf\") } });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "delete_invoice_note": {
+      "function": "Invoices.DeleteInvoiceNoteAsync",
+      "code": "var response = await client.Invoices.DeleteInvoiceNoteAsync(\n    \"INV-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_invoice_note_files": {
+      "function": "Invoices.GetInvoiceNoteFilesAsync",
+      "code": "var response = await client.Invoices.GetInvoiceNoteFilesAsync(\n    \"INV-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_invoice_note_file": {
+      "function": "Invoices.GetInvoiceNoteFileAsync",
+      "code": "var response = await client.Invoices.GetInvoiceNoteFileAsync(\n    \"INV-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n    \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_order_invoices": {
+      "function": "Invoices.GetOrderInvoicesAsync",
+      "code": "var response = await client.Invoices.GetOrderInvoicesAsync(\n    \"ORD-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "create_order_invoice": {
+      "function": "Invoices.CreateOrderInvoiceAsync",
+      "code": "var response = await client.Invoices.CreateOrderInvoiceAsync(\n    \"ORD-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"invoice\"] = new Dictionary<string, object?>\n        {\n            [\"invoice_note\"] = \"First month of service.\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_invoice_kpis": {
+      "function": "Invoices.GetInvoiceKpisAsync",
+      "code": "var response = await client.Invoices.GetInvoiceKpisAsync(\"INV-0001\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_invoice_lines": {
+      "function": "Invoices.GetInvoiceLinesAsync",
+      "code": "var response = await client.Invoices.GetInvoiceLinesAsync(\"INV-0001\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_invoice_line": {
+      "function": "Invoices.GetInvoiceLineAsync",
+      "code": "var response = await client.Invoices.GetInvoiceLineAsync(\n    \"INV-0001\",\n    \"4d2e6f8a-1b3c-4d5e-9f0a-2b4c6d8e0f1a\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_invoice_credit_note_application": {
+      "function": "Invoices.GetInvoiceCreditNoteApplicationAsync",
+      "code": "var response = await client.Invoices.GetInvoiceCreditNoteApplicationAsync(\"INV-0001\", \"CNA-0001\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_invoice_custom_objects": {
+      "function": "Invoices.GetInvoiceCustomObjectsAsync",
+      "code": "var response = await client.Invoices.GetInvoiceCustomObjectsAsync(\n    \"INV-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_invoice_custom_object": {
+      "function": "Invoices.GetInvoiceCustomObjectAsync",
+      "code": "var response = await client.Invoices.GetInvoiceCustomObjectAsync(\"INV-0001\", \"CO-0001\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_invoice_custom_object_instance": {
+      "function": "Invoices.GetInvoiceCustomObjectInstanceAsync",
+      "code": "var response = await client.Invoices.GetInvoiceCustomObjectInstanceAsync(\n    \"INV-0001\",\n    \"CO-0001\",\n    \"COI-0001\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "delete_invoice_note_file": {
+      "function": "Invoices.DeleteInvoiceNoteFileAsync",
+      "code": "var response = await client.Invoices.DeleteInvoiceNoteFileAsync(\n    \"INV-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n    \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\n\nConsole.WriteLine(response.Json);\n"
+    }
+  }
+}
