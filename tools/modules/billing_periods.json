@@ -1,0 +1,391 @@
+{
+  "family": "billing_periods",
+  "tag": "Billing periods",
+  "slug": "billing-periods",
+  "icon": "calendar",
+  "base": "/settings/billing_periods",
+  "overview_description": "List, create, read, update and delete billing periods, each built on a time period.",
+  "intro": "A billing period is a settings record built on a time period, with a name, a period and a duration. You can list, create, read, update and delete billing periods. This area has 5 endpoints, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**A create takes the time period's hyphenated uuid, not its `tp_` id.** For a time period `tp_580762f904bd2bd26d3d7e71ae87aa72`, send `580762f9-04bd-2bd2-6d3d-7e71ae87aa72` as `time_period`.",
+    "**`name` and `time_period` are required on a create.** Both go under the `billing_period` key.",
+    "**An update returns `time_period` in place of `period` and `duration`.** Read the billing period again to see those two fields.",
+    "**A billing period `id` starts with `bp_`.**",
+    "**Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true.",
+    "**A delete returns `204` with no body.** Reading the billing period afterwards returns `404`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_billing_periods",
+      "method": "GET",
+      "path": "/settings/billing_periods",
+      "slug": "list-billing-periods",
+      "title": "List billing periods",
+      "summary": "Returns a page of billing periods under `data`, with paging details under `pagination`.",
+      "description": "Lists the billing periods on the instance. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of billing periods, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/BillingPeriodList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_billing_period",
+      "method": "POST",
+      "path": "/settings/billing_periods",
+      "slug": "create-a-billing-period",
+      "title": "Create a billing period",
+      "summary": "Creates a billing period and returns it under `billing_period`.",
+      "description": "Send the new billing period under `billing_period`. `name` and `time_period` are required. `time_period` is the time period's hyphenated uuid, not its `tp_` id: put dashes back into the 32 characters after `tp_` in an 8, 4, 4, 4, 12 pattern.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "billing_period": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The billing period's name."
+                },
+                "time_period": {
+                  "type": "string",
+                  "description": "The time period's hyphenated uuid, not its `tp_` id."
+                }
+              },
+              "required": [
+                "name",
+                "time_period"
+              ]
+            }
+          },
+          "required": [
+            "billing_period"
+          ]
+        },
+        "example": {
+          "billing_period": {
+            "name": "Monthly billing",
+            "time_period": "580762f9-04bd-2bd2-6d3d-7e71ae87aa72"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new billing period, under `billing_period`.",
+          "schema": {
+            "$ref": "#/components/schemas/BillingPeriodResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "billing_period": {
+            "name": "Monthly billing",
+            "time_period": "580762f9-04bd-2bd2-6d3d-7e71ae87aa72"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_billing_period",
+      "method": "GET",
+      "path": "/settings/billing_periods/{billing_period_id}",
+      "slug": "retrieve-a-billing-period",
+      "title": "Retrieve a billing period",
+      "summary": "Returns one billing period by its `id`, under `billing_period`.",
+      "description": "Reads the billing period with this `bp_` `id`. The `id` is the one a listing or a create returns.",
+      "parameters": [
+        {
+          "name": "billing_period_id",
+          "in": "path",
+          "required": true,
+          "description": "The billing period's `bp_` `id`, as a listing or a create returns it.",
+          "schema": {
+            "type": "string",
+            "example": "bp_8032a9c720486f23f5592488f24068d3"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The billing period, under `billing_period`.",
+          "schema": {
+            "$ref": "#/components/schemas/BillingPeriodResponse"
+          }
+        },
+        "404": {
+          "description": "No billing period has that `id`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "billing_period_id": "bp_8032a9c720486f23f5592488f24068d3"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_billing_period",
+      "method": "DELETE",
+      "path": "/settings/billing_periods/{billing_period_id}",
+      "slug": "delete-a-billing-period",
+      "title": "Delete a billing period",
+      "summary": "Deletes a billing period. The response has no body.",
+      "description": "Deletes the billing period with this `id`. Reading the same `id` afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "billing_period_id",
+          "in": "path",
+          "required": true,
+          "description": "The billing period's `bp_` `id`, as a listing or a create returns it.",
+          "schema": {
+            "type": "string",
+            "example": "bp_8032a9c720486f23f5592488f24068d3"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The billing period is deleted. The response has no body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "billing_period_id": "bp_8032a9c720486f23f5592488f24068d3"
+        }
+      }
+    },
+    {
+      "key": "update_settings_billing_period",
+      "method": "PATCH",
+      "path": "/settings/billing_periods/{billing_period_id}",
+      "slug": "update-a-billing-period",
+      "title": "Update a billing period",
+      "summary": "Changes the fields you send on a billing period and returns it under `billing_period`.",
+      "description": "Send the fields to change under `billing_period`. The response carries `time_period` in place of `period` and `duration`, so read the billing period again to see those fields.",
+      "parameters": [
+        {
+          "name": "billing_period_id",
+          "in": "path",
+          "required": true,
+          "description": "The billing period's `bp_` `id`, as a listing or a create returns it.",
+          "schema": {
+            "type": "string",
+            "example": "bp_8032a9c720486f23f5592488f24068d3"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "billing_period": {
+              "type": "object",
+              "properties": {
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "billing_period"
+          ]
+        },
+        "example": {
+          "billing_period": {
+            "display_name": "Monthly billing (AU)",
+            "description": "Bills once a month"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated billing period, under `billing_period`.",
+          "schema": {
+            "$ref": "#/components/schemas/BillingPeriodResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "billing_period_id": "bp_8032a9c720486f23f5592488f24068d3"
+        },
+        "body": {
+          "billing_period": {
+            "display_name": "Monthly billing (AU)",
+            "description": "Bills once a month"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "BillingPeriodList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/BillingPeriod"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/BillingPeriodPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "BillingPeriod": {
+      "type": "object",
+      "properties": {
+        "created_by": {
+          "description": "Null in every record read so far, so its type is not known."
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "description": "Null in every record read so far, so its type is not known."
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "ordering": {
+          "type": "integer"
+        },
+        "period": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "time_period": {
+          "type": "string"
+        }
+      }
+    },
+    "BillingPeriodPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass this back as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/BillingPeriodPaginationLinks"
+        }
+      }
+    },
+    "BillingPeriodPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "BillingPeriodResponse": {
+      "type": "object",
+      "properties": {
+        "billing_period": {
+          "$ref": "#/components/schemas/BillingPeriod"
+        }
+      }
+    }
+  }
+}

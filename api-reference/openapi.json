@@ -224,6 +224,9 @@
     },
     {
       "name": "Additional codes"
+    },
+    {
+      "name": "Billing periods"
     }
   ],
   "paths": {
@@ -71464,6 +71467,458 @@
           }
         }
       }
+    },
+    "/settings/billing_periods": {
+      "get": {
+        "tags": [
+          "Billing periods"
+        ],
+        "summary": "List billing periods",
+        "operationId": "billing_periods_get_settings_billing_periods",
+        "description": "Lists the billing periods on the instance. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` of the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of billing periods, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingPeriodList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/billing_periods?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.billing_periods.get_settings_billing_periods({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.billingPeriods.getSettingsBillingPeriods({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->billingPeriods->getSettingsBillingPeriods(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.billing_periods.billing_periods_dto.BillingPeriodsDto.SettingsBillingPeriodList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsBillingPeriodList> response = client.billingPeriods().getSettingsBillingPeriods(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.BillingPeriods.GetSettingsBillingPeriodsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.billingPeriods.getSettingsBillingPeriods(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.BillingPeriods().GetSettingsBillingPeriods(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Billing periods"
+        ],
+        "summary": "Create a billing period",
+        "operationId": "billing_periods_create_settings_billing_period",
+        "description": "Send the new billing period under `billing_period`. `name` and `time_period` are required. `time_period` is the time period's hyphenated uuid, not its `tp_` id: put dashes back into the 32 characters after `tp_` in an 8, 4, 4, 4, 12 pattern.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new billing period, under `billing_period`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingPeriodResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/billing_periods\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"billing_period\": {\n      \"name\": \"Monthly billing\",\n      \"time_period\": \"580762f9-04bd-2bd2-6d3d-7e71ae87aa72\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.billing_periods.create_settings_billing_period(\n    {\n        \"billing_period\": {\n            \"name\": \"Monthly billing\",\n            \"time_period\": \"580762f9-04bd-2bd2-6d3d-7e71ae87aa72\",\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.billingPeriods.createSettingsBillingPeriod({\n    billing_period: {name: 'Monthly billing', time_period: '580762f9-04bd-2bd2-6d3d-7e71ae87aa72'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->billingPeriods->createSettingsBillingPeriod([\n    'billing_period' => [\n        'name' => 'Monthly billing',\n        'time_period' => '580762f9-04bd-2bd2-6d3d-7e71ae87aa72',\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.billing_periods.billing_periods_dto.BillingPeriodsDto.SettingsBillingPeriod;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsBillingPeriod> response = client.billingPeriods().createSettingsBillingPeriod(\n        Map.of(\n                \"billing_period\", Map.of(\n                        \"name\", \"Monthly billing\",\n                        \"time_period\", \"580762f9-04bd-2bd2-6d3d-7e71ae87aa72\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.BillingPeriods.CreateSettingsBillingPeriodAsync(new Dictionary<string, object?>\n{\n    [\"billing_period\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Monthly billing\",\n        [\"time_period\"] = \"580762f9-04bd-2bd2-6d3d-7e71ae87aa72\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.billingPeriods.createSettingsBillingPeriod({\n  'billing_period': {\n    'name': 'Monthly billing',\n    'time_period': '580762f9-04bd-2bd2-6d3d-7e71ae87aa72',\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.BillingPeriods().CreateSettingsBillingPeriod(context.Background(), map[string]any{\n\t\"billing_period\": map[string]any{\n\t\t\"name\":        \"Monthly billing\",\n\t\t\"time_period\": \"580762f9-04bd-2bd2-6d3d-7e71ae87aa72\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "billing_period": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The billing period's name."
+                      },
+                      "time_period": {
+                        "type": "string",
+                        "description": "The time period's hyphenated uuid, not its `tp_` id."
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "time_period"
+                    ]
+                  }
+                },
+                "required": [
+                  "billing_period"
+                ]
+              },
+              "example": {
+                "billing_period": {
+                  "name": "Monthly billing",
+                  "time_period": "580762f9-04bd-2bd2-6d3d-7e71ae87aa72"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/billing_periods/{billing_period_id}": {
+      "get": {
+        "tags": [
+          "Billing periods"
+        ],
+        "summary": "Retrieve a billing period",
+        "operationId": "billing_periods_get_settings_billing_period",
+        "description": "Reads the billing period with this `bp_` `id`. The `id` is the one a listing or a create returns.",
+        "parameters": [
+          {
+            "name": "billing_period_id",
+            "in": "path",
+            "required": true,
+            "description": "The billing period's `bp_` `id`, as a listing or a create returns it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The billing period, under `billing_period`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingPeriodResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No billing period has that `id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/billing_periods/bp_8032a9c720486f23f5592488f24068d3\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.billing_periods.get_settings_billing_period(\n    \"bp_8032a9c720486f23f5592488f24068d3\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.billingPeriods.getSettingsBillingPeriod('bp_8032a9c720486f23f5592488f24068d3');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->billingPeriods->getSettingsBillingPeriod(\n    'bp_8032a9c720486f23f5592488f24068d3',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.billing_periods.billing_periods_dto.BillingPeriodsDto.SettingsBillingPeriod;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsBillingPeriod> response = client.billingPeriods().getSettingsBillingPeriod(\n        \"bp_8032a9c720486f23f5592488f24068d3\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.BillingPeriods.GetSettingsBillingPeriodAsync(\"bp_8032a9c720486f23f5592488f24068d3\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.billingPeriods.getSettingsBillingPeriod(\n  'bp_8032a9c720486f23f5592488f24068d3',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.BillingPeriods().GetSettingsBillingPeriod(context.Background(), \"bp_8032a9c720486f23f5592488f24068d3\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Billing periods"
+        ],
+        "summary": "Delete a billing period",
+        "operationId": "billing_periods_delete_settings_billing_period",
+        "description": "Deletes the billing period with this `id`. Reading the same `id` afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "billing_period_id",
+            "in": "path",
+            "required": true,
+            "description": "The billing period's `bp_` `id`, as a listing or a create returns it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The billing period is deleted. The response has no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/billing_periods/bp_8032a9c720486f23f5592488f24068d3\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.billing_periods.delete_settings_billing_period(\n    \"bp_8032a9c720486f23f5592488f24068d3\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.billingPeriods.deleteSettingsBillingPeriod('bp_8032a9c720486f23f5592488f24068d3');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->billingPeriods->deleteSettingsBillingPeriod(\n    'bp_8032a9c720486f23f5592488f24068d3',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.billingPeriods().deleteSettingsBillingPeriod(\"bp_8032a9c720486f23f5592488f24068d3\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.BillingPeriods.DeleteSettingsBillingPeriodAsync(\"bp_8032a9c720486f23f5592488f24068d3\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.billingPeriods.deleteSettingsBillingPeriod(\n  'bp_8032a9c720486f23f5592488f24068d3',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.BillingPeriods().DeleteSettingsBillingPeriod(context.Background(), \"bp_8032a9c720486f23f5592488f24068d3\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Billing periods"
+        ],
+        "summary": "Update a billing period",
+        "operationId": "billing_periods_update_settings_billing_period",
+        "description": "Send the fields to change under `billing_period`. The response carries `time_period` in place of `period` and `duration`, so read the billing period again to see those fields.",
+        "parameters": [
+          {
+            "name": "billing_period_id",
+            "in": "path",
+            "required": true,
+            "description": "The billing period's `bp_` `id`, as a listing or a create returns it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated billing period, under `billing_period`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingPeriodResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/billing_periods/bp_8032a9c720486f23f5592488f24068d3\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"billing_period\": {\n      \"display_name\": \"Monthly billing (AU)\",\n      \"description\": \"Bills once a month\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.billing_periods.update_settings_billing_period(\n    \"bp_8032a9c720486f23f5592488f24068d3\",\n    {\n        \"billing_period\": {\n            \"display_name\": \"Monthly billing (AU)\",\n            \"description\": \"Bills once a month\",\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.billingPeriods.updateSettingsBillingPeriod('bp_8032a9c720486f23f5592488f24068d3', {\n    billing_period: {display_name: 'Monthly billing (AU)', description: 'Bills once a month'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->billingPeriods->updateSettingsBillingPeriod(\n    'bp_8032a9c720486f23f5592488f24068d3',\n    [\n        'billing_period' => [\n            'display_name' => 'Monthly billing (AU)',\n            'description' => 'Bills once a month',\n        ],\n    ],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.billing_periods.billing_periods_dto.BillingPeriodsDto.SettingsBillingPeriod;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsBillingPeriod> response = client.billingPeriods().updateSettingsBillingPeriod(\n        \"bp_8032a9c720486f23f5592488f24068d3\",\n        Map.of(\n                \"billing_period\", Map.of(\n                        \"display_name\", \"Monthly billing (AU)\",\n                        \"description\", \"Bills once a month\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.BillingPeriods.UpdateSettingsBillingPeriodAsync(\n    \"bp_8032a9c720486f23f5592488f24068d3\",\n    new Dictionary<string, object?>\n    {\n        [\"billing_period\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Monthly billing (AU)\",\n            [\"description\"] = \"Bills once a month\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.billingPeriods.updateSettingsBillingPeriod(\n  'bp_8032a9c720486f23f5592488f24068d3',\n  {\n    'billing_period': {\n      'display_name': 'Monthly billing (AU)',\n      'description': 'Bills once a month',\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.BillingPeriods().UpdateSettingsBillingPeriod(context.Background(), \"bp_8032a9c720486f23f5592488f24068d3\", map[string]any{\n\t\"billing_period\": map[string]any{\n\t\t\"display_name\": \"Monthly billing (AU)\",\n\t\t\"description\":  \"Bills once a month\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "billing_period": {
+                    "type": "object",
+                    "properties": {
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "billing_period"
+                ]
+              },
+              "example": {
+                "billing_period": {
+                  "display_name": "Monthly billing (AU)",
+                  "description": "Bills once a month"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -110155,6 +110610,118 @@
         "properties": {
           "additional_code": {
             "$ref": "#/components/schemas/AdditionalCode"
+          }
+        }
+      },
+      "BillingPeriodList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BillingPeriod"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/BillingPeriodPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "BillingPeriod": {
+        "type": "object",
+        "properties": {
+          "created_by": {
+            "description": "Null in every record read so far, so its type is not known."
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "integer"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "description": "Null in every record read so far, so its type is not known."
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "ordering": {
+            "type": "integer"
+          },
+          "period": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "time_period": {
+            "type": "string"
+          }
+        }
+      },
+      "BillingPeriodPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass this back as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/BillingPeriodPaginationLinks"
+          }
+        }
+      },
+      "BillingPeriodPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "BillingPeriodResponse": {
+        "type": "object",
+        "properties": {
+          "billing_period": {
+            "$ref": "#/components/schemas/BillingPeriod"
           }
         }
       },
