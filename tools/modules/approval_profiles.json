@@ -1,0 +1,404 @@
+{
+  "family": "approval_profiles",
+  "tag": "Approval profiles",
+  "slug": "approval-profiles",
+  "icon": "user-check",
+  "base": "/settings/approval_profiles",
+  "overview_description": "Create, read, update and delete the approval profiles that hold transactions for sign-off.",
+  "intro": "Approval profiles decide which transactions need approval and who approves them. You can list, create, read, update and delete them. This area has 5 endpoints, and all seven Exsited SDKs call every one.",
+  "warning": "**An approval profile gates every matching transaction while it exists.** Create one only when those transactions should wait for approval.",
+  "notes": [
+    "**Five fields are required to create a profile.** `name`, `entity`, `event`, `approver_type` and `approver`.",
+    "**A profile takes effect as soon as it exists.** It gates every matching transaction until it is deleted or its status changes.",
+    "**Approval profile ids start with `ap_`.** One profile comes back under `approval_profile`.",
+    "**A profile in use cannot be deleted.**",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_approval_profiles",
+      "method": "GET",
+      "path": "/settings/approval_profiles",
+      "slug": "list-approval-profiles",
+      "title": "List approval profiles",
+      "summary": "Lists the approval profiles on your instance, one page at a time.",
+      "description": "Returns a page of approval profiles under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of approval profiles.",
+          "schema": {
+            "$ref": "#/components/schemas/SettingsApprovalProfileList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_approval_profile",
+      "method": "POST",
+      "path": "/settings/approval_profiles",
+      "slug": "create-an-approval-profile",
+      "title": "Create an approval profile",
+      "summary": "Creates an approval profile that holds matching transactions for approval.",
+      "description": "`name`, `entity`, `event`, `approver_type` and `approver` are required. From the moment it exists, the profile gates every matching transaction on the instance.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "approval_profile": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The profile's name."
+                },
+                "entity": {
+                  "type": "string",
+                  "description": "The kind of record the profile applies to."
+                },
+                "event": {
+                  "type": "string",
+                  "description": "The event that triggers the approval."
+                },
+                "approver_type": {
+                  "type": "string",
+                  "description": "The kind of approver."
+                },
+                "approver": {
+                  "type": "string",
+                  "description": "Who approves."
+                }
+              },
+              "required": [
+                "name",
+                "entity",
+                "event",
+                "approver_type",
+                "approver"
+              ]
+            }
+          },
+          "required": [
+            "approval_profile"
+          ]
+        },
+        "example": {
+          "approval_profile": {
+            "name": "Large order approval",
+            "entity": "account",
+            "event": "<event name>",
+            "approver_type": "<approver type>",
+            "approver": "<approver>"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new approval profile."
+        }
+      },
+      "example_call": {
+        "body": {
+          "approval_profile": {
+            "name": "Large order approval",
+            "entity": "account",
+            "event": "<event name>",
+            "approver_type": "<approver type>",
+            "approver": "<approver>"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_approval_profile",
+      "method": "GET",
+      "path": "/settings/approval_profiles/{approval_profile_id}",
+      "slug": "retrieve-an-approval-profile",
+      "title": "Retrieve an approval profile",
+      "summary": "Retrieves one approval profile by its `ap_` id.",
+      "description": "Returns the approval profile under `approval_profile`.",
+      "parameters": [
+        {
+          "name": "approval_profile_id",
+          "in": "path",
+          "required": true,
+          "description": "The approval profile's `ap_` id.",
+          "schema": {
+            "type": "string",
+            "example": "ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The approval profile, under `approval_profile`.",
+          "schema": {
+            "$ref": "#/components/schemas/SettingsApprovalProfileResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "approval_profile_id": "ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_approval_profile",
+      "method": "DELETE",
+      "path": "/settings/approval_profiles/{approval_profile_id}",
+      "slug": "delete-an-approval-profile",
+      "title": "Delete an approval profile",
+      "summary": "Deletes an approval profile that is not in use. Nothing comes back.",
+      "description": "Returns `204` with no body. A profile that is in use cannot be deleted.",
+      "parameters": [
+        {
+          "name": "approval_profile_id",
+          "in": "path",
+          "required": true,
+          "description": "The approval profile's `ap_` id.",
+          "schema": {
+            "type": "string",
+            "example": "ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The approval profile is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "approval_profile_id": "ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b"
+        }
+      }
+    },
+    {
+      "key": "update_settings_approval_profile",
+      "method": "PATCH",
+      "path": "/settings/approval_profiles/{approval_profile_id}",
+      "slug": "update-an-approval-profile",
+      "title": "Update an approval profile",
+      "summary": "Changes an approval profile's fields or its status.",
+      "description": "Send the fields to change. The updated approval profile comes back.",
+      "parameters": [
+        {
+          "name": "approval_profile_id",
+          "in": "path",
+          "required": true,
+          "description": "The approval profile's `ap_` id.",
+          "schema": {
+            "type": "string",
+            "example": "ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "approval_profile": {
+              "type": "object",
+              "properties": {
+                "display_name": {
+                  "type": "string",
+                  "description": "The name shown for the profile."
+                },
+                "status": {
+                  "type": "string",
+                  "description": "The profile's status."
+                }
+              },
+              "description": "The fields to change."
+            }
+          },
+          "required": [
+            "approval_profile"
+          ]
+        },
+        "example": {
+          "approval_profile": {
+            "display_name": "Large order approval (finance)"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated approval profile."
+        }
+      },
+      "example_call": {
+        "path": {
+          "approval_profile_id": "ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b"
+        },
+        "body": {
+          "approval_profile": {
+            "display_name": "Large order approval (finance)"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "SettingsApprovalProfile": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The approval profile's `ap_` id."
+        },
+        "status": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "description": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "created_by": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "last_updated_by": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "SettingsApprovalProfileResponse": {
+      "type": "object",
+      "properties": {
+        "approval_profile": {
+          "$ref": "#/components/schemas/SettingsApprovalProfile"
+        }
+      }
+    },
+    "SettingsApprovalProfileList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "description": "Always `list`."
+        },
+        "url": {
+          "type": "string",
+          "description": "The path this page was read from."
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/SettingsApprovalProfile"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/SettingsApprovalProfilePagination"
+        }
+      }
+    },
+    "SettingsApprovalProfilePagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Pass as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "links": {
+          "$ref": "#/components/schemas/SettingsApprovalProfilePaginationLinks"
+        }
+      }
+    },
+    "SettingsApprovalProfilePaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

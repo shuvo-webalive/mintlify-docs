@@ -191,6 +191,9 @@
     },
     {
       "name": "Approvals"
+    },
+    {
+      "name": "Approval profiles"
     }
   ],
   "paths": {
@@ -58966,6 +58969,454 @@
           }
         }
       }
+    },
+    "/settings/approval_profiles": {
+      "get": {
+        "tags": [
+          "Approval profiles"
+        ],
+        "summary": "List approval profiles",
+        "operationId": "approval_profiles_get_settings_approval_profiles",
+        "description": "Returns a page of approval profiles under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of approval profiles.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsApprovalProfileList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/approval_profiles?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.approval_profiles.get_settings_approval_profiles({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.approvalProfiles.getSettingsApprovalProfiles({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->approvalProfiles->getSettingsApprovalProfiles(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.approval_profiles.approval_profiles_dto.ApprovalProfilesDto.SettingsApprovalProfileList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsApprovalProfileList> response = client.approvalProfiles().getSettingsApprovalProfiles(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ApprovalProfiles.GetSettingsApprovalProfilesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.approvalProfiles.getSettingsApprovalProfiles(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ApprovalProfiles().GetSettingsApprovalProfiles(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Approval profiles"
+        ],
+        "summary": "Create an approval profile",
+        "operationId": "approval_profiles_create_settings_approval_profile",
+        "description": "`name`, `entity`, `event`, `approver_type` and `approver` are required. From the moment it exists, the profile gates every matching transaction on the instance.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new approval profile."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/approval_profiles\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"approval_profile\": {\n      \"name\": \"Large order approval\",\n      \"entity\": \"account\",\n      \"event\": \"<event name>\",\n      \"approver_type\": \"<approver type>\",\n      \"approver\": \"<approver>\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.approval_profiles.create_settings_approval_profile(\n    {\n        \"approval_profile\": {\n            \"name\": \"Large order approval\",\n            \"entity\": \"account\",\n            \"event\": \"<event name>\",\n            \"approver_type\": \"<approver type>\",\n            \"approver\": \"<approver>\",\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.approvalProfiles.createSettingsApprovalProfile({\n    approval_profile: {\n        name: 'Large order approval',\n        entity: 'account',\n        event: '<event name>',\n        approver_type: '<approver type>',\n        approver: '<approver>',\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->approvalProfiles->createSettingsApprovalProfile([\n    'approval_profile' => [\n        'name' => 'Large order approval',\n        'entity' => 'account',\n        'event' => '<event name>',\n        'approver_type' => '<approver type>',\n        'approver' => '<approver>',\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.approvalProfiles().createSettingsApprovalProfile(\n        Map.of(\n                \"approval_profile\", Map.of(\n                        \"name\", \"Large order approval\",\n                        \"entity\", \"account\",\n                        \"event\", \"<event name>\",\n                        \"approver_type\", \"<approver type>\",\n                        \"approver\", \"<approver>\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ApprovalProfiles.CreateSettingsApprovalProfileAsync(new Dictionary<string, object?>\n{\n    [\"approval_profile\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Large order approval\",\n        [\"entity\"] = \"account\",\n        [\"event\"] = \"<event name>\",\n        [\"approver_type\"] = \"<approver type>\",\n        [\"approver\"] = \"<approver>\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.approvalProfiles.createSettingsApprovalProfile({\n  'approval_profile': {\n    'name': 'Large order approval',\n    'entity': 'account',\n    'event': '<event name>',\n    'approver_type': '<approver type>',\n    'approver': '<approver>',\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ApprovalProfiles().CreateSettingsApprovalProfile(context.Background(), map[string]any{\n\t\"approval_profile\": map[string]any{\n\t\t\"name\":          \"Large order approval\",\n\t\t\"entity\":        \"account\",\n\t\t\"event\":         \"<event name>\",\n\t\t\"approver_type\": \"<approver type>\",\n\t\t\"approver\":      \"<approver>\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "approval_profile": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The profile's name."
+                      },
+                      "entity": {
+                        "type": "string",
+                        "description": "The kind of record the profile applies to."
+                      },
+                      "event": {
+                        "type": "string",
+                        "description": "The event that triggers the approval."
+                      },
+                      "approver_type": {
+                        "type": "string",
+                        "description": "The kind of approver."
+                      },
+                      "approver": {
+                        "type": "string",
+                        "description": "Who approves."
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "entity",
+                      "event",
+                      "approver_type",
+                      "approver"
+                    ]
+                  }
+                },
+                "required": [
+                  "approval_profile"
+                ]
+              },
+              "example": {
+                "approval_profile": {
+                  "name": "Large order approval",
+                  "entity": "account",
+                  "event": "<event name>",
+                  "approver_type": "<approver type>",
+                  "approver": "<approver>"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/approval_profiles/{approval_profile_id}": {
+      "get": {
+        "tags": [
+          "Approval profiles"
+        ],
+        "summary": "Retrieve an approval profile",
+        "operationId": "approval_profiles_get_settings_approval_profile",
+        "description": "Returns the approval profile under `approval_profile`.",
+        "parameters": [
+          {
+            "name": "approval_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The approval profile's `ap_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The approval profile, under `approval_profile`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsApprovalProfileResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/approval_profiles/ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.approval_profiles.get_settings_approval_profile(\n    \"ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.approvalProfiles.getSettingsApprovalProfile('ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->approvalProfiles->getSettingsApprovalProfile(\n    'ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.approval_profiles.approval_profiles_dto.ApprovalProfilesDto.SettingsApprovalProfile;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsApprovalProfile> response = client.approvalProfiles().getSettingsApprovalProfile(\n        \"ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ApprovalProfiles.GetSettingsApprovalProfileAsync(\"ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.approvalProfiles.getSettingsApprovalProfile(\n  'ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ApprovalProfiles().GetSettingsApprovalProfile(context.Background(), \"ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Approval profiles"
+        ],
+        "summary": "Delete an approval profile",
+        "operationId": "approval_profiles_delete_settings_approval_profile",
+        "description": "Returns `204` with no body. A profile that is in use cannot be deleted.",
+        "parameters": [
+          {
+            "name": "approval_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The approval profile's `ap_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The approval profile is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/approval_profiles/ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.approval_profiles.delete_settings_approval_profile(\n    \"ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.approvalProfiles.deleteSettingsApprovalProfile('ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->approvalProfiles->deleteSettingsApprovalProfile(\n    'ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.approvalProfiles().deleteSettingsApprovalProfile(\n        \"ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ApprovalProfiles.DeleteSettingsApprovalProfileAsync(\"ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.approvalProfiles.deleteSettingsApprovalProfile(\n  'ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ApprovalProfiles().DeleteSettingsApprovalProfile(context.Background(), \"ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Approval profiles"
+        ],
+        "summary": "Update an approval profile",
+        "operationId": "approval_profiles_update_settings_approval_profile",
+        "description": "Send the fields to change. The updated approval profile comes back.",
+        "parameters": [
+          {
+            "name": "approval_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The approval profile's `ap_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated approval profile."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/approval_profiles/ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"approval_profile\": {\n      \"display_name\": \"Large order approval (finance)\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.approval_profiles.update_settings_approval_profile(\n    \"ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b\",\n    {\"approval_profile\": {\"display_name\": \"Large order approval (finance)\"}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.approvalProfiles.updateSettingsApprovalProfile('ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b', {\n    approval_profile: {display_name: 'Large order approval (finance)'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->approvalProfiles->updateSettingsApprovalProfile(\n    'ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b',\n    ['approval_profile' => ['display_name' => 'Large order approval (finance)']],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.approvalProfiles().updateSettingsApprovalProfile(\n        \"ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b\",\n        Map.of(\"approval_profile\", Map.of(\"display_name\", \"Large order approval (finance)\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ApprovalProfiles.UpdateSettingsApprovalProfileAsync(\n    \"ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b\",\n    new Dictionary<string, object?>\n    {\n        [\"approval_profile\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Large order approval (finance)\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.approvalProfiles.updateSettingsApprovalProfile(\n  'ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b',\n  {\n    'approval_profile': {'display_name': 'Large order approval (finance)'},\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ApprovalProfiles().UpdateSettingsApprovalProfile(context.Background(), \"ap_0c2e4a6b8d1f4c3e5a7b9d0f2a4c6e8b\", map[string]any{\n\t\"approval_profile\": map[string]any{\n\t\t\"display_name\": \"Large order approval (finance)\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "approval_profile": {
+                    "type": "object",
+                    "properties": {
+                      "display_name": {
+                        "type": "string",
+                        "description": "The name shown for the profile."
+                      },
+                      "status": {
+                        "type": "string",
+                        "description": "The profile's status."
+                      }
+                    },
+                    "description": "The fields to change."
+                  }
+                },
+                "required": [
+                  "approval_profile"
+                ]
+              },
+              "example": {
+                "approval_profile": {
+                  "display_name": "Large order approval (finance)"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -92827,6 +93278,121 @@
         }
       },
       "ApprovalPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "prev": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "SettingsApprovalProfile": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "The approval profile's `ap_` id."
+          },
+          "status": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "description": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "created_by": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "last_updated_by": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "href": {
+            "type": "string"
+          }
+        }
+      },
+      "SettingsApprovalProfileResponse": {
+        "type": "object",
+        "properties": {
+          "approval_profile": {
+            "$ref": "#/components/schemas/SettingsApprovalProfile"
+          }
+        }
+      },
+      "SettingsApprovalProfileList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "description": "Always `list`."
+          },
+          "url": {
+            "type": "string",
+            "description": "The path this page was read from."
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SettingsApprovalProfile"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/SettingsApprovalProfilePagination"
+          }
+        }
+      },
+      "SettingsApprovalProfilePagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "links": {
+            "$ref": "#/components/schemas/SettingsApprovalProfilePaginationLinks"
+          }
+        }
+      },
+      "SettingsApprovalProfilePaginationLinks": {
         "type": "object",
         "properties": {
           "next": {
