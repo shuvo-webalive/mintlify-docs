@@ -122,6 +122,9 @@
     },
     {
       "name": "Purchase invoices"
+    },
+    {
+      "name": "Purchase payments"
     }
   ],
   "paths": {
@@ -44341,6 +44344,126 @@
             "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().GetPurchaseInvoicePurchasePayments(context.Background(), \"PI-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
           }
         ]
+      },
+      "post": {
+        "tags": [
+          "Purchase payments"
+        ],
+        "summary": "Create a purchase payment for a purchase invoice",
+        "operationId": "purchase_payments_create_purchase_invoice_purchase_payment",
+        "description": "Records a purchase payment that pays the purchase invoice in the path. Send only `payment_method_applications`, wrapped in `purchase_payment`; the payment is applied to that invoice.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The `id` of the purchase invoice to pay.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The new purchase payment, under `purchase_payment`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchasePaymentCreatedResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001/purchase_payments\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"purchase_payment\": {\n      \"payment_method_applications\": [\n        {\n          \"amount\": \"1.00\",\n          \"payment_processor\": \"PROC-0001\"\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_payments.create_purchase_invoice_purchase_payment(\n    \"PI-0001\",\n    {\n        \"purchase_payment\": {\n            \"payment_method_applications\": [\n                {\"amount\": \"1.00\", \"payment_processor\": \"PROC-0001\"}\n            ]\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchasePayments.createPurchaseInvoicePurchasePayment('PI-0001', {\n    purchase_payment: {payment_method_applications: [{amount: '1.00', payment_processor: 'PROC-0001'}]},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchasePayments->createPurchaseInvoicePurchasePayment('PI-0001', [\n    'purchase_payment' => [\n        'payment_method_applications' => [['amount' => '1.00', 'payment_processor' => 'PROC-0001']],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_payments.purchase_payments_dto.PurchasePaymentsDto;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchasePaymentsDto.PurchasePayments> response = client.purchasePayments().createPurchaseInvoicePurchasePayment(\n        \"PI-0001\",\n        Map.of(\n                \"purchase_payment\", Map.of(\n                        \"payment_method_applications\", List.of(\n                                Map.of(\"amount\", \"1.00\", \"payment_processor\", \"PROC-0001\")))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchasePayments.CreatePurchaseInvoicePurchasePaymentAsync(\n    \"PI-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"purchase_payment\"] = new Dictionary<string, object?>\n        {\n            [\"payment_method_applications\"] = new List<object?>\n            {\n                new Dictionary<string, object?>\n                {\n                    [\"amount\"] = \"1.00\",\n                    [\"payment_processor\"] = \"PROC-0001\",\n                },\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchasePayments\n    .createPurchaseInvoicePurchasePayment('PI-0001', {\n      'purchase_payment': {\n        'payment_method_applications': [\n          {'amount': '1.00', 'payment_processor': 'PROC-0001'},\n        ],\n      },\n    });\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchasePayments().CreatePurchaseInvoicePurchasePayment(context.Background(), \"PI-0001\", map[string]any{\n\t\"purchase_payment\": map[string]any{\n\t\t\"payment_method_applications\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"amount\":            \"1.00\",\n\t\t\t\t\"payment_processor\": \"PROC-0001\",\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "purchase_payment": {
+                    "type": "object",
+                    "properties": {
+                      "payment_method_applications": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "amount": {
+                              "type": "string",
+                              "description": "The amount paid with this processor, such as `1.00`."
+                            },
+                            "payment_processor": {
+                              "type": "string",
+                              "description": "The `id` of a payment processor from the payment processor settings."
+                            }
+                          }
+                        },
+                        "description": "How the payment is made."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "purchase_payment"
+                ]
+              },
+              "example": {
+                "purchase_payment": {
+                  "payment_method_applications": [
+                    {
+                      "amount": "1.00",
+                      "payment_processor": "PROC-0001"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/purchase_invoices/{purchase_invoice_id}/reactivate": {
@@ -45084,6 +45207,1384 @@
             "lang": "go",
             "label": "Go",
             "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().GetPurchaseInvoicePurchaseCreditNoteApplication(context.Background(), \"PI-0001\", \"PCNA-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_payments": {
+      "get": {
+        "tags": [
+          "Purchase payments"
+        ],
+        "summary": "List purchase payments",
+        "operationId": "purchase_payments_get_purchase_payments",
+        "description": "Lists the purchase payments on the account, one page at a time, under `data`. Pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter the list as `filter_<field>` or `filter_<field>_<operator>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of purchase payments.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchasePaymentList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_payments?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_payments.get_purchase_payments({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchasePayments.getPurchasePayments({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchasePayments->getPurchasePayments(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_payments.purchase_payments_dto.PurchasePaymentsDto.PurchasePaymentList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchasePaymentList> response = client.purchasePayments().getPurchasePayments(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchasePayments.GetPurchasePaymentsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchasePayments.getPurchasePayments(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchasePayments().GetPurchasePayments(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Purchase payments"
+        ],
+        "summary": "Create a purchase payment",
+        "operationId": "purchase_payments_create_purchase_payment",
+        "description": "Records a purchase payment, wrapped in `purchase_payment`. `payment_method_applications` says how it is paid, `purchase_invoice_applications` which invoices it pays, and `credit_note_applications` which purchase credit notes it spends. Paying more than the invoices take raises a purchase credit note.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new purchase payment, under `purchase_payment`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchasePaymentCreatedResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/purchase_payments\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"purchase_payment\": {\n      \"payment_method_applications\": [\n        {\n          \"amount\": \"1.00\",\n          \"payment_processor\": \"PROC-0001\"\n        }\n      ],\n      \"purchase_invoice_applications\": [\n        {\n          \"purchase_invoice\": \"PI-0001\",\n          \"amount\": \"1.00\"\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_payments.create_purchase_payment(\n    {\n        \"purchase_payment\": {\n            \"payment_method_applications\": [\n                {\"amount\": \"1.00\", \"payment_processor\": \"PROC-0001\"}\n            ],\n            \"purchase_invoice_applications\": [\n                {\"purchase_invoice\": \"PI-0001\", \"amount\": \"1.00\"}\n            ],\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchasePayments.createPurchasePayment({\n    purchase_payment: {\n        payment_method_applications: [{amount: '1.00', payment_processor: 'PROC-0001'}],\n        purchase_invoice_applications: [{purchase_invoice: 'PI-0001', amount: '1.00'}],\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchasePayments->createPurchasePayment([\n    'purchase_payment' => [\n        'payment_method_applications' => [['amount' => '1.00', 'payment_processor' => 'PROC-0001']],\n        'purchase_invoice_applications' => [['purchase_invoice' => 'PI-0001', 'amount' => '1.00']],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_payments.purchase_payments_dto.PurchasePaymentsDto;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchasePaymentsDto.PurchasePayments> response = client.purchasePayments().createPurchasePayment(\n        Map.of(\n                \"purchase_payment\", Map.of(\n                        \"payment_method_applications\", List.of(\n                                Map.of(\"amount\", \"1.00\", \"payment_processor\", \"PROC-0001\")),\n                        \"purchase_invoice_applications\", List.of(\n                                Map.of(\"purchase_invoice\", \"PI-0001\", \"amount\", \"1.00\")))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchasePayments.CreatePurchasePaymentAsync(new Dictionary<string, object?>\n{\n    [\"purchase_payment\"] = new Dictionary<string, object?>\n    {\n        [\"payment_method_applications\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"amount\"] = \"1.00\",\n                [\"payment_processor\"] = \"PROC-0001\",\n            },\n        },\n        [\"purchase_invoice_applications\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"purchase_invoice\"] = \"PI-0001\",\n                [\"amount\"] = \"1.00\",\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchasePayments.createPurchasePayment({\n  'purchase_payment': {\n    'payment_method_applications': [\n      {'amount': '1.00', 'payment_processor': 'PROC-0001'},\n    ],\n    'purchase_invoice_applications': [\n      {'purchase_invoice': 'PI-0001', 'amount': '1.00'},\n    ],\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchasePayments().CreatePurchasePayment(context.Background(), map[string]any{\n\t\"purchase_payment\": map[string]any{\n\t\t\"payment_method_applications\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"amount\":            \"1.00\",\n\t\t\t\t\"payment_processor\": \"PROC-0001\",\n\t\t\t},\n\t\t},\n\t\t\"purchase_invoice_applications\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"purchase_invoice\": \"PI-0001\",\n\t\t\t\t\"amount\":           \"1.00\",\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "purchase_payment": {
+                    "type": "object",
+                    "properties": {
+                      "payment_method_applications": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "amount": {
+                              "type": "string",
+                              "description": "The amount paid with this processor, such as `1.00`."
+                            },
+                            "payment_processor": {
+                              "type": "string",
+                              "description": "The `id` of a payment processor from the payment processor settings."
+                            }
+                          }
+                        },
+                        "description": "How the payment is made."
+                      },
+                      "purchase_invoice_applications": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "purchase_invoice": {
+                              "type": "string",
+                              "description": "The purchase invoice's `id`."
+                            },
+                            "amount": {
+                              "type": "string",
+                              "description": "The amount, as a decimal string such as `1.00`."
+                            }
+                          }
+                        },
+                        "description": "The purchase invoices this payment pays, and how much goes to each."
+                      },
+                      "credit_note_applications": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "purchase_credit_note": {
+                              "type": "string",
+                              "description": "The purchase credit note's `id`."
+                            },
+                            "amount": {
+                              "type": "string",
+                              "description": "The amount, as a decimal string such as `1.00`."
+                            }
+                          }
+                        },
+                        "description": "Purchase credit notes to spend as part of this payment."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "purchase_payment"
+                ]
+              },
+              "example": {
+                "purchase_payment": {
+                  "payment_method_applications": [
+                    {
+                      "amount": "1.00",
+                      "payment_processor": "PROC-0001"
+                    }
+                  ],
+                  "purchase_invoice_applications": [
+                    {
+                      "purchase_invoice": "PI-0001",
+                      "amount": "1.00"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/purchase_payments/{purchase_payment_id}": {
+      "delete": {
+        "tags": [
+          "Purchase payments"
+        ],
+        "summary": "Delete a purchase payment",
+        "operationId": "purchase_payments_delete_purchase_payment",
+        "description": "Deletes the purchase payment. The call returns `204` with no body, and reading the payment afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "purchase_payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The purchase payment is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/purchase_payments/PP-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_payments.delete_purchase_payment(\"PP-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchasePayments.deletePurchasePayment('PP-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchasePayments->deletePurchasePayment('PP-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.purchasePayments().deletePurchasePayment(\"PP-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchasePayments.DeletePurchasePaymentAsync(\"PP-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchasePayments.deletePurchasePayment(\n  'PP-0001',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchasePayments().DeletePurchasePayment(context.Background(), \"PP-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Purchase payments"
+        ],
+        "summary": "Retrieve a purchase payment",
+        "operationId": "purchase_payments_get_purchase_payment",
+        "description": "Returns the purchase payment with its supplier, amounts and the invoices, credit notes and payment methods it applies to, under `purchase_payment`.",
+        "parameters": [
+          {
+            "name": "purchase_payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The purchase payment, under `purchase_payment`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchasePaymentResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No purchase payment has that `id`, for example after it is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_payments/PP-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_payments.get_purchase_payment(\"PP-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchasePayments.getPurchasePayment('PP-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchasePayments->getPurchasePayment('PP-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_payments.purchase_payments_dto.PurchasePaymentsDto.PurchasePaymentRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchasePaymentRead> response = client.purchasePayments().getPurchasePayment(\"PP-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchasePayments.GetPurchasePaymentAsync(\"PP-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchasePayments.getPurchasePayment('PP-0001');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchasePayments().GetPurchasePayment(context.Background(), \"PP-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Purchase payments"
+        ],
+        "summary": "Update a purchase payment",
+        "operationId": "purchase_payments_update_purchase_payment",
+        "description": "Updates fields of the purchase payment, such as `payment_note`, wrapped in `purchase_payment`. Each update raises the payment's `version`.",
+        "parameters": [
+          {
+            "name": "purchase_payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated purchase payment, under `purchase_payment`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchasePaymentUpdatedResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/purchase_payments/PP-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"purchase_payment\": {\n      \"payment_note\": \"Paid by bank transfer.\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_payments.update_purchase_payment(\n    \"PP-0001\", {\"purchase_payment\": {\"payment_note\": \"Paid by bank transfer.\"}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchasePayments.updatePurchasePayment('PP-0001', {\n    purchase_payment: {payment_note: 'Paid by bank transfer.'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchasePayments->updatePurchasePayment('PP-0001', [\n    'purchase_payment' => ['payment_note' => 'Paid by bank transfer.'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_payments.purchase_payments_dto.PurchasePaymentsDto.PurchasePaymentUpdated;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchasePaymentUpdated> response = client.purchasePayments().updatePurchasePayment(\n        \"PP-0001\",\n        Map.of(\"purchase_payment\", Map.of(\"payment_note\", \"Paid by bank transfer.\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchasePayments.UpdatePurchasePaymentAsync(\n    \"PP-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"purchase_payment\"] = new Dictionary<string, object?>\n        {\n            [\"payment_note\"] = \"Paid by bank transfer.\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchasePayments.updatePurchasePayment(\n  'PP-0001',\n  {\n    'purchase_payment': {'payment_note': 'Paid by bank transfer.'},\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchasePayments().UpdatePurchasePayment(context.Background(), \"PP-0001\", map[string]any{\n\t\"purchase_payment\": map[string]any{\"payment_note\": \"Paid by bank transfer.\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "purchase_payment": {
+                    "type": "object",
+                    "properties": {
+                      "payment_note": {
+                        "type": "string",
+                        "description": "A note on the payment."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "purchase_payment"
+                ]
+              },
+              "example": {
+                "purchase_payment": {
+                  "payment_note": "Paid by bank transfer."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/purchase_payments/{purchase_payment_id}/notes": {
+      "get": {
+        "tags": [
+          "Purchase payments"
+        ],
+        "summary": "List a purchase payment's notes",
+        "operationId": "purchase_payments_get_purchase_payment_notes",
+        "description": "Lists the notes on the purchase payment under `data`.",
+        "parameters": [
+          {
+            "name": "purchase_payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of the payment's notes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchasePaymentNoteList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_payments/PP-0001/notes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_payments.get_purchase_payment_notes(\"PP-0001\", {\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchasePayments.getPurchasePaymentNotes('PP-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchasePayments->getPurchasePaymentNotes('PP-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_payments.purchase_payments_dto.PurchasePaymentsDto.PurchasePaymentNoteList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchasePaymentNoteList> response = client.purchasePayments().getPurchasePaymentNotes(\n        \"PP-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchasePayments.GetPurchasePaymentNotesAsync(\n    \"PP-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchasePayments.getPurchasePaymentNotes(\n  'PP-0001',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchasePayments().GetPurchasePaymentNotes(context.Background(), \"PP-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Purchase payments"
+        ],
+        "summary": "Create a purchase payment note",
+        "operationId": "purchase_payments_create_purchase_payment_note",
+        "description": "Adds a note to the purchase payment. Send a multipart form with the text as the `note` field and, optionally, a file to attach. The new note comes back under `note`.",
+        "parameters": [
+          {
+            "name": "purchase_payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The new note, under `note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchasePaymentNoteCreatedResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/purchase_payments/PP-0001/notes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -F \"file=@delivery-note.pdf\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_payments.create_purchase_payment_note(\n    \"PP-0001\",\n    \"<p>Goods received in full.</p>\",\n    files={\"file\": open(\"delivery-note.pdf\", \"rb\")},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {readFileSync} from 'node:fs';\nimport {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchasePayments.createPurchasePaymentNote('PP-0001', '<p>Goods received in full.</p>', {\n    files: {file: ['delivery-note.pdf', readFileSync('delivery-note.pdf')]},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchasePayments->createPurchasePaymentNote(\n    'PP-0001',\n    '<p>Goods received in full.</p>',\n    ['file' => ['delivery-note.pdf', fopen('delivery-note.pdf', 'r')]],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.client.RequestOptions;\nimport com.exsited.sdk.resources.purchase_payments.purchase_payments_dto.PurchasePaymentsDto.PurchasePaymentNotes;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchasePaymentNotes> response = client.purchasePayments().createPurchasePaymentNote(\n        \"PP-0001\",\n        \"<p>Goods received in full.</p>\",\n        Map.of(\"file\", Path.of(\"delivery-note.pdf\")),\n        RequestOptions.none());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchasePayments.CreatePurchasePaymentNoteAsync(\n    \"PP-0001\",\n    \"<p>Goods received in full.</p>\",\n    new Dictionary<string, object?> { [\"file\"] = new object?[] { \"delivery-note.pdf\", File.ReadAllBytes(\"delivery-note.pdf\") } });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'dart:io';\n\nimport 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchasePayments.createPurchasePaymentNote(\n  'PP-0001',\n  '<p>Goods received in full.</p>',\n  files: {\n    'file': [\n      'delivery-note.pdf',\n      File('delivery-note.pdf').readAsBytesSync(),\n    ],\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nfile, err := os.ReadFile(\"delivery-note.pdf\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.PurchasePayments().CreatePurchasePaymentNote(context.Background(), \"PP-0001\", \"<p>Goods received in full.</p>\", map[string]any{\"file\": []any{\"delivery-note.pdf\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "note"
+                ],
+                "properties": {
+                  "note": {
+                    "type": "string",
+                    "description": "The note text. HTML is accepted."
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "An optional file to attach to the note."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/purchase_payments/{purchase_payment_id}/notes/{pp_note_id}": {
+      "get": {
+        "tags": [
+          "Purchase payments"
+        ],
+        "summary": "Retrieve a purchase payment note",
+        "operationId": "purchase_payments_get_purchase_payment_note",
+        "description": "Returns the note with its content, attachments and watchers under `note`.",
+        "parameters": [
+          {
+            "name": "purchase_payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pp_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, from the note create or the notes list.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note, under `note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchasePaymentNoteResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The purchase payment has no note with that `id`, for example after it is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_payments/PP-0001/notes/note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_payments.get_purchase_payment_note(\n    \"PP-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchasePayments.getPurchasePaymentNote(\n    'PP-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchasePayments->getPurchasePaymentNote(\n    'PP-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_payments.purchase_payments_dto.PurchasePaymentsDto.PurchasePaymentNoteRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchasePaymentNoteRead> response = client.purchasePayments().getPurchasePaymentNote(\n        \"PP-0001\",\n        \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchasePayments.GetPurchasePaymentNoteAsync(\n    \"PP-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchasePayments.getPurchasePaymentNote(\n  'PP-0001',\n  'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchasePayments().GetPurchasePaymentNote(context.Background(), \"PP-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Purchase payments"
+        ],
+        "summary": "Delete a purchase payment note",
+        "operationId": "purchase_payments_delete_purchase_payment_note",
+        "description": "Deletes the note. The call returns `204` with no body, and reading the note afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "purchase_payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pp_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, from the note create or the notes list.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The note is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/purchase_payments/PP-0001/notes/note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_payments.delete_purchase_payment_note(\n    \"PP-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchasePayments.deletePurchasePaymentNote(\n    'PP-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchasePayments->deletePurchasePaymentNote(\n    'PP-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.purchasePayments().deletePurchasePaymentNote(\n        \"PP-0001\",\n        \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchasePayments.DeletePurchasePaymentNoteAsync(\n    \"PP-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchasePayments.deletePurchasePaymentNote(\n  'PP-0001',\n  'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchasePayments().DeletePurchasePaymentNote(context.Background(), \"PP-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Purchase payments"
+        ],
+        "summary": "Update a purchase payment note",
+        "operationId": "purchase_payments_update_purchase_payment_note",
+        "description": "Changes the note's text. Send a multipart form with the new text as the `note` field and, optionally, a file to attach. The updated note comes back under `note`.",
+        "parameters": [
+          {
+            "name": "purchase_payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pp_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, from the note create or the notes list.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated note, under `note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchasePaymentNoteUpdatedResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/purchase_payments/PP-0001/notes/note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -F \"file=@delivery-note.pdf\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_payments.update_purchase_payment_note(\n    \"PP-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"<p>Goods received in full.</p>\",\n    files={\"file\": open(\"delivery-note.pdf\", \"rb\")},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {readFileSync} from 'node:fs';\nimport {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchasePayments.updatePurchasePaymentNote(\n    'PP-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    '<p>Goods received in full.</p>',\n    {files: {file: ['delivery-note.pdf', readFileSync('delivery-note.pdf')]}},\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchasePayments->updatePurchasePaymentNote(\n    'PP-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    '<p>Goods received in full.</p>',\n    ['file' => ['delivery-note.pdf', fopen('delivery-note.pdf', 'r')]],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.client.RequestOptions;\nimport com.exsited.sdk.resources.purchase_payments.purchase_payments_dto.PurchasePaymentsDto.PurchasePaymentNoteUpdated;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchasePaymentNoteUpdated> response = client.purchasePayments().updatePurchasePaymentNote(\n        \"PP-0001\",\n        \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n        \"<p>Goods received in full.</p>\",\n        Map.of(\"file\", Path.of(\"delivery-note.pdf\")),\n        RequestOptions.none());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchasePayments.UpdatePurchasePaymentNoteAsync(\n    \"PP-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"<p>Goods received in full.</p>\",\n    new Dictionary<string, object?> { [\"file\"] = new object?[] { \"delivery-note.pdf\", File.ReadAllBytes(\"delivery-note.pdf\") } });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'dart:io';\n\nimport 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchasePayments.updatePurchasePaymentNote(\n  'PP-0001',\n  'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n  '<p>Goods received in full.</p>',\n  files: {\n    'file': [\n      'delivery-note.pdf',\n      File('delivery-note.pdf').readAsBytesSync(),\n    ],\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nfile, err := os.ReadFile(\"delivery-note.pdf\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.PurchasePayments().UpdatePurchasePaymentNote(context.Background(), \"PP-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", \"<p>Goods received in full.</p>\", map[string]any{\"file\": []any{\"delivery-note.pdf\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "note"
+                ],
+                "properties": {
+                  "note": {
+                    "type": "string",
+                    "description": "The new note text. HTML is accepted."
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "An optional file to attach to the note."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/purchase_payments/{purchase_payment_id}/notes/{pp_note_id}/files": {
+      "get": {
+        "tags": [
+          "Purchase payments"
+        ],
+        "summary": "List a purchase payment note's files",
+        "operationId": "purchase_payments_get_purchase_payment_note_files",
+        "description": "Lists the files attached to the note under `data`, with each file's name, type, size and `uuid`.",
+        "parameters": [
+          {
+            "name": "purchase_payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pp_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, from the note create or the notes list.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note's files.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchasePaymentNoteFileList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_payments/PP-0001/notes/note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a/files?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_payments.get_purchase_payment_note_files(\n    \"PP-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchasePayments.getPurchasePaymentNoteFiles(\n    'PP-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    {limit: 20},\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchasePayments->getPurchasePaymentNoteFiles(\n    'PP-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    ['limit' => 20],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_payments.purchase_payments_dto.PurchasePaymentsDto.PurchasePaymentNoteRead;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchasePaymentNoteRead> response = client.purchasePayments().getPurchasePaymentNoteFiles(\n        \"PP-0001\",\n        \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchasePayments.GetPurchasePaymentNoteFilesAsync(\n    \"PP-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchasePayments.getPurchasePaymentNoteFiles(\n  'PP-0001',\n  'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchasePayments().GetPurchasePaymentNoteFiles(context.Background(), \"PP-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_payments/{purchase_payment_id}/notes/{pp_note_id}/files/{file_id}": {
+      "get": {
+        "tags": [
+          "Purchase payments"
+        ],
+        "summary": "Retrieve a purchase payment note file",
+        "operationId": "purchase_payments_get_purchase_payment_note_file",
+        "description": "Returns one attachment's name, content type, size, `uuid` and link under `file`. Address the file by its `uuid`.",
+        "parameters": [
+          {
+            "name": "purchase_payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pp_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, from the note create or the notes list.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The attachment's `uuid`, from the note's `attachments`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file's details, under `file`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchasePaymentNoteFileResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_payments/PP-0001/notes/note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a/files/6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_payments.get_purchase_payment_note_file(\n    \"PP-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\",\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchasePayments.getPurchasePaymentNoteFile(\n    'PP-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    '6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchasePayments->getPurchasePaymentNoteFile(\n    'PP-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    '6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_payments.purchase_payments_dto.PurchasePaymentsDto.PurchasePaymentNoteFile;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchasePaymentNoteFile> response = client.purchasePayments().getPurchasePaymentNoteFile(\n        \"PP-0001\",\n        \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n        \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchasePayments.GetPurchasePaymentNoteFileAsync(\n    \"PP-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchasePayments.getPurchasePaymentNoteFile(\n  'PP-0001',\n  'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n  '6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchasePayments().GetPurchasePaymentNoteFile(context.Background(), \"PP-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Purchase payments"
+        ],
+        "summary": "Delete a purchase payment note file",
+        "operationId": "purchase_payments_delete_purchase_payment_note_file",
+        "description": "Deletes one file from the note, addressed by its `uuid`. The call returns `204` with no body.",
+        "parameters": [
+          {
+            "name": "purchase_payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pp_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, from the note create or the notes list.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The attachment's `uuid`, from the note's `attachments`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The file is removed from the note."
+          },
+          "404": {
+            "description": "Attachment not found. This call can return `404` even for a file the note's file list shows.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/purchase_payments/PP-0001/notes/note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a/files/6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_payments.delete_purchase_payment_note_file(\n    \"PP-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\",\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchasePayments.deletePurchasePaymentNoteFile(\n    'PP-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    '6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchasePayments->deletePurchasePaymentNoteFile(\n    'PP-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    '6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.purchasePayments().deletePurchasePaymentNoteFile(\n        \"PP-0001\",\n        \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n        \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchasePayments.DeletePurchasePaymentNoteFileAsync(\n    \"PP-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchasePayments.deletePurchasePaymentNoteFile(\n  'PP-0001',\n  'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n  '6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchasePayments().DeletePurchasePaymentNoteFile(context.Background(), \"PP-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_payments/{purchase_payment_id}/purchase_credit_notes": {
+      "get": {
+        "tags": [
+          "Purchase payments"
+        ],
+        "summary": "List a purchase payment's purchase credit notes",
+        "operationId": "purchase_payments_get_purchase_payment_purchase_credit_notes",
+        "description": "Lists the purchase credit notes the payment raised, under `data`. A payment raises one when it pays more than its invoices take; a payment that does not overpay has an empty list.",
+        "parameters": [
+          {
+            "name": "purchase_payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of the payment's purchase credit notes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNoteList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_payments/PP-0001/purchase_credit_notes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_payments.get_purchase_payment_purchase_credit_notes(\n    \"PP-0001\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchasePayments.getPurchasePaymentPurchaseCreditNotes('PP-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchasePayments->getPurchasePaymentPurchaseCreditNotes('PP-0001', [\n    'limit' => 20,\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_credit_notes.purchase_credit_notes_dto.PurchaseCreditNotesDto.PurchaseCreditNoteList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseCreditNoteList> response = client.purchasePayments().getPurchasePaymentPurchaseCreditNotes(\n        \"PP-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchasePayments.GetPurchasePaymentPurchaseCreditNotesAsync(\n    \"PP-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchasePayments\n    .getPurchasePaymentPurchaseCreditNotes(\n      'PP-0001',\n      queryParams: {'limit': 20},\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchasePayments().GetPurchasePaymentPurchaseCreditNotes(context.Background(), \"PP-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
           }
         ]
       }
@@ -71128,6 +72629,1957 @@
         "properties": {
           "purchase_credit_note_application": {
             "$ref": "#/components/schemas/PurchaseInvoicePurchaseCreditNoteApplicationRead"
+          }
+        }
+      },
+      "PurchasePayment": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PurchasePaymentAccount"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchasePaymentCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "credit_note_applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentCreditNoteApplication"
+            }
+          },
+          "credit_note_total": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/PurchasePaymentCurrency"
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {}
+          },
+          "custom_objects": {
+            "type": "array",
+            "items": {}
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchasePaymentLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "paid_total": {
+            "type": "string"
+          },
+          "payment_date": {
+            "type": "string"
+          },
+          "payment_method_applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentPaymentMethodApplication"
+            }
+          },
+          "payment_note": {
+            "type": "string"
+          },
+          "payment_reference": {},
+          "purchase_credit_applied": {
+            "type": "array",
+            "items": {}
+          },
+          "purchase_invoice_applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentPurchaseInvoiceApplication"
+            }
+          },
+          "purchase_invoices": {
+            "type": "array",
+            "items": {}
+          },
+          "purchase_order_id": {
+            "type": "string"
+          },
+          "purchase_payment_applied": {
+            "type": "array",
+            "items": {}
+          },
+          "purchase_payment_date": {
+            "type": "string"
+          },
+          "purchase_payment_note": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "total_applied": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchasePaymentAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentCreditNoteApplication": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "purchase_credit_note": {
+            "$ref": "#/components/schemas/PurchasePaymentCreditNoteApplicationPurchaseCreditNote"
+          }
+        }
+      },
+      "PurchasePaymentCreditNoteApplicationPurchaseCreditNote": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentPaymentMethodApplication": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "payment_method": {
+            "$ref": "#/components/schemas/PurchasePaymentPaymentMethodApplicationDetail"
+          },
+          "payment_processor": {
+            "$ref": "#/components/schemas/PurchasePaymentPaymentMethodApplicationPaymentProcessor"
+          },
+          "reference": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentPaymentMethodApplicationDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentPaymentMethodApplicationPaymentProcessor": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentPurchaseInvoiceApplication": {
+        "type": "object",
+        "properties": {
+          "applied": {
+            "type": "string"
+          },
+          "due_date": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "outstanding": {
+            "type": "string"
+          },
+          "purchase_invoice": {
+            "$ref": "#/components/schemas/PurchasePaymentPurchaseInvoiceApplicationDetail"
+          },
+          "total": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentPurchaseInvoiceApplicationDetail": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size the API applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can be set on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": "string",
+            "description": "The cursor of the previous page."
+          },
+          "links": {
+            "$ref": "#/components/schemas/PurchasePaymentPaginationLinks"
+          }
+        }
+      },
+      "PurchasePaymentList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePayment"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PurchasePaymentPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePayments": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PurchasePaymentsAccount"
+          },
+          "activity_logs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentsActivityLog"
+            }
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchasePaymentsCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "credit_note_applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentsCreditNoteApplication"
+            }
+          },
+          "credit_note_total": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/PurchasePaymentsCurrency"
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {}
+          },
+          "custom_objects": {
+            "type": "array",
+            "items": {}
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "paid_total": {
+            "type": "string"
+          },
+          "payment_date": {
+            "type": "string"
+          },
+          "payment_method_applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentsPaymentMethodApplication"
+            }
+          },
+          "payment_note": {
+            "type": "string"
+          },
+          "payment_reference": {},
+          "purchase_credit_applied": {
+            "type": "array",
+            "items": {}
+          },
+          "purchase_invoice_applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentsPurchaseInvoiceApplication"
+            }
+          },
+          "purchase_invoices": {
+            "type": "array",
+            "items": {}
+          },
+          "purchase_order_id": {
+            "type": "string"
+          },
+          "purchase_payment_applied": {
+            "type": "array",
+            "items": {}
+          },
+          "purchase_payment_date": {
+            "type": "string"
+          },
+          "purchase_payment_note": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "total_applied": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchasePaymentsAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentsActivityLog": {
+        "type": "object",
+        "properties": {
+          "activity": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentsCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentsCreditNoteApplication": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "purchase_credit_note": {
+            "$ref": "#/components/schemas/PurchasePaymentsCreditNoteApplicationPurchaseCreditNote"
+          }
+        }
+      },
+      "PurchasePaymentsCreditNoteApplicationPurchaseCreditNote": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentsCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentsPaymentMethodApplication": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "payment_method": {
+            "$ref": "#/components/schemas/PurchasePaymentsPaymentMethodApplicationDetail"
+          },
+          "payment_processor": {
+            "$ref": "#/components/schemas/PurchasePaymentsPaymentMethodApplicationPaymentProcessor"
+          },
+          "reference": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentsPaymentMethodApplicationDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentsPaymentMethodApplicationPaymentProcessor": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentsPurchaseInvoiceApplication": {
+        "type": "object",
+        "properties": {
+          "applied": {
+            "type": "string"
+          },
+          "due_date": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "outstanding": {
+            "type": "string"
+          },
+          "purchase_invoice": {
+            "$ref": "#/components/schemas/PurchasePaymentsPurchaseInvoiceApplicationDetail"
+          },
+          "total": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentsPurchaseInvoiceApplicationDetail": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentCreatedResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_payment": {
+            "$ref": "#/components/schemas/PurchasePayments"
+          }
+        }
+      },
+      "PurchasePaymentRead": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PurchasePaymentReadAccount"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchasePaymentReadCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "credit_note_applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentReadCreditNoteApplication"
+            }
+          },
+          "credit_note_total": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/PurchasePaymentReadCurrency"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchasePaymentReadLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "paid_total": {
+            "type": "string"
+          },
+          "payment_date": {
+            "type": "string"
+          },
+          "payment_method_applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentReadPaymentMethodApplication"
+            }
+          },
+          "payment_note": {
+            "type": "string"
+          },
+          "payment_reference": {},
+          "purchase_invoice_applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentReadPurchaseInvoiceApplication"
+            }
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchasePaymentReadAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentReadCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentReadCreditNoteApplication": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "purchase_credit_note": {
+            "$ref": "#/components/schemas/PurchasePaymentReadCreditNoteApplicationPurchaseCreditNote"
+          }
+        }
+      },
+      "PurchasePaymentReadCreditNoteApplicationPurchaseCreditNote": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentReadCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentReadLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentReadPaymentMethodApplication": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "payment_method": {
+            "$ref": "#/components/schemas/PurchasePaymentReadPaymentMethodApplicationDetail"
+          },
+          "payment_processor": {
+            "$ref": "#/components/schemas/PurchasePaymentReadPaymentMethodApplicationPaymentProcessor"
+          },
+          "reference": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentReadPaymentMethodApplicationDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentReadPaymentMethodApplicationPaymentProcessor": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentReadPurchaseInvoiceApplication": {
+        "type": "object",
+        "properties": {
+          "applied": {
+            "type": "string"
+          },
+          "due_date": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "outstanding": {
+            "type": "string"
+          },
+          "purchase_invoice": {
+            "$ref": "#/components/schemas/PurchasePaymentReadPurchaseInvoiceApplicationDetail"
+          },
+          "total": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentReadPurchaseInvoiceApplicationDetail": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_payment": {
+            "$ref": "#/components/schemas/PurchasePaymentRead"
+          }
+        }
+      },
+      "PurchasePaymentUpdated": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PurchasePaymentUpdatedAccount"
+          },
+          "activity_logs": {
+            "type": "array",
+            "items": {}
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchasePaymentUpdatedCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "credit_note_applications": {
+            "type": "array",
+            "items": {}
+          },
+          "credit_note_total": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/PurchasePaymentUpdatedCurrency"
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {}
+          },
+          "custom_objects": {
+            "type": "array",
+            "items": {}
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchasePaymentUpdatedLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "paid_total": {
+            "type": "string"
+          },
+          "payment_date": {
+            "type": "string"
+          },
+          "payment_method_applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentUpdatedPaymentMethodApplication"
+            }
+          },
+          "payment_note": {
+            "type": "string"
+          },
+          "payment_reference": {},
+          "purchase_credit_applied": {
+            "type": "array",
+            "items": {}
+          },
+          "purchase_invoice_applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentUpdatedPurchaseInvoiceApplication"
+            }
+          },
+          "purchase_invoices": {
+            "type": "array",
+            "items": {}
+          },
+          "purchase_order_id": {
+            "type": "string"
+          },
+          "purchase_payment_applied": {
+            "type": "array",
+            "items": {}
+          },
+          "purchase_payment_date": {
+            "type": "string"
+          },
+          "purchase_payment_note": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "total_applied": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchasePaymentUpdatedAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentUpdatedCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentUpdatedCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentUpdatedLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentUpdatedPaymentMethodApplication": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "payment_method": {
+            "$ref": "#/components/schemas/PurchasePaymentUpdatedPaymentMethodApplicationDetail"
+          },
+          "payment_processor": {
+            "$ref": "#/components/schemas/PurchasePaymentUpdatedPaymentMethodApplicationPaymentProcessor"
+          },
+          "reference": {}
+        }
+      },
+      "PurchasePaymentUpdatedPaymentMethodApplicationDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentUpdatedPaymentMethodApplicationPaymentProcessor": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentUpdatedPurchaseInvoiceApplication": {
+        "type": "object",
+        "properties": {
+          "applied": {
+            "type": "string"
+          },
+          "due_date": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "outstanding": {
+            "type": "string"
+          },
+          "purchase_invoice": {
+            "$ref": "#/components/schemas/PurchasePaymentUpdatedPurchaseInvoiceApplicationDetail"
+          },
+          "total": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentUpdatedPurchaseInvoiceApplicationDetail": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentUpdatedResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_payment": {
+            "$ref": "#/components/schemas/PurchasePaymentUpdated"
+          }
+        }
+      },
+      "PurchasePaymentNote": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentNoteAttachment"
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "group": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "purchase_payment": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteDetail"
+          },
+          "user": {},
+          "version": {
+            "type": "integer"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentNoteWatcher"
+            }
+          }
+        }
+      },
+      "PurchasePaymentNoteAttachment": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNoteCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNoteDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNoteWatcher": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNoteList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentNote"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PurchasePaymentPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNotesNote": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentNotesNoteAttachment"
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchasePaymentNotesNoteCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "group": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "purchase_payment": {
+            "$ref": "#/components/schemas/PurchasePaymentNotesNoteDetail"
+          },
+          "user": {},
+          "version": {
+            "type": "integer"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentNotesNoteWatcher"
+            }
+          }
+        }
+      },
+      "PurchasePaymentNotesNoteAttachment": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNotesNoteCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNotesNoteDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNotesNoteWatcher": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNoteCreatedResponse": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "$ref": "#/components/schemas/PurchasePaymentNotesNote"
+          }
+        }
+      },
+      "PurchasePaymentNoteReadDetail": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentNoteReadDetailAttachment"
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteReadDetailCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "group": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "purchase_payment": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteReadDetailPurchasePayment"
+          },
+          "user": {},
+          "version": {
+            "type": "integer"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentNoteReadDetailWatcher"
+            }
+          }
+        }
+      },
+      "PurchasePaymentNoteReadDetailAttachment": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNoteReadDetailCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNoteReadDetailPurchasePayment": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNoteReadDetailWatcher": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNoteResponse": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteReadDetail"
+          }
+        }
+      },
+      "PurchasePaymentNoteReadData": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNoteFileList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentNoteReadData"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PurchasePaymentPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNoteFile": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNoteFileResponse": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteFile"
+          }
+        }
+      },
+      "PurchasePaymentPurchaseCreditNote": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNoteAccount"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNoteCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNoteCurrency"
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {}
+          },
+          "date": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "initial_amount": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNoteLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "payment_id": {
+            "type": "string"
+          },
+          "purchase_credit_note_rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNotePurchaseCreditNoteRow"
+            }
+          },
+          "purchase_payment": {
+            "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNotePurchasePayment"
+          },
+          "refund_amount": {
+            "type": "string"
+          },
+          "refundable": {
+            "type": "boolean"
+          },
+          "remaining_amount": {
+            "type": "string"
+          },
+          "remaining_balance": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchasePaymentPurchaseCreditNoteAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentPurchaseCreditNoteCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentPurchaseCreditNoteCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentPurchaseCreditNoteLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentPurchaseCreditNotePurchaseCreditNoteRow": {
+        "type": "object",
+        "properties": {
+          "credit_note_from_blank_method": {
+            "type": "string"
+          },
+          "credit_note_from_credit_note": {
+            "type": "string"
+          },
+          "credit_note_from_payment_method": {
+            "type": "string"
+          },
+          "credit_note_total": {
+            "type": "string"
+          },
+          "payment_method": {
+            "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNotePurchaseCreditNoteRowPaymentMethod"
+          },
+          "payment_processor": {
+            "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNotePurchaseCreditNoteRowPaymentProcessor"
+          },
+          "refund_from_blank_method": {
+            "type": "string"
+          },
+          "refund_from_credit_note": {
+            "type": "string"
+          },
+          "refund_from_payment_method": {
+            "type": "string"
+          },
+          "refund_total": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentPurchaseCreditNotePurchaseCreditNoteRowPaymentMethod": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentPurchaseCreditNotePurchaseCreditNoteRowPaymentProcessor": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentPurchaseCreditNotePurchasePayment": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentPurchaseCreditNoteList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNote"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PurchasePaymentPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNoteUpdated": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasePaymentNoteUpdatedAttachment"
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteUpdatedUser"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "group": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteUpdatedUser"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "purchase_payment": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteUpdatedPurchasePayment"
+          },
+          "user": {},
+          "version": {
+            "type": "integer"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {}
+          }
+        }
+      },
+      "PurchasePaymentNoteUpdatedAttachment": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNoteUpdatedUser": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNoteUpdatedPurchasePayment": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchasePaymentNoteUpdatedResponse": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteUpdated"
           }
         }
       },

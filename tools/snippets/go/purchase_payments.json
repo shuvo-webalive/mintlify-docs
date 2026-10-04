@@ -1,0 +1,66 @@
+{
+ "sdk": "go",
+ "module": "purchase_payments",
+ "endpoints": {
+  "get_purchase_payments": {
+   "function": "PurchasePayments.GetPurchasePayments",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.PurchasePayments().GetPurchasePayments(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "create_purchase_payment": {
+   "function": "PurchasePayments.CreatePurchasePayment",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.PurchasePayments().CreatePurchasePayment(context.Background(), map[string]any{\n\t\"purchase_payment\": map[string]any{\n\t\t\"payment_method_applications\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"amount\":            \"1.00\",\n\t\t\t\t\"payment_processor\": \"PROC-0001\",\n\t\t\t},\n\t\t},\n\t\t\"purchase_invoice_applications\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"purchase_invoice\": \"PI-0001\",\n\t\t\t\t\"amount\":           \"1.00\",\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "delete_purchase_payment": {
+   "function": "PurchasePayments.DeletePurchasePayment",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.PurchasePayments().DeletePurchasePayment(context.Background(), \"PP-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_purchase_payment": {
+   "function": "PurchasePayments.GetPurchasePayment",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.PurchasePayments().GetPurchasePayment(context.Background(), \"PP-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "update_purchase_payment": {
+   "function": "PurchasePayments.UpdatePurchasePayment",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.PurchasePayments().UpdatePurchasePayment(context.Background(), \"PP-0001\", map[string]any{\n\t\"purchase_payment\": map[string]any{\"payment_note\": \"Paid by bank transfer.\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "create_purchase_invoice_purchase_payment": {
+   "function": "PurchasePayments.CreatePurchaseInvoicePurchasePayment",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.PurchasePayments().CreatePurchaseInvoicePurchasePayment(context.Background(), \"PI-0001\", map[string]any{\n\t\"purchase_payment\": map[string]any{\n\t\t\"payment_method_applications\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"amount\":            \"1.00\",\n\t\t\t\t\"payment_processor\": \"PROC-0001\",\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_purchase_payment_notes": {
+   "function": "PurchasePayments.GetPurchasePaymentNotes",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.PurchasePayments().GetPurchasePaymentNotes(context.Background(), \"PP-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "create_purchase_payment_note": {
+   "function": "PurchasePayments.CreatePurchasePaymentNote",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n)\n\nfile, err := os.ReadFile(\"delivery-note.pdf\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.PurchasePayments().CreatePurchasePaymentNote(context.Background(), \"PP-0001\", \"<p>Goods received in full.</p>\", map[string]any{\"file\": []any{\"delivery-note.pdf\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_purchase_payment_note": {
+   "function": "PurchasePayments.GetPurchasePaymentNote",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.PurchasePayments().GetPurchasePaymentNote(context.Background(), \"PP-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "delete_purchase_payment_note": {
+   "function": "PurchasePayments.DeletePurchasePaymentNote",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.PurchasePayments().DeletePurchasePaymentNote(context.Background(), \"PP-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_purchase_payment_note_files": {
+   "function": "PurchasePayments.GetPurchasePaymentNoteFiles",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.PurchasePayments().GetPurchasePaymentNoteFiles(context.Background(), \"PP-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_purchase_payment_note_file": {
+   "function": "PurchasePayments.GetPurchasePaymentNoteFile",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.PurchasePayments().GetPurchasePaymentNoteFile(context.Background(), \"PP-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_purchase_payment_purchase_credit_notes": {
+   "function": "PurchasePayments.GetPurchasePaymentPurchaseCreditNotes",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.PurchasePayments().GetPurchasePaymentPurchaseCreditNotes(context.Background(), \"PP-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "update_purchase_payment_note": {
+   "function": "PurchasePayments.UpdatePurchasePaymentNote",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n)\n\nfile, err := os.ReadFile(\"delivery-note.pdf\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.PurchasePayments().UpdatePurchasePaymentNote(context.Background(), \"PP-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", \"<p>Goods received in full.</p>\", map[string]any{\"file\": []any{\"delivery-note.pdf\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "delete_purchase_payment_note_file": {
+   "function": "PurchasePayments.DeletePurchasePaymentNoteFile",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.PurchasePayments().DeletePurchasePaymentNoteFile(context.Background(), \"PP-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  }
+ }
+}

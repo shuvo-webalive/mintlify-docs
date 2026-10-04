@@ -1,0 +1,2927 @@
+{
+  "family": "purchase_payments",
+  "tag": "Purchase payments",
+  "slug": "purchase-payments",
+  "icon": "credit-card",
+  "base": "/purchase_payments",
+  "overview_description": "Record, update, delete and read payments to suppliers, with their notes, files and the purchase credit notes they raise.",
+  "intro": "A purchase payment records money paid to a supplier against purchase invoices. These endpoints record, update, delete and read purchase payments, list the purchase credit notes a payment raised, and manage payment notes and their files. There are 15 endpoints, and all seven SDKs call every one.",
+  "warning": "**Deleting a purchase payment, a note or a note file cannot be undone.**",
+  "notes": [
+    "**Every write body is wrapped in `purchase_payment`.** Amounts are decimal strings such as `\"1.00\"`.",
+    "**A payment needs `payment_method_applications`.** Each entry names a payment processor by `id` and an amount.",
+    "**Paying more than the invoices take raises a purchase credit note.** List it with the purchase credit notes call on the payment.",
+    "**The invoice scoped create pays the invoice in the path.** Send only `payment_method_applications` to it.",
+    "**Listings page by cursor.** Records are under `data`; pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_purchase_payments",
+      "method": "GET",
+      "path": "/purchase_payments",
+      "slug": "list-purchase-payments",
+      "title": "List purchase payments",
+      "summary": "Returns one page of purchase payments.",
+      "description": "Lists the purchase payments on the account, one page at a time, under `data`. Pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter the list as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of purchase payments.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchasePaymentList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_purchase_payment",
+      "method": "POST",
+      "path": "/purchase_payments",
+      "slug": "create-a-purchase-payment",
+      "title": "Create a purchase payment",
+      "summary": "Records a payment to a supplier and returns it under `purchase_payment`.",
+      "description": "Records a purchase payment, wrapped in `purchase_payment`. `payment_method_applications` says how it is paid, `purchase_invoice_applications` which invoices it pays, and `credit_note_applications` which purchase credit notes it spends. Paying more than the invoices take raises a purchase credit note.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "purchase_payment": {
+              "type": "object",
+              "properties": {
+                "payment_method_applications": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "amount": {
+                        "type": "string",
+                        "description": "The amount paid with this processor, such as `1.00`."
+                      },
+                      "payment_processor": {
+                        "type": "string",
+                        "description": "The `id` of a payment processor from the payment processor settings."
+                      }
+                    }
+                  },
+                  "description": "How the payment is made."
+                },
+                "purchase_invoice_applications": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "purchase_invoice": {
+                        "type": "string",
+                        "description": "The purchase invoice's `id`."
+                      },
+                      "amount": {
+                        "type": "string",
+                        "description": "The amount, as a decimal string such as `1.00`."
+                      }
+                    }
+                  },
+                  "description": "The purchase invoices this payment pays, and how much goes to each."
+                },
+                "credit_note_applications": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "purchase_credit_note": {
+                        "type": "string",
+                        "description": "The purchase credit note's `id`."
+                      },
+                      "amount": {
+                        "type": "string",
+                        "description": "The amount, as a decimal string such as `1.00`."
+                      }
+                    }
+                  },
+                  "description": "Purchase credit notes to spend as part of this payment."
+                }
+              }
+            }
+          },
+          "required": [
+            "purchase_payment"
+          ]
+        },
+        "example": {
+          "purchase_payment": {
+            "payment_method_applications": [
+              {
+                "amount": "1.00",
+                "payment_processor": "PROC-0001"
+              }
+            ],
+            "purchase_invoice_applications": [
+              {
+                "purchase_invoice": "PI-0001",
+                "amount": "1.00"
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new purchase payment, under `purchase_payment`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchasePaymentCreatedResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "purchase_payment": {
+            "payment_method_applications": [
+              {
+                "amount": "1.00",
+                "payment_processor": "PROC-0001"
+              }
+            ],
+            "purchase_invoice_applications": [
+              {
+                "purchase_invoice": "PI-0001",
+                "amount": "1.00"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_purchase_payment",
+      "method": "DELETE",
+      "path": "/purchase_payments/{purchase_payment_id}",
+      "slug": "delete-a-purchase-payment",
+      "title": "Delete a purchase payment",
+      "summary": "Deletes a purchase payment. Nothing comes back.",
+      "description": "Deletes the purchase payment. The call returns `204` with no body, and reading the payment afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "purchase_payment_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase payment's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PP-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The purchase payment is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_payment_id": "PP-0001"
+        }
+      }
+    },
+    {
+      "key": "get_purchase_payment",
+      "method": "GET",
+      "path": "/purchase_payments/{purchase_payment_id}",
+      "slug": "retrieve-a-purchase-payment",
+      "title": "Retrieve a purchase payment",
+      "summary": "Returns one purchase payment under `purchase_payment`.",
+      "description": "Returns the purchase payment with its supplier, amounts and the invoices, credit notes and payment methods it applies to, under `purchase_payment`.",
+      "parameters": [
+        {
+          "name": "purchase_payment_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase payment's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PP-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The purchase payment, under `purchase_payment`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchasePaymentResponse"
+          }
+        },
+        "404": {
+          "description": "No purchase payment has that `id`, for example after it is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_payment_id": "PP-0001"
+        }
+      }
+    },
+    {
+      "key": "update_purchase_payment",
+      "method": "PATCH",
+      "path": "/purchase_payments/{purchase_payment_id}",
+      "slug": "update-a-purchase-payment",
+      "title": "Update a purchase payment",
+      "summary": "Changes fields of a purchase payment and returns it under `purchase_payment`.",
+      "description": "Updates fields of the purchase payment, such as `payment_note`, wrapped in `purchase_payment`. Each update raises the payment's `version`.",
+      "parameters": [
+        {
+          "name": "purchase_payment_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase payment's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PP-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "purchase_payment": {
+              "type": "object",
+              "properties": {
+                "payment_note": {
+                  "type": "string",
+                  "description": "A note on the payment."
+                }
+              }
+            }
+          },
+          "required": [
+            "purchase_payment"
+          ]
+        },
+        "example": {
+          "purchase_payment": {
+            "payment_note": "Paid by bank transfer."
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated purchase payment, under `purchase_payment`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchasePaymentUpdatedResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_payment_id": "PP-0001"
+        },
+        "body": {
+          "purchase_payment": {
+            "payment_note": "Paid by bank transfer."
+          }
+        }
+      }
+    },
+    {
+      "key": "create_purchase_invoice_purchase_payment",
+      "method": "POST",
+      "path": "/purchase_invoices/{purchase_invoice_id}/purchase_payments",
+      "slug": "create-a-purchase-payment-for-a-purchase-invoice",
+      "title": "Create a purchase payment for a purchase invoice",
+      "summary": "Records a payment against one purchase invoice and returns it under `purchase_payment`.",
+      "description": "Records a purchase payment that pays the purchase invoice in the path. Send only `payment_method_applications`, wrapped in `purchase_payment`; the payment is applied to that invoice.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The `id` of the purchase invoice to pay.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "purchase_payment": {
+              "type": "object",
+              "properties": {
+                "payment_method_applications": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "amount": {
+                        "type": "string",
+                        "description": "The amount paid with this processor, such as `1.00`."
+                      },
+                      "payment_processor": {
+                        "type": "string",
+                        "description": "The `id` of a payment processor from the payment processor settings."
+                      }
+                    }
+                  },
+                  "description": "How the payment is made."
+                }
+              }
+            }
+          },
+          "required": [
+            "purchase_payment"
+          ]
+        },
+        "example": {
+          "purchase_payment": {
+            "payment_method_applications": [
+              {
+                "amount": "1.00",
+                "payment_processor": "PROC-0001"
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new purchase payment, under `purchase_payment`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchasePaymentCreatedResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001"
+        },
+        "body": {
+          "purchase_payment": {
+            "payment_method_applications": [
+              {
+                "amount": "1.00",
+                "payment_processor": "PROC-0001"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "get_purchase_payment_notes",
+      "method": "GET",
+      "path": "/purchase_payments/{purchase_payment_id}/notes",
+      "slug": "list-a-purchase-payments-notes",
+      "title": "List a purchase payment's notes",
+      "summary": "Returns one page of the notes on a purchase payment.",
+      "description": "Lists the notes on the purchase payment under `data`.",
+      "parameters": [
+        {
+          "name": "purchase_payment_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase payment's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PP-0001"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of the payment's notes.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_payment_id": "PP-0001"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_purchase_payment_note",
+      "method": "POST",
+      "path": "/purchase_payments/{purchase_payment_id}/notes",
+      "slug": "create-a-purchase-payment-note",
+      "title": "Create a purchase payment note",
+      "summary": "Adds a note, with an optional file, to a purchase payment and returns it under `note`.",
+      "description": "Adds a note to the purchase payment. Send a multipart form with the text as the `note` field and, optionally, a file to attach. The new note comes back under `note`.",
+      "parameters": [
+        {
+          "name": "purchase_payment_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase payment's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PP-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "note"
+          ],
+          "properties": {
+            "note": {
+              "type": "string",
+              "description": "The note text. HTML is accepted."
+            },
+            "file": {
+              "type": "string",
+              "format": "binary",
+              "description": "An optional file to attach to the note."
+            }
+          }
+        },
+        "example": {
+          "note": "<p>Goods received in full.</p>",
+          "file": "delivery-note.pdf"
+        }
+      },
+      "multipart": true,
+      "responses": {
+        "201": {
+          "description": "The new note, under `note`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteCreatedResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_payment_id": "PP-0001"
+        },
+        "note": "<p>Goods received in full.</p>",
+        "file": "delivery-note.pdf"
+      }
+    },
+    {
+      "key": "get_purchase_payment_note",
+      "method": "GET",
+      "path": "/purchase_payments/{purchase_payment_id}/notes/{pp_note_id}",
+      "slug": "retrieve-a-purchase-payment-note",
+      "title": "Retrieve a purchase payment note",
+      "summary": "Returns one note of a purchase payment under `note`.",
+      "description": "Returns the note with its content, attachments and watchers under `note`.",
+      "parameters": [
+        {
+          "name": "purchase_payment_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase payment's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PP-0001"
+          }
+        },
+        {
+          "name": "pp_note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, from the note create or the notes list.",
+          "schema": {
+            "type": "string",
+            "example": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The note, under `note`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteResponse"
+          }
+        },
+        "404": {
+          "description": "The purchase payment has no note with that `id`, for example after it is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_payment_id": "PP-0001",
+          "pp_note_id": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+        }
+      }
+    },
+    {
+      "key": "delete_purchase_payment_note",
+      "method": "DELETE",
+      "path": "/purchase_payments/{purchase_payment_id}/notes/{pp_note_id}",
+      "slug": "delete-a-purchase-payment-note",
+      "title": "Delete a purchase payment note",
+      "summary": "Deletes a note from a purchase payment. Nothing comes back.",
+      "description": "Deletes the note. The call returns `204` with no body, and reading the note afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "purchase_payment_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase payment's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PP-0001"
+          }
+        },
+        {
+          "name": "pp_note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, from the note create or the notes list.",
+          "schema": {
+            "type": "string",
+            "example": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The note is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_payment_id": "PP-0001",
+          "pp_note_id": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+        }
+      }
+    },
+    {
+      "key": "get_purchase_payment_note_files",
+      "method": "GET",
+      "path": "/purchase_payments/{purchase_payment_id}/notes/{pp_note_id}/files",
+      "slug": "list-a-purchase-payment-notes-files",
+      "title": "List a purchase payment note's files",
+      "summary": "Returns the files attached to one purchase payment note.",
+      "description": "Lists the files attached to the note under `data`, with each file's name, type, size and `uuid`.",
+      "parameters": [
+        {
+          "name": "purchase_payment_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase payment's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PP-0001"
+          }
+        },
+        {
+          "name": "pp_note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, from the note create or the notes list.",
+          "schema": {
+            "type": "string",
+            "example": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The note's files.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteFileList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_payment_id": "PP-0001",
+          "pp_note_id": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_purchase_payment_note_file",
+      "method": "GET",
+      "path": "/purchase_payments/{purchase_payment_id}/notes/{pp_note_id}/files/{file_id}",
+      "slug": "retrieve-a-purchase-payment-note-file",
+      "title": "Retrieve a purchase payment note file",
+      "summary": "Returns the details of one file attached to a purchase payment note, under `file`.",
+      "description": "Returns one attachment's name, content type, size, `uuid` and link under `file`. Address the file by its `uuid`.",
+      "parameters": [
+        {
+          "name": "purchase_payment_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase payment's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PP-0001"
+          }
+        },
+        {
+          "name": "pp_note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, from the note create or the notes list.",
+          "schema": {
+            "type": "string",
+            "example": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+          }
+        },
+        {
+          "name": "file_id",
+          "in": "path",
+          "required": true,
+          "description": "The attachment's `uuid`, from the note's `attachments`.",
+          "schema": {
+            "type": "string",
+            "example": "6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The file's details, under `file`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteFileResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_payment_id": "PP-0001",
+          "pp_note_id": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a",
+          "file_id": "6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e"
+        }
+      }
+    },
+    {
+      "key": "get_purchase_payment_purchase_credit_notes",
+      "method": "GET",
+      "path": "/purchase_payments/{purchase_payment_id}/purchase_credit_notes",
+      "slug": "list-a-purchase-payments-purchase-credit-notes",
+      "title": "List a purchase payment's purchase credit notes",
+      "summary": "Returns one page of the purchase credit notes a purchase payment raised.",
+      "description": "Lists the purchase credit notes the payment raised, under `data`. A payment raises one when it pays more than its invoices take; a payment that does not overpay has an empty list.",
+      "parameters": [
+        {
+          "name": "purchase_payment_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase payment's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PP-0001"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of the payment's purchase credit notes.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNoteList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_payment_id": "PP-0001"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "update_purchase_payment_note",
+      "method": "PATCH",
+      "path": "/purchase_payments/{purchase_payment_id}/notes/{pp_note_id}",
+      "slug": "update-a-purchase-payment-note",
+      "title": "Update a purchase payment note",
+      "summary": "Replaces the text of a purchase payment note and returns it under `note`.",
+      "description": "Changes the note's text. Send a multipart form with the new text as the `note` field and, optionally, a file to attach. The updated note comes back under `note`.",
+      "parameters": [
+        {
+          "name": "purchase_payment_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase payment's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PP-0001"
+          }
+        },
+        {
+          "name": "pp_note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, from the note create or the notes list.",
+          "schema": {
+            "type": "string",
+            "example": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "note"
+          ],
+          "properties": {
+            "note": {
+              "type": "string",
+              "description": "The new note text. HTML is accepted."
+            },
+            "file": {
+              "type": "string",
+              "format": "binary",
+              "description": "An optional file to attach to the note."
+            }
+          }
+        },
+        "example": {
+          "note": "<p>Goods received in full.</p>",
+          "file": "delivery-note.pdf"
+        }
+      },
+      "multipart": true,
+      "responses": {
+        "200": {
+          "description": "The updated note, under `note`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteUpdatedResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_payment_id": "PP-0001",
+          "pp_note_id": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+        },
+        "note": "<p>Goods received in full.</p>",
+        "file": "delivery-note.pdf"
+      }
+    },
+    {
+      "key": "delete_purchase_payment_note_file",
+      "method": "DELETE",
+      "path": "/purchase_payments/{purchase_payment_id}/notes/{pp_note_id}/files/{file_id}",
+      "slug": "delete-a-purchase-payment-note-file",
+      "title": "Delete a purchase payment note file",
+      "summary": "Removes one attachment from a purchase payment note. Nothing comes back.",
+      "description": "Deletes one file from the note, addressed by its `uuid`. The call returns `204` with no body.",
+      "parameters": [
+        {
+          "name": "purchase_payment_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase payment's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PP-0001"
+          }
+        },
+        {
+          "name": "pp_note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, from the note create or the notes list.",
+          "schema": {
+            "type": "string",
+            "example": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+          }
+        },
+        {
+          "name": "file_id",
+          "in": "path",
+          "required": true,
+          "description": "The attachment's `uuid`, from the note's `attachments`.",
+          "schema": {
+            "type": "string",
+            "example": "6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The file is removed from the note."
+        },
+        "404": {
+          "description": "Attachment not found. This call can return `404` even for a file the note's file list shows."
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_payment_id": "PP-0001",
+          "pp_note_id": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a",
+          "file_id": "6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "PurchasePayment": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/PurchasePaymentAccount"
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchasePaymentCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "credit_note_applications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentCreditNoteApplication"
+          }
+        },
+        "credit_note_total": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/PurchasePaymentCurrency"
+        },
+        "custom_attributes": {
+          "type": "array",
+          "items": {}
+        },
+        "custom_objects": {
+          "type": "array",
+          "items": {}
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/PurchasePaymentLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "paid_total": {
+          "type": "string"
+        },
+        "payment_date": {
+          "type": "string"
+        },
+        "payment_method_applications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentPaymentMethodApplication"
+          }
+        },
+        "payment_note": {
+          "type": "string"
+        },
+        "payment_reference": {},
+        "purchase_credit_applied": {
+          "type": "array",
+          "items": {}
+        },
+        "purchase_invoice_applications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentPurchaseInvoiceApplication"
+          }
+        },
+        "purchase_invoices": {
+          "type": "array",
+          "items": {}
+        },
+        "purchase_order_id": {
+          "type": "string"
+        },
+        "purchase_payment_applied": {
+          "type": "array",
+          "items": {}
+        },
+        "purchase_payment_date": {
+          "type": "string"
+        },
+        "purchase_payment_note": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "total_applied": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchasePaymentAccount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentCreditNoteApplication": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string"
+        },
+        "purchase_credit_note": {
+          "$ref": "#/components/schemas/PurchasePaymentCreditNoteApplicationPurchaseCreditNote"
+        }
+      }
+    },
+    "PurchasePaymentCreditNoteApplicationPurchaseCreditNote": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentPaymentMethodApplication": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string"
+        },
+        "payment_method": {
+          "$ref": "#/components/schemas/PurchasePaymentPaymentMethodApplicationDetail"
+        },
+        "payment_processor": {
+          "$ref": "#/components/schemas/PurchasePaymentPaymentMethodApplicationPaymentProcessor"
+        },
+        "reference": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentPaymentMethodApplicationDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentPaymentMethodApplicationPaymentProcessor": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentPurchaseInvoiceApplication": {
+      "type": "object",
+      "properties": {
+        "applied": {
+          "type": "string"
+        },
+        "due_date": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "outstanding": {
+          "type": "string"
+        },
+        "purchase_invoice": {
+          "$ref": "#/components/schemas/PurchasePaymentPurchaseInvoiceApplicationDetail"
+        },
+        "total": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentPurchaseInvoiceApplicationDetail": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size the API applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can be set on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": "string",
+          "description": "The cursor of the previous page."
+        },
+        "links": {
+          "$ref": "#/components/schemas/PurchasePaymentPaginationLinks"
+        }
+      }
+    },
+    "PurchasePaymentList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePayment"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/PurchasePaymentPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePayments": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/PurchasePaymentsAccount"
+        },
+        "activity_logs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentsActivityLog"
+          }
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchasePaymentsCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "credit_note_applications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentsCreditNoteApplication"
+          }
+        },
+        "credit_note_total": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/PurchasePaymentsCurrency"
+        },
+        "custom_attributes": {
+          "type": "array",
+          "items": {}
+        },
+        "custom_objects": {
+          "type": "array",
+          "items": {}
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "paid_total": {
+          "type": "string"
+        },
+        "payment_date": {
+          "type": "string"
+        },
+        "payment_method_applications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentsPaymentMethodApplication"
+          }
+        },
+        "payment_note": {
+          "type": "string"
+        },
+        "payment_reference": {},
+        "purchase_credit_applied": {
+          "type": "array",
+          "items": {}
+        },
+        "purchase_invoice_applications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentsPurchaseInvoiceApplication"
+          }
+        },
+        "purchase_invoices": {
+          "type": "array",
+          "items": {}
+        },
+        "purchase_order_id": {
+          "type": "string"
+        },
+        "purchase_payment_applied": {
+          "type": "array",
+          "items": {}
+        },
+        "purchase_payment_date": {
+          "type": "string"
+        },
+        "purchase_payment_note": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "total_applied": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchasePaymentsAccount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentsActivityLog": {
+      "type": "object",
+      "properties": {
+        "activity": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentsCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentsCreditNoteApplication": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string"
+        },
+        "purchase_credit_note": {
+          "$ref": "#/components/schemas/PurchasePaymentsCreditNoteApplicationPurchaseCreditNote"
+        }
+      }
+    },
+    "PurchasePaymentsCreditNoteApplicationPurchaseCreditNote": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentsCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentsPaymentMethodApplication": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string"
+        },
+        "payment_method": {
+          "$ref": "#/components/schemas/PurchasePaymentsPaymentMethodApplicationDetail"
+        },
+        "payment_processor": {
+          "$ref": "#/components/schemas/PurchasePaymentsPaymentMethodApplicationPaymentProcessor"
+        },
+        "reference": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentsPaymentMethodApplicationDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentsPaymentMethodApplicationPaymentProcessor": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentsPurchaseInvoiceApplication": {
+      "type": "object",
+      "properties": {
+        "applied": {
+          "type": "string"
+        },
+        "due_date": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "outstanding": {
+          "type": "string"
+        },
+        "purchase_invoice": {
+          "$ref": "#/components/schemas/PurchasePaymentsPurchaseInvoiceApplicationDetail"
+        },
+        "total": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentsPurchaseInvoiceApplicationDetail": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentCreatedResponse": {
+      "type": "object",
+      "properties": {
+        "purchase_payment": {
+          "$ref": "#/components/schemas/PurchasePayments"
+        }
+      }
+    },
+    "PurchasePaymentRead": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/PurchasePaymentReadAccount"
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchasePaymentReadCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "credit_note_applications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentReadCreditNoteApplication"
+          }
+        },
+        "credit_note_total": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/PurchasePaymentReadCurrency"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/PurchasePaymentReadLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "paid_total": {
+          "type": "string"
+        },
+        "payment_date": {
+          "type": "string"
+        },
+        "payment_method_applications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentReadPaymentMethodApplication"
+          }
+        },
+        "payment_note": {
+          "type": "string"
+        },
+        "payment_reference": {},
+        "purchase_invoice_applications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentReadPurchaseInvoiceApplication"
+          }
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchasePaymentReadAccount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentReadCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentReadCreditNoteApplication": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string"
+        },
+        "purchase_credit_note": {
+          "$ref": "#/components/schemas/PurchasePaymentReadCreditNoteApplicationPurchaseCreditNote"
+        }
+      }
+    },
+    "PurchasePaymentReadCreditNoteApplicationPurchaseCreditNote": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentReadCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentReadLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentReadPaymentMethodApplication": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string"
+        },
+        "payment_method": {
+          "$ref": "#/components/schemas/PurchasePaymentReadPaymentMethodApplicationDetail"
+        },
+        "payment_processor": {
+          "$ref": "#/components/schemas/PurchasePaymentReadPaymentMethodApplicationPaymentProcessor"
+        },
+        "reference": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentReadPaymentMethodApplicationDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentReadPaymentMethodApplicationPaymentProcessor": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentReadPurchaseInvoiceApplication": {
+      "type": "object",
+      "properties": {
+        "applied": {
+          "type": "string"
+        },
+        "due_date": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "outstanding": {
+          "type": "string"
+        },
+        "purchase_invoice": {
+          "$ref": "#/components/schemas/PurchasePaymentReadPurchaseInvoiceApplicationDetail"
+        },
+        "total": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentReadPurchaseInvoiceApplicationDetail": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentResponse": {
+      "type": "object",
+      "properties": {
+        "purchase_payment": {
+          "$ref": "#/components/schemas/PurchasePaymentRead"
+        }
+      }
+    },
+    "PurchasePaymentUpdated": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/PurchasePaymentUpdatedAccount"
+        },
+        "activity_logs": {
+          "type": "array",
+          "items": {}
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchasePaymentUpdatedCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "credit_note_applications": {
+          "type": "array",
+          "items": {}
+        },
+        "credit_note_total": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/PurchasePaymentUpdatedCurrency"
+        },
+        "custom_attributes": {
+          "type": "array",
+          "items": {}
+        },
+        "custom_objects": {
+          "type": "array",
+          "items": {}
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/PurchasePaymentUpdatedLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "paid_total": {
+          "type": "string"
+        },
+        "payment_date": {
+          "type": "string"
+        },
+        "payment_method_applications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentUpdatedPaymentMethodApplication"
+          }
+        },
+        "payment_note": {
+          "type": "string"
+        },
+        "payment_reference": {},
+        "purchase_credit_applied": {
+          "type": "array",
+          "items": {}
+        },
+        "purchase_invoice_applications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentUpdatedPurchaseInvoiceApplication"
+          }
+        },
+        "purchase_invoices": {
+          "type": "array",
+          "items": {}
+        },
+        "purchase_order_id": {
+          "type": "string"
+        },
+        "purchase_payment_applied": {
+          "type": "array",
+          "items": {}
+        },
+        "purchase_payment_date": {
+          "type": "string"
+        },
+        "purchase_payment_note": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "total_applied": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchasePaymentUpdatedAccount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentUpdatedCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentUpdatedCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentUpdatedLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentUpdatedPaymentMethodApplication": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string"
+        },
+        "payment_method": {
+          "$ref": "#/components/schemas/PurchasePaymentUpdatedPaymentMethodApplicationDetail"
+        },
+        "payment_processor": {
+          "$ref": "#/components/schemas/PurchasePaymentUpdatedPaymentMethodApplicationPaymentProcessor"
+        },
+        "reference": {}
+      }
+    },
+    "PurchasePaymentUpdatedPaymentMethodApplicationDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentUpdatedPaymentMethodApplicationPaymentProcessor": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentUpdatedPurchaseInvoiceApplication": {
+      "type": "object",
+      "properties": {
+        "applied": {
+          "type": "string"
+        },
+        "due_date": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "outstanding": {
+          "type": "string"
+        },
+        "purchase_invoice": {
+          "$ref": "#/components/schemas/PurchasePaymentUpdatedPurchaseInvoiceApplicationDetail"
+        },
+        "total": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentUpdatedPurchaseInvoiceApplicationDetail": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentUpdatedResponse": {
+      "type": "object",
+      "properties": {
+        "purchase_payment": {
+          "$ref": "#/components/schemas/PurchasePaymentUpdated"
+        }
+      }
+    },
+    "PurchasePaymentNote": {
+      "type": "object",
+      "properties": {
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteAttachment"
+          }
+        },
+        "content": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchasePaymentNoteCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "group": {},
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {},
+        "object": {
+          "type": "string"
+        },
+        "purchase_payment": {
+          "$ref": "#/components/schemas/PurchasePaymentNoteDetail"
+        },
+        "user": {},
+        "version": {
+          "type": "integer"
+        },
+        "watchers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteWatcher"
+          }
+        }
+      }
+    },
+    "PurchasePaymentNoteAttachment": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNoteCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNoteDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNoteWatcher": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNoteList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentNote"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/PurchasePaymentPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNotesNote": {
+      "type": "object",
+      "properties": {
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentNotesNoteAttachment"
+          }
+        },
+        "content": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchasePaymentNotesNoteCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "group": {},
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {},
+        "object": {
+          "type": "string"
+        },
+        "purchase_payment": {
+          "$ref": "#/components/schemas/PurchasePaymentNotesNoteDetail"
+        },
+        "user": {},
+        "version": {
+          "type": "integer"
+        },
+        "watchers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentNotesNoteWatcher"
+          }
+        }
+      }
+    },
+    "PurchasePaymentNotesNoteAttachment": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNotesNoteCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNotesNoteDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNotesNoteWatcher": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNoteCreatedResponse": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "$ref": "#/components/schemas/PurchasePaymentNotesNote"
+        }
+      }
+    },
+    "PurchasePaymentNoteReadDetail": {
+      "type": "object",
+      "properties": {
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteReadDetailAttachment"
+          }
+        },
+        "content": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchasePaymentNoteReadDetailCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "group": {},
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {},
+        "object": {
+          "type": "string"
+        },
+        "purchase_payment": {
+          "$ref": "#/components/schemas/PurchasePaymentNoteReadDetailPurchasePayment"
+        },
+        "user": {},
+        "version": {
+          "type": "integer"
+        },
+        "watchers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteReadDetailWatcher"
+          }
+        }
+      }
+    },
+    "PurchasePaymentNoteReadDetailAttachment": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNoteReadDetailCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNoteReadDetailPurchasePayment": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNoteReadDetailWatcher": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNoteResponse": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "$ref": "#/components/schemas/PurchasePaymentNoteReadDetail"
+        }
+      }
+    },
+    "PurchasePaymentNoteReadData": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNoteFileList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteReadData"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/PurchasePaymentPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNoteFile": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNoteFileResponse": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "$ref": "#/components/schemas/PurchasePaymentNoteFile"
+        }
+      }
+    },
+    "PurchasePaymentPurchaseCreditNote": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNoteAccount"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNoteCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNoteCurrency"
+        },
+        "custom_attributes": {
+          "type": "array",
+          "items": {}
+        },
+        "date": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "initial_amount": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNoteLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "payment_id": {
+          "type": "string"
+        },
+        "purchase_credit_note_rows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNotePurchaseCreditNoteRow"
+          }
+        },
+        "purchase_payment": {
+          "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNotePurchasePayment"
+        },
+        "refund_amount": {
+          "type": "string"
+        },
+        "refundable": {
+          "type": "boolean"
+        },
+        "remaining_amount": {
+          "type": "string"
+        },
+        "remaining_balance": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchasePaymentPurchaseCreditNoteAccount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentPurchaseCreditNoteCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentPurchaseCreditNoteCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentPurchaseCreditNoteLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentPurchaseCreditNotePurchaseCreditNoteRow": {
+      "type": "object",
+      "properties": {
+        "credit_note_from_blank_method": {
+          "type": "string"
+        },
+        "credit_note_from_credit_note": {
+          "type": "string"
+        },
+        "credit_note_from_payment_method": {
+          "type": "string"
+        },
+        "credit_note_total": {
+          "type": "string"
+        },
+        "payment_method": {
+          "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNotePurchaseCreditNoteRowPaymentMethod"
+        },
+        "payment_processor": {
+          "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNotePurchaseCreditNoteRowPaymentProcessor"
+        },
+        "refund_from_blank_method": {
+          "type": "string"
+        },
+        "refund_from_credit_note": {
+          "type": "string"
+        },
+        "refund_from_payment_method": {
+          "type": "string"
+        },
+        "refund_total": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentPurchaseCreditNotePurchaseCreditNoteRowPaymentMethod": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentPurchaseCreditNotePurchaseCreditNoteRowPaymentProcessor": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentPurchaseCreditNotePurchasePayment": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentPurchaseCreditNoteList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentPurchaseCreditNote"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/PurchasePaymentPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNoteUpdated": {
+      "type": "object",
+      "properties": {
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchasePaymentNoteUpdatedAttachment"
+          }
+        },
+        "content": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchasePaymentNoteUpdatedUser"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "group": {},
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/PurchasePaymentNoteUpdatedUser"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "purchase_payment": {
+          "$ref": "#/components/schemas/PurchasePaymentNoteUpdatedPurchasePayment"
+        },
+        "user": {},
+        "version": {
+          "type": "integer"
+        },
+        "watchers": {
+          "type": "array",
+          "items": {}
+        }
+      }
+    },
+    "PurchasePaymentNoteUpdatedAttachment": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNoteUpdatedUser": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNoteUpdatedPurchasePayment": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchasePaymentNoteUpdatedResponse": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "$ref": "#/components/schemas/PurchasePaymentNoteUpdated"
+        }
+      }
+    }
+  }
+}
