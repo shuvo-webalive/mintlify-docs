@@ -233,6 +233,9 @@
     },
     {
       "name": "Pricing periods"
+    },
+    {
+      "name": "Invoice terms"
     }
   ],
   "paths": {
@@ -72843,6 +72846,467 @@
           }
         }
       }
+    },
+    "/settings/invoice_terms": {
+      "get": {
+        "tags": [
+          "Invoice terms"
+        ],
+        "summary": "List invoice terms",
+        "operationId": "invoice_terms_get_settings_invoice_terms",
+        "description": "Lists the invoice terms on the instance. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` of the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of invoice terms, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceTermList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/invoice_terms?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoice_terms.get_settings_invoice_terms({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoiceTerms.getSettingsInvoiceTerms({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoiceTerms->getSettingsInvoiceTerms(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoice_terms.invoice_terms_dto.InvoiceTermsDto.SettingsInvoiceTermList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsInvoiceTermList> response = client.invoiceTerms().getSettingsInvoiceTerms(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.InvoiceTerms.GetSettingsInvoiceTermsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoiceTerms.getSettingsInvoiceTerms(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.InvoiceTerms().GetSettingsInvoiceTerms(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Invoice terms"
+        ],
+        "summary": "Create an invoice term",
+        "operationId": "invoice_terms_create_settings_invoice_term",
+        "description": "Send the new invoice term under `invoice_term`. The response is flat, with `period` and an integer `duration`, where a read nests them under `duration`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new invoice term, under `invoice_term`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceTermWriteResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/invoice_terms\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"invoice_term\": {\n      \"name\": \"Net one month\",\n      \"display_name\": \"Net one month\",\n      \"period\": \"MONTHLY\",\n      \"duration\": 1\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoice_terms.create_settings_invoice_term(\n    {\n        \"invoice_term\": {\n            \"name\": \"Net one month\",\n            \"display_name\": \"Net one month\",\n            \"period\": \"MONTHLY\",\n            \"duration\": 1,\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoiceTerms.createSettingsInvoiceTerm({\n    invoice_term: {name: 'Net one month', display_name: 'Net one month', period: 'MONTHLY', duration: 1},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoiceTerms->createSettingsInvoiceTerm([\n    'invoice_term' => [\n        'name' => 'Net one month',\n        'display_name' => 'Net one month',\n        'period' => 'MONTHLY',\n        'duration' => 1,\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoice_terms.invoice_terms_dto.InvoiceTermsDto.SettingsInvoiceTermWrite;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsInvoiceTermWrite> response = client.invoiceTerms().createSettingsInvoiceTerm(\n        Map.of(\n                \"invoice_term\", Map.of(\n                        \"name\", \"Net one month\",\n                        \"display_name\", \"Net one month\",\n                        \"period\", \"MONTHLY\",\n                        \"duration\", 1)));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.InvoiceTerms.CreateSettingsInvoiceTermAsync(new Dictionary<string, object?>\n{\n    [\"invoice_term\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Net one month\",\n        [\"display_name\"] = \"Net one month\",\n        [\"period\"] = \"MONTHLY\",\n        [\"duration\"] = 1,\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoiceTerms.createSettingsInvoiceTerm({\n  'invoice_term': {\n    'name': 'Net one month',\n    'display_name': 'Net one month',\n    'period': 'MONTHLY',\n    'duration': 1,\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.InvoiceTerms().CreateSettingsInvoiceTerm(context.Background(), map[string]any{\n\t\"invoice_term\": map[string]any{\n\t\t\"name\":         \"Net one month\",\n\t\t\"display_name\": \"Net one month\",\n\t\t\"period\":       \"MONTHLY\",\n\t\t\"duration\":     1,\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "invoice_term": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The invoice term's name."
+                      },
+                      "display_name": {
+                        "type": "string",
+                        "description": "The name shown for the invoice term."
+                      },
+                      "period": {
+                        "type": "string",
+                        "description": "The period, such as `MONTHLY`."
+                      },
+                      "duration": {
+                        "type": "integer",
+                        "description": "How many periods the term lasts."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "invoice_term"
+                ]
+              },
+              "example": {
+                "invoice_term": {
+                  "name": "Net one month",
+                  "display_name": "Net one month",
+                  "period": "MONTHLY",
+                  "duration": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/invoice_terms/{invoice_term_id}": {
+      "get": {
+        "tags": [
+          "Invoice terms"
+        ],
+        "summary": "Retrieve an invoice term",
+        "operationId": "invoice_terms_get_settings_invoice_term",
+        "description": "Reads the invoice term with this `id`. The `id` is the one a listing or a create returns. A read nests the period and count under `duration`.",
+        "parameters": [
+          {
+            "name": "invoice_term_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice term's `id`, as a listing or a create returns it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The invoice term, under `invoice_term`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceTermResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No invoice term has that `id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/invoice_terms/946ed1d6908648ca86cb1e5baef55e40\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoice_terms.get_settings_invoice_term(\n    \"946ed1d6908648ca86cb1e5baef55e40\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoiceTerms.getSettingsInvoiceTerm('946ed1d6908648ca86cb1e5baef55e40');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoiceTerms->getSettingsInvoiceTerm('946ed1d6908648ca86cb1e5baef55e40');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoice_terms.invoice_terms_dto.InvoiceTermsDto.SettingsInvoiceTerm;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsInvoiceTerm> response = client.invoiceTerms().getSettingsInvoiceTerm(\n        \"946ed1d6908648ca86cb1e5baef55e40\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.InvoiceTerms.GetSettingsInvoiceTermAsync(\"946ed1d6908648ca86cb1e5baef55e40\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoiceTerms.getSettingsInvoiceTerm(\n  '946ed1d6908648ca86cb1e5baef55e40',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.InvoiceTerms().GetSettingsInvoiceTerm(context.Background(), \"946ed1d6908648ca86cb1e5baef55e40\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Invoice terms"
+        ],
+        "summary": "Delete an invoice term",
+        "operationId": "invoice_terms_delete_settings_invoice_term",
+        "description": "Deletes the invoice term with this `id`. Reading the same `id` afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "invoice_term_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice term's `id`, as a listing or a create returns it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The invoice term is deleted. The response has no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/invoice_terms/946ed1d6908648ca86cb1e5baef55e40\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoice_terms.delete_settings_invoice_term(\n    \"946ed1d6908648ca86cb1e5baef55e40\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoiceTerms.deleteSettingsInvoiceTerm('946ed1d6908648ca86cb1e5baef55e40');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoiceTerms->deleteSettingsInvoiceTerm('946ed1d6908648ca86cb1e5baef55e40');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.invoiceTerms().deleteSettingsInvoiceTerm(\"946ed1d6908648ca86cb1e5baef55e40\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.InvoiceTerms.DeleteSettingsInvoiceTermAsync(\"946ed1d6908648ca86cb1e5baef55e40\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoiceTerms.deleteSettingsInvoiceTerm(\n  '946ed1d6908648ca86cb1e5baef55e40',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.InvoiceTerms().DeleteSettingsInvoiceTerm(context.Background(), \"946ed1d6908648ca86cb1e5baef55e40\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Invoice terms"
+        ],
+        "summary": "Update an invoice term",
+        "operationId": "invoice_terms_update_settings_invoice_term",
+        "description": "Send the fields to change under `invoice_term`. Send `status` to enable or disable it. The response is flat, with `period` and an integer `duration`, where a read nests them under `duration`.",
+        "parameters": [
+          {
+            "name": "invoice_term_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice term's `id`, as a listing or a create returns it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated invoice term, under `invoice_term`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceTermWriteResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/invoice_terms/946ed1d6908648ca86cb1e5baef55e40\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"invoice_term\": {\n      \"display_name\": \"Net one month (AU)\",\n      \"description\": \"Due one month after issue\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.invoice_terms.update_settings_invoice_term(\n    \"946ed1d6908648ca86cb1e5baef55e40\",\n    {\n        \"invoice_term\": {\n            \"display_name\": \"Net one month (AU)\",\n            \"description\": \"Due one month after issue\",\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.invoiceTerms.updateSettingsInvoiceTerm('946ed1d6908648ca86cb1e5baef55e40', {\n    invoice_term: {display_name: 'Net one month (AU)', description: 'Due one month after issue'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->invoiceTerms->updateSettingsInvoiceTerm('946ed1d6908648ca86cb1e5baef55e40', [\n    'invoice_term' => [\n        'display_name' => 'Net one month (AU)',\n        'description' => 'Due one month after issue',\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.invoice_terms.invoice_terms_dto.InvoiceTermsDto.SettingsInvoiceTermWrite;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsInvoiceTermWrite> response = client.invoiceTerms().updateSettingsInvoiceTerm(\n        \"946ed1d6908648ca86cb1e5baef55e40\",\n        Map.of(\n                \"invoice_term\", Map.of(\n                        \"display_name\", \"Net one month (AU)\",\n                        \"description\", \"Due one month after issue\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.InvoiceTerms.UpdateSettingsInvoiceTermAsync(\n    \"946ed1d6908648ca86cb1e5baef55e40\",\n    new Dictionary<string, object?>\n    {\n        [\"invoice_term\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Net one month (AU)\",\n            [\"description\"] = \"Due one month after issue\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.invoiceTerms.updateSettingsInvoiceTerm(\n  '946ed1d6908648ca86cb1e5baef55e40',\n  {\n    'invoice_term': {\n      'display_name': 'Net one month (AU)',\n      'description': 'Due one month after issue',\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.InvoiceTerms().UpdateSettingsInvoiceTerm(context.Background(), \"946ed1d6908648ca86cb1e5baef55e40\", map[string]any{\n\t\"invoice_term\": map[string]any{\n\t\t\"display_name\": \"Net one month (AU)\",\n\t\t\"description\":  \"Due one month after issue\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "invoice_term": {
+                    "type": "object",
+                    "properties": {
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "invoice_term"
+                ]
+              },
+              "example": {
+                "invoice_term": {
+                  "display_name": "Net one month (AU)",
+                  "description": "Due one month after issue"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -111886,6 +112350,163 @@
         "properties": {
           "pricing_period": {
             "$ref": "#/components/schemas/PricingPeriod"
+          }
+        }
+      },
+      "InvoiceTermList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceTerm"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/InvoiceTermPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceTerm": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "duration": {
+            "$ref": "#/components/schemas/InvoiceTermDuration"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceTermDuration": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "period": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceTermPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass this back as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/InvoiceTermPaginationLinks"
+          }
+        }
+      },
+      "InvoiceTermPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceTermWrite": {
+        "type": "object",
+        "properties": {
+          "created_by": {
+            "description": "Null in every record read so far, so its type is not known."
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "integer"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "description": "Null in every record read so far, so its type is not known."
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "ordering": {
+            "type": "integer"
+          },
+          "period": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "InvoiceTermWriteResponse": {
+        "type": "object",
+        "properties": {
+          "invoice_term": {
+            "$ref": "#/components/schemas/InvoiceTermWrite"
+          }
+        }
+      },
+      "InvoiceTermResponse": {
+        "type": "object",
+        "properties": {
+          "invoice_term": {
+            "$ref": "#/components/schemas/InvoiceTerm"
           }
         }
       },

@@ -1,0 +1,30 @@
+---
+title: "Invoice terms"
+sidebarTitle: "Overview"
+description: "List, create, read, update, enable, disable and delete invoice terms, each a period and a duration."
+---
+
+An invoice term is a settings record made of a period, such as `MONTHLY`, and a duration. You can list, create, read, update, enable or disable and delete invoice terms. This area has 5 endpoints, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List invoice terms](/api-reference/invoice-terms/list-invoice-terms) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/invoice_terms` | Returns a page of invoice terms under `data`, with paging details under `pagination`. |
+| [Create an invoice term](/api-reference/invoice-terms/create-an-invoice-term) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/invoice_terms` | Creates an invoice term and returns it under `invoice_term`. |
+| [Retrieve an invoice term](/api-reference/invoice-terms/retrieve-an-invoice-term) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/invoice_terms/{invoice_term_id}` | Returns one invoice term by its `id`, under `invoice_term`. |
+| [Delete an invoice term](/api-reference/invoice-terms/delete-an-invoice-term) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/invoice_terms/{invoice_term_id}` | Deletes an invoice term. The response has no body. |
+| [Update an invoice term](/api-reference/invoice-terms/update-an-invoice-term) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/invoice_terms/{invoice_term_id}` | Changes the fields of an invoice term, or enables or disables it, and returns it under `invoice_term`. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Writes and reads return different shapes.** A create or an update returns a flat `period` and an integer `duration`, where a read nests them as `duration.period` and `duration.count`.
+- **A create sends `period` and `duration`.** For example `"period": "MONTHLY"` and `"duration": 1`, with `name` and `display_name`, under `invoice_term`.
+- **Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true.
+- **A delete returns `204` with no body.** Reading the invoice term afterwards returns `404`.
