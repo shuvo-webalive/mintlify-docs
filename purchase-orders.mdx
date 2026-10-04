@@ -1,13 +1,13 @@
 ---
 title: "Purchase orders"
 sidebarTitle: "Overview"
-description: "Create, change, cancel and read purchase orders, their lines, notes, files, KPIs and the invoices and payments raised from them."
+description: "Create, change, cancel and read purchase orders, their lines, notes, files and KPIs, and the purchase invoices and payments raised from them."
 ---
 
-A purchase order records what you are buying from a supplier. These endpoints create, update, change, cancel and reactivate purchase orders, read their lines, KPIs, purchase invoices and payments, and manage their notes and attached files. There are 23 endpoints, and all seven SDKs call every one.
+A purchase order records what you are buying from a supplier. These endpoints create, update, change, cancel and reactivate purchase orders, read their lines, KPIs, purchase invoices and payments, and manage their notes and attached files. This area has 23 endpoints, each available in all seven SDKs.
 
 <Warning>
-  **Deleting a purchase order, a note or a note file cannot be undone.** Cancel a purchase order instead if you may need it again.
+  **Deleting a purchase order or a note cannot be undone.** Cancel a purchase order instead if you may need it again. Deleting a note file currently returns `404`.
 </Warning>
 
 ## At a glance
@@ -46,7 +46,7 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 
 ## Things to know
 
-- **Every write body is wrapped in `purchase_order`.** The one exception is the purchase invoice create, which is wrapped in `purchase_invoice`; the cancel and reactivate calls take an empty object.
+- **Every JSON write body is wrapped in `purchase_order`.** The exceptions are the purchase invoice create, wrapped in `purchase_invoice`, and the note create, a multipart form; the cancel and reactivate calls take an empty object.
 - **The note calls take the purchase order's `code`, not its `id`.** That covers listing, creating, reading and deleting notes and their files.
 - **A new purchase order is `active`.** Send `"draft": true` in the create body to save it as a draft instead.
 - **Cancelling sets the status to `inactive`.** Reactivating sets it back to `active`.
