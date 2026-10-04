@@ -1,0 +1,1562 @@
+{
+  "family": "tasks",
+  "tag": "Tasks",
+  "slug": "tasks",
+  "icon": "list-check",
+  "base": "/tasks",
+  "overview_description": "Manage tasks in Exsited: create, read, update and delete tasks, their checklist items, notes and note files.",
+  "intro": "Tasks are units of work in Exsited, with a checklist, assignees, notes and attached files. You can create, list, retrieve, update and delete tasks, manage their checklist items, and add, read, change and remove notes and note files. This area has 18 endpoints, and all seven SDKs call every one.",
+  "warning": "**Deletes in this area cannot be undone.** Deleting a task, a checklist item, a note or a note file removes it; a deleted task then returns `404`.",
+  "notes": [
+    "**Task bodies go under `work_task`.** The create and the update wrap their fields in `work_task`, `name` is required to create, and a key the API does not know is refused.",
+    "**The note routes take the task's `code`, not its `wt_` id.** A `wt_` id returns `404` on every `/notes` path; the task, checklist and update calls take the `wt_` id.",
+    "**Checklist bodies go under `checklist`.** Adding items sends an array of `{\"name\": ...}`; updating one item sends a single object. Most checklist calls return the whole task under `work_task`.",
+    "**`checklist` changes shape.** It is an array on the task and on the checklist list, and a single object when you retrieve one checklist item.",
+    "**Notes are multipart forms.** Send the text as the `note` field and an optional `file`; a file's details come from its `uuid` in the note's file list, not its contents.",
+    "**A `COMPLETED` checklist item cannot be deleted.** The delete returns `409`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_tasks",
+      "method": "GET",
+      "path": "/tasks",
+      "slug": "list-tasks",
+      "title": "List tasks",
+      "summary": "Lists tasks, one page at a time.",
+      "description": "Returns one page of tasks under `data`, with `pagination` for the next page. Each task carries its `id`, `code`, `name`, `status`, `task_status`, `priority`, dates and hours. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by; prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of tasks.",
+          "schema": {
+            "$ref": "#/components/schemas/TaskList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "delete_task",
+      "method": "DELETE",
+      "path": "/tasks/{task_id}",
+      "slug": "delete-a-task",
+      "title": "Delete a task",
+      "summary": "Deletes a task; the response has no body.",
+      "description": "Deletes the task with this `id`. A successful delete returns `204` with no body, and reading the task afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "task_id",
+          "in": "path",
+          "required": true,
+          "description": "The task's `id`, which starts with `wt_`.",
+          "schema": {
+            "type": "string",
+            "example": "wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The task is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "task_id": "wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b"
+        }
+      }
+    },
+    {
+      "key": "get_task",
+      "method": "GET",
+      "path": "/tasks/{task_id}",
+      "slug": "retrieve-a-task",
+      "title": "Retrieve a task",
+      "summary": "Retrieves one task, with its checklist, assignees and alerts.",
+      "description": "Returns the task under `work_task`, including its `checklist`, its `assignees` (employees, labours, operators and account contacts) and its `alerts`.",
+      "parameters": [
+        {
+          "name": "task_id",
+          "in": "path",
+          "required": true,
+          "description": "The task's `id`, which starts with `wt_`.",
+          "schema": {
+            "type": "string",
+            "example": "wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The task, under `work_task`.",
+          "schema": {
+            "$ref": "#/components/schemas/TaskViewResponse"
+          }
+        },
+        "404": {
+          "description": "No task has that `id`, for example because it has been deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "task_id": "wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b"
+        }
+      }
+    },
+    {
+      "key": "update_task",
+      "method": "PATCH",
+      "path": "/tasks/{task_id}",
+      "slug": "update-a-task",
+      "title": "Update a task",
+      "summary": "Updates a task and returns it under `work_task`.",
+      "description": "Send the fields to change under `work_task`, such as `description`. The updated task comes back under `work_task`.",
+      "parameters": [
+        {
+          "name": "task_id",
+          "in": "path",
+          "required": true,
+          "description": "The task's `id`, which starts with `wt_`.",
+          "schema": {
+            "type": "string",
+            "example": "wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "work_task": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "priority": {
+                  "type": "string"
+                },
+                "start_date": {
+                  "type": "string"
+                },
+                "due_date": {
+                  "type": "string"
+                },
+                "estimated_hours": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "required": [
+            "work_task"
+          ]
+        },
+        "example": {
+          "work_task": {
+            "description": "Replace the damaged fence panels"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated task, under `work_task`.",
+          "schema": {
+            "$ref": "#/components/schemas/TaskViewResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "task_id": "wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b"
+        },
+        "body": {
+          "work_task": {
+            "description": "Replace the damaged fence panels"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_task_checklist",
+      "method": "GET",
+      "path": "/tasks/{task_id}/checklist",
+      "slug": "list-a-tasks-checklist-items",
+      "title": "List a task's checklist items",
+      "summary": "Lists the checklist items of one task.",
+      "description": "Returns `work_task` holding only `checklist`, the array of the task's checklist items.",
+      "parameters": [
+        {
+          "name": "task_id",
+          "in": "path",
+          "required": true,
+          "description": "The task's `id`, which starts with `wt_`.",
+          "schema": {
+            "type": "string",
+            "example": "wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The task's checklist, under `work_task.checklist`.",
+          "schema": {
+            "$ref": "#/components/schemas/TaskChecklistResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "task_id": "wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b"
+        }
+      }
+    },
+    {
+      "key": "create_task_checklist",
+      "method": "POST",
+      "path": "/tasks/{task_id}/checklist",
+      "slug": "add-checklist-items-to-a-task",
+      "title": "Add checklist items to a task",
+      "summary": "Adds one or more checklist items to a task and returns the whole task.",
+      "description": "Send the new items as an array under `checklist`, each with a `name`. The whole task comes back under `work_task`, with the new items at the end of its `checklist`.",
+      "parameters": [
+        {
+          "name": "task_id",
+          "in": "path",
+          "required": true,
+          "description": "The task's `id`, which starts with `wt_`.",
+          "schema": {
+            "type": "string",
+            "example": "wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "checklist": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          },
+          "required": [
+            "checklist"
+          ]
+        },
+        "example": {
+          "checklist": [
+            {
+              "name": "Measure the fence line"
+            }
+          ]
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The task with its updated checklist, under `work_task`.",
+          "schema": {
+            "$ref": "#/components/schemas/TaskViewResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "task_id": "wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b"
+        },
+        "body": {
+          "checklist": [
+            {
+              "name": "Measure the fence line"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "key": "get_task_notes",
+      "method": "GET",
+      "path": "/tasks/{task_id}/notes",
+      "slug": "list-a-tasks-notes",
+      "title": "List a task's notes",
+      "summary": "Lists the notes on one task, found by the task's code.",
+      "description": "Returns the task's notes under `data`, with `pagination`. The path takes the task's `code`; a `wt_` id returns `404`. A task with no notes returns an empty `data` list.",
+      "parameters": [
+        {
+          "name": "task_id",
+          "in": "path",
+          "required": true,
+          "description": "The task's `code`. The note routes look the task up by its code, and a `wt_` id returns `404`.",
+          "schema": {
+            "type": "string",
+            "example": "TASK-00012"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of the task's notes.",
+          "schema": {
+            "$ref": "#/components/schemas/TaskNoteList"
+          }
+        },
+        "404": {
+          "description": "No task has that code. A `wt_` id in place of the code also returns `404`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "task_id": "TASK-00012"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_task_note",
+      "method": "POST",
+      "path": "/tasks/{task_id}/notes",
+      "slug": "add-a-note-to-a-task",
+      "title": "Add a note to a task",
+      "summary": "Adds a note, with an optional file, to a task found by its code.",
+      "description": "Send a multipart form with the note's text as `note` and, optionally, a `file` to attach. The path takes the task's `code`. The new note comes back under `note`, with its `id`.",
+      "parameters": [
+        {
+          "name": "task_id",
+          "in": "path",
+          "required": true,
+          "description": "The task's `code`. The note routes look the task up by its code, and a `wt_` id returns `404`.",
+          "schema": {
+            "type": "string",
+            "example": "TASK-00012"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "note": {
+              "type": "string",
+              "description": "The note's text, such as `<p>Call the client back.</p>`."
+            },
+            "file": {
+              "type": "string",
+              "format": "binary",
+              "description": "An optional file to attach to the note."
+            }
+          },
+          "required": [
+            "note"
+          ]
+        },
+        "example": {
+          "note": "<p>Call the client back on Monday.</p>",
+          "file": "site-visit.txt"
+        }
+      },
+      "multipart": true,
+      "responses": {
+        "200": {
+          "description": "The new note, under `note`.",
+          "schema": {
+            "$ref": "#/components/schemas/TaskNoteResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "task_id": "TASK-00012"
+        },
+        "file": "site-visit.txt",
+        "note": "<p>Call the client back on Monday.</p>"
+      }
+    },
+    {
+      "key": "get_task_checklist_by_uuid",
+      "method": "GET",
+      "path": "/tasks/{task_id}/checklist/{task_checklist_uuid}",
+      "slug": "retrieve-a-checklist-item",
+      "title": "Retrieve a checklist item",
+      "summary": "Retrieves one checklist item of a task.",
+      "description": "Returns `work_task` holding only `checklist`, which here is the single checklist item as an object rather than an array.",
+      "parameters": [
+        {
+          "name": "task_id",
+          "in": "path",
+          "required": true,
+          "description": "The task's `id`, which starts with `wt_`.",
+          "schema": {
+            "type": "string",
+            "example": "wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b"
+          }
+        },
+        {
+          "name": "task_checklist_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The checklist item's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The checklist item, under `work_task.checklist`.",
+          "schema": {
+            "$ref": "#/components/schemas/TaskChecklistItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "task_id": "wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b",
+          "task_checklist_uuid": "3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b"
+        }
+      }
+    },
+    {
+      "key": "delete_task_note",
+      "method": "DELETE",
+      "path": "/tasks/{task_id}/notes/{task_note_id}",
+      "slug": "delete-a-task-note",
+      "title": "Delete a task note",
+      "summary": "Deletes one note from a task found by its code.",
+      "description": "Deletes the note with this `id` from the task. The path takes the task's `code`; a `wt_` id returns `404`. After the delete, the task's note list no longer holds the note.",
+      "parameters": [
+        {
+          "name": "task_id",
+          "in": "path",
+          "required": true,
+          "description": "The task's `code`. The note routes look the task up by its code, and a `wt_` id returns `404`.",
+          "schema": {
+            "type": "string",
+            "example": "TASK-00012"
+          }
+        },
+        {
+          "name": "task_note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The note is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "task_id": "TASK-00012",
+          "task_note_id": "6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f"
+        }
+      }
+    },
+    {
+      "key": "create_task",
+      "method": "POST",
+      "path": "/tasks",
+      "slug": "create-a-task",
+      "title": "Create a task",
+      "summary": "Creates a task and returns it under `work_task`.",
+      "description": "Send the new task under `work_task`. `name` is required, and a key the API does not know is refused. The new task comes back with `201` under `work_task`, in the same form as retrieving it.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "work_task": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The task's name."
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "priority": {
+                  "type": "string"
+                },
+                "start_date": {
+                  "type": "string"
+                },
+                "due_date": {
+                  "type": "string"
+                },
+                "estimated_hours": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          },
+          "required": [
+            "work_task"
+          ]
+        },
+        "example": {
+          "work_task": {
+            "name": "Repair fence"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new task, under `work_task`.",
+          "schema": {
+            "$ref": "#/components/schemas/TaskViewResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "work_task": {
+            "name": "Repair fence"
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_task_checklist_by_uuid",
+      "method": "DELETE",
+      "path": "/tasks/{task_id}/checklist/{task_checklist_uuid}",
+      "slug": "delete-a-checklist-item",
+      "title": "Delete a checklist item",
+      "summary": "Deletes one checklist item from a task; the response has no body.",
+      "description": "Deletes the checklist item with this `id` from the task. A successful delete returns `204` with no body. An item whose status is `COMPLETED` cannot be deleted and returns `409`.",
+      "parameters": [
+        {
+          "name": "task_id",
+          "in": "path",
+          "required": true,
+          "description": "The task's `id`, which starts with `wt_`.",
+          "schema": {
+            "type": "string",
+            "example": "wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b"
+          }
+        },
+        {
+          "name": "task_checklist_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The checklist item's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The checklist item is deleted. No body."
+        },
+        "409": {
+          "description": "The checklist item is `COMPLETED` and cannot be deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "task_id": "wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b",
+          "task_checklist_uuid": "3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b"
+        }
+      }
+    },
+    {
+      "key": "update_task_checklist_by_uuid",
+      "method": "PATCH",
+      "path": "/tasks/{task_id}/checklist/{task_checklist_uuid}",
+      "slug": "update-a-checklist-item",
+      "title": "Update a checklist item",
+      "summary": "Changes one checklist item and returns the task.",
+      "description": "Send the fields to change under `checklist`, as an object, such as a new `name`. The path takes the task's `id` or `code`. The task comes back under `work_task`.",
+      "parameters": [
+        {
+          "name": "task_id",
+          "in": "path",
+          "required": true,
+          "description": "The task's `id`, which starts with `wt_`, or its `code`.",
+          "schema": {
+            "type": "string",
+            "example": "wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b"
+          }
+        },
+        {
+          "name": "task_checklist_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The checklist item's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "checklist": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "checklist"
+          ]
+        },
+        "example": {
+          "checklist": {
+            "name": "Measure and mark the fence line"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The task, under `work_task`.",
+          "schema": {
+            "$ref": "#/components/schemas/TaskViewResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "task_id": "wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b",
+          "task_checklist_uuid": "3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b"
+        },
+        "body": {
+          "checklist": {
+            "name": "Measure and mark the fence line"
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_task_note_file",
+      "method": "DELETE",
+      "path": "/tasks/{task_code}/notes/{note_id}/files/{file_id}",
+      "slug": "delete-a-task-note-file",
+      "title": "Delete a task note file",
+      "summary": "Deletes one file attached to a task note; the response has no body.",
+      "description": "Deletes the attachment with this `uuid` from the note. The path takes the task's `code` and the file's `uuid` from the note's file list. A successful delete returns `204` with no body.",
+      "parameters": [
+        {
+          "name": "task_code",
+          "in": "path",
+          "required": true,
+          "description": "The task's `code`. A `wt_` id returns `404` on the note routes.",
+          "schema": {
+            "type": "string",
+            "example": "TASK-00012"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f"
+          }
+        },
+        {
+          "name": "file_id",
+          "in": "path",
+          "required": true,
+          "description": "The attachment's `uuid`, from the note's file list.",
+          "schema": {
+            "type": "string",
+            "example": "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The file is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "task_code": "TASK-00012",
+          "note_id": "6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f",
+          "file_id": "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d"
+        }
+      }
+    },
+    {
+      "key": "get_task_note_files",
+      "method": "GET",
+      "path": "/tasks/{task_code}/notes/{note_id}/files",
+      "slug": "list-a-task-notes-files",
+      "title": "List a task note's files",
+      "summary": "Lists the files attached to one task note.",
+      "description": "Returns the note's attachments under `data`, with `pagination`. Each attachment carries its `uuid`, `filename`, `content_type`, `size` and `href`. The path takes the task's `code`.",
+      "parameters": [
+        {
+          "name": "task_code",
+          "in": "path",
+          "required": true,
+          "description": "The task's `code`. A `wt_` id returns `404` on the note routes.",
+          "schema": {
+            "type": "string",
+            "example": "TASK-00012"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The note's files.",
+          "schema": {
+            "$ref": "#/components/schemas/TaskNoteFileList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "task_code": "TASK-00012",
+          "note_id": "6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f"
+        }
+      }
+    },
+    {
+      "key": "get_task_note_file",
+      "method": "GET",
+      "path": "/tasks/{task_code}/notes/{note_id}/files/{file_id}",
+      "slug": "retrieve-a-task-note-file",
+      "title": "Retrieve a task note file",
+      "summary": "Retrieves the details of one file attached to a task note.",
+      "description": "Returns a description of the attachment under `file`: its `uuid`, `filename`, `content_type`, `size` and `href`. It does not return the file's contents.",
+      "parameters": [
+        {
+          "name": "task_code",
+          "in": "path",
+          "required": true,
+          "description": "The task's `code`. A `wt_` id returns `404` on the note routes.",
+          "schema": {
+            "type": "string",
+            "example": "TASK-00012"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f"
+          }
+        },
+        {
+          "name": "file_id",
+          "in": "path",
+          "required": true,
+          "description": "The attachment's `uuid`, from the note's file list.",
+          "schema": {
+            "type": "string",
+            "example": "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The file's details, under `file`.",
+          "schema": {
+            "$ref": "#/components/schemas/TaskNoteFileResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "task_code": "TASK-00012",
+          "note_id": "6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f",
+          "file_id": "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d"
+        }
+      }
+    },
+    {
+      "key": "get_task_note",
+      "method": "GET",
+      "path": "/tasks/{task_id}/notes/{task_note_id}",
+      "slug": "retrieve-a-task-note",
+      "title": "Retrieve a task note",
+      "summary": "Retrieves one note of a task found by its code.",
+      "description": "Returns the note under `note`, with its `id` and `content`. The path takes the task's `code`; a `wt_` id returns `404`.",
+      "parameters": [
+        {
+          "name": "task_id",
+          "in": "path",
+          "required": true,
+          "description": "The task's `code`. The note routes look the task up by its code, and a `wt_` id returns `404`.",
+          "schema": {
+            "type": "string",
+            "example": "TASK-00012"
+          }
+        },
+        {
+          "name": "task_note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The note, under `note`.",
+          "schema": {
+            "$ref": "#/components/schemas/TaskNoteResponse"
+          }
+        },
+        "404": {
+          "description": "No task has that code, or the task has no note with that `id`. A `wt_` id in place of the code also returns `404`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "task_id": "TASK-00012",
+          "task_note_id": "6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f"
+        }
+      }
+    },
+    {
+      "key": "update_task_note",
+      "method": "PATCH",
+      "path": "/tasks/{task_id}/notes/{task_note_id}",
+      "slug": "update-a-task-note",
+      "title": "Update a task note",
+      "summary": "Changes the text of one task note.",
+      "description": "Send a multipart form with the new text as `note` and, optionally, a `file` to attach, as for adding a note. The path takes the task's `code`. The note comes back under `note`.",
+      "parameters": [
+        {
+          "name": "task_id",
+          "in": "path",
+          "required": true,
+          "description": "The task's `code`. The note routes look the task up by its code, and a `wt_` id returns `404`.",
+          "schema": {
+            "type": "string",
+            "example": "TASK-00012"
+          }
+        },
+        {
+          "name": "task_note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "note": {
+              "type": "string",
+              "description": "The note's text, such as `<p>Call the client back.</p>`."
+            },
+            "file": {
+              "type": "string",
+              "format": "binary",
+              "description": "An optional file to attach to the note."
+            }
+          },
+          "required": [
+            "note"
+          ]
+        },
+        "example": {
+          "note": "<p>Client confirmed Monday.</p>",
+          "file": "site-visit.txt"
+        }
+      },
+      "multipart": true,
+      "responses": {
+        "200": {
+          "description": "The updated note, under `note`.",
+          "schema": {
+            "$ref": "#/components/schemas/TaskNoteResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "task_id": "TASK-00012",
+          "task_note_id": "6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f"
+        },
+        "file": "site-visit.txt",
+        "note": "<p>Client confirmed Monday.</p>"
+      }
+    }
+  ],
+  "schemas": {
+    "TaskView": {
+      "type": "object",
+      "properties": {
+        "activity_logs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/TaskViewActivityLog"
+          }
+        },
+        "actual_hours": {
+          "type": "null"
+        },
+        "alerts": {
+          "type": "array"
+        },
+        "assignees": {
+          "$ref": "#/components/schemas/TaskViewAssignees"
+        },
+        "checklist": {
+          "type": [
+            "array",
+            "object"
+          ],
+          "description": "The checklist items: an array on the task and on the checklist list, and a single item object when you retrieve one checklist item."
+        },
+        "code": {
+          "type": "string"
+        },
+        "completed_at": {
+          "type": "string"
+        },
+        "completed_by": {
+          "$ref": "#/components/schemas/TaskViewCompletedBy"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/TaskViewCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "custom_attributes": {
+          "type": "array"
+        },
+        "description": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "due_date": {
+          "type": "string"
+        },
+        "estimated_hours": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/TaskViewLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "milestone": {
+          "type": "null"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "parent_task": {
+          "type": "null"
+        },
+        "priority": {
+          "type": "string"
+        },
+        "resource": {
+          "type": "null"
+        },
+        "sort_order": {
+          "type": "integer"
+        },
+        "start_after": {
+          "type": "null"
+        },
+        "start_date": {
+          "type": "string"
+        },
+        "state": {
+          "type": "null"
+        },
+        "status": {
+          "type": "string"
+        },
+        "task_status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "workflow": {
+          "type": "null"
+        }
+      }
+    },
+    "TaskViewActivityLog": {
+      "type": "object",
+      "properties": {
+        "activity": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskViewAssignees": {
+      "type": "object",
+      "properties": {
+        "manually_added_account_contacts": {
+          "type": "array"
+        },
+        "selected_account_contacts": {
+          "type": "array"
+        },
+        "selected_employees": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/TaskViewAssigneesSelectedEmployee"
+          }
+        },
+        "selected_labours": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/TaskViewAssigneesSelectedLabour"
+          }
+        },
+        "selected_operators": {
+          "type": "array"
+        }
+      }
+    },
+    "TaskViewAssigneesSelectedEmployee": {
+      "type": "object",
+      "properties": {
+        "display_order": {
+          "type": "integer"
+        },
+        "email": {
+          "type": "string"
+        },
+        "employee_code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "responsibility": {
+          "type": "null"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskViewAssigneesSelectedLabour": {
+      "type": "object",
+      "properties": {
+        "display_order": {
+          "type": "integer"
+        },
+        "email": {
+          "type": "string"
+        },
+        "labour_code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "responsibility": {
+          "type": "null"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskViewCompletedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskViewCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskViewLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskViewResponse": {
+      "type": "object",
+      "properties": {
+        "work_task": {
+          "$ref": "#/components/schemas/TaskView"
+        }
+      }
+    },
+    "TaskChecklistResponse": {
+      "type": "object",
+      "properties": {
+        "work_task": {
+          "type": "object",
+          "properties": {
+            "checklist": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/TaskChecklistItem"
+              }
+            }
+          }
+        }
+      }
+    },
+    "TaskChecklistItemResponse": {
+      "type": "object",
+      "properties": {
+        "work_task": {
+          "type": "object",
+          "properties": {
+            "checklist": {
+              "$ref": "#/components/schemas/TaskChecklistItem"
+            }
+          }
+        }
+      }
+    },
+    "TaskChecklistItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskNote": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string",
+          "description": "The note's text, as sent in `note`."
+        }
+      }
+    },
+    "TaskNoteResponse": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "$ref": "#/components/schemas/TaskNote"
+        }
+      }
+    },
+    "TaskNoteFile": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "content_type": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskNoteFileList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/TaskNoteFile"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/TaskPagination"
+        }
+      }
+    },
+    "TaskNoteFileResponse": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "$ref": "#/components/schemas/TaskNoteFile"
+        }
+      }
+    },
+    "TaskList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Task"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/TaskPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "Task": {
+      "type": "object",
+      "properties": {
+        "actual_hours": {
+          "type": "null"
+        },
+        "code": {
+          "type": "string"
+        },
+        "completed_at": {
+          "type": "string"
+        },
+        "completed_by": {
+          "$ref": "#/components/schemas/TaskCompletedBy"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/TaskCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "custom_attributes": {
+          "type": "array"
+        },
+        "description": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "due_date": {
+          "type": "string"
+        },
+        "estimated_hours": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/TaskLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "milestone": {
+          "type": "null"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "parent_task": {
+          "type": "null"
+        },
+        "priority": {
+          "type": "string"
+        },
+        "resource": {
+          "type": "null"
+        },
+        "sort_order": {
+          "type": "integer"
+        },
+        "start_after": {
+          "type": "null"
+        },
+        "start_date": {
+          "type": "string"
+        },
+        "state": {
+          "type": "null"
+        },
+        "status": {
+          "type": "string"
+        },
+        "task_status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "workflow": {
+          "type": "null"
+        }
+      }
+    },
+    "TaskCompletedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Rely on this rather than on `next_cursor`, which can still hold a value on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/TaskPaginationLinks"
+        }
+      }
+    },
+    "TaskPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskNoteList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array"
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/TaskPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

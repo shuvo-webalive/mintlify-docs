@@ -1,0 +1,49 @@
+---
+title: "Tasks"
+sidebarTitle: "Overview"
+description: "Manage tasks in Exsited: create, read, update and delete tasks, their checklist items, notes and note files."
+---
+
+Tasks are units of work in Exsited, with a checklist, assignees, notes and attached files. You can create, list, retrieve, update and delete tasks, manage their checklist items, and add, read, change and remove notes and note files. This area has 18 endpoints, and all seven SDKs call every one.
+
+<Warning>
+  **Deletes in this area cannot be undone.** Deleting a task, a checklist item, a note or a note file removes it; a deleted task then returns `404`.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List tasks](/api-reference/tasks/list-tasks) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tasks` | Lists tasks, one page at a time. |
+| [Delete a task](/api-reference/tasks/delete-a-task) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/tasks/{task_id}` | Deletes a task; the response has no body. |
+| [Retrieve a task](/api-reference/tasks/retrieve-a-task) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tasks/{task_id}` | Retrieves one task, with its checklist, assignees and alerts. |
+| [Update a task](/api-reference/tasks/update-a-task) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/tasks/{task_id}` | Updates a task and returns it under `work_task`. |
+| [List a task's checklist items](/api-reference/tasks/list-a-tasks-checklist-items) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tasks/{task_id}/checklist` | Lists the checklist items of one task. |
+| [Add checklist items to a task](/api-reference/tasks/add-checklist-items-to-a-task) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/tasks/{task_id}/checklist` | Adds one or more checklist items to a task and returns the whole task. |
+| [List a task's notes](/api-reference/tasks/list-a-tasks-notes) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tasks/{task_id}/notes` | Lists the notes on one task, found by the task's code. |
+| [Add a note to a task](/api-reference/tasks/add-a-note-to-a-task) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/tasks/{task_id}/notes` | Adds a note, with an optional file, to a task found by its code. |
+| [Retrieve a checklist item](/api-reference/tasks/retrieve-a-checklist-item) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tasks/{task_id}/checklist/{task_checklist_uuid}` | Retrieves one checklist item of a task. |
+| [Delete a task note](/api-reference/tasks/delete-a-task-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/tasks/{task_id}/notes/{task_note_id}` | Deletes one note from a task found by its code. |
+| [Create a task](/api-reference/tasks/create-a-task) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/tasks` | Creates a task and returns it under `work_task`. |
+| [Delete a checklist item](/api-reference/tasks/delete-a-checklist-item) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/tasks/{task_id}/checklist/{task_checklist_uuid}` | Deletes one checklist item from a task; the response has no body. |
+| [Update a checklist item](/api-reference/tasks/update-a-checklist-item) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/tasks/{task_id}/checklist/{task_checklist_uuid}` | Changes one checklist item and returns the task. |
+| [Delete a task note file](/api-reference/tasks/delete-a-task-note-file) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/tasks/{task_code}/notes/{note_id}/files/{file_id}` | Deletes one file attached to a task note; the response has no body. |
+| [List a task note's files](/api-reference/tasks/list-a-task-notes-files) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tasks/{task_code}/notes/{note_id}/files` | Lists the files attached to one task note. |
+| [Retrieve a task note file](/api-reference/tasks/retrieve-a-task-note-file) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tasks/{task_code}/notes/{note_id}/files/{file_id}` | Retrieves the details of one file attached to a task note. |
+| [Retrieve a task note](/api-reference/tasks/retrieve-a-task-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tasks/{task_id}/notes/{task_note_id}` | Retrieves one note of a task found by its code. |
+| [Update a task note](/api-reference/tasks/update-a-task-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/tasks/{task_id}/notes/{task_note_id}` | Changes the text of one task note. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Task bodies go under `work_task`.** The create and the update wrap their fields in `work_task`, `name` is required to create, and a key the API does not know is refused.
+- **The note routes take the task's `code`, not its `wt_` id.** A `wt_` id returns `404` on every `/notes` path; the task, checklist and update calls take the `wt_` id.
+- **Checklist bodies go under `checklist`.** Adding items sends an array of `{"name": ...}`; updating one item sends a single object. Most checklist calls return the whole task under `work_task`.
+- **`checklist` changes shape.** It is an array on the task and on the checklist list, and a single object when you retrieve one checklist item.
+- **Notes are multipart forms.** Send the text as the `note` field and an optional `file`; a file's details come from its `uuid` in the note's file list, not its contents.
+- **A `COMPLETED` checklist item cannot be deleted.** The delete returns `409`.
