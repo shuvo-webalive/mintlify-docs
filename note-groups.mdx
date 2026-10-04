@@ -1,0 +1,33 @@
+---
+title: "Note groups"
+sidebarTitle: "Overview"
+description: "Create, read, update and delete note groups, and list the notes each group holds."
+---
+
+Note groups gather notes and the users who share them. You can list, create, read, update and delete groups, and list a group's notes overall or as one user sees them. This area has 7 endpoints, and all seven Exsited SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List note groups](/api-reference/note-groups/list-note-groups) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/note_groups` | Lists the note groups on your instance, one page at a time. |
+| [Create a note group](/api-reference/note-groups/create-a-note-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/note_groups` | Creates a note group and returns it. |
+| [Delete a note group](/api-reference/note-groups/delete-a-note-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/note_groups/{note_group_id}` | Deletes a note group. Nothing comes back. |
+| [Retrieve a note group](/api-reference/note-groups/retrieve-a-note-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/note_groups/{note_group_id}` | Retrieves one note group by its id. |
+| [Update a note group](/api-reference/note-groups/update-a-note-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/note_groups/{note_group_id}` | Changes a note group and returns it. |
+| [List a note group's notes](/api-reference/note-groups/list-a-note-groups-notes) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/note_groups/{note_group_id}/notes` | Lists the notes in one note group, one page at a time. |
+| [List a note group's notes for a user](/api-reference/note-groups/list-a-note-groups-notes-for-a-user) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/note_groups/{note_group_id}/notes/user/{note_user}` | Lists a note group's notes as one of its users sees them. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Writes are wrapped in `note_group`.** One group comes back under the same key.
+- **Users can be added at create time.** Send `note_users` with a `name` and an `email_address` for each.
+- **`version` counts changes.** After one update a new group reads `version` 2.
+- **A user's view of the notes takes a uuid or an email address.** A user the group does not hold returns `404`.
+- **Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.
