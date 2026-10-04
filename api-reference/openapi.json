@@ -47,6 +47,9 @@
     },
     {
       "name": "Express"
+    },
+    {
+      "name": "Usages"
     }
   ],
   "paths": {
@@ -15336,6 +15339,644 @@
           }
         }
       }
+    },
+    "/usages": {
+      "get": {
+        "tags": [
+          "Usages"
+        ],
+        "summary": "List usages",
+        "operationId": "usages_get_usages",
+        "description": "The records are under `data`, and `pagination` holds the cursor for the next page. Other fields filter as `filter_<field>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` to sort in descending order.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of usages, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/usages?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.usages.get_usages({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.usages.getUsages({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->usages->getUsages(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.usages.usages_dto.UsagesDto.UsageList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<UsageList> response = client.usages().getUsages(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Usages.GetUsagesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.usages.getUsages(queryParams: {'limit': 20});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Usages().GetUsages(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Usages"
+        ],
+        "summary": "Create usages",
+        "operationId": "usages_create_usage",
+        "description": "Send one usage as an object under `usage`, or several as a list under `usages`. `charge_item_id` is the `id` of an order line whose item is charged as `METERED`, and `charging_period` names the billing period the usage falls in. For several usages the response lists each one under `usages.success` or `usages.failed`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new usage under `usage`, or the outcome of each one under `usages`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageCreateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`usage` holds a list. Send several usages under `usages` instead.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/usages\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"usage\": {\n      \"charge_item_id\": \"6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c\",\n      \"charging_period\": \"2026-10-01-2026-10-31\",\n      \"quantity\": 1,\n      \"start_time\": \"2026-10-01T09:00:00Z\",\n      \"end_time\": \"2026-10-01T09:05:00Z\",\n      \"type\": \"INCREMENTAL\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.usages.create_usage(\n    {\n        \"usage\": {\n            \"charge_item_id\": \"6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c\",\n            \"charging_period\": \"2026-10-01-2026-10-31\",\n            \"quantity\": 1,\n            \"start_time\": \"2026-10-01T09:00:00Z\",\n            \"end_time\": \"2026-10-01T09:05:00Z\",\n            \"type\": \"INCREMENTAL\",\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.usages.createUsage({\n    usage: {\n        charge_item_id: '6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c',\n        charging_period: '2026-10-01-2026-10-31',\n        quantity: 1,\n        start_time: '2026-10-01T09:00:00Z',\n        end_time: '2026-10-01T09:05:00Z',\n        type: 'INCREMENTAL',\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->usages->createUsage([\n    'usage' => [\n        'charge_item_id' => '6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c',\n        'charging_period' => '2026-10-01-2026-10-31',\n        'quantity' => 1,\n        'start_time' => '2026-10-01T09:00:00Z',\n        'end_time' => '2026-10-01T09:05:00Z',\n        'type' => 'INCREMENTAL',\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.usages.usages_dto.UsagesDto;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<UsagesDto.Usages> response = client.usages().createUsage(\n        Map.of(\n                \"usage\", Map.of(\n                        \"charge_item_id\", \"6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c\",\n                        \"charging_period\", \"2026-10-01-2026-10-31\",\n                        \"quantity\", 1,\n                        \"start_time\", \"2026-10-01T09:00:00Z\",\n                        \"end_time\", \"2026-10-01T09:05:00Z\",\n                        \"type\", \"INCREMENTAL\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Usages.CreateUsageAsync(new Dictionary<string, object?>\n{\n    [\"usage\"] = new Dictionary<string, object?>\n    {\n        [\"charge_item_id\"] = \"6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c\",\n        [\"charging_period\"] = \"2026-10-01-2026-10-31\",\n        [\"quantity\"] = 1,\n        [\"start_time\"] = \"2026-10-01T09:00:00Z\",\n        [\"end_time\"] = \"2026-10-01T09:05:00Z\",\n        [\"type\"] = \"INCREMENTAL\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.usages.createUsage({\n  'usage': {\n    'charge_item_id': '6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c',\n    'charging_period': '2026-10-01-2026-10-31',\n    'quantity': 1,\n    'start_time': '2026-10-01T09:00:00Z',\n    'end_time': '2026-10-01T09:05:00Z',\n    'type': 'INCREMENTAL',\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Usages().CreateUsage(context.Background(), map[string]any{\n\t\"usage\": map[string]any{\n\t\t\"charge_item_id\":  \"6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c\",\n\t\t\"charging_period\": \"2026-10-01-2026-10-31\",\n\t\t\"quantity\":        1,\n\t\t\"start_time\":      \"2026-10-01T09:00:00Z\",\n\t\t\"end_time\":        \"2026-10-01T09:05:00Z\",\n\t\t\"type\":            \"INCREMENTAL\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Send one usage as an object under `usage`, or several as a list under `usages`.",
+                "properties": {
+                  "usage": {
+                    "type": "object",
+                    "properties": {
+                      "charge_item_id": {
+                        "type": "string",
+                        "description": "The `id` of the order line that bills the usage. The line's item must be charged as `METERED`."
+                      },
+                      "charging_period": {
+                        "type": "string",
+                        "description": "The billing period the usage falls in, as `<start date>-<end date>`, such as `2026-10-01-2026-10-31`."
+                      },
+                      "quantity": {
+                        "type": "number"
+                      },
+                      "start_time": {
+                        "type": "string",
+                        "description": "When the usage started, in UTC, such as `2026-10-01T09:00:00Z`."
+                      },
+                      "end_time": {
+                        "type": "string",
+                        "description": "When the usage ended, in UTC."
+                      },
+                      "type": {
+                        "type": "string",
+                        "description": "Such as `INCREMENTAL`."
+                      }
+                    }
+                  },
+                  "usages": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "charge_item_id": {
+                          "type": "string",
+                          "description": "The `id` of the order line that bills the usage. The line's item must be charged as `METERED`."
+                        },
+                        "charging_period": {
+                          "type": "string",
+                          "description": "The billing period the usage falls in, as `<start date>-<end date>`, such as `2026-10-01-2026-10-31`."
+                        },
+                        "quantity": {
+                          "type": "number"
+                        },
+                        "start_time": {
+                          "type": "string",
+                          "description": "When the usage started, in UTC, such as `2026-10-01T09:00:00Z`."
+                        },
+                        "end_time": {
+                          "type": "string",
+                          "description": "When the usage ended, in UTC."
+                        },
+                        "type": {
+                          "type": "string",
+                          "description": "Such as `INCREMENTAL`."
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "usage": {
+                  "charge_item_id": "6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c",
+                  "charging_period": "2026-10-01-2026-10-31",
+                  "quantity": 1,
+                  "start_time": "2026-10-01T09:00:00Z",
+                  "end_time": "2026-10-01T09:05:00Z",
+                  "type": "INCREMENTAL"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/usages/{usage_id}": {
+      "get": {
+        "tags": [
+          "Usages"
+        ],
+        "summary": "Retrieve a usage",
+        "operationId": "usages_get_usage",
+        "description": "Pass the usage's `id`. The response holds the quantity, the times, the charging period and the order line it is billed on, under `charge_item`.",
+        "parameters": [
+          {
+            "name": "usage_id",
+            "in": "path",
+            "required": true,
+            "description": "The usage's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The usage, under `usage`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No usage has that `id`, for example after it is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/usages/usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.usages.get_usage(\"usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.usages.getUsage('usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->usages->getUsage('usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.usages.usages_dto.UsagesDto.Usage;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Usage> response = client.usages().getUsage(\"usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Usages.GetUsageAsync(\"usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.usages.getUsage(\n  'usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Usages().GetUsage(context.Background(), \"usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Usages"
+        ],
+        "summary": "Delete a usage",
+        "operationId": "usages_delete_usage",
+        "description": "Pass the usage's `id`. A successful delete returns `204` with an empty body, and reading the usage afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "usage_id",
+            "in": "path",
+            "required": true,
+            "description": "The usage's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The usage is deleted. The body is empty."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/usages/usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.usages.delete_usage(\"usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.usages.deleteUsage('usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->usages->deleteUsage('usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.usages().deleteUsage(\"usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Usages.DeleteUsageAsync(\"usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.usages.deleteUsage(\n  'usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Usages().DeleteUsage(context.Background(), \"usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Usages"
+        ],
+        "summary": "Update a usage",
+        "operationId": "usages_update_usage",
+        "description": "Send only the fields to change under `usage`, such as `quantity`. The response holds the usage's `id` and `href` under `usage`.",
+        "parameters": [
+          {
+            "name": "usage_id",
+            "in": "path",
+            "required": true,
+            "description": "The usage's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A reference to the updated usage, under `usage`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageUpdated"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/usages/usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"usage\": {\n      \"quantity\": 5\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.usages.update_usage(\n    \"usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\", {\"usage\": {\"quantity\": 5}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.usages.updateUsage('usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b', {usage: {quantity: 5}});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->usages->updateUsage('usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b', [\n    'usage' => ['quantity' => 5],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.usages.usages_dto.UsagesDto.UsageUpdated;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<UsageUpdated> response = client.usages().updateUsage(\n        \"usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\",\n        Map.of(\"usage\", Map.of(\"quantity\", 5)));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Usages.UpdateUsageAsync(\n    \"usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\",\n    new Dictionary<string, object?>\n    {\n        [\"usage\"] = new Dictionary<string, object?>\n        {\n            [\"quantity\"] = 5,\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.usages.updateUsage(\n  'usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b',\n  {\n    'usage': {'quantity': 5},\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Usages().UpdateUsage(context.Background(), \"usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\", map[string]any{\n\t\"usage\": map[string]any{\"quantity\": 5},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "usage": {
+                    "type": "object",
+                    "properties": {
+                      "charge_item_id": {
+                        "type": "string",
+                        "description": "The `id` of the order line that bills the usage. The line's item must be charged as `METERED`."
+                      },
+                      "charging_period": {
+                        "type": "string",
+                        "description": "The billing period the usage falls in, as `<start date>-<end date>`, such as `2026-10-01-2026-10-31`."
+                      },
+                      "quantity": {
+                        "type": "number"
+                      },
+                      "start_time": {
+                        "type": "string",
+                        "description": "When the usage started, in UTC, such as `2026-10-01T09:00:00Z`."
+                      },
+                      "end_time": {
+                        "type": "string",
+                        "description": "When the usage ended, in UTC."
+                      },
+                      "type": {
+                        "type": "string",
+                        "description": "Such as `INCREMENTAL`."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "usage"
+                ]
+              },
+              "example": {
+                "usage": {
+                  "quantity": 5
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Usages"
+        ],
+        "summary": "Replace a usage",
+        "operationId": "usages_replace_usage",
+        "description": "Send the full usage under `usage`: `quantity`, `start_time`, `end_time` and `custom_attributes`. The response holds the usage's `id` and `href` under `usage`.",
+        "parameters": [
+          {
+            "name": "usage_id",
+            "in": "path",
+            "required": true,
+            "description": "The usage's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A reference to the replaced usage, under `usage`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageUpdated"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$EXSITED_BASE_URL/api/v4/usages/usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"usage\": {\n      \"quantity\": 4,\n      \"start_time\": \"2026-10-01T09:00:00Z\",\n      \"end_time\": \"2026-10-01T09:05:00Z\",\n      \"custom_attributes\": []\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.usages.replace_usage(\n    \"usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\",\n    {\n        \"usage\": {\n            \"quantity\": 4,\n            \"start_time\": \"2026-10-01T09:00:00Z\",\n            \"end_time\": \"2026-10-01T09:05:00Z\",\n            \"custom_attributes\": [],\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.usages.replaceUsage('usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b', {\n    usage: {quantity: 4, start_time: '2026-10-01T09:00:00Z', end_time: '2026-10-01T09:05:00Z', custom_attributes: []},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->usages->replaceUsage('usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b', [\n    'usage' => [\n        'quantity' => 4,\n        'start_time' => '2026-10-01T09:00:00Z',\n        'end_time' => '2026-10-01T09:05:00Z',\n        'custom_attributes' => [],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.usages.usages_dto.UsagesDto.UsageUpdated;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<UsageUpdated> response = client.usages().replaceUsage(\n        \"usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\",\n        Map.of(\n                \"usage\", Map.of(\n                        \"quantity\", 4,\n                        \"start_time\", \"2026-10-01T09:00:00Z\",\n                        \"end_time\", \"2026-10-01T09:05:00Z\",\n                        \"custom_attributes\", List.of())));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Usages.ReplaceUsageAsync(\n    \"usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\",\n    new Dictionary<string, object?>\n    {\n        [\"usage\"] = new Dictionary<string, object?>\n        {\n            [\"quantity\"] = 4,\n            [\"start_time\"] = \"2026-10-01T09:00:00Z\",\n            [\"end_time\"] = \"2026-10-01T09:05:00Z\",\n            [\"custom_attributes\"] = new List<object?>(),\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.usages.replaceUsage(\n  'usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b',\n  {\n    'usage': {\n      'quantity': 4,\n      'start_time': '2026-10-01T09:00:00Z',\n      'end_time': '2026-10-01T09:05:00Z',\n      'custom_attributes': [],\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Usages().ReplaceUsage(context.Background(), \"usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b\", map[string]any{\n\t\"usage\": map[string]any{\n\t\t\"quantity\":          4,\n\t\t\"start_time\":        \"2026-10-01T09:00:00Z\",\n\t\t\"end_time\":          \"2026-10-01T09:05:00Z\",\n\t\t\"custom_attributes\": []any{},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "usage": {
+                    "type": "object",
+                    "properties": {
+                      "quantity": {
+                        "type": "number"
+                      },
+                      "start_time": {
+                        "type": "string"
+                      },
+                      "end_time": {
+                        "type": "string"
+                      },
+                      "custom_attributes": {
+                        "type": "array",
+                        "items": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "usage"
+                ]
+              },
+              "example": {
+                "usage": {
+                  "quantity": 4,
+                  "start_time": "2026-10-01T09:00:00Z",
+                  "end_time": "2026-10-01T09:05:00Z",
+                  "custom_attributes": []
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -23693,6 +24334,357 @@
         "properties": {
           "express": {
             "$ref": "#/components/schemas/Express"
+          }
+        }
+      },
+      "UsageList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Usage"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/UsagePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "Usage": {
+        "type": "object",
+        "properties": {
+          "charge_item": {
+            "$ref": "#/components/schemas/UsageChargeItem"
+          },
+          "charging_end_date": {
+            "type": "string"
+          },
+          "charging_period": {
+            "type": "string"
+          },
+          "charging_start_date": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/UsageCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UsageCustomAttribute"
+            }
+          },
+          "end_time": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/UsageLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "source": {},
+          "start_time": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "uom": {},
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "UsageChargeItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "UsageCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "UsageCustomAttribute": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "UsageLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "UsageResponse": {
+        "type": "object",
+        "properties": {
+          "usage": {
+            "$ref": "#/components/schemas/Usage"
+          }
+        }
+      },
+      "UsageCreated": {
+        "type": "object",
+        "properties": {
+          "activity_logs": {
+            "type": "array"
+          },
+          "charge_item_name": {
+            "type": "string"
+          },
+          "charge_item_uuid": {
+            "type": "string"
+          },
+          "charge_status": {
+            "type": "string"
+          },
+          "charging_period": {
+            "type": "string"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "custom_attributes": {
+            "type": "array"
+          },
+          "end_time": {
+            "type": "string"
+          },
+          "event_id": {
+            "type": "string"
+          },
+          "failed": {
+            "type": "array"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          },
+          "success": {
+            "type": "array"
+          },
+          "type": {
+            "type": "string"
+          },
+          "uom": {
+            "type": "string"
+          },
+          "usages": {
+            "$ref": "#/components/schemas/UsageBatch"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "UsageBatch": {
+        "type": "object",
+        "properties": {
+          "activity_logs": {
+            "type": "array"
+          },
+          "failed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UsageBatchFailed"
+            }
+          },
+          "success": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UsageBatchSuccess"
+            }
+          }
+        }
+      },
+      "UsageBatchFailed": {
+        "type": "object",
+        "properties": {
+          "charge_item_id": {
+            "type": "string"
+          },
+          "charging_period": {
+            "type": "string"
+          },
+          "error": {
+            "type": "object"
+          }
+        }
+      },
+      "UsageBatchSuccess": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "UsageCreateResponse": {
+        "type": "object",
+        "properties": {
+          "usage": {
+            "$ref": "#/components/schemas/UsageCreated"
+          },
+          "usages": {
+            "$ref": "#/components/schemas/UsageBatch"
+          }
+        },
+        "description": "`usage` when one usage was sent, `usages` when several were."
+      },
+      "UsageUpdated": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/UsageUpdatedDetail"
+          }
+        }
+      },
+      "UsageUpdatedDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "UsagePagination": {
+        "type": "object",
+        "description": "Cursor paging for the listing.",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size the API applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. `false` ends the listing even when `next_cursor` is present."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Send as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "next": {
+                "type": "string"
+              },
+              "prev": {
+                "type": "string"
+              }
+            }
           }
         }
       },

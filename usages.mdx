@@ -1,0 +1,32 @@
+---
+title: "Usages"
+sidebarTitle: "Overview"
+description: "Record, list, read, change and delete the usage that Exsited bills on metered order lines."
+---
+
+A usage records how much of a metered item a customer used in a billing period, against one order line. This area records usages one at a time or several at once, and lists, reads, changes and deletes them. It has 6 endpoints, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List usages](/api-reference/usages/list-usages) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/usages` | Lists recorded usages, one page at a time. |
+| [Create usages](/api-reference/usages/create-usages) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/usages` | Records one usage, or several in one call, against a metered order line. |
+| [Retrieve a usage](/api-reference/usages/retrieve-a-usage) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/usages/{usage_id}` | Returns one usage, under `usage`. |
+| [Delete a usage](/api-reference/usages/delete-a-usage) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/usages/{usage_id}` | Deletes a usage and returns no content. |
+| [Update a usage](/api-reference/usages/update-a-usage) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/usages/{usage_id}` | Changes some of a usage's fields and returns a reference to it. |
+| [Replace a usage](/api-reference/usages/replace-a-usage) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/usages/{usage_id}` | Replaces a usage's quantity, times and custom attributes and returns a reference to it. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **A usage belongs to a metered order line.** `charge_item_id` is the `id` of an order line whose item is charged as `METERED`.
+- **`charging_period` is two dates joined by a hyphen.** It runs from the order's `order_start_date` to the day before its `next_billing_from_date`, such as `2026-10-01-2026-10-31`.
+- **One usage goes under `usage`, several under `usages`.** A list sent under `usage` returns `400`. For several, the response lists each one under `usages.success` or `usages.failed`.
+- **Updates return a reference, not the usage.** `update_usage` and `replace_usage` return the usage's `id` and `href` under `usage`; read it again for the new values.
+- **The listing pages by cursor.** Send `limit`, then pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`.
