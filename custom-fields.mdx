@@ -1,0 +1,27 @@
+---
+title: "Custom fields"
+sidebarTitle: "Overview"
+description: "List the custom fields in your Exsited settings and read one by its id."
+---
+
+Custom fields are the extra fields set up in your Exsited settings. This area has 2 read-only endpoints, one to list the custom fields and one to read a single field, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List custom fields](/api-reference/custom-fields/list-custom-fields) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/custom_fields` | Returns one page of the custom fields in your settings. |
+| [Retrieve a custom field](/api-reference/custom-fields/retrieve-a-custom-field) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/custom_fields/{custom_field_id}` | Returns one custom field, under `custom_field`. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **This area is read only.** There are no create, update or delete calls for custom fields here.
+- **A custom field id starts with `cfld_`.** Pass that `id` to read one field.
+- **One field comes back under `custom_field`.** The listing puts its records under `data`.
+- **The listing pages by cursor.** Pass `limit`, then the `next_cursor` from `pagination` as `cursor` while `has_more` is true.

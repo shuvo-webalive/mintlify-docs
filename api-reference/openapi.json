@@ -263,6 +263,9 @@
     },
     {
       "name": "Custom features"
+    },
+    {
+      "name": "Custom fields"
     }
   ],
   "paths": {
@@ -80794,6 +80797,176 @@
           }
         }
       }
+    },
+    "/settings/custom_fields": {
+      "get": {
+        "tags": [
+          "Custom fields"
+        ],
+        "summary": "List custom fields",
+        "operationId": "custom_fields_get_settings_custom_fields",
+        "description": "Lists the custom fields with each one's name, type and whether it is mandatory. Records are under `data` and paging details under `pagination`. Fields filter as `filter_<field>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` from the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "A field to sort by, such as `created_on`, or `-created_on` for newest first.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of custom fields, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomFieldList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/custom_fields?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.custom_fields.get_settings_custom_fields({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.customFields.getSettingsCustomFields({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->customFields->getSettingsCustomFields(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.custom_fields.custom_fields_dto.CustomFieldsDto.SettingsCustomFieldList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsCustomFieldList> response = client.customFields().getSettingsCustomFields(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CustomFields.GetSettingsCustomFieldsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customFields.getSettingsCustomFields(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CustomFields().GetSettingsCustomFields(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/settings/custom_fields/{custom_field_id}": {
+      "get": {
+        "tags": [
+          "Custom fields"
+        ],
+        "summary": "Retrieve a custom field",
+        "operationId": "custom_fields_get_settings_custom_field",
+        "description": "Reads a single custom field by its `cfld_` id, with its name, display name, type and status.",
+        "parameters": [
+          {
+            "name": "custom_field_id",
+            "in": "path",
+            "required": true,
+            "description": "The custom field's `id`, which starts with `cfld_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The custom field, under `custom_field`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomFieldResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/custom_fields/cfld_1e3a5c7e9b2d4f6a8c0e1b3d5f7a9c2e\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.custom_fields.get_settings_custom_field(\n    \"cfld_1e3a5c7e9b2d4f6a8c0e1b3d5f7a9c2e\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.customFields.getSettingsCustomField('cfld_1e3a5c7e9b2d4f6a8c0e1b3d5f7a9c2e');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->customFields->getSettingsCustomField('cfld_1e3a5c7e9b2d4f6a8c0e1b3d5f7a9c2e');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.custom_fields.custom_fields_dto.CustomFieldsDto.SettingsCustomField;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsCustomField> response = client.customFields().getSettingsCustomField(\n        \"cfld_1e3a5c7e9b2d4f6a8c0e1b3d5f7a9c2e\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CustomFields.GetSettingsCustomFieldAsync(\"cfld_1e3a5c7e9b2d4f6a8c0e1b3d5f7a9c2e\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customFields.getSettingsCustomField(\n  'cfld_1e3a5c7e9b2d4f6a8c0e1b3d5f7a9c2e',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CustomFields().GetSettingsCustomField(context.Background(), \"cfld_1e3a5c7e9b2d4f6a8c0e1b3d5f7a9c2e\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -122160,6 +122333,122 @@
         }
       },
       "CustomFeaturePaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "prev": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "CustomField": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "is_mandatory": {
+            "type": "boolean"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "created_by": {},
+          "last_updated_by": {},
+          "version": {
+            "type": "integer"
+          },
+          "href": {
+            "type": "string"
+          }
+        }
+      },
+      "CustomFieldResponse": {
+        "type": "object",
+        "properties": {
+          "custom_field": {
+            "$ref": "#/components/schemas/CustomField"
+          }
+        }
+      },
+      "CustomFieldList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomField"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/CustomFieldPagination"
+          }
+        }
+      },
+      "CustomFieldPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can be stale on the last page."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "prev_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "links": {
+            "$ref": "#/components/schemas/CustomFieldPaginationLinks"
+          }
+        }
+      },
+      "CustomFieldPaginationLinks": {
         "type": "object",
         "properties": {
           "next": {
