@@ -1,0 +1,62 @@
+{
+  "family": "account_emails",
+  "tag": "Account emails",
+  "slug": "account-emails",
+  "icon": "inbox",
+  "base": "/accounts/{account_id}/communications/emails",
+  "overview_description": "Delete an email from an account's email history.",
+  "intro": "An account keeps a history of the emails sent to or from it. This area deletes one email from that history; listing and reading emails are in Accounts. It has 1 endpoint, and all seven SDKs call it.",
+  "warning": null,
+  "notes": [
+    "**The email is named by its `uuid`.** List an account's emails, in Accounts, returns each email's `uuid`.",
+    "**The account is named by its `id`.** The `id` is a short code such as `W13ZGY`, not the account's `uuid`.",
+    "**A successful delete returns `200`.** Retrieve an email, in Accounts, then returns `404` for that `uuid`."
+  ],
+  "endpoints": [
+    {
+      "key": "delete_account_communications_email",
+      "method": "DELETE",
+      "path": "/accounts/{account_id}/communications/emails/{email_uuid}",
+      "slug": "delete-an-account-email",
+      "title": "Delete an account email",
+      "summary": "Deletes one email from an account's email history.",
+      "description": "Name the account by its `id` and the email by its `uuid`, as List an account's emails returns it. Returns `200`. Retrieving the email afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "account_id",
+          "in": "path",
+          "required": true,
+          "description": "The account's `id`, such as `W13ZGY`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "W13ZGY"
+          }
+        },
+        {
+          "name": "email_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The email's `uuid`, as returned by List an account's emails.",
+          "schema": {
+            "type": "string",
+            "example": "EMAIL_UUID"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The email is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "account_id": "W13ZGY",
+          "email_uuid": "EMAIL_UUID"
+        }
+      }
+    }
+  ],
+  "schemas": {}
+}
