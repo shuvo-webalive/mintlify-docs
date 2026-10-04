@@ -1,0 +1,395 @@
+{
+  "family": "accounting_codes",
+  "tag": "Accounting codes",
+  "slug": "accounting-codes",
+  "icon": "book",
+  "base": "/settings/accounting_codes",
+  "overview_description": "List, create, read, update and delete the accounting codes that carry general ledger account numbers and names.",
+  "intro": "An accounting code is a settings record that carries a general ledger account number and name and a code type such as `sales_revenue`. You can list, create, read, update and delete accounting codes. This area has 5 endpoints, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**Requests and responses wrap the record in `accounting_code`.** A create sends `{\"accounting_code\": {...}}` and a read returns the record under the same key.",
+    "**A create sets the code type with `account_code_type`.** The stored record reports the same value in `default_match_key`, such as `sales_revenue`.",
+    "**Discount profiles need a discount accounting code.** A discount profile accepts only an accounting code whose `default_match_key` is `discount`.",
+    "**Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true.",
+    "**A delete returns `204` with no body.** Reading the accounting code afterwards returns `404`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_accounting_codes",
+      "method": "GET",
+      "path": "/settings/accounting_codes",
+      "slug": "list-accounting-codes",
+      "title": "List accounting codes",
+      "summary": "Returns a page of accounting codes under `data`, with paging details under `pagination`.",
+      "description": "Lists the accounting codes on the instance. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of accounting codes, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/AccountingCodeList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_accounting_code",
+      "method": "POST",
+      "path": "/settings/accounting_codes",
+      "slug": "create-an-accounting-code",
+      "title": "Create an accounting code",
+      "summary": "Creates an accounting code and returns it under `accounting_code`.",
+      "description": "Send the new accounting code under `accounting_code`. Give it a `name`, an `account_code_type` such as `sales_revenue` and a `gl_account_number`. The stored code reports its type in `default_match_key` as well.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "accounting_code": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The code's name."
+                },
+                "account_code_type": {
+                  "type": "string",
+                  "description": "The code type, such as `sales_revenue`."
+                },
+                "gl_account_number": {
+                  "type": "string",
+                  "description": "The general ledger account number."
+                }
+              }
+            }
+          },
+          "required": [
+            "accounting_code"
+          ]
+        },
+        "example": {
+          "accounting_code": {
+            "name": "Consulting revenue",
+            "account_code_type": "sales_revenue",
+            "gl_account_number": "940215"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new accounting code, under `accounting_code`.",
+          "schema": {
+            "$ref": "#/components/schemas/AccountingCodeResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "accounting_code": {
+            "name": "Consulting revenue",
+            "account_code_type": "sales_revenue",
+            "gl_account_number": "940215"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_accounting_code",
+      "method": "GET",
+      "path": "/settings/accounting_codes/{accounting_code_id}",
+      "slug": "retrieve-an-accounting-code",
+      "title": "Retrieve an accounting code",
+      "summary": "Returns one accounting code by its `id`, under `accounting_code`.",
+      "description": "Reads the accounting code with this `id`. The `id` is the one a listing or a create returns.",
+      "parameters": [
+        {
+          "name": "accounting_code_id",
+          "in": "path",
+          "required": true,
+          "description": "The accounting code's `id`, as a listing or a create returns it.",
+          "schema": {
+            "type": "string",
+            "example": "564372d513f207a3d8437811207203c1"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The accounting code, under `accounting_code`.",
+          "schema": {
+            "$ref": "#/components/schemas/AccountingCodeResponse"
+          }
+        },
+        "404": {
+          "description": "No accounting code has that `id`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "accounting_code_id": "564372d513f207a3d8437811207203c1"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_accounting_code",
+      "method": "DELETE",
+      "path": "/settings/accounting_codes/{accounting_code_id}",
+      "slug": "delete-an-accounting-code",
+      "title": "Delete an accounting code",
+      "summary": "Deletes an accounting code. The response has no body.",
+      "description": "Deletes the accounting code with this `id`. Reading the same `id` afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "accounting_code_id",
+          "in": "path",
+          "required": true,
+          "description": "The accounting code's `id`, as a listing or a create returns it.",
+          "schema": {
+            "type": "string",
+            "example": "564372d513f207a3d8437811207203c1"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The accounting code is deleted. The response has no body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "accounting_code_id": "564372d513f207a3d8437811207203c1"
+        }
+      }
+    },
+    {
+      "key": "update_settings_accounting_code",
+      "method": "PATCH",
+      "path": "/settings/accounting_codes/{accounting_code_id}",
+      "slug": "update-an-accounting-code",
+      "title": "Update an accounting code",
+      "summary": "Changes the fields you send on an accounting code and returns it under `accounting_code`.",
+      "description": "Send the fields to change under `accounting_code`. The response holds the whole accounting code after the change.",
+      "parameters": [
+        {
+          "name": "accounting_code_id",
+          "in": "path",
+          "required": true,
+          "description": "The accounting code's `id`, as a listing or a create returns it.",
+          "schema": {
+            "type": "string",
+            "example": "564372d513f207a3d8437811207203c1"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "accounting_code": {
+              "type": "object",
+              "properties": {
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "accounting_code"
+          ]
+        },
+        "example": {
+          "accounting_code": {
+            "display_name": "Consulting revenue (AU)",
+            "description": "Revenue from consulting work"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated accounting code, under `accounting_code`.",
+          "schema": {
+            "$ref": "#/components/schemas/AccountingCodeResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "accounting_code_id": "564372d513f207a3d8437811207203c1"
+        },
+        "body": {
+          "accounting_code": {
+            "display_name": "Consulting revenue (AU)",
+            "description": "Revenue from consulting work"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "AccountingCodeList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/AccountingCode"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/AccountingCodePagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "AccountingCode": {
+      "type": "object",
+      "properties": {
+        "account_code_type": {
+          "type": "string"
+        },
+        "created_by": {
+          "description": "Null in every record read so far, so its type is not known."
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "default_match_key": {
+          "type": "string"
+        },
+        "description": {
+          "description": "Null in every record read so far, so its type is not known."
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "gl_account_name": {
+          "type": "string"
+        },
+        "gl_account_number": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "description": "Null in every record read so far, so its type is not known."
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "AccountingCodePagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass this back as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/AccountingCodePaginationLinks"
+        }
+      }
+    },
+    "AccountingCodePaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "AccountingCodeResponse": {
+      "type": "object",
+      "properties": {
+        "accounting_code": {
+          "$ref": "#/components/schemas/AccountingCode"
+        }
+      }
+    }
+  }
+}

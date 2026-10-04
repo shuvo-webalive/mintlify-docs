@@ -218,6 +218,9 @@
     },
     {
       "name": "Settings"
+    },
+    {
+      "name": "Accounting codes"
     }
   ],
   "paths": {
@@ -70563,6 +70566,459 @@
           }
         }
       }
+    },
+    "/settings/accounting_codes": {
+      "get": {
+        "tags": [
+          "Accounting codes"
+        ],
+        "summary": "List accounting codes",
+        "operationId": "accounting_codes_get_settings_accounting_codes",
+        "description": "Lists the accounting codes on the instance. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` of the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of accounting codes, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountingCodeList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/accounting_codes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.accounting_codes.get_settings_accounting_codes({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.accountingCodes.getSettingsAccountingCodes({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->accountingCodes->getSettingsAccountingCodes(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.accounting_codes.accounting_codes_dto.AccountingCodesDto.SettingsAccountingCodeList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsAccountingCodeList> response = client.accountingCodes().getSettingsAccountingCodes(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AccountingCodes.GetSettingsAccountingCodesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.accountingCodes.getSettingsAccountingCodes(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AccountingCodes().GetSettingsAccountingCodes(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Accounting codes"
+        ],
+        "summary": "Create an accounting code",
+        "operationId": "accounting_codes_create_settings_accounting_code",
+        "description": "Send the new accounting code under `accounting_code`. Give it a `name`, an `account_code_type` such as `sales_revenue` and a `gl_account_number`. The stored code reports its type in `default_match_key` as well.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new accounting code, under `accounting_code`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountingCodeResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/accounting_codes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"accounting_code\": {\n      \"name\": \"Consulting revenue\",\n      \"account_code_type\": \"sales_revenue\",\n      \"gl_account_number\": \"940215\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.accounting_codes.create_settings_accounting_code(\n    {\n        \"accounting_code\": {\n            \"name\": \"Consulting revenue\",\n            \"account_code_type\": \"sales_revenue\",\n            \"gl_account_number\": \"940215\",\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.accountingCodes.createSettingsAccountingCode({\n    accounting_code: {name: 'Consulting revenue', account_code_type: 'sales_revenue', gl_account_number: '940215'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->accountingCodes->createSettingsAccountingCode([\n    'accounting_code' => [\n        'name' => 'Consulting revenue',\n        'account_code_type' => 'sales_revenue',\n        'gl_account_number' => '940215',\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.accounting_codes.accounting_codes_dto.AccountingCodesDto.SettingsAccountingCode;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsAccountingCode> response = client.accountingCodes().createSettingsAccountingCode(\n        Map.of(\n                \"accounting_code\", Map.of(\n                        \"name\", \"Consulting revenue\",\n                        \"account_code_type\", \"sales_revenue\",\n                        \"gl_account_number\", \"940215\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AccountingCodes.CreateSettingsAccountingCodeAsync(new Dictionary<string, object?>\n{\n    [\"accounting_code\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Consulting revenue\",\n        [\"account_code_type\"] = \"sales_revenue\",\n        [\"gl_account_number\"] = \"940215\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.accountingCodes.createSettingsAccountingCode({\n  'accounting_code': {\n    'name': 'Consulting revenue',\n    'account_code_type': 'sales_revenue',\n    'gl_account_number': '940215',\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AccountingCodes().CreateSettingsAccountingCode(context.Background(), map[string]any{\n\t\"accounting_code\": map[string]any{\n\t\t\"name\":              \"Consulting revenue\",\n\t\t\"account_code_type\": \"sales_revenue\",\n\t\t\"gl_account_number\": \"940215\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "accounting_code": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The code's name."
+                      },
+                      "account_code_type": {
+                        "type": "string",
+                        "description": "The code type, such as `sales_revenue`."
+                      },
+                      "gl_account_number": {
+                        "type": "string",
+                        "description": "The general ledger account number."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "accounting_code"
+                ]
+              },
+              "example": {
+                "accounting_code": {
+                  "name": "Consulting revenue",
+                  "account_code_type": "sales_revenue",
+                  "gl_account_number": "940215"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/accounting_codes/{accounting_code_id}": {
+      "get": {
+        "tags": [
+          "Accounting codes"
+        ],
+        "summary": "Retrieve an accounting code",
+        "operationId": "accounting_codes_get_settings_accounting_code",
+        "description": "Reads the accounting code with this `id`. The `id` is the one a listing or a create returns.",
+        "parameters": [
+          {
+            "name": "accounting_code_id",
+            "in": "path",
+            "required": true,
+            "description": "The accounting code's `id`, as a listing or a create returns it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The accounting code, under `accounting_code`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountingCodeResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No accounting code has that `id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/accounting_codes/564372d513f207a3d8437811207203c1\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.accounting_codes.get_settings_accounting_code(\n    \"564372d513f207a3d8437811207203c1\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.accountingCodes.getSettingsAccountingCode('564372d513f207a3d8437811207203c1');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->accountingCodes->getSettingsAccountingCode('564372d513f207a3d8437811207203c1');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.accounting_codes.accounting_codes_dto.AccountingCodesDto.SettingsAccountingCode;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsAccountingCode> response = client.accountingCodes().getSettingsAccountingCode(\n        \"564372d513f207a3d8437811207203c1\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AccountingCodes.GetSettingsAccountingCodeAsync(\"564372d513f207a3d8437811207203c1\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.accountingCodes.getSettingsAccountingCode(\n  '564372d513f207a3d8437811207203c1',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AccountingCodes().GetSettingsAccountingCode(context.Background(), \"564372d513f207a3d8437811207203c1\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Accounting codes"
+        ],
+        "summary": "Delete an accounting code",
+        "operationId": "accounting_codes_delete_settings_accounting_code",
+        "description": "Deletes the accounting code with this `id`. Reading the same `id` afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "accounting_code_id",
+            "in": "path",
+            "required": true,
+            "description": "The accounting code's `id`, as a listing or a create returns it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The accounting code is deleted. The response has no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/accounting_codes/564372d513f207a3d8437811207203c1\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.accounting_codes.delete_settings_accounting_code(\n    \"564372d513f207a3d8437811207203c1\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.accountingCodes.deleteSettingsAccountingCode('564372d513f207a3d8437811207203c1');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->accountingCodes->deleteSettingsAccountingCode(\n    '564372d513f207a3d8437811207203c1',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.accountingCodes().deleteSettingsAccountingCode(\"564372d513f207a3d8437811207203c1\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AccountingCodes.DeleteSettingsAccountingCodeAsync(\"564372d513f207a3d8437811207203c1\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.accountingCodes.deleteSettingsAccountingCode(\n  '564372d513f207a3d8437811207203c1',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AccountingCodes().DeleteSettingsAccountingCode(context.Background(), \"564372d513f207a3d8437811207203c1\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Accounting codes"
+        ],
+        "summary": "Update an accounting code",
+        "operationId": "accounting_codes_update_settings_accounting_code",
+        "description": "Send the fields to change under `accounting_code`. The response holds the whole accounting code after the change.",
+        "parameters": [
+          {
+            "name": "accounting_code_id",
+            "in": "path",
+            "required": true,
+            "description": "The accounting code's `id`, as a listing or a create returns it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated accounting code, under `accounting_code`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountingCodeResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/accounting_codes/564372d513f207a3d8437811207203c1\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"accounting_code\": {\n      \"display_name\": \"Consulting revenue (AU)\",\n      \"description\": \"Revenue from consulting work\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.accounting_codes.update_settings_accounting_code(\n    \"564372d513f207a3d8437811207203c1\",\n    {\n        \"accounting_code\": {\n            \"display_name\": \"Consulting revenue (AU)\",\n            \"description\": \"Revenue from consulting work\",\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.accountingCodes.updateSettingsAccountingCode('564372d513f207a3d8437811207203c1', {\n    accounting_code: {display_name: 'Consulting revenue (AU)', description: 'Revenue from consulting work'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->accountingCodes->updateSettingsAccountingCode(\n    '564372d513f207a3d8437811207203c1',\n    [\n        'accounting_code' => [\n            'display_name' => 'Consulting revenue (AU)',\n            'description' => 'Revenue from consulting work',\n        ],\n    ],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.accounting_codes.accounting_codes_dto.AccountingCodesDto.SettingsAccountingCode;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsAccountingCode> response = client.accountingCodes().updateSettingsAccountingCode(\n        \"564372d513f207a3d8437811207203c1\",\n        Map.of(\n                \"accounting_code\", Map.of(\n                        \"display_name\", \"Consulting revenue (AU)\",\n                        \"description\", \"Revenue from consulting work\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AccountingCodes.UpdateSettingsAccountingCodeAsync(\n    \"564372d513f207a3d8437811207203c1\",\n    new Dictionary<string, object?>\n    {\n        [\"accounting_code\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Consulting revenue (AU)\",\n            [\"description\"] = \"Revenue from consulting work\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.accountingCodes.updateSettingsAccountingCode(\n  '564372d513f207a3d8437811207203c1',\n  {\n    'accounting_code': {\n      'display_name': 'Consulting revenue (AU)',\n      'description': 'Revenue from consulting work',\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AccountingCodes().UpdateSettingsAccountingCode(context.Background(), \"564372d513f207a3d8437811207203c1\", map[string]any{\n\t\"accounting_code\": map[string]any{\n\t\t\"display_name\": \"Consulting revenue (AU)\",\n\t\t\"description\":  \"Revenue from consulting work\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "accounting_code": {
+                    "type": "object",
+                    "properties": {
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "accounting_code"
+                ]
+              },
+              "example": {
+                "accounting_code": {
+                  "display_name": "Consulting revenue (AU)",
+                  "description": "Revenue from consulting work"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -109051,6 +109507,121 @@
         "properties": {
           "tax": {
             "$ref": "#/components/schemas/SettingsTaxRead"
+          }
+        }
+      },
+      "AccountingCodeList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountingCode"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/AccountingCodePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "AccountingCode": {
+        "type": "object",
+        "properties": {
+          "account_code_type": {
+            "type": "string"
+          },
+          "created_by": {
+            "description": "Null in every record read so far, so its type is not known."
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "default_match_key": {
+            "type": "string"
+          },
+          "description": {
+            "description": "Null in every record read so far, so its type is not known."
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "gl_account_name": {
+            "type": "string"
+          },
+          "gl_account_number": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "description": "Null in every record read so far, so its type is not known."
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "AccountingCodePagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass this back as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/AccountingCodePaginationLinks"
+          }
+        }
+      },
+      "AccountingCodePaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "AccountingCodeResponse": {
+        "type": "object",
+        "properties": {
+          "accounting_code": {
+            "$ref": "#/components/schemas/AccountingCode"
           }
         }
       },
