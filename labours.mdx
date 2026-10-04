@@ -4,10 +4,10 @@ sidebarTitle: "Overview"
 description: "Manage labours in Exsited: labours, labour profiles and their sessions, availability, booking windows and orders."
 ---
 
-Labours are the people or resources you book on orders, and labour profiles set their prices, sessions and availability. You can manage labours and profiles, set availability, find labours free to book and list the orders that book a labour. This area has 19 endpoints, and all seven SDKs call every one.
+Labours are the people or resources you book on orders, and labour profiles set their prices, sessions and availability. You can manage labours and profiles, set availability, find labours free to book and list the orders that book a labour. This area has 19 endpoints, each available in all seven SDKs.
 
 <Warning>
-  **A booked labour cannot be deleted, and deletes cannot be undone.** Cancel a booked labour instead; a deleted labour or labour profile then returns `404`.
+  **A booked labour cannot be deleted, and deletes cannot be undone.** To take a booked labour out of use, cancel it instead; a labour profile that a booked labour uses cannot be deleted either. After a delete, reading the labour or labour profile returns `404`. The bulk availability update (`PATCH /labour_availability`) currently returns `500`.
 </Warning>
 
 ## At a glance
@@ -42,8 +42,8 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 
 ## Things to know
 
-- **Bodies go under a wrapper key.** Labours go under `labour`, profiles under `labour_profile`, and the bulk availability update under `labours`; single records come back under `labour`, `labour_profile`, `labour_profile_session` or `labour_calendar`.
-- **A labour profile needs at least one session.** A create without `labour_profile_sessions` is refused with `400`.
+- **Requests and responses use a wrapper key.** Labours go under `labour`, profiles under `labour_profile`, and the bulk availability update under `labours`; single records come back under `labour`, `labour_profile`, `labour_profile_session` or `labour_calendar`.
+- **A new labour profile needs at least one session.** A create without `labour_profile_sessions` is refused with `400`.
 - **A labour names its profile by `name`.** Send the profile's `name` as `labour.labour_profile` when you create a labour.
 - **Cancel and reactivate take an empty JSON object.** Cancel sets `status` to `inactive`, reactivate sets it to `active`, and reactivating an active labour is refused.
 - **Some routes take the labour's `code`.** The orders route takes the `code`, the calendar takes the `id` or the `code`, and the other labour routes take the `id`.
