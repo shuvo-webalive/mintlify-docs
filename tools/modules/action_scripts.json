@@ -1,0 +1,443 @@
+{
+  "family": "action_scripts",
+  "tag": "Action scripts",
+  "slug": "action-scripts",
+  "icon": "code",
+  "base": "/action_scripts",
+  "overview_description": "Create, read, update and delete the action scripts that hold JavaScript for your automations.",
+  "intro": "Action scripts store JavaScript that your automations can run. You can list, create, read, update and delete them. This area has 5 endpoints, and all seven Exsited SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**Writes are wrapped in `action_script`.** `name` is required and unique, and one script comes back under `action_script`.",
+    "**Code is sent as a base64 `.js` file.** Put the file in `script_file`, with its contents base64 encoded in `content`. A script stored without one holds no code.",
+    "**Action script ids start with `ascr_`.**",
+    "**An update refuses unknown keys.**",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_action_scripts",
+      "method": "GET",
+      "path": "/action_scripts",
+      "slug": "list-action-scripts",
+      "title": "List action scripts",
+      "summary": "Lists the action scripts on your instance, one page at a time.",
+      "description": "Returns a page of action scripts under `data`, with cursor `pagination`. Deleted scripts are left out. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of action scripts.",
+          "schema": {
+            "$ref": "#/components/schemas/ActionScriptList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_action_script",
+      "method": "GET",
+      "path": "/action_scripts/{action_script_id}",
+      "slug": "retrieve-an-action-script",
+      "title": "Retrieve an action script",
+      "summary": "Retrieves one action script by its `ascr_` id.",
+      "description": "Returns the action script under `action_script`. A deleted script returns `404`.",
+      "parameters": [
+        {
+          "name": "action_script_id",
+          "in": "path",
+          "required": true,
+          "description": "The action script's `ascr_` id.",
+          "schema": {
+            "type": "string",
+            "example": "ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The action script, under `action_script`.",
+          "schema": {
+            "$ref": "#/components/schemas/ActionScriptResponse"
+          }
+        },
+        "404": {
+          "description": "No action script has that id, or the script is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "action_script_id": "ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b"
+        }
+      }
+    },
+    {
+      "key": "create_action_script",
+      "method": "POST",
+      "path": "/action_scripts",
+      "slug": "create-an-action-script",
+      "title": "Create an action script",
+      "summary": "Stores an action script and returns it.",
+      "description": "Send the script wrapped in `action_script`. `name` is required and must be unique. To include code, send a `.js` file as `script_file`, with its contents base64 encoded in `content`. A `display_name` left out is the `name`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "action_script": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The script's name. Must be unique."
+                },
+                "display_name": {
+                  "type": "string",
+                  "description": "Defaults to `name`."
+                },
+                "description": {
+                  "type": "string"
+                },
+                "script_file": {
+                  "type": "object",
+                  "properties": {
+                    "content": {
+                      "type": "string",
+                      "description": "The file's contents, base64 encoded."
+                    }
+                  },
+                  "description": "A `.js` file holding the script."
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          },
+          "required": [
+            "action_script"
+          ]
+        },
+        "example": {
+          "action_script": {
+            "name": "notify-account-manager",
+            "description": "Notifies the account manager."
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new action script, under `action_script`.",
+          "schema": {
+            "$ref": "#/components/schemas/ActionScriptResponse"
+          }
+        }
+      },
+      "example_call": {
+        "body": {
+          "action_script": {
+            "name": "notify-account-manager",
+            "description": "Notifies the account manager."
+          }
+        }
+      }
+    },
+    {
+      "key": "update_action_script",
+      "method": "PATCH",
+      "path": "/action_scripts/{action_script_id}",
+      "slug": "update-an-action-script",
+      "title": "Update an action script",
+      "summary": "Changes an action script and returns it.",
+      "description": "Send the fields to change wrapped in `action_script`. An unknown key is refused. The updated script comes back under `action_script`.",
+      "parameters": [
+        {
+          "name": "action_script_id",
+          "in": "path",
+          "required": true,
+          "description": "The action script's `ascr_` id.",
+          "schema": {
+            "type": "string",
+            "example": "ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "action_script": {
+              "type": "object",
+              "properties": {
+                "description": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                }
+              },
+              "description": "The fields to change. An unknown key is refused."
+            }
+          },
+          "required": [
+            "action_script"
+          ]
+        },
+        "example": {
+          "action_script": {
+            "description": "Notifies the account manager and the sales rep."
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated action script, under `action_script`.",
+          "schema": {
+            "$ref": "#/components/schemas/ActionScriptResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "action_script_id": "ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b"
+        },
+        "body": {
+          "action_script": {
+            "description": "Notifies the account manager and the sales rep."
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_action_script",
+      "method": "DELETE",
+      "path": "/action_scripts/{action_script_id}",
+      "slug": "delete-an-action-script",
+      "title": "Delete an action script",
+      "summary": "Deletes an action script. Nothing comes back.",
+      "description": "Returns `204` with no body. The script is no longer listed, and a read of it returns `404`.",
+      "parameters": [
+        {
+          "name": "action_script_id",
+          "in": "path",
+          "required": true,
+          "description": "The action script's `ascr_` id.",
+          "schema": {
+            "type": "string",
+            "example": "ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The action script is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "action_script_id": "ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "ActionScript": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The action script's `ascr_` id."
+        },
+        "status": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique across action scripts."
+        },
+        "display_name": {
+          "type": "string",
+          "description": "The `name` when none is sent."
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "object_name": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "action_name": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/ActionScriptCreatedBy"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/ActionScriptLastUpdatedBy"
+        },
+        "href": {
+          "type": "string"
+        },
+        "activity_logs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "Present on the create response only."
+        }
+      }
+    },
+    "ActionScriptResponse": {
+      "type": "object",
+      "properties": {
+        "action_script": {
+          "$ref": "#/components/schemas/ActionScript"
+        }
+      }
+    },
+    "ActionScriptList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "description": "Always `list`."
+        },
+        "url": {
+          "type": "string",
+          "description": "The path this page was read from."
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ActionScript"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ActionScriptPagination"
+        }
+      }
+    },
+    "ActionScriptCreatedBy": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "ActionScriptLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "description": "Set once the script is updated."
+    },
+    "ActionScriptPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Pass as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "links": {
+          "$ref": "#/components/schemas/ActionScriptPaginationLinks"
+        }
+      }
+    },
+    "ActionScriptPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

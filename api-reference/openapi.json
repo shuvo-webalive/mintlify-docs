@@ -206,6 +206,9 @@
     },
     {
       "name": "Alert responsibilities"
+    },
+    {
+      "name": "Action scripts"
     }
   ],
   "paths": {
@@ -61177,6 +61180,470 @@
           }
         ]
       }
+    },
+    "/action_scripts": {
+      "get": {
+        "tags": [
+          "Action scripts"
+        ],
+        "summary": "List action scripts",
+        "operationId": "action_scripts_get_action_scripts",
+        "description": "Returns a page of action scripts under `data`, with cursor `pagination`. Deleted scripts are left out. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of action scripts.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionScriptList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/action_scripts?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.action_scripts.get_action_scripts({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.actionScripts.getActionScripts({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->actionScripts->getActionScripts(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.action_scripts.action_scripts_dto.ActionScriptsDto.ActionScriptList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ActionScriptList> response = client.actionScripts().getActionScripts(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ActionScripts.GetActionScriptsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.actionScripts.getActionScripts(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ActionScripts().GetActionScripts(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Action scripts"
+        ],
+        "summary": "Create an action script",
+        "operationId": "action_scripts_create_action_script",
+        "description": "Send the script wrapped in `action_script`. `name` is required and must be unique. To include code, send a `.js` file as `script_file`, with its contents base64 encoded in `content`. A `display_name` left out is the `name`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new action script, under `action_script`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionScriptResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/action_scripts\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"action_script\": {\n      \"name\": \"notify-account-manager\",\n      \"description\": \"Notifies the account manager.\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.action_scripts.create_action_script(\n    {\n        \"action_script\": {\n            \"name\": \"notify-account-manager\",\n            \"description\": \"Notifies the account manager.\",\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.actionScripts.createActionScript({\n    action_script: {name: 'notify-account-manager', description: 'Notifies the account manager.'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->actionScripts->createActionScript([\n    'action_script' => [\n        'name' => 'notify-account-manager',\n        'description' => 'Notifies the account manager.',\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.action_scripts.action_scripts_dto.ActionScriptsDto.ActionScript;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ActionScript> response = client.actionScripts().createActionScript(\n        Map.of(\n                \"action_script\", Map.of(\n                        \"name\", \"notify-account-manager\",\n                        \"description\", \"Notifies the account manager.\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ActionScripts.CreateActionScriptAsync(new Dictionary<string, object?>\n{\n    [\"action_script\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"notify-account-manager\",\n        [\"description\"] = \"Notifies the account manager.\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.actionScripts.createActionScript({\n  'action_script': {\n    'name': 'notify-account-manager',\n    'description': 'Notifies the account manager.',\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ActionScripts().CreateActionScript(context.Background(), map[string]any{\n\t\"action_script\": map[string]any{\n\t\t\"name\":        \"notify-account-manager\",\n\t\t\"description\": \"Notifies the account manager.\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action_script": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The script's name. Must be unique."
+                      },
+                      "display_name": {
+                        "type": "string",
+                        "description": "Defaults to `name`."
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "script_file": {
+                        "type": "object",
+                        "properties": {
+                          "content": {
+                            "type": "string",
+                            "description": "The file's contents, base64 encoded."
+                          }
+                        },
+                        "description": "A `.js` file holding the script."
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ]
+                  }
+                },
+                "required": [
+                  "action_script"
+                ]
+              },
+              "example": {
+                "action_script": {
+                  "name": "notify-account-manager",
+                  "description": "Notifies the account manager."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/action_scripts/{action_script_id}": {
+      "get": {
+        "tags": [
+          "Action scripts"
+        ],
+        "summary": "Retrieve an action script",
+        "operationId": "action_scripts_get_action_script",
+        "description": "Returns the action script under `action_script`. A deleted script returns `404`.",
+        "parameters": [
+          {
+            "name": "action_script_id",
+            "in": "path",
+            "required": true,
+            "description": "The action script's `ascr_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The action script, under `action_script`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionScriptResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No action script has that id, or the script is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/action_scripts/ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.action_scripts.get_action_script(\n    \"ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.actionScripts.getActionScript('ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->actionScripts->getActionScript('ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.action_scripts.action_scripts_dto.ActionScriptsDto.ActionScript;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ActionScript> response = client.actionScripts().getActionScript(\"ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ActionScripts.GetActionScriptAsync(\"ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.actionScripts.getActionScript(\n  'ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ActionScripts().GetActionScript(context.Background(), \"ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Action scripts"
+        ],
+        "summary": "Update an action script",
+        "operationId": "action_scripts_update_action_script",
+        "description": "Send the fields to change wrapped in `action_script`. An unknown key is refused. The updated script comes back under `action_script`.",
+        "parameters": [
+          {
+            "name": "action_script_id",
+            "in": "path",
+            "required": true,
+            "description": "The action script's `ascr_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated action script, under `action_script`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionScriptResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/action_scripts/ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"action_script\": {\n      \"description\": \"Notifies the account manager and the sales rep.\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.action_scripts.update_action_script(\n    \"ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b\",\n    {\n        \"action_script\": {\n            \"description\": \"Notifies the account manager and the sales rep.\"\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.actionScripts.updateActionScript('ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b', {\n    action_script: {description: 'Notifies the account manager and the sales rep.'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->actionScripts->updateActionScript('ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b', [\n    'action_script' => ['description' => 'Notifies the account manager and the sales rep.'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.action_scripts.action_scripts_dto.ActionScriptsDto.ActionScript;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ActionScript> response = client.actionScripts().updateActionScript(\n        \"ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b\",\n        Map.of(\n                \"action_script\", Map.of(\n                        \"description\", \"Notifies the account manager and the sales rep.\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ActionScripts.UpdateActionScriptAsync(\n    \"ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b\",\n    new Dictionary<string, object?>\n    {\n        [\"action_script\"] = new Dictionary<string, object?>\n        {\n            [\"description\"] = \"Notifies the account manager and the sales rep.\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.actionScripts.updateActionScript(\n  'ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b',\n  {\n    'action_script': {\n      'description': 'Notifies the account manager and the sales rep.',\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ActionScripts().UpdateActionScript(context.Background(), \"ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b\", map[string]any{\n\t\"action_script\": map[string]any{\n\t\t\"description\": \"Notifies the account manager and the sales rep.\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action_script": {
+                    "type": "object",
+                    "properties": {
+                      "description": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      }
+                    },
+                    "description": "The fields to change. An unknown key is refused."
+                  }
+                },
+                "required": [
+                  "action_script"
+                ]
+              },
+              "example": {
+                "action_script": {
+                  "description": "Notifies the account manager and the sales rep."
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Action scripts"
+        ],
+        "summary": "Delete an action script",
+        "operationId": "action_scripts_delete_action_script",
+        "description": "Returns `204` with no body. The script is no longer listed, and a read of it returns `404`.",
+        "parameters": [
+          {
+            "name": "action_script_id",
+            "in": "path",
+            "required": true,
+            "description": "The action script's `ascr_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The action script is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/action_scripts/ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.action_scripts.delete_action_script(\n    \"ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.actionScripts.deleteActionScript('ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->actionScripts->deleteActionScript('ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.actionScripts().deleteActionScript(\"ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ActionScripts.DeleteActionScriptAsync(\"ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.actionScripts.deleteActionScript(\n  'ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ActionScripts().DeleteActionScript(context.Background(), \"ascr_7c9e1b3d5f2a4c6e8a0b2d4f6c8e0a1b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -95528,6 +95995,162 @@
         }
       },
       "AlertResponsibilityPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "prev": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "ActionScript": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "The action script's `ascr_` id."
+          },
+          "status": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "Unique across action scripts."
+          },
+          "display_name": {
+            "type": "string",
+            "description": "The `name` when none is sent."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "object_name": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "action_name": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/ActionScriptCreatedBy"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/ActionScriptLastUpdatedBy"
+          },
+          "href": {
+            "type": "string"
+          },
+          "activity_logs": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "Present on the create response only."
+          }
+        }
+      },
+      "ActionScriptResponse": {
+        "type": "object",
+        "properties": {
+          "action_script": {
+            "$ref": "#/components/schemas/ActionScript"
+          }
+        }
+      },
+      "ActionScriptList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "description": "Always `list`."
+          },
+          "url": {
+            "type": "string",
+            "description": "The path this page was read from."
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActionScript"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/ActionScriptPagination"
+          }
+        }
+      },
+      "ActionScriptCreatedBy": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "ActionScriptLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "description": "Set once the script is updated."
+      },
+      "ActionScriptPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "links": {
+            "$ref": "#/components/schemas/ActionScriptPaginationLinks"
+          }
+        }
+      },
+      "ActionScriptPaginationLinks": {
         "type": "object",
         "properties": {
           "next": {

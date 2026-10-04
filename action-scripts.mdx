@@ -1,0 +1,31 @@
+---
+title: "Action scripts"
+sidebarTitle: "Overview"
+description: "Create, read, update and delete the action scripts that hold JavaScript for your automations."
+---
+
+Action scripts store JavaScript that your automations can run. You can list, create, read, update and delete them. This area has 5 endpoints, and all seven Exsited SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List action scripts](/api-reference/action-scripts/list-action-scripts) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/action_scripts` | Lists the action scripts on your instance, one page at a time. |
+| [Retrieve an action script](/api-reference/action-scripts/retrieve-an-action-script) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/action_scripts/{action_script_id}` | Retrieves one action script by its `ascr_` id. |
+| [Create an action script](/api-reference/action-scripts/create-an-action-script) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/action_scripts` | Stores an action script and returns it. |
+| [Update an action script](/api-reference/action-scripts/update-an-action-script) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/action_scripts/{action_script_id}` | Changes an action script and returns it. |
+| [Delete an action script](/api-reference/action-scripts/delete-an-action-script) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/action_scripts/{action_script_id}` | Deletes an action script. Nothing comes back. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Writes are wrapped in `action_script`.** `name` is required and unique, and one script comes back under `action_script`.
+- **Code is sent as a base64 `.js` file.** Put the file in `script_file`, with its contents base64 encoded in `content`. A script stored without one holds no code.
+- **Action script ids start with `ascr_`.**
+- **An update refuses unknown keys.**
+- **Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.
