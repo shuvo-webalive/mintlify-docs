@@ -1,0 +1,198 @@
+{
+  "family": "organisation",
+  "tag": "Organisation",
+  "slug": "organisation",
+  "icon": "building",
+  "base": "/settings/organisation",
+  "overview_description": "Read the root organisation of your Exsited instance, with its name, type, contact and address fields.",
+  "intro": "The organisation endpoint reads the root organisation of your Exsited instance: its name, type, contact and address fields. The root organisation is read only. This area has 1 endpoint, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**The response sits under `organization`, spelled with a z.**",
+    "**The root organisation is read only.** A `PATCH` to `/settings/organisation` returns `405`.",
+    "**The root's `type` is `root`, and it names itself as its `parent_organization`.**",
+    "**Child organisations are a separate area.** They are listed under `/settings/organisations`, and the root is never among them."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_organisation",
+      "method": "GET",
+      "path": "/settings/organisation",
+      "slug": "retrieve-the-root-organisation",
+      "title": "Retrieve the root organisation",
+      "summary": "Returns the root organisation of your instance under `organization`.",
+      "description": "The response holds the root organisation under `organization`, spelled with a z: its name, status, type, contact and address fields, and its `parent_organization`. The root's `type` is `root`, and it names itself as its parent. This record is read only.",
+      "parameters": [],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The root organisation, under `organization`.",
+          "schema": {
+            "$ref": "#/components/schemas/OrganisationResponse"
+          }
+        }
+      },
+      "example_call": {}
+    }
+  ],
+  "schemas": {
+    "OrganisationResponse": {
+      "type": "object",
+      "properties": {
+        "organization": {
+          "$ref": "#/components/schemas/Organisation"
+        }
+      }
+    },
+    "Organisation": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "description": "`root` for the root organisation."
+        },
+        "description": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "email": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "phone": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "phone_country_code": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "phone_area_code": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "fax": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "fax_country_code": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "fax_area_code": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "mobile": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "mobile_country_code": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "mobile_area_code": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "website": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "address_line1": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "address_line2": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "address_line3": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "address_line4": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "address_line5": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "city": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "state": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "post_code": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "parent_organization": {
+          "$ref": "#/components/schemas/OrganisationParent"
+        },
+        "nodes": {
+          "type": "array",
+          "description": "Empty for the root organisation."
+        },
+        "details": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "created_by": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "last_updated_by": {
+          "type": "null",
+          "description": "Returned as `null`."
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "OrganisationParent": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

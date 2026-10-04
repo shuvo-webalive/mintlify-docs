@@ -287,6 +287,9 @@
     },
     {
       "name": "Applications"
+    },
+    {
+      "name": "Organisation"
     }
   ],
   "paths": {
@@ -84349,6 +84352,71 @@
           }
         }
       }
+    },
+    "/settings/organisation": {
+      "get": {
+        "tags": [
+          "Organisation"
+        ],
+        "summary": "Retrieve the root organisation",
+        "operationId": "organisation_get_settings_organisation",
+        "description": "The response holds the root organisation under `organization`, spelled with a z: its name, status, type, contact and address fields, and its `parent_organization`. The root's `type` is `root`, and it names itself as its parent. This record is read only.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The root organisation, under `organization`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganisationResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/organisation\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.organisation.get_settings_organisation()\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.organisation.getSettingsOrganisation();\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->organisation->getSettingsOrganisation();\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.organisation.organisation_dto.OrganisationDto.SettingsOrganisation;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsOrganisation> response = client.organisation().getSettingsOrganisation();\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Organisation.GetSettingsOrganisationAsync();\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.organisation.getSettingsOrganisation();\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Organisation().GetSettingsOrganisation(context.Background(), nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -126745,6 +126813,163 @@
             "type": "string"
           },
           "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "OrganisationResponse": {
+        "type": "object",
+        "properties": {
+          "organization": {
+            "$ref": "#/components/schemas/Organisation"
+          }
+        }
+      },
+      "Organisation": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "description": "`root` for the root organisation."
+          },
+          "description": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "email": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "phone": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "phone_country_code": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "phone_area_code": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "fax": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "fax_country_code": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "fax_area_code": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "mobile": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "mobile_country_code": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "mobile_area_code": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "website": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "address_line1": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "address_line2": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "address_line3": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "address_line4": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "address_line5": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "city": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "state": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "post_code": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "parent_organization": {
+            "$ref": "#/components/schemas/OrganisationParent"
+          },
+          "nodes": {
+            "type": "array",
+            "description": "Empty for the root organisation."
+          },
+          "details": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "created_by": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "last_updated_by": {
+            "type": "null",
+            "description": "Returned as `null`."
+          },
+          "href": {
+            "type": "string"
+          }
+        }
+      },
+      "OrganisationParent": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "href": {
             "type": "string"
           }
         }
