@@ -1,0 +1,421 @@
+{
+  "family": "email_templates",
+  "tag": "Email templates",
+  "slug": "email-templates",
+  "icon": "paper-plane",
+  "base": "/settings/email_templates",
+  "overview_description": "List, create, read, update and delete the email templates shared across the instance.",
+  "intro": "Email templates are the shared settings records for outgoing email, each with a name and a subject. You can list, create, read, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**`name` is required on a create.** Send it, and usually a `subject`, under `email_template`.",
+    "**`cc` and `bcc` are lists of addresses.** Send each as an array of strings, not one comma separated string.",
+    "**An email template `id` starts with `et_`.**",
+    "**Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true.",
+    "**A delete returns `204` with no body.** Reading the email template afterwards returns `404`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_email_templates",
+      "method": "GET",
+      "path": "/settings/email_templates",
+      "slug": "list-email-templates",
+      "title": "List email templates",
+      "summary": "Returns a page of email templates under `data`, with paging details under `pagination`.",
+      "description": "Lists the email templates shared across the instance. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of email templates, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/EmailTemplateList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_email_template",
+      "method": "POST",
+      "path": "/settings/email_templates",
+      "slug": "create-an-email-template",
+      "title": "Create an email template",
+      "summary": "Creates an email template and returns it under `email_template`.",
+      "description": "Send the new email template under `email_template`. `name` is required, and `cc` and `bcc` are lists of addresses.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "email_template": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The template's name."
+                },
+                "subject": {
+                  "type": "string",
+                  "description": "The email subject."
+                },
+                "cc": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Addresses to copy."
+                },
+                "bcc": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Addresses to blind copy."
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          },
+          "required": [
+            "email_template"
+          ]
+        },
+        "example": {
+          "email_template": {
+            "name": "Welcome email",
+            "subject": "Welcome to Acme Pty Ltd"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new email template, under `email_template`.",
+          "schema": {
+            "$ref": "#/components/schemas/EmailTemplateResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "email_template": {
+            "name": "Welcome email",
+            "subject": "Welcome to Acme Pty Ltd"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_email_template",
+      "method": "GET",
+      "path": "/settings/email_templates/{email_template_id}",
+      "slug": "retrieve-an-email-template",
+      "title": "Retrieve an email template",
+      "summary": "Returns one email template by its `id`, under `email_template`.",
+      "description": "Reads the email template with this `et_` `id`. The `id` is the one a listing or a create returns.",
+      "parameters": [
+        {
+          "name": "email_template_id",
+          "in": "path",
+          "required": true,
+          "description": "The email template's `et_` `id`, as a listing or a create returns it.",
+          "schema": {
+            "type": "string",
+            "example": "et_696cf59198fff877f4d13748cb882360"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The email template, under `email_template`.",
+          "schema": {
+            "$ref": "#/components/schemas/EmailTemplateResponse"
+          }
+        },
+        "404": {
+          "description": "No email template has that `id`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "email_template_id": "et_696cf59198fff877f4d13748cb882360"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_email_template",
+      "method": "DELETE",
+      "path": "/settings/email_templates/{email_template_id}",
+      "slug": "delete-an-email-template",
+      "title": "Delete an email template",
+      "summary": "Deletes an email template. The response has no body.",
+      "description": "Deletes the email template with this `id`. Reading the same `id` afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "email_template_id",
+          "in": "path",
+          "required": true,
+          "description": "The email template's `et_` `id`, as a listing or a create returns it.",
+          "schema": {
+            "type": "string",
+            "example": "et_696cf59198fff877f4d13748cb882360"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The email template is deleted. The response has no body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "email_template_id": "et_696cf59198fff877f4d13748cb882360"
+        }
+      }
+    },
+    {
+      "key": "update_settings_email_template",
+      "method": "PATCH",
+      "path": "/settings/email_templates/{email_template_id}",
+      "slug": "update-an-email-template",
+      "title": "Update an email template",
+      "summary": "Changes the fields you send on an email template and returns it under `email_template`.",
+      "description": "Send the fields to change under `email_template`. You can change its fields or its content.",
+      "parameters": [
+        {
+          "name": "email_template_id",
+          "in": "path",
+          "required": true,
+          "description": "The email template's `et_` `id`, as a listing or a create returns it.",
+          "schema": {
+            "type": "string",
+            "example": "et_696cf59198fff877f4d13748cb882360"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "email_template": {
+              "type": "object",
+              "properties": {
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "email_template"
+          ]
+        },
+        "example": {
+          "email_template": {
+            "display_name": "Welcome email (AU)",
+            "description": "Sent to new customers"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated email template, under `email_template`.",
+          "schema": {
+            "$ref": "#/components/schemas/EmailTemplateResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "email_template_id": "et_696cf59198fff877f4d13748cb882360"
+        },
+        "body": {
+          "email_template": {
+            "display_name": "Welcome email (AU)",
+            "description": "Sent to new customers"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "EmailTemplateList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/EmailTemplate"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/EmailTemplatePagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "EmailTemplate": {
+      "type": "object",
+      "properties": {
+        "created_by": {
+          "description": "Null in every record read so far, so its type is not known."
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "entity": {
+          "description": "Null in every record read so far, so its type is not known."
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "is_edited": {
+          "type": "boolean"
+        },
+        "is_system_template": {
+          "type": "boolean"
+        },
+        "last_updated_by": {
+          "description": "Null in every record read so far, so its type is not known."
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "reply_address": {
+          "description": "Null in every record read so far, so its type is not known."
+        },
+        "rich_editor": {
+          "type": "boolean"
+        },
+        "sender_address": {
+          "description": "Null in every record read so far, so its type is not known."
+        },
+        "sender_name": {
+          "description": "Null in every record read so far, so its type is not known."
+        },
+        "status": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "track_email_open": {
+          "type": "boolean"
+        },
+        "track_link_click": {
+          "type": "boolean"
+        }
+      }
+    },
+    "EmailTemplatePagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass this back as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/EmailTemplatePaginationLinks"
+        }
+      }
+    },
+    "EmailTemplatePaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "EmailTemplateResponse": {
+      "type": "object",
+      "properties": {
+        "email_template": {
+          "$ref": "#/components/schemas/EmailTemplate"
+        }
+      }
+    }
+  }
+}
