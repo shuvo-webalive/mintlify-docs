@@ -9,11 +9,11 @@
   "warning": null,
   "notes": [
     "**Every write sends its fields under `custom_attribute`.** The create and update bodies wrap the fields in `custom_attribute`, and one attribute comes back under the same key.",
-    "**A create needs `name`, `display_name` and `type`.** Those are the fields the create example sends; `type` takes values such as `STRING`, `NUMBER` and `DROPDOWN`.",
+    "**A create sends `name`, `display_name` and `type`.** `type` takes values such as `STRING`, `NUMBER` and `DROPDOWN`.",
     "**Dropdown options go in as strings and come back as objects.** Send `options` as a list of strings; the response lists each option as an object with `name` and `display_order`.",
-    "**A create returns 201 with two extra fields.** The created attribute also carries `uuid` and `activity_logs`.",
-    "**The listing pages by cursor.** Pass `limit`, then the `next_cursor` from `pagination` as `cursor` while `has_more` is true.",
-    "**A delete returns 204 with no body.** Reading the attribute afterwards returns 404."
+    "**A create returns `201` with two extra fields.** The created attribute also carries `uuid` and `activity_logs`.",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.",
+    "**A delete returns `204` with no body.** Reading the attribute afterwards returns `404`."
   ],
   "endpoints": [
     {
@@ -22,7 +22,7 @@
       "path": "/custom_attributes",
       "slug": "list-custom-attributes",
       "title": "List custom attributes",
-      "summary": "Returns one page of the custom attributes defined on your Exsited account.",
+      "summary": "Returns one page of the custom attributes you have defined.",
       "description": "Lists the custom attributes with each one's type, options and the records it is used in. Records are under `data` and paging details under `pagination`. Fields filter as `filter_<field>`.",
       "parameters": [
         {
@@ -152,7 +152,7 @@
       "slug": "delete-a-custom-attribute",
       "title": "Delete a custom attribute",
       "summary": "Deletes a custom attribute and returns no body.",
-      "description": "Removes the custom attribute with this `id`. A successful call returns 204 with an empty body, and reading the attribute afterwards returns 404.",
+      "description": "Removes the custom attribute with this `id`. A successful call returns `204` with an empty body, and reading the attribute afterwards returns `404`.",
       "parameters": [
         {
           "name": "custom_attribute_id",

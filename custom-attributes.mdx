@@ -10,7 +10,7 @@ Custom attributes are fields you define yourself, such as a text, number or drop
 
 | Endpoint | Method | Path | What it does |
 | --- | --- | --- | --- |
-| [List custom attributes](/api-reference/custom-attributes/list-custom-attributes) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/custom_attributes` | Returns one page of the custom attributes defined on your Exsited account. |
+| [List custom attributes](/api-reference/custom-attributes/list-custom-attributes) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/custom_attributes` | Returns one page of the custom attributes you have defined. |
 | [Create a custom attribute](/api-reference/custom-attributes/create-a-custom-attribute) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/custom_attributes` | Creates a custom attribute and returns it, under `custom_attribute`. |
 | [Delete a custom attribute](/api-reference/custom-attributes/delete-a-custom-attribute) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `/custom_attributes/{custom_attribute_id}` | Deletes a custom attribute and returns no body. |
 | [Retrieve a custom attribute](/api-reference/custom-attributes/retrieve-a-custom-attribute) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/custom_attributes/{custom_attribute_id}` | Returns one custom attribute, under `custom_attribute`. |
@@ -25,8 +25,8 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 ## Things to know
 
 - **Every write sends its fields under `custom_attribute`.** The create and update bodies wrap the fields in `custom_attribute`, and one attribute comes back under the same key.
-- **A create needs `name`, `display_name` and `type`.** Those are the fields the create example sends; `type` takes values such as `STRING`, `NUMBER` and `DROPDOWN`.
+- **A create sends `name`, `display_name` and `type`.** `type` takes values such as `STRING`, `NUMBER` and `DROPDOWN`.
 - **Dropdown options go in as strings and come back as objects.** Send `options` as a list of strings; the response lists each option as an object with `name` and `display_order`.
-- **A create returns 201 with two extra fields.** The created attribute also carries `uuid` and `activity_logs`.
-- **The listing pages by cursor.** Pass `limit`, then the `next_cursor` from `pagination` as `cursor` while `has_more` is true.
-- **A delete returns 204 with no body.** Reading the attribute afterwards returns 404.
+- **A create returns `201` with two extra fields.** The created attribute also carries `uuid` and `activity_logs`.
+- **Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.
+- **A delete returns `204` with no body.** Reading the attribute afterwards returns `404`.
