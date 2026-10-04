@@ -173,6 +173,9 @@
     },
     {
       "name": "Time periods"
+    },
+    {
+      "name": "Workflows"
     }
   ],
   "paths": {
@@ -53963,6 +53966,82 @@
             "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Milestones().GetMilestone(context.Background(), \"wfm_9f8e7d6c5b4a43219f8e7d6c5b4a3210\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
           }
         ]
+      },
+      "delete": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "Delete a milestone",
+        "operationId": "workflows_delete_milestone",
+        "description": "Returns `204` with no body. A milestone id that does not exist returns `404` with the code `resource_not_found`.",
+        "parameters": [
+          {
+            "name": "milestone_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The milestone's id: its `wfm_` id or its raw uuid.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The milestone is deleted."
+          },
+          "404": {
+            "description": "No milestone has that id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/milestones/4c8e2a6d-1b3f-4d5e-9a7c-0e2f4b6d8a1c\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.workflows.delete_milestone(\"4c8e2a6d-1b3f-4d5e-9a7c-0e2f4b6d8a1c\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.workflows.deleteMilestone('4c8e2a6d-1b3f-4d5e-9a7c-0e2f4b6d8a1c');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->workflows->deleteMilestone('4c8e2a6d-1b3f-4d5e-9a7c-0e2f4b6d8a1c');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.workflows().deleteMilestone(\"4c8e2a6d-1b3f-4d5e-9a7c-0e2f4b6d8a1c\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Workflows.DeleteMilestoneAsync(\"4c8e2a6d-1b3f-4d5e-9a7c-0e2f4b6d8a1c\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.workflows.deleteMilestone(\n  '4c8e2a6d-1b3f-4d5e-9a7c-0e2f4b6d8a1c',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Workflows().DeleteMilestone(context.Background(), \"4c8e2a6d-1b3f-4d5e-9a7c-0e2f4b6d8a1c\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
       }
     },
     "/employees": {
@@ -55979,6 +56058,1326 @@
             }
           }
         }
+      }
+    },
+    "/workflows": {
+      "get": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "List workflows",
+        "operationId": "workflows_get_workflows",
+        "description": "Returns a page of workflows under `data`, with cursor `pagination`. A deleted workflow is not listed. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of workflows.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/workflows?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.workflows.get_workflows({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.workflows.getWorkflows({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->workflows->getWorkflows(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.workflows.workflows_dto.WorkflowsDto.WorkflowList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<WorkflowList> response = client.workflows().getWorkflows(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Workflows.GetWorkflowsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.workflows.getWorkflows(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Workflows().GetWorkflows(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "Create a workflow",
+        "operationId": "workflows_create_workflow",
+        "description": "Send the workflow wrapped in `workflow`. `name` is required, and a key the API does not read is refused. The new workflow starts with the status `draft` and comes back under `workflow`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new workflow, under `workflow`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/workflows\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"workflow\": {\n      \"name\": \"Account onboarding\",\n      \"entity\": \"account\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.workflows.create_workflow(\n    {\"workflow\": {\"name\": \"Account onboarding\", \"entity\": \"account\"}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.workflows.createWorkflow({workflow: {name: 'Account onboarding', entity: 'account'}});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->workflows->createWorkflow([\n    'workflow' => ['name' => 'Account onboarding', 'entity' => 'account'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.workflows.workflows_dto.WorkflowsDto.WorkflowView;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<WorkflowView> response = client.workflows().createWorkflow(\n        Map.of(\"workflow\", Map.of(\"name\", \"Account onboarding\", \"entity\", \"account\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Workflows.CreateWorkflowAsync(new Dictionary<string, object?>\n{\n    [\"workflow\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Account onboarding\",\n        [\"entity\"] = \"account\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.workflows.createWorkflow({\n  'workflow': {'name': 'Account onboarding', 'entity': 'account'},\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Workflows().CreateWorkflow(context.Background(), map[string]any{\n\t\"workflow\": map[string]any{\n\t\t\"name\":   \"Account onboarding\",\n\t\t\"entity\": \"account\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "workflow": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The workflow's name."
+                      },
+                      "entity": {
+                        "type": "string",
+                        "description": "The entity the workflow belongs to, such as `account`."
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ],
+                    "description": "The new workflow. Keys the API does not read are refused."
+                  }
+                },
+                "required": [
+                  "workflow"
+                ]
+              },
+              "example": {
+                "workflow": {
+                  "name": "Account onboarding",
+                  "entity": "account"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workflows/{workflow_id}": {
+      "get": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "Retrieve a workflow",
+        "operationId": "workflows_get_workflow",
+        "description": "Returns the workflow under `workflow`. A deleted workflow returns `404`.",
+        "parameters": [
+          {
+            "name": "workflow_id",
+            "in": "path",
+            "required": true,
+            "description": "The workflow's `wf_` id, or its `code`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The workflow, under `workflow`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No workflow has that id or code, or the workflow is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/workflows/wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.workflows.get_workflow(\"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.workflows.getWorkflow('wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->workflows->getWorkflow('wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.workflows.workflows_dto.WorkflowsDto.WorkflowView;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<WorkflowView> response = client.workflows().getWorkflow(\"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Workflows.GetWorkflowAsync(\"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.workflows.getWorkflow(\n  'wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Workflows().GetWorkflow(context.Background(), \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "Update a workflow",
+        "operationId": "workflows_update_workflow",
+        "description": "Send the fields to change wrapped in `workflow`. A draft can move to active, and an active workflow can move to inactive and back. The updated workflow comes back under `workflow`.",
+        "parameters": [
+          {
+            "name": "workflow_id",
+            "in": "path",
+            "required": true,
+            "description": "The workflow's `wf_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated workflow, under `workflow`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/workflows/wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"workflow\": {\n      \"display_name\": \"Account onboarding (revised)\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.workflows.update_workflow(\n    \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\",\n    {\"workflow\": {\"display_name\": \"Account onboarding (revised)\"}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.workflows.updateWorkflow('wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b', {\n    workflow: {display_name: 'Account onboarding (revised)'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->workflows->updateWorkflow('wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b', [\n    'workflow' => ['display_name' => 'Account onboarding (revised)'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.workflows.workflows_dto.WorkflowsDto.WorkflowView;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<WorkflowView> response = client.workflows().updateWorkflow(\n        \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\",\n        Map.of(\"workflow\", Map.of(\"display_name\", \"Account onboarding (revised)\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Workflows.UpdateWorkflowAsync(\n    \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\",\n    new Dictionary<string, object?>\n    {\n        [\"workflow\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Account onboarding (revised)\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.workflows.updateWorkflow(\n  'wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b',\n  {\n    'workflow': {'display_name': 'Account onboarding (revised)'},\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Workflows().UpdateWorkflow(context.Background(), \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\", map[string]any{\n\t\"workflow\": map[string]any{\n\t\t\"display_name\": \"Account onboarding (revised)\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "workflow": {
+                    "type": "object",
+                    "properties": {
+                      "display_name": {
+                        "type": "string",
+                        "description": "The name shown for the workflow."
+                      },
+                      "status": {
+                        "type": "string",
+                        "description": "The status to move to. A draft can become active, and active and inactive can switch."
+                      }
+                    },
+                    "description": "The fields to change."
+                  }
+                },
+                "required": [
+                  "workflow"
+                ]
+              },
+              "example": {
+                "workflow": {
+                  "display_name": "Account onboarding (revised)"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "Delete a workflow",
+        "operationId": "workflows_delete_workflow",
+        "description": "Returns `204` with no body. The workflow is marked deleted, is no longer listed, and a read of it returns `404`. A pre-built workflow cannot be deleted.",
+        "parameters": [
+          {
+            "name": "workflow_id",
+            "in": "path",
+            "required": true,
+            "description": "The workflow's `wf_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The workflow is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/workflows/wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.workflows.delete_workflow(\"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.workflows.deleteWorkflow('wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->workflows->deleteWorkflow('wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.workflows().deleteWorkflow(\"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Workflows.DeleteWorkflowAsync(\"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.workflows.deleteWorkflow(\n  'wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Workflows().DeleteWorkflow(context.Background(), \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/workflows/{workflow_id}/stages": {
+      "get": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "List a workflow's stages",
+        "operationId": "workflows_get_workflow_stages",
+        "description": "Returns a page of the workflow's stages under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+        "parameters": [
+          {
+            "name": "workflow_id",
+            "in": "path",
+            "required": true,
+            "description": "The workflow's `wf_` id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of the workflow's stages.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowStageList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/workflows/wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b/stages?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.workflows.get_workflow_stages(\n    \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.workflows.getWorkflowStages('wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->workflows->getWorkflowStages('wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b', [\n    'limit' => 20,\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.workflows().getWorkflowStages(\n        \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Workflows.GetWorkflowStagesAsync(\n    \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.workflows.getWorkflowStages(\n  'wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Workflows().GetWorkflowStages(context.Background(), \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/workflows/{workflow_id}/stages/{stage_id}": {
+      "get": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "Retrieve a workflow stage",
+        "operationId": "workflows_get_workflow_stage",
+        "description": "Returns the stage under `workflow_stage`. A stage id the workflow does not hold returns `404` with the code `resource_not_found`.",
+        "parameters": [
+          {
+            "name": "workflow_id",
+            "in": "path",
+            "required": true,
+            "description": "The workflow's `wf_` id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "stage_id",
+            "in": "path",
+            "required": true,
+            "description": "The stage's `wfs_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The stage, under `workflow_stage`."
+          },
+          "404": {
+            "description": "No stage has that id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/workflows/wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b/stages/wfs_2b7e4d1c9a8f4e3b8c6d5a4f3e2d1c0b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.workflows.get_workflow_stage(\n    \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\", \"wfs_2b7e4d1c9a8f4e3b8c6d5a4f3e2d1c0b\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.workflows.getWorkflowStage(\n    'wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b',\n    'wfs_2b7e4d1c9a8f4e3b8c6d5a4f3e2d1c0b',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->workflows->getWorkflowStage(\n    'wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b',\n    'wfs_2b7e4d1c9a8f4e3b8c6d5a4f3e2d1c0b',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.workflows().getWorkflowStage(\n        \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\",\n        \"wfs_2b7e4d1c9a8f4e3b8c6d5a4f3e2d1c0b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Workflows.GetWorkflowStageAsync(\n    \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\",\n    \"wfs_2b7e4d1c9a8f4e3b8c6d5a4f3e2d1c0b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.workflows.getWorkflowStage(\n  'wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b',\n  'wfs_2b7e4d1c9a8f4e3b8c6d5a4f3e2d1c0b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Workflows().GetWorkflowStage(context.Background(), \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\", \"wfs_2b7e4d1c9a8f4e3b8c6d5a4f3e2d1c0b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/workflows/{workflow_uuid}/milestones": {
+      "get": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "List a workflow's milestones",
+        "operationId": "workflows_get_workflow_milestones",
+        "description": "Returns a page of the workflow's milestones under `data`, with cursor `pagination`. The `workflow_uuid` slot takes the workflow's `wf_` id. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+        "parameters": [
+          {
+            "name": "workflow_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The workflow's `wf_` id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of the workflow's milestones.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowMilestoneList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/workflows/wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b/milestones?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.workflows.get_workflow_milestones(\n    \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.workflows.getWorkflowMilestones('wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->workflows->getWorkflowMilestones('wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b', [\n    'limit' => 20,\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.workflows.workflows_dto.WorkflowsDto.WorkflowMilestoneList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<WorkflowMilestoneList> response = client.workflows().getWorkflowMilestones(\n        \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Workflows.GetWorkflowMilestonesAsync(\n    \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.workflows.getWorkflowMilestones(\n  'wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Workflows().GetWorkflowMilestones(context.Background(), \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/workflows/{workflow_id}/milestones/{milestone_id}": {
+      "get": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "Retrieve a workflow milestone",
+        "operationId": "workflows_get_workflow_milestone",
+        "description": "Returns the milestone under `workflow_milestone`, with the same fields a listed milestone carries.",
+        "parameters": [
+          {
+            "name": "workflow_id",
+            "in": "path",
+            "required": true,
+            "description": "The workflow's `wf_` id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "milestone_id",
+            "in": "path",
+            "required": true,
+            "description": "The milestone's `wfm_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The milestone, under `workflow_milestone`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowMilestoneResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/workflows/wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b/milestones/wfm_9d3a5c7e1f2b4a6c8e0d2f4b6a8c0e1d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.workflows.get_workflow_milestone(\n    \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\", \"wfm_9d3a5c7e1f2b4a6c8e0d2f4b6a8c0e1d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.workflows.getWorkflowMilestone(\n    'wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b',\n    'wfm_9d3a5c7e1f2b4a6c8e0d2f4b6a8c0e1d',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->workflows->getWorkflowMilestone(\n    'wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b',\n    'wfm_9d3a5c7e1f2b4a6c8e0d2f4b6a8c0e1d',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.workflows.workflows_dto.WorkflowsDto.WorkflowMilestoneView;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<WorkflowMilestoneView> response = client.workflows().getWorkflowMilestone(\n        \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\",\n        \"wfm_9d3a5c7e1f2b4a6c8e0d2f4b6a8c0e1d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Workflows.GetWorkflowMilestoneAsync(\n    \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\",\n    \"wfm_9d3a5c7e1f2b4a6c8e0d2f4b6a8c0e1d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.workflows.getWorkflowMilestone(\n  'wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b',\n  'wfm_9d3a5c7e1f2b4a6c8e0d2f4b6a8c0e1d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Workflows().GetWorkflowMilestone(context.Background(), \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\", \"wfm_9d3a5c7e1f2b4a6c8e0d2f4b6a8c0e1d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/workflows/custom_components/{component_uuid}/{object_code}/history": {
+      "get": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "List a component instance's workflow history",
+        "operationId": "workflows_get_workflow_custom_component_history",
+        "description": "Name the component by its dashed uuid and the instance by its `code`. Returns a page of history entries under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+        "parameters": [
+          {
+            "name": "component_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The component's dashed uuid: the hex of its `cmp_` id with the dashes put back. The `cmp_` id itself returns `404`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "object_code",
+            "in": "path",
+            "required": true,
+            "description": "The component instance's `code`, not its `cco_` id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of the instance's workflow history.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowComponentRecordList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The component is given by its `cmp_` id or its bare hex rather than its dashed uuid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/workflows/custom_components/7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d/CC-1001/history?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.workflows.get_workflow_custom_component_history(\n    \"7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d\", \"CC-1001\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.workflows.getWorkflowCustomComponentHistory(\n    '7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d',\n    'CC-1001',\n    {limit: 20},\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->workflows->getWorkflowCustomComponentHistory(\n    '7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d',\n    'CC-1001',\n    ['limit' => 20],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.workflows().getWorkflowCustomComponentHistory(\n        \"7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d\",\n        \"CC-1001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Workflows.GetWorkflowCustomComponentHistoryAsync(\n    \"7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d\",\n    \"CC-1001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.workflows.getWorkflowCustomComponentHistory(\n  '7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d',\n  'CC-1001',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Workflows().GetWorkflowCustomComponentHistory(context.Background(), \"7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d\", \"CC-1001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/workflows/custom_components/{component_uuid}/{object_code}/milestones": {
+      "get": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "List a component instance's milestones",
+        "operationId": "workflows_get_workflow_custom_component_milestones",
+        "description": "Name the component by its dashed uuid and the instance by its `code`. Returns a page of milestones under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+        "parameters": [
+          {
+            "name": "component_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The component's dashed uuid: the hex of its `cmp_` id with the dashes put back. The `cmp_` id itself returns `404`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "object_code",
+            "in": "path",
+            "required": true,
+            "description": "The component instance's `code`, not its `cco_` id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of the instance's milestones.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowComponentRecordList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The component is given by its `cmp_` id or its bare hex rather than its dashed uuid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/workflows/custom_components/7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d/CC-1001/milestones?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.workflows.get_workflow_custom_component_milestones(\n    \"7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d\", \"CC-1001\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.workflows.getWorkflowCustomComponentMilestones(\n    '7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d',\n    'CC-1001',\n    {limit: 20},\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->workflows->getWorkflowCustomComponentMilestones(\n    '7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d',\n    'CC-1001',\n    ['limit' => 20],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.workflows().getWorkflowCustomComponentMilestones(\n        \"7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d\",\n        \"CC-1001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Workflows.GetWorkflowCustomComponentMilestonesAsync(\n    \"7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d\",\n    \"CC-1001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.workflows.getWorkflowCustomComponentMilestones(\n  '7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d',\n  'CC-1001',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Workflows().GetWorkflowCustomComponentMilestones(context.Background(), \"7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d\", \"CC-1001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/workflows/custom_components/{component_uuid}/{object_code}/milestones/{milestone_id}": {
+      "get": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "Retrieve a component instance's milestone",
+        "operationId": "workflows_get_workflow_custom_component_milestone",
+        "description": "Name the component by its dashed uuid and the instance by its `code`. Returns the milestone under `workflow_milestone_instance`. A milestone id that does not exist returns `404` with the code `resource_not_found`.",
+        "parameters": [
+          {
+            "name": "component_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The component's dashed uuid: the hex of its `cmp_` id with the dashes put back. The `cmp_` id itself returns `404`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "object_code",
+            "in": "path",
+            "required": true,
+            "description": "The component instance's `code`, not its `cco_` id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "milestone_id",
+            "in": "path",
+            "required": true,
+            "description": "The instance milestone's `wfmi_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The milestone, under `workflow_milestone_instance`."
+          },
+          "404": {
+            "description": "No milestone has that id, or the component is given by its `cmp_` id or bare hex rather than its dashed uuid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/workflows/custom_components/7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d/CC-1001/milestones/wfmi_5e7a9c1b3d4f4e6a8b0c2d4e6f8a0b1c\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.workflows.get_workflow_custom_component_milestone(\n    \"7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d\",\n    \"CC-1001\",\n    \"wfmi_5e7a9c1b3d4f4e6a8b0c2d4e6f8a0b1c\",\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.workflows.getWorkflowCustomComponentMilestone(\n    '7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d',\n    'CC-1001',\n    'wfmi_5e7a9c1b3d4f4e6a8b0c2d4e6f8a0b1c',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->workflows->getWorkflowCustomComponentMilestone(\n    '7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d',\n    'CC-1001',\n    'wfmi_5e7a9c1b3d4f4e6a8b0c2d4e6f8a0b1c',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.workflows().getWorkflowCustomComponentMilestone(\n        \"7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d\",\n        \"CC-1001\",\n        \"wfmi_5e7a9c1b3d4f4e6a8b0c2d4e6f8a0b1c\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Workflows.GetWorkflowCustomComponentMilestoneAsync(\n    \"7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d\",\n    \"CC-1001\",\n    \"wfmi_5e7a9c1b3d4f4e6a8b0c2d4e6f8a0b1c\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.workflows.getWorkflowCustomComponentMilestone(\n  '7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d',\n  'CC-1001',\n  'wfmi_5e7a9c1b3d4f4e6a8b0c2d4e6f8a0b1c',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Workflows().GetWorkflowCustomComponentMilestone(context.Background(), \"7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d\", \"CC-1001\", \"wfmi_5e7a9c1b3d4f4e6a8b0c2d4e6f8a0b1c\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/workflow/component/{component_object_id}/history": {
+      "get": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "Retrieve a component instance's workflow history by code",
+        "operationId": "workflows_get_workflow_component_history",
+        "description": "Returns the history under `histories`, with `pagination` beside it.",
+        "parameters": [
+          {
+            "name": "component_object_id",
+            "in": "path",
+            "required": true,
+            "description": "The component instance's `code`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The instance's workflow history, under `histories`, with `pagination`."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/workflow/component/CC-1001/history\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.workflows.get_workflow_component_history(\"CC-1001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.workflows.getWorkflowComponentHistory('CC-1001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->workflows->getWorkflowComponentHistory('CC-1001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.workflows().getWorkflowComponentHistory(\"CC-1001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Workflows.GetWorkflowComponentHistoryAsync(\"CC-1001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.workflows.getWorkflowComponentHistory(\n  'CC-1001',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Workflows().GetWorkflowComponentHistory(context.Background(), \"CC-1001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/workflow/component/{component_uuid}/{component_object_id}/milestone": {
+      "get": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "Retrieve a component instance's milestones by code",
+        "operationId": "workflows_get_workflow_component_cc_instance_cc_milestone",
+        "description": "Returns the milestones under `milestones`, with `pagination` beside it.",
+        "parameters": [
+          {
+            "name": "component_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The component's `uuid`, as the component settings listing shows it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "component_object_id",
+            "in": "path",
+            "required": true,
+            "description": "The component instance's `code`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The instance's milestones, under `milestones`, with `pagination`."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/workflow/component/7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d/CC-1001/milestone\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.workflows.get_workflow_component_cc_instance_cc_milestone(\n    \"7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d\", \"CC-1001\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.workflows.getWorkflowComponentCcInstanceCcMilestone(\n    '7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d',\n    'CC-1001',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->workflows->getWorkflowComponentCcInstanceCcMilestone(\n    '7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d',\n    'CC-1001',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.workflows().getWorkflowComponentCcInstanceCcMilestone(\n        \"7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d\",\n        \"CC-1001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Workflows.GetWorkflowComponentCcInstanceCcMilestoneAsync(\n    \"7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d\",\n    \"CC-1001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.workflows\n    .getWorkflowComponentCcInstanceCcMilestone(\n      '7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d',\n      'CC-1001',\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Workflows().GetWorkflowComponentCcInstanceCcMilestone(context.Background(), \"7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d\", \"CC-1001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
       }
     }
   },
@@ -88870,6 +90269,372 @@
           },
           "prev": {
             "type": "string"
+          }
+        }
+      },
+      "Workflow": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "description": "Always `workflow`."
+          },
+          "id": {
+            "type": "string",
+            "description": "The workflow's `wf_` id."
+          },
+          "status": {
+            "type": "string",
+            "description": "The workflow's status. A new workflow reads `draft`."
+          },
+          "code": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "description": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "entity": {
+            "type": "string",
+            "description": "The entity the workflow belongs to, such as `account`."
+          },
+          "entity_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "event": {
+            "type": "string"
+          },
+          "is_pre_built": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Whether the workflow comes built in. A pre-built workflow cannot be deleted."
+          },
+          "enable_stage": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "current_version": {
+            "$ref": "#/components/schemas/WorkflowCurrentVersion"
+          },
+          "custom_form": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/WorkflowCreatedBy"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/WorkflowLastUpdatedBy"
+          },
+          "href": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkflowResponse": {
+        "type": "object",
+        "properties": {
+          "workflow": {
+            "$ref": "#/components/schemas/Workflow"
+          }
+        }
+      },
+      "WorkflowList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "description": "Always `list`."
+          },
+          "url": {
+            "type": "string",
+            "description": "The path this page was read from."
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Workflow"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/WorkflowPagination"
+          }
+        }
+      },
+      "WorkflowCurrentVersion": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkflowCreatedBy": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkflowLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkflowStageList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "description": "Always `list`."
+          },
+          "url": {
+            "type": "string",
+            "description": "The path this page was read from."
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "The workflow's stages."
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/WorkflowPagination"
+          }
+        }
+      },
+      "WorkflowMilestone": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "The milestone's `wfm_` id."
+          },
+          "status": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "description": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "icon": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "priority": {
+            "type": "string"
+          },
+          "sort_order": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "auto_create": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "estimated_hours": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "workflow": {
+            "$ref": "#/components/schemas/WorkflowMilestoneWorkflow"
+          },
+          "activity_definition": {
+            "$ref": "#/components/schemas/WorkflowMilestoneActivityDefinition"
+          },
+          "workflow_version": {
+            "$ref": "#/components/schemas/WorkflowMilestoneWorkflowVersion"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkflowMilestoneResponse": {
+        "type": "object",
+        "properties": {
+          "workflow_milestone": {
+            "$ref": "#/components/schemas/WorkflowMilestone"
+          }
+        }
+      },
+      "WorkflowMilestoneList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "description": "Always `list`."
+          },
+          "url": {
+            "type": "string",
+            "description": "The path this page was read from."
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkflowMilestone"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/WorkflowPagination"
+          }
+        }
+      },
+      "WorkflowMilestoneWorkflow": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkflowMilestoneActivityDefinition": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkflowMilestoneWorkflowVersion": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkflowComponentRecordList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "description": "Always `list`."
+          },
+          "url": {
+            "type": "string",
+            "description": "The path this page was read from."
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "The component instance's history entries or milestones."
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/WorkflowPagination"
+          }
+        }
+      },
+      "WorkflowPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "links": {
+            "$ref": "#/components/schemas/WorkflowPaginationLinks"
+          }
+        }
+      },
+      "WorkflowPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "prev": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
