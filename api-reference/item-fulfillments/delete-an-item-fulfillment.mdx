@@ -4,6 +4,10 @@ description: "Deletes an item fulfillment. A successful call returns `204` with 
 openapi: "DELETE /item_fulfillments/{fulfillment_id}"
 ---
 
-Deletes the fulfillment with that `ifm_` id. Once any of its stock has been sent the delete is refused.
+Deletes the fulfillment with that `ifm_` id. Once any of its stock has been sent the delete is refused. Every fulfillment created through this API is marked `shipped` at once, so this delete returns `400` `stock_committed` for it.
+
+<Warning>
+  **A fulfillment created through the API cannot be deleted.** A new fulfillment comes back `shipped`, with its stock sent, so this call refuses it with `400` `stock_committed`.
+</Warning>
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `host` to your Exsited API host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

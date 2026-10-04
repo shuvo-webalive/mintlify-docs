@@ -4,7 +4,7 @@ sidebarTitle: "Overview"
 description: "Record items sent against a sale invoice's lines, then list, read, update and delete fulfillments and manage their notes."
 ---
 
-An item fulfillment records items sent against the lines of a sale invoice. These endpoints create, list, read, update and delete fulfillments, and add, list, read and delete their notes. This area has 9 endpoints, and all seven SDKs call every one.
+An item fulfillment records items sent against the lines of a sale invoice. These endpoints create, list, read, update and delete fulfillments, and add, list, read and delete their notes. This area has 9 endpoints, each available in all seven SDKs.
 
 <Warning>
   **A fulfillment cannot be deleted once any of its stock has been sent.** The delete is refused with `400` `stock_committed`.
@@ -20,7 +20,7 @@ An item fulfillment records items sent against the lines of a sale invoice. Thes
 | [Update an item fulfillment](/api-reference/item-fulfillments/update-an-item-fulfillment) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `/item_fulfillments/{fulfillment_id}` | Changes an item fulfillment, such as its tracking number, and returns a short record. |
 | [Create an item fulfillment note](/api-reference/item-fulfillments/create-an-item-fulfillment-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/item_fulfillments/{fulfillment_id}/notes` | Adds a note to a fulfillment, with optional files, and returns the note's id. |
 | [Delete an item fulfillment](/api-reference/item-fulfillments/delete-an-item-fulfillment) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `/item_fulfillments/{fulfillment_id}` | Deletes an item fulfillment. A successful call returns `204` with no body. |
-| [Delete an item fulfillment note](/api-reference/item-fulfillments/delete-an-item-fulfillment-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `/item_fulfillments/{fulfillment_id}/notes/{note_id}` | Deletes a note held on the fulfillment itself. A successful call returns `204` with no body. |
+| [Delete an item fulfillment note](/api-reference/item-fulfillments/delete-an-item-fulfillment-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `/item_fulfillments/{fulfillment_id}/notes/{note_id}` | Deletes a note stored on the fulfillment itself. A successful call returns `204` with no body. |
 | [List an item fulfillment's notes](/api-reference/item-fulfillments/list-an-item-fulfillments-notes) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/item_fulfillments/{fulfillment_id}/notes` | Returns a page of the notes on a fulfillment's sale invoice. |
 | [Retrieve an item fulfillment note](/api-reference/item-fulfillments/retrieve-an-item-fulfillment-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/item_fulfillments/{fulfillment_id}/notes/{note_id}` | Returns one fulfillment note, under `item_fulfillment.note`. |
 
@@ -32,7 +32,7 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 
 ## Things to know
 
-- **Writes are wrapped in `item_fulfillment`.** A create names the sale invoice in `invoice_id` and lists `fulfillments`, each with an `invoice_line` id and a `fulfillment_quantity`.
+- **Fulfillment creates and updates are wrapped in `item_fulfillment`.** A create names the sale invoice in `invoice_id` and lists `fulfillments`, each with an `invoice_line` id and a `fulfillment_quantity`.
 - **Fulfillment ids start with `ifm_`, and note ids with `note_`.** Pass them in the paths as they are.
 - **Notes are stored on the fulfillment's sale invoice.** The notes listing returns the invoice's notes, and a single note read comes back under `item_fulfillment.note`.
 - **Deleting a note looks on the fulfillment itself.** A note added through the create note endpoint is stored on the invoice, so that delete does not find it.
