@@ -1,0 +1,541 @@
+{
+  "family": "employees",
+  "tag": "Employees",
+  "slug": "employees",
+  "icon": "id-badge",
+  "base": "/employees",
+  "overview_description": "Manage employees in Exsited: list, create, retrieve, update and delete employee records.",
+  "intro": "Employees are the staff records in Exsited, each with a code, contact details and custom attributes. You can list, create, retrieve, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.",
+  "warning": "**Deleting an employee cannot be undone.** After a delete, reading the employee returns `404`.",
+  "notes": [
+    "**Request bodies go under `employee`.** Both the create and the update wrap their fields in an `employee` object, and every single-employee response returns it under `employee`.",
+    "**An employee has both an `id` and a `code`.** The `id` starts with `emp_` and is what these calls take; the milestones-by-employee call takes the `code` instead.",
+    "**A new employee needs only a `name`.** The response gives its `id`, `code` and the rest of the record.",
+    "**The list pages by cursor.** Records are under `data`; pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_employees",
+      "method": "GET",
+      "path": "/employees",
+      "slug": "list-employees",
+      "title": "List employees",
+      "summary": "Lists employees, one page at a time.",
+      "description": "Returns one page of employees under `data`, with `pagination` for the next page. Each employee carries its `id`, `code`, `name`, `display_name`, `email_address`, `status`, `contacts` and `custom_attributes`. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by; prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of employees.",
+          "schema": {
+            "$ref": "#/components/schemas/EmployeeList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_employee",
+      "method": "POST",
+      "path": "/employees",
+      "slug": "create-an-employee",
+      "title": "Create an employee",
+      "summary": "Creates an employee and returns it under `employee`.",
+      "description": "Send the new employee under `employee` with at least a `name`. The new employee comes back under `employee`, with its `emp_` id and its `code`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "employee": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The employee's name."
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "email_address": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          },
+          "required": [
+            "employee"
+          ]
+        },
+        "example": {
+          "employee": {
+            "name": "Jane Citizen"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new employee, under `employee`.",
+          "schema": {
+            "$ref": "#/components/schemas/EmployeeResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "employee": {
+            "name": "Jane Citizen"
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_employee",
+      "method": "DELETE",
+      "path": "/employees/{employee_id}",
+      "slug": "delete-an-employee",
+      "title": "Delete an employee",
+      "summary": "Deletes an employee; the response has no body.",
+      "description": "Deletes the employee with this `id`. A successful delete returns `204` with no body, and reading the employee afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "employee_id",
+          "in": "path",
+          "required": true,
+          "description": "The employee's `id`, which starts with `emp_`.",
+          "schema": {
+            "type": "string",
+            "example": "emp_7b3c9d1e2f4a4b5c8d6e7f8091a2b3c4"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The employee is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "employee_id": "emp_7b3c9d1e2f4a4b5c8d6e7f8091a2b3c4"
+        }
+      }
+    },
+    {
+      "key": "get_employee",
+      "method": "GET",
+      "path": "/employees/{employee_id}",
+      "slug": "retrieve-an-employee",
+      "title": "Retrieve an employee",
+      "summary": "Retrieves one employee by its `emp_` id.",
+      "description": "Returns the employee under `employee`, including `contacts`, `custom_attributes` and `activity_logs`.",
+      "parameters": [
+        {
+          "name": "employee_id",
+          "in": "path",
+          "required": true,
+          "description": "The employee's `id`, which starts with `emp_`.",
+          "schema": {
+            "type": "string",
+            "example": "emp_7b3c9d1e2f4a4b5c8d6e7f8091a2b3c4"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The employee, under `employee`.",
+          "schema": {
+            "$ref": "#/components/schemas/EmployeeResponse"
+          }
+        },
+        "404": {
+          "description": "No employee has that `id`, for example because it has been deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "employee_id": "emp_7b3c9d1e2f4a4b5c8d6e7f8091a2b3c4"
+        }
+      }
+    },
+    {
+      "key": "update_employee",
+      "method": "PATCH",
+      "path": "/employees/{employee_id}",
+      "slug": "update-an-employee",
+      "title": "Update an employee",
+      "summary": "Updates an employee and returns it under `employee`.",
+      "description": "Send the fields to change under `employee`, such as `description`. The updated employee comes back under `employee`.",
+      "parameters": [
+        {
+          "name": "employee_id",
+          "in": "path",
+          "required": true,
+          "description": "The employee's `id`, which starts with `emp_`.",
+          "schema": {
+            "type": "string",
+            "example": "emp_7b3c9d1e2f4a4b5c8d6e7f8091a2b3c4"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "employee": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "email_address": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "employee"
+          ]
+        },
+        "example": {
+          "employee": {
+            "description": "Senior technician"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated employee, under `employee`.",
+          "schema": {
+            "$ref": "#/components/schemas/EmployeeResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "employee_id": "emp_7b3c9d1e2f4a4b5c8d6e7f8091a2b3c4"
+        },
+        "body": {
+          "employee": {
+            "description": "Senior technician"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "Employee": {
+      "type": "object",
+      "properties": {
+        "activity_logs": {
+          "type": "array"
+        },
+        "code": {
+          "type": "string"
+        },
+        "contacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/EmployeeContact"
+          }
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/EmployeeCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "custom_attributes": {
+          "type": "array"
+        },
+        "custom_form": {
+          "$ref": "#/components/schemas/EmployeeCustomForm"
+        },
+        "description": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "email_address": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "image_uuid": {
+          "type": "null"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/EmployeeLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "EmployeeContact": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "null"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/EmployeeContactCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "email": {
+          "$ref": "#/components/schemas/EmployeeContactEmail"
+        },
+        "fax": {
+          "type": "null"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "type": "null"
+        },
+        "last_updated_on": {
+          "type": "null"
+        },
+        "mobile": {
+          "type": "null"
+        },
+        "name": {
+          "$ref": "#/components/schemas/EmployeeContactName"
+        },
+        "object": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "null"
+        },
+        "status": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "EmployeeContactCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "EmployeeContactEmail": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "email_opted_out": {
+          "type": "boolean"
+        }
+      }
+    },
+    "EmployeeContactName": {
+      "type": "object",
+      "properties": {
+        "designation": {
+          "type": "null"
+        },
+        "first": {
+          "type": "string"
+        },
+        "last": {
+          "type": "string"
+        },
+        "middle": {
+          "type": "null"
+        },
+        "salutation": {
+          "type": "null"
+        }
+      }
+    },
+    "EmployeeCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "EmployeeCustomForm": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "EmployeeLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "EmployeeResponse": {
+      "type": "object",
+      "properties": {
+        "employee": {
+          "$ref": "#/components/schemas/Employee"
+        }
+      }
+    },
+    "EmployeeList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Employee"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/EmployeePagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "EmployeePagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Rely on this rather than on `next_cursor`, which can still hold a value on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/EmployeePaginationLinks"
+        }
+      }
+    },
+    "EmployeePaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
