@@ -1,0 +1,31 @@
+---
+title: "Additional codes"
+sidebarTitle: "Overview"
+description: "List, create, read, update and delete additional codes, the data sets used on purchase order lines."
+---
+
+Additional codes are the data sets used on purchase order lines. You can list, create, read, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List additional codes](/api-reference/additional-codes/list-additional-codes) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/additional_codes` | Returns a page of additional codes under `data`, with paging details under `pagination`. |
+| [Create an additional code](/api-reference/additional-codes/create-an-additional-code) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/additional_codes` | Creates an additional code and returns it under `additional_code`. |
+| [Retrieve an additional code](/api-reference/additional-codes/retrieve-an-additional-code) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/additional_codes/{additional_code_id}` | Returns one additional code by its `id`, under `additional_code`. |
+| [Delete an additional code](/api-reference/additional-codes/delete-an-additional-code) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/additional_codes/{additional_code_id}` | Deletes an additional code. The response has no body. |
+| [Update an additional code](/api-reference/additional-codes/update-an-additional-code) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/additional_codes/{additional_code_id}` | Changes the fields or the status of an additional code. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Requests and responses wrap the record in `additional_code`.** A create sends `{"additional_code": {...}}` and a read returns the record under the same key.
+- **`name` is the one required field on a create.**
+- **An additional code `id` starts with `ac_`.** Use that `id` in the path of a read, an update or a delete.
+- **Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true.
+- **A delete returns `204` with no body.** Reading the additional code afterwards returns `404`.
