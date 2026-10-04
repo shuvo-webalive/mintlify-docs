@@ -1,0 +1,34 @@
+---
+title: "Timesheets"
+sidebarTitle: "Overview"
+description: "Manage timesheets in Exsited: record time worked against booked order lines, then list, read, update or delete it."
+---
+
+Timesheets record the time a labour worked on a booked order line. You can list, create, retrieve, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.
+
+<Warning>
+  **Deleting a timesheet cannot be undone.** After a delete, reading the timesheet returns `404`.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List timesheets](/api-reference/timesheets/list-timesheets) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/timesheets` | Lists timesheets, one page at a time. |
+| [Create a timesheet](/api-reference/timesheets/create-a-timesheet) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/timesheets` | Records time worked against a booked order line and returns the timesheet under `timesheet`. |
+| [Delete a timesheet](/api-reference/timesheets/delete-a-timesheet) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/timesheets/{created_timesheet_id}` | Deletes a timesheet; the response has no body. |
+| [Update a timesheet](/api-reference/timesheets/update-a-timesheet) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/timesheets/{created_timesheet_id}` | Changes a timesheet's times and returns it under `timesheet`. |
+| [Retrieve a timesheet](/api-reference/timesheets/retrieve-a-timesheet) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/timesheets/{created_timesheet_id}` | Retrieves one timesheet by its `ts_` id. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Request bodies go under `timesheet`.** The create and the update wrap their fields in a `timesheet` object, and every single-timesheet response returns it under `timesheet`.
+- **A timesheet belongs to a booked order line.** `sale_order_item` is the line's `ln_` id with the prefix changed to `soi_`, on a line that books a labour.
+- **Times are ISO 8601 in UTC.** Send `start_time` and `end_time` as values such as `2026-11-09T09:00:00Z`.
+- **Timesheet ids start with `ts_`.** Pass that `id` as `created_timesheet_id`.
