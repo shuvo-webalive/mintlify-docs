@@ -5,14 +5,14 @@
   "icon": "users",
   "base": "/accounts",
   "overview_description": "List, create, change, cancel and delete accounts, with their contacts, addresses, payment methods, notes and related records.",
-  "intro": "Accounts are the customers and suppliers you bill and buy from. Here you create, read, change, cancel and delete accounts, manage their contacts, addresses, payment methods, billing preferences, notes, image and emails, and list the orders, invoices, payments and other records that belong to an account. This area has 65 endpoints, and all seven SDKs call every one.",
+  "intro": "Accounts are the customers and suppliers you bill and buy from. Here you create, read, change, cancel and delete accounts, manage their contacts, addresses, payment methods, billing preferences, notes, image and emails, and list the orders, invoices, payments and other records that belong to an account. This area has 65 endpoints, and every SDK supports all of them.",
   "warning": "**Purging an account removes it and its records permanently, and cannot be undone.**",
   "notes": [
     "**Paths take the account's `id`, not its `uuid`.** The `id` is a short code such as `W13ZGY`; passing the `uuid` returns `404`.",
-    "**Most writes wrap their fields in one key.** Account writes use `account`, a single address `address`, a contact `contact`, a payment method `payment_method` and billing preferences `billing_preferences`. Setting a password and sending an email take their fields at the top level, and adding addresses takes a top-level `addresses` list.",
-    "**A contact is read by its slot and written by its id.** Retrieve a contact with its slot, `CONTACT_1` to `CONTACT_5`; update, replace and delete it with its `con_` id. A contact created as `CONTACT_1` reads back with `type` `billing`.",
+    "**Most writes wrap their fields in one key.** Account writes use `account`, a single address `address`, a contact `contact`, a payment method `payment_method` and billing preferences `billing_preferences`. Adding contacts takes a top-level `contacts` list and adding addresses a top-level `addresses` list. Setting a password, sending an email and uploading an image take their fields at the top level. Custom object instance writes use `custom_object_instances`, and notes are sent as a multipart form.",
+    "**Contacts and payment methods are read by one value and written by another.** Retrieve a contact with its slot, `CONTACT_1` to `CONTACT_5`, and update, replace or delete it with its `con_` id; a contact created as `CONTACT_1` reads back with `type` `billing`. Retrieve a payment method with its `reference`, and update, replace or delete it with its `id`, as listed under `payment_methods`.",
     "**Writes are flatter than reads.** `currency` and `time_zone` go in as a code and a name and read back as objects, an address is written with `post_code` and reads back with `postal_code`, and a contact's name is written as `first_name` and `last_name` and reads back under `name`.",
-    "**Many reads and every account write return the whole account.** The contacts, addresses, payment methods, billing preferences, inventories and partial invoice reads return the account under `account`, carrying the part asked for, rather than a paged listing.",
+    "**Many reads and most writes return the whole account under `account`.** Note writes return the note, sending an email returns the email, and deletes return `204` with no body. The contacts, addresses, payment methods, billing preferences, inventories and partial invoice reads return the account, carrying the part asked for, rather than a paged listing.",
     "**Paged listings use a cursor.** Records come under `data` with a `pagination` object; while `has_more` is `true`, pass `pagination.next_cursor` as `cursor` to get the next page."
   ],
   "endpoints": [
@@ -328,7 +328,7 @@
       "path": "/accounts/{account_id}/information",
       "slug": "retrieve-an-accounts-information",
       "title": "Retrieve an account's information",
-      "summary": "Returns an account's core information, under `account`.",
+      "summary": "Returns the account under `account`, the same body as Retrieve an account.",
       "description": "Returns the same `account` body as Retrieve an account.",
       "parameters": [
         {
@@ -437,7 +437,7 @@
       "slug": "retrieve-a-contact-by-slot",
       "title": "Retrieve a contact by slot",
       "summary": "Returns one of the account's contacts, chosen by its slot.",
-      "description": "Name the contact by its slot, `CONTACT_1` to `CONTACT_5`. The response is the account under `account`, whose `contacts` holds that one contact as an object rather than a list. The `type` the contact reads back as, such as `billing`, and its `con_` id both return `404` here.",
+      "description": "Name the contact by its slot, `CONTACT_1` to `CONTACT_5`. The response is the account under `account`, whose `contacts` holds that one contact as an object rather than a list. Passing the contact's `con_` id or its `type`, such as `billing`, returns `404`.",
       "parameters": [
         {
           "name": "account_id",
@@ -645,7 +645,7 @@
       "slug": "retrieve-a-payment-method",
       "title": "Retrieve a payment method",
       "summary": "Returns one of the account's payment methods, under `account.payment_method`.",
-      "description": "Returns the account under `account`, with the one method under `payment_method`. A method the account does not hold returns `200` without `payment_method`, not `404`.",
+      "description": "Returns the account under `account`, with the one method under `payment_method`. A method the account does not hold returns `200` without `payment_method`, not `404`. Update, replace and delete take the method's `id` instead.",
       "parameters": [
         {
           "name": "account_id",
@@ -778,7 +778,7 @@
           "description": "The note's `id`, as returned when the note is created or listed.",
           "schema": {
             "type": "string",
-            "example": "NOTE_ID"
+            "example": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
           }
         }
       ],
@@ -798,7 +798,7 @@
       "example_call": {
         "path": {
           "account_id": "W13ZGY",
-          "note_id": "NOTE_ID"
+          "note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
         }
       }
     },
@@ -806,10 +806,10 @@
       "key": "get_account_note_files",
       "method": "GET",
       "path": "/accounts/{account_id}/notes/{note_id}/files",
-      "slug": "list-a-notes-files",
-      "title": "List a note's files",
+      "slug": "list-an-account-notes-files",
+      "title": "List an account note's files",
       "summary": "Lists the files attached to one note.",
-      "description": "Returns the attachments under `data`. Each one is addressed by its `uuid` in the file read and delete.",
+      "description": "Returns the attachments under `data`. Pass an attachment's `uuid` to [Retrieve an account note file](/api-reference/accounts/retrieve-an-account-note-file) or [Delete an account note file](/api-reference/accounts/delete-an-account-note-file).",
       "parameters": [
         {
           "name": "account_id",
@@ -828,7 +828,7 @@
           "description": "The note's `id`, as returned when the note is created or listed.",
           "schema": {
             "type": "string",
-            "example": "NOTE_ID"
+            "example": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
           }
         }
       ],
@@ -845,7 +845,7 @@
       "example_call": {
         "path": {
           "account_id": "W13ZGY",
-          "note_id": "NOTE_ID"
+          "note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
         }
       }
     },
@@ -853,8 +853,8 @@
       "key": "get_account_note_file",
       "method": "GET",
       "path": "/accounts/{account_id}/notes/{note_id}/files/{file_id}",
-      "slug": "retrieve-a-note-file",
-      "title": "Retrieve a note file",
+      "slug": "retrieve-an-account-note-file",
+      "title": "Retrieve an account note file",
       "summary": "Returns a description of one attached file, under `file`.",
       "description": "Returns the file's `uuid`, `filename`, `content_type`, `size` and `href` under `file`. It returns JSON describing the file, not the file's contents.",
       "parameters": [
@@ -875,14 +875,14 @@
           "description": "The note's `id`, as returned when the note is created or listed.",
           "schema": {
             "type": "string",
-            "example": "NOTE_ID"
+            "example": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
           }
         },
         {
           "name": "file_id",
           "in": "path",
           "required": true,
-          "description": "The attachment's `uuid`, as listed by List a note's files.",
+          "description": "The attachment's `uuid`, as listed by List an account note's files.",
           "schema": {
             "type": "string",
             "example": "FILE_UUID"
@@ -902,7 +902,7 @@
       "example_call": {
         "path": {
           "account_id": "W13ZGY",
-          "note_id": "NOTE_ID",
+          "note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d",
           "file_id": "FILE_UUID"
         }
       }
@@ -1631,8 +1631,8 @@
       "key": "get_account_custom_objects",
       "method": "GET",
       "path": "/accounts/{account_id}/custom_objects",
-      "slug": "list-an-accounts-custom-objects",
-      "title": "List an account's custom objects",
+      "slug": "list-custom-objects-for-accounts",
+      "title": "List custom objects for accounts",
       "summary": "Lists the custom objects defined for accounts, a page at a time.",
       "description": "Returns the custom objects under `data`, with `pagination` for the next page. Use a custom object's `co_` id to read this account's instances of it.",
       "parameters": [
@@ -1916,7 +1916,10 @@
                     }
                   }
                 },
-                "billing_preferences": {},
+                "billing_preferences": {
+                  "type": "object",
+                  "description": "Billing preferences for the new account."
+                },
                 "custom_attributes": {
                   "type": "array"
                 },
@@ -1930,7 +1933,150 @@
                     "properties": {
                       "type": {
                         "type": "string",
-                        "description": "The slot, `CONTACT_1` to `CONTACT_5`."
+                        "description": "The slot, `CONTACT_1` to `CONTACT_5`. Required."
+                      },
+                      "salutation": {
+                        "type": "string"
+                      },
+                      "designation": {
+                        "type": "string"
+                      },
+                      "first_name": {
+                        "type": "string",
+                        "description": "Reads back as `name.first`."
+                      },
+                      "middle_name": {
+                        "type": "string",
+                        "description": "Reads back as `name.middle`."
+                      },
+                      "last_name": {
+                        "type": "string",
+                        "description": "Reads back as `name.last`."
+                      },
+                      "email": {
+                        "type": "object",
+                        "properties": {
+                          "address": {
+                            "type": "string"
+                          },
+                          "do_not_email": {
+                            "type": "boolean"
+                          },
+                          "email_opted_out": {
+                            "type": "boolean"
+                          }
+                        }
+                      },
+                      "phone": {
+                        "type": "object",
+                        "properties": {
+                          "country_code": {
+                            "type": "string"
+                          },
+                          "area_code": {
+                            "type": "string"
+                          },
+                          "number": {
+                            "type": "string"
+                          },
+                          "do_not_call": {
+                            "type": "boolean"
+                          },
+                          "call_opted_out": {
+                            "type": "boolean"
+                          },
+                          "dialing_code": {
+                            "type": "string"
+                          },
+                          "formatted": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "mobile": {
+                        "type": "object",
+                        "properties": {
+                          "country_code": {
+                            "type": "string"
+                          },
+                          "area_code": {
+                            "type": "string"
+                          },
+                          "number": {
+                            "type": "string"
+                          },
+                          "do_not_call": {
+                            "type": "boolean"
+                          },
+                          "call_opted_out": {
+                            "type": "boolean"
+                          },
+                          "dialing_code": {
+                            "type": "string"
+                          },
+                          "formatted": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "fax": {
+                        "type": "object",
+                        "properties": {
+                          "country_code": {
+                            "type": "string"
+                          },
+                          "area_code": {
+                            "type": "string"
+                          },
+                          "number": {
+                            "type": "string"
+                          },
+                          "do_not_call": {
+                            "type": "boolean"
+                          },
+                          "call_opted_out": {
+                            "type": "boolean"
+                          },
+                          "dialing_code": {
+                            "type": "string"
+                          },
+                          "formatted": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "city": {
+                        "type": "string"
+                      },
+                      "state": {
+                        "type": "string"
+                      },
+                      "country": {
+                        "type": "string"
+                      },
+                      "post_code": {
+                        "type": "string"
+                      },
+                      "address_line_1": {
+                        "type": "string"
+                      },
+                      "address_line_2": {
+                        "type": "string"
+                      },
+                      "address_line_3": {
+                        "type": "string"
+                      },
+                      "address_line_4": {
+                        "type": "string"
+                      },
+                      "address_line_5": {
+                        "type": "string"
+                      },
+                      "receive_billing_information": {
+                        "type": "boolean"
+                      },
+                      "custom_attributes": {
+                        "type": "array"
                       }
                     }
                   },
@@ -1986,7 +2132,41 @@
                   "type": "array",
                   "items": {
                     "type": "object",
-                    "properties": {}
+                    "required": [
+                      "processor_type",
+                      "payment_processor",
+                      "reference"
+                    ],
+                    "properties": {
+                      "processor_type": {
+                        "type": "string",
+                        "description": "`DIRECT_CREDIT`, `DIRECT_DEBIT` or `OTHER`. Required."
+                      },
+                      "payment_processor": {
+                        "type": "string",
+                        "description": "The payment processor's `pp_` id. Required."
+                      },
+                      "reference": {
+                        "type": "string",
+                        "maxLength": 70,
+                        "description": "Your reference for the method, at most 70 characters. Required."
+                      },
+                      "status": {
+                        "type": "string"
+                      },
+                      "default": {
+                        "type": "boolean"
+                      },
+                      "note": {
+                        "type": "string"
+                      },
+                      "use_for_specified_orders": {
+                        "type": "boolean"
+                      },
+                      "specified_orders": {
+                        "type": "array"
+                      }
+                    }
                   },
                   "description": "Payment methods to add, each written as in Add a payment method."
                 },
@@ -2001,7 +2181,7 @@
           "account": {
             "name": "Acme Pty Ltd",
             "type": "CUSTOMER",
-            "email_address": "jane@example.com"
+            "email_address": "accounts@acme.example.com"
           }
         }
       },
@@ -2023,7 +2203,7 @@
           "account": {
             "name": "Acme Pty Ltd",
             "type": "CUSTOMER",
-            "email_address": "jane@example.com"
+            "email_address": "accounts@acme.example.com"
           }
         }
       }
@@ -2083,7 +2263,7 @@
                 },
                 "currency": {
                   "type": "string",
-                  "description": "The currency code. The default currency applies when omitted."
+                  "description": "The currency code."
                 },
                 "time_zone": {
                   "type": "string",
@@ -2378,7 +2558,8 @@
             "effective_date": null
           }
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.**"
     },
     {
       "key": "set_account_password",
@@ -3989,7 +4170,7 @@
           "description": "The note's `id`, as returned when the note is created or listed.",
           "schema": {
             "type": "string",
-            "example": "NOTE_ID"
+            "example": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
           }
         }
       ],
@@ -4025,7 +4206,7 @@
       "example_call": {
         "path": {
           "account_id": "W13ZGY",
-          "note_id": "NOTE_ID"
+          "note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
         },
         "note": "<p>Called Jane about the renewal.</p>",
         "file": "notes.txt"
@@ -4181,7 +4362,8 @@
             ]
           }
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** The response body is not documented yet."
     },
     {
       "key": "update_account_custom_object_instance",
@@ -4278,7 +4460,8 @@
             ]
           }
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.**"
     },
     {
       "key": "send_account_email",
@@ -4364,7 +4547,8 @@
           "subject": "Your account",
           "body": "Hello Jane, your account is ready."
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** The response body is not documented yet."
     },
     {
       "key": "purge_account",
@@ -4397,7 +4581,8 @@
         "path": {
           "account_id": "W13ZGY"
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** A purge cannot be undone."
     },
     {
       "key": "delete_account",
@@ -4596,7 +4781,7 @@
           "description": "The note's `id`, as returned when the note is created or listed.",
           "schema": {
             "type": "string",
-            "example": "NOTE_ID"
+            "example": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
           }
         }
       ],
@@ -4610,7 +4795,7 @@
       "example_call": {
         "path": {
           "account_id": "W13ZGY",
-          "note_id": "NOTE_ID"
+          "note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
         }
       }
     },
@@ -4844,7 +5029,8 @@
           "custom_object_id": "co_5d2a8f1c3b7e4a9d8c6b1e2f3a4d5c6b",
           "custom_object_instance_id": "coi_9f3b6c1d2e8a4b7c9d5e1f2a3b4c6d7e"
         }
-      }
+      },
+      "warning": "**A successful response has not been confirmed.** The response body is not documented yet."
     },
     {
       "key": "get_account_component_objects",
@@ -4919,8 +5105,8 @@
       "key": "get_account_component_object",
       "method": "GET",
       "path": "/accounts/{account_id}/component/{component_id}/{component_object_id}",
-      "slug": "retrieve-a-component-object",
-      "title": "Retrieve a component object",
+      "slug": "retrieve-an-accounts-component-object",
+      "title": "Retrieve an account's component object",
       "summary": "Returns one component object under an account, under `custom_component_object`.",
       "description": "Name the component by its `cmp_` id and the object by its `cco_` id. The object's `parents` list the accounts it belongs to.",
       "parameters": [
@@ -4977,10 +5163,10 @@
       "key": "delete_account_note_file",
       "method": "DELETE",
       "path": "/accounts/{account_id}/notes/{note_id}/files/{file_id}",
-      "slug": "delete-a-note-file",
-      "title": "Delete a note file",
+      "slug": "delete-an-account-note-file",
+      "title": "Delete an account note file",
       "summary": "Removes one attachment from a note.",
-      "description": "Name the attachment by its `uuid`. Returns `204` with no content. This call can return `404` with the message `attachment not found` even for an attachment that List a note's files shows.",
+      "description": "Name the attachment by its `uuid`. A delete returns `204` with no content.",
       "parameters": [
         {
           "name": "account_id",
@@ -4999,14 +5185,14 @@
           "description": "The note's `id`, as returned when the note is created or listed.",
           "schema": {
             "type": "string",
-            "example": "NOTE_ID"
+            "example": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
           }
         },
         {
           "name": "file_id",
           "in": "path",
           "required": true,
-          "description": "The attachment's `uuid`, as listed by List a note's files.",
+          "description": "The attachment's `uuid`, as listed by List an account note's files.",
           "schema": {
             "type": "string",
             "example": "FILE_UUID"
@@ -5020,16 +5206,17 @@
           "description": "The attachment is removed."
         },
         "404": {
-          "description": "The attachment is not found. This can happen even for an attachment the files listing shows."
+          "description": "`attachment not found`, returned even for an attachment the files listing shows."
         }
       },
       "example_call": {
         "path": {
           "account_id": "W13ZGY",
-          "note_id": "NOTE_ID",
+          "note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d",
           "file_id": "FILE_UUID"
         }
-      }
+      },
+      "warning": "**This call currently returns `404`.** The message is `attachment not found`, even for an attachment that [List an account note's files](/api-reference/accounts/list-an-account-notes-files) shows."
     }
   ],
   "schemas": {
@@ -5083,7 +5270,7 @@
           "type": "string"
         },
         "image_url": {
-          "description": "Retrieve an account's image returns the image link instead."
+          "description": "`null` on the account read. Use Retrieve an account's image to get the image link."
         },
         "workflow_status": {
           "type": "string"
@@ -5738,7 +5925,7 @@
     },
     "AccountPagination": {
       "type": "object",
-      "description": "How to fetch the next page. A cursor listing sets `has_more` and `next_cursor`; an offset listing sets `records`, `offset` and `next_page`.",
+      "description": "How to fetch the next page.",
       "properties": {
         "limit": {
           "type": "integer",
@@ -5757,29 +5944,6 @@
         },
         "links": {
           "$ref": "#/components/schemas/AccountPaginationLinks"
-        },
-        "records": {
-          "type": "integer",
-          "description": "The total number of matching records, not the length of the page."
-        },
-        "offset": {
-          "type": "integer"
-        },
-        "next_page": {
-          "type": "string",
-          "description": "On an offset listing, the literal string `NULL` at the end of the listing, not JSON `null`."
-        },
-        "previous_page": {
-          "type": "string"
-        },
-        "has_next": {
-          "type": "boolean"
-        },
-        "has_prev": {
-          "type": "boolean"
-        },
-        "per_page": {
-          "type": "integer"
         }
       }
     },
@@ -6710,7 +6874,7 @@
         },
         "uuid": {
           "type": "string",
-          "description": "The value Retrieve an email and the email delete take."
+          "description": "The email's `uuid`. Pass it to Retrieve an email and Delete an account email."
         }
       }
     },
