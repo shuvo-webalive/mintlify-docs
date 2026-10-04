@@ -16414,7 +16414,7 @@
         ],
         "summary": "List sales reps",
         "operationId": "sales_reps_get_settings_sales_reps",
-        "description": "The records are under `data`, and `pagination` holds the cursor for the next page. Other fields filter as `filter_<field>`.",
+        "description": "The records are under `data`, and `pagination` holds the cursor for the next page. To filter, add `filter_<field>=<value>`.",
         "parameters": [
           {
             "name": "limit",
@@ -16507,14 +16507,14 @@
         ],
         "summary": "Create a sales rep",
         "operationId": "sales_reps_create_settings_sales_rep",
-        "description": "Send the new rep under `sales_rep`. On the current instance this call returns `400` with `validation_error` and no field named, for every valid body tried.",
+        "description": "Send the new rep under `sales_rep`, with `first_name`, `last_name` and `email_address`.",
         "parameters": [],
         "responses": {
           "201": {
             "description": "The sales rep is created."
           },
           "400": {
-            "description": "`validation_error` with no field named, returned for every valid body tried.",
+            "description": "`validation_error`, naming no field, returned even for a valid body.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16678,72 +16678,6 @@
           }
         ]
       },
-      "delete": {
-        "tags": [
-          "Sales reps"
-        ],
-        "summary": "Delete a sales rep",
-        "operationId": "sales_reps_delete_settings_sales_rep",
-        "description": "Pass the rep's `id`. A successful delete returns `204` with an empty body.",
-        "parameters": [
-          {
-            "name": "sales_rep_id",
-            "in": "path",
-            "required": true,
-            "description": "The sales rep's `id`, which starts with `sr_`.",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "The sales rep is deleted. The body is empty."
-          }
-        },
-        "x-codeSamples": [
-          {
-            "lang": "bash",
-            "label": "cURL",
-            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/sales_reps/sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
-          },
-          {
-            "lang": "python",
-            "label": "Python",
-            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.sales_reps.delete_settings_sales_rep(\n    \"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\"\n)\nprint(response.data)\n"
-          },
-          {
-            "lang": "javascript",
-            "label": "JavaScript",
-            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.salesReps.deleteSettingsSalesRep('sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c');\nconsole.log(response.data);\n"
-          },
-          {
-            "lang": "php",
-            "label": "PHP",
-            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->salesReps->deleteSettingsSalesRep('sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c');\nprint_r($response->data);\n"
-          },
-          {
-            "lang": "java",
-            "label": "Java",
-            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.salesReps().deleteSettingsSalesRep(\"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\");\nSystem.out.println(response.getMap());\n"
-          },
-          {
-            "lang": "csharp",
-            "label": ".NET",
-            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.SalesReps.DeleteSettingsSalesRepAsync(\"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\");\n\nConsole.WriteLine(response.Json);\n"
-          },
-          {
-            "lang": "dart",
-            "label": "Dart",
-            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.salesReps.deleteSettingsSalesRep(\n  'sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c',\n);\nprint(response.map);\n"
-          },
-          {
-            "lang": "go",
-            "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.SalesReps().DeleteSettingsSalesRep(context.Background(), \"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
-          }
-        ]
-      },
       "patch": {
         "tags": [
           "Sales reps"
@@ -16847,6 +16781,72 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "Sales reps"
+        ],
+        "summary": "Delete a sales rep",
+        "operationId": "sales_reps_delete_settings_sales_rep",
+        "description": "Pass the rep's `id`. A successful delete returns `204` with an empty body.",
+        "parameters": [
+          {
+            "name": "sales_rep_id",
+            "in": "path",
+            "required": true,
+            "description": "The sales rep's `id`, which starts with `sr_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The sales rep is deleted. The body is empty."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/sales_reps/sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.sales_reps.delete_settings_sales_rep(\n    \"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.salesReps.deleteSettingsSalesRep('sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->salesReps->deleteSettingsSalesRep('sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.salesReps().deleteSettingsSalesRep(\"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.SalesReps.DeleteSettingsSalesRepAsync(\"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.salesReps.deleteSettingsSalesRep(\n  'sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.SalesReps().DeleteSettingsSalesRep(context.Background(), \"sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
       }
     },
     "/gift_certificates": {
