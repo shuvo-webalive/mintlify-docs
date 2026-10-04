@@ -1,0 +1,246 @@
+{
+  "sdk": "js",
+  "module": "orders",
+  "endpoints": {
+    "get_orders": {
+      "function": "orders.getOrders",
+      "code": "const response = await client.orders.getOrders({limit: 20});\nconsole.log(response.data);\n"
+    },
+    "create_order": {
+      "function": "orders.createOrder",
+      "code": "const response = await client.orders.createOrder({\n    order: {\n        account_id: 'W13ZGY',\n        name: 'Acme Pty Ltd monthly order',\n        lines: [{item_id: 'ITEM-0001', item_order_quantity: 1}],\n    },\n});\nconsole.log(response.data);\n"
+    },
+    "get_order": {
+      "function": "orders.getOrder",
+      "code": "const response = await client.orders.getOrder('ORD-0001');\nconsole.log(response.data);\n"
+    },
+    "delete_order": {
+      "function": "orders.deleteOrder",
+      "code": "const response = await client.orders.deleteOrder('ORD-0001');\nconsole.log(response.data);\n"
+    },
+    "activate_order": {
+      "function": "orders.activateOrder",
+      "code": "const response = await client.orders.activateOrder('ORD-0001', {order: {effective_date: '2026-10-01'}});\nconsole.log(response.data);\n"
+    },
+    "create_order_activate_draft": {
+      "function": "orders.createOrderActivateDraft",
+      "code": "const response = await client.orders.createOrderActivateDraft('ORD-0002', {\n    order: {effective_date: '2026-10-01', note: 'Approved by Acme Pty Ltd'},\n});\nconsole.log(response.data);\n"
+    },
+    "get_order_billing_preferences": {
+      "function": "orders.getOrderBillingPreferences",
+      "code": "const response = await client.orders.getOrderBillingPreferences('ORD-0001');\nconsole.log(response.data);\n"
+    },
+    "update_order_billing_preferences": {
+      "function": "orders.updateOrderBillingPreferences",
+      "code": "const response = await client.orders.updateOrderBillingPreferences('ORD-0001', {\n    order: {billing_preferences: {invoice_mode: 'MANUAL'}},\n});\nconsole.log(response.data);\n"
+    },
+    "replace_order_billing_preferences": {
+      "function": "orders.replaceOrderBillingPreferences",
+      "code": "const response = await client.orders.replaceOrderBillingPreferences('ORD-0001', {\n    order: {billing_preferences: {invoice_mode: 'AUTOMATIC'}},\n});\nconsole.log(response.data);\n"
+    },
+    "cancel_order": {
+      "function": "orders.cancelOrder",
+      "code": "const response = await client.orders.cancelOrder('ORD-0001', {order: {effective_date: '2026-10-01'}});\nconsole.log(response.data);\n"
+    },
+    "change_order": {
+      "function": "orders.changeOrder",
+      "code": "const response = await client.orders.changeOrder('ORD-0001', {\n    order: {effective_date: '2026-10-01', lines: [{op: 'add', item_id: 'ITEM-0001', item_order_quantity: 1}]},\n});\nconsole.log(response.data);\n"
+    },
+    "create_order_convert_to_order": {
+      "function": "orders.createOrderConvertToOrder",
+      "code": "const response = await client.orders.createOrderConvertToOrder('ORD-0002', {});\nconsole.log(response.data);\n"
+    },
+    "get_order_custom_objects": {
+      "function": "orders.getOrderCustomObjects",
+      "code": "const response = await client.orders.getOrderCustomObjects('ORD-0001', {limit: 20});\nconsole.log(response.data);\n"
+    },
+    "get_order_custom_objects_instances": {
+      "function": "orders.getOrderCustomObjectsInstances",
+      "code": "const response = await client.orders.getOrderCustomObjectsInstances('ORD-0001', {limit: 20});\nconsole.log(response.data);\n"
+    },
+    "create_order_discard_draft": {
+      "function": "orders.createOrderDiscardDraft",
+      "code": "const response = await client.orders.createOrderDiscardDraft('ORD-0002', {order: {note: 'Quote no longer needed'}});\nconsole.log(response.data);\n"
+    },
+    "create_order_extend_trial": {
+      "function": "orders.createOrderExtendTrial",
+      "code": "const response = await client.orders.createOrderExtendTrial('ORD-0001', {\n    order: {trial_start_date: '2026-10-04', trial_end_date: '2026-10-11'},\n});\nconsole.log(response.data);\n"
+    },
+    "get_order_information": {
+      "function": "orders.getOrderInformation",
+      "code": "const response = await client.orders.getOrderInformation('ORD-0001');\nconsole.log(response.data);\n"
+    },
+    "update_order_information": {
+      "function": "orders.updateOrderInformation",
+      "code": "const response = await client.orders.updateOrderInformation('ORD-0001', {\n    order: {description: 'Monthly service for Acme Pty Ltd'},\n});\nconsole.log(response.data);\n"
+    },
+    "get_order_item_fulfillments": {
+      "function": "orders.getOrderItemFulfillments",
+      "code": "const response = await client.orders.getOrderItemFulfillments('ORD-0001', {limit: 20});\nconsole.log(response.data);\n"
+    },
+    "get_order_lines": {
+      "function": "orders.getOrderLines",
+      "code": "const response = await client.orders.getOrderLines('ORD-0001');\nconsole.log(response.data);\n"
+    },
+    "get_order_notes": {
+      "function": "orders.getOrderNotes",
+      "code": "const response = await client.orders.getOrderNotes('ORD-0001', {limit: 20});\nconsole.log(response.data);\n"
+    },
+    "create_order_note": {
+      "function": "orders.createOrderNote",
+      "code": "import {readFileSync} from 'node:fs';\n\nconst response = await client.orders.createOrderNote('ORD-0001', '<p>Customer asked for a call back.</p>', {\n    files: {file: ['call-notes.txt', readFileSync('call-notes.txt')]},\n});\nconsole.log(response.data);\n"
+    },
+    "get_order_payment_methods": {
+      "function": "orders.getOrderPaymentMethods",
+      "code": "const response = await client.orders.getOrderPaymentMethods('ORD-0001');\nconsole.log(response.data);\n"
+    },
+    "get_order_pdf": {
+      "function": "orders.getOrderPdf",
+      "code": "const response = await client.orders.getOrderPdf('ORD-0001');\nconsole.log(response.data);\n"
+    },
+    "reactivate_order": {
+      "function": "orders.reactivateOrder",
+      "code": "const response = await client.orders.reactivateOrder('ORD-0001', {order: {effective_date: '2026-10-01'}});\nconsole.log(response.data);\n"
+    },
+    "create_order_relinquish": {
+      "function": "orders.createOrderRelinquish",
+      "code": "const response = await client.orders.createOrderRelinquish('ORD-0001', {order: {effective_date: '2026-10-01'}});\nconsole.log(response.data);\n"
+    },
+    "update_order_line": {
+      "function": "orders.updateOrderLine",
+      "code": "const response = await client.orders.updateOrderLine('ORD-0001', '6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c', {\n    order: {line: {item_description: 'Monthly support, 10 hours'}},\n});\nconsole.log(response.data);\n"
+    },
+    "get_order_line": {
+      "function": "orders.getOrderLine",
+      "code": "const response = await client.orders.getOrderLine('ORD-0001', '6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c');\nconsole.log(response.data);\n"
+    },
+    "delete_order_note": {
+      "function": "orders.deleteOrderNote",
+      "code": "const response = await client.orders.deleteOrderNote('ORD-0001', 'nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f');\nconsole.log(response.data);\n"
+    },
+    "get_order_note": {
+      "function": "orders.getOrderNote",
+      "code": "const response = await client.orders.getOrderNote('ORD-0001', 'nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f');\nconsole.log(response.data);\n"
+    },
+    "update_order_note": {
+      "function": "orders.updateOrderNote",
+      "code": "import {readFileSync} from 'node:fs';\n\nconst response = await client.orders.updateOrderNote(\n    'ORD-0001',\n    'nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f',\n    '<p>Customer called back.</p>',\n    {files: {file: ['call-notes.txt', readFileSync('call-notes.txt')]}},\n);\nconsole.log(response.data);\n"
+    },
+    "get_order_payment_method": {
+      "function": "orders.getOrderPaymentMethod",
+      "code": "const response = await client.orders.getOrderPaymentMethod('ORD-0001', 'acme-cash-01');\nconsole.log(response.data);\n"
+    },
+    "update_order_line_billing_preferences": {
+      "function": "orders.updateOrderLineBillingPreferences",
+      "code": "const response = await client.orders.updateOrderLineBillingPreferences(\n    'ORD-0001',\n    '6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c',\n    {order: {line: {item_properties: {charging_start_date: 'SUBSCRIPTION_START_DATE'}}}},\n);\nconsole.log(response.data);\n"
+    },
+    "replace_order_line_billing_preferences": {
+      "function": "orders.replaceOrderLineBillingPreferences",
+      "code": "const response = await client.orders.replaceOrderLineBillingPreferences(\n    'ORD-0001',\n    '6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c',\n    {order: {line: {billing_preferences: {charging_start_date: 'SUBSCRIPTION_START_DATE'}}}},\n);\nconsole.log(response.data);\n"
+    },
+    "get_order_note_files": {
+      "function": "orders.getOrderNoteFiles",
+      "code": "const response = await client.orders.getOrderNoteFiles('ORD-0001', 'nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f', {limit: 20});\nconsole.log(response.data);\n"
+    },
+    "get_order_note_file": {
+      "function": "orders.getOrderNoteFile",
+      "code": "const response = await client.orders.getOrderNoteFile(\n    'ORD-0001',\n    'nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f',\n    'b7c8d9e0-f1a2-4b3c-8d4e-5f6a7b8c9d0e',\n);\nconsole.log(response.data);\n"
+    },
+    "get_orders_notes": {
+      "function": "orders.getOrdersNotes",
+      "code": "const response = await client.orders.getOrdersNotes({limit: 20});\nconsole.log(response.data);\n"
+    },
+    "preview_order": {
+      "function": "orders.previewOrder",
+      "code": "const response = await client.orders.previewOrder({\n    order: {\n        account_id: 'W13ZGY',\n        name: 'Acme Pty Ltd monthly order',\n        lines: [{item_id: 'ITEM-0001', item_order_quantity: 1}],\n    },\n});\nconsole.log(response.data);\n"
+    },
+    "create_order_express": {
+      "function": "orders.createOrderExpress",
+      "code": "const response = await client.orders.createOrderExpress({\n    account: {\n        id: 'W13ZGY',\n        order: {\n            price_tax_inclusive: false,\n            properties: {fulfillment_mode: 'MANUAL', fulfillment_term: 'IMMEDIATELY'},\n            lines: [\n                {\n                    item_id: 'ITEM-0001',\n                    item_order_quantity: 2,\n                    item_price_snapshot: {pricing_rule: {price: 1.5}},\n                    tax_exempt_when_sold: true,\n                },\n            ],\n        },\n    },\n});\nconsole.log(response.data);\n"
+    },
+    "accept_order": {
+      "function": "orders.acceptOrder",
+      "code": "const response = await client.orders.acceptOrder('ORD-0001');\nconsole.log(response.data);\n"
+    },
+    "activate_order_invoice_from_dormant": {
+      "function": "orders.activateOrderInvoiceFromDormant",
+      "code": "const response = await client.orders.activateOrderInvoiceFromDormant(\n    'ORD-0001',\n    '4d5e6f70-8192-4a3b-bc4d-5e6f708192a3',\n    {activate: {due_date: '2026-10-31', amount: '100.00'}},\n);\nconsole.log(response.data);\n"
+    },
+    "preview_order_change": {
+      "function": "orders.previewOrderChange",
+      "code": "const response = await client.orders.previewOrderChange('ORD-0001', {\n    order: {effective_date: '2026-10-01', lines: [{op: 'add', item_id: 'ITEM-0001', item_order_quantity: 1}]},\n});\nconsole.log(response.data);\n"
+    },
+    "change_order_status": {
+      "function": "orders.changeOrderStatus",
+      "code": "const response = await client.orders.changeOrderStatus('ORD-0001', {order: {workflow_status: 'Approved'}});\nconsole.log(response.data);\n"
+    },
+    "adjust_order_contract": {
+      "function": "orders.adjustOrderContract",
+      "code": "const response = await client.orders.adjustOrderContract('ORD-0001', {\n    effective_date: '2026-10-01',\n    lines: [{charge_item_uuid: '0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d', package_name: 'Premium'}],\n});\nconsole.log(response.data);\n"
+    },
+    "preview_order_contract_adjustment": {
+      "function": "orders.previewOrderContractAdjustment",
+      "code": "const response = await client.orders.previewOrderContractAdjustment('ORD-0001', {\n    effective_date: '2026-10-01',\n    lines: [{charge_item_uuid: '0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d', package_name: 'Premium'}],\n});\nconsole.log(response.data);\n"
+    },
+    "downgrade_order": {
+      "function": "orders.downgradeOrder",
+      "code": "const response = await client.orders.downgradeOrder('ORD-0001', {\n    effective_date: '2026-10-01',\n    lines: [{charge_item_uuid: '0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d', package_name: 'Premium'}],\n});\nconsole.log(response.data);\n"
+    },
+    "preview_order_downgrade": {
+      "function": "orders.previewOrderDowngrade",
+      "code": "const response = await client.orders.previewOrderDowngrade('ORD-0001', {\n    effective_date: '2026-10-01',\n    lines: [{charge_item_uuid: '0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d', package_name: 'Premium'}],\n});\nconsole.log(response.data);\n"
+    },
+    "upgrade_order": {
+      "function": "orders.upgradeOrder",
+      "code": "const response = await client.orders.upgradeOrder('ORD-0001', {\n    effective_date: '2026-10-01',\n    lines: [{charge_item_uuid: '0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d', package_name: 'Premium'}],\n});\nconsole.log(response.data);\n"
+    },
+    "preview_order_upgrade": {
+      "function": "orders.previewOrderUpgrade",
+      "code": "const response = await client.orders.previewOrderUpgrade('ORD-0001', {\n    effective_date: '2026-10-01',\n    lines: [{charge_item_uuid: '0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d', package_name: 'Premium'}],\n});\nconsole.log(response.data);\n"
+    },
+    "terminate_order_trial": {
+      "function": "orders.terminateOrderTrial",
+      "code": "const response = await client.orders.terminateOrderTrial('ORD-0001');\nconsole.log(response.data);\n"
+    },
+    "delete_order_note_file": {
+      "function": "orders.deleteOrderNoteFile",
+      "code": "const response = await client.orders.deleteOrderNoteFile(\n    'ORD-0001',\n    'nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f',\n    'b7c8d9e0-f1a2-4b3c-8d4e-5f6a7b8c9d0e',\n);\nconsole.log(response.data);\n"
+    },
+    "get_order_custom_object": {
+      "function": "orders.getOrderCustomObject",
+      "code": "const response = await client.orders.getOrderCustomObject('ORD-0001', 'co_4f1c9a2e7b3d4e6f8a0b1c2d3e4f5a6b');\nconsole.log(response.data);\n"
+    },
+    "get_order_custom_object_instance": {
+      "function": "orders.getOrderCustomObjectInstance",
+      "code": "const response = await client.orders.getOrderCustomObjectInstance(\n    'ORD-0001',\n    'co_4f1c9a2e7b3d4e6f8a0b1c2d3e4f5a6b',\n    'coi_9a8b7c6d5e4f40312a1b2c3d4e5f6a7b',\n);\nconsole.log(response.data);\n"
+    },
+    "get_order_custom_objects_instance": {
+      "function": "orders.getOrderCustomObjectsInstance",
+      "code": "const response = await client.orders.getOrderCustomObjectsInstance('ORD-0001', 'co_4f1c9a2e7b3d4e6f8a0b1c2d3e4f5a6b');\nconsole.log(response.data);\n"
+    },
+    "get_order_custom_objects_instance_instance": {
+      "function": "orders.getOrderCustomObjectsInstanceInstance",
+      "code": "const response = await client.orders.getOrderCustomObjectsInstanceInstance(\n    'ORD-0001',\n    'co_4f1c9a2e7b3d4e6f8a0b1c2d3e4f5a6b',\n    'coi_9a8b7c6d5e4f40312a1b2c3d4e5f6a7b',\n);\nconsole.log(response.data);\n"
+    },
+    "get_order_item_fulfillment": {
+      "function": "orders.getOrderItemFulfillment",
+      "code": "const response = await client.orders.getOrderItemFulfillment('ORD-0001', 'IF-0001');\nconsole.log(response.data);\n"
+    },
+    "get_order_kpis": {
+      "function": "orders.getOrderKpis",
+      "code": "const response = await client.orders.getOrderKpis('ORD-0001');\nconsole.log(response.data);\n"
+    },
+    "get_order_payment": {
+      "function": "orders.getOrderPayment",
+      "code": "const response = await client.orders.getOrderPayment('ORD-0001', 'PAY-0001');\nconsole.log(response.data);\n"
+    },
+    "get_order_quote_partial_invoices": {
+      "function": "orders.getOrderQuotePartialInvoices",
+      "code": "const response = await client.orders.getOrderQuotePartialInvoices('ORD-0002');\nconsole.log(response.data);\n"
+    },
+    "get_order_shipping_pdf": {
+      "function": "orders.getOrderShippingPdf",
+      "code": "const response = await client.orders.getOrderShippingPdf('ORD-0001', '8e9f0a1b-2c3d-4e5f-a6b7-c8d9e0f1a2b3');\nconsole.log(response.data);\n"
+    }
+  }
+}
