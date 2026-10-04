@@ -1,0 +1,30 @@
+---
+title: "Milestones"
+sidebarTitle: "Overview"
+description: "Read milestones in Exsited: list them all, list them by account, labour or employee, or retrieve one."
+---
+
+Milestones mark progress points in Exsited work. You can list every milestone, list the milestones of one account, labour or employee, and retrieve one milestone. This area has 5 endpoints, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List milestones](/api-reference/milestones/list-milestones) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/milestones` | Lists milestones, one page at a time. |
+| [List an account's milestones](/api-reference/milestones/list-an-accounts-milestones) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/milestones/account/{account_id}` | Lists the milestones that belong to one account. |
+| [List a labour's milestones](/api-reference/milestones/list-a-labours-milestones) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/milestones/labour/{labour_id}` | Lists the milestones that belong to one labour. |
+| [List an employee's milestones](/api-reference/milestones/list-an-employees-milestones) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/milestones/employee/{employee_code}` | Lists the milestones that belong to one employee, found by the employee's code. |
+| [Retrieve a milestone](/api-reference/milestones/retrieve-a-milestone) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/milestones/{milestone_uuid}` | Retrieves one milestone by its `wfm_` id or raw uuid. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **The milestone calls only read.** This area has no create, update or delete call.
+- **The employee route takes the employee's `code`.** Passing the `emp_` id returns `404`.
+- **A single milestone is read by its `wfm_` id or raw uuid.** A workflow's milestone definition is a different record and returns `404`.
+- **The listings return `data` and `pagination`.** An account, labour or employee with no milestones returns an empty `data` list.

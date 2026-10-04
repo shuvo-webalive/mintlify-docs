@@ -155,6 +155,9 @@
     },
     {
       "name": "Timesheets"
+    },
+    {
+      "name": "Milestones"
     }
   ],
   "paths": {
@@ -53502,6 +53505,450 @@
           }
         ]
       }
+    },
+    "/milestones": {
+      "get": {
+        "tags": [
+          "Milestones"
+        ],
+        "summary": "List milestones",
+        "operationId": "milestones_get_milestones",
+        "description": "Returns one page of milestones under `data`, with `pagination` for the next page. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by; prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of milestones.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Milestones"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/milestones?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.milestones.get_milestones({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.milestones.getMilestones({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->milestones->getMilestones(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.milestones.milestones_dto.MilestonesDto;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<MilestonesDto.Milestones> response = client.milestones().getMilestones(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Milestones.GetMilestonesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.milestones.getMilestones(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Milestones().GetMilestones(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/milestones/account/{account_id}": {
+      "get": {
+        "tags": [
+          "Milestones"
+        ],
+        "summary": "List an account's milestones",
+        "operationId": "milestones_get_milestones_account_by_id",
+        "description": "Returns the account's milestones under `data`, with `pagination`. An account with no milestones returns an empty `data` list.",
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "path",
+            "required": true,
+            "description": "The account's `id`, such as `W13ZGY`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The account's milestones.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Milestones"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/milestones/account/W13ZGY\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.milestones.get_milestones_account_by_id(\"W13ZGY\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.milestones.getMilestonesAccountById('W13ZGY');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->milestones->getMilestonesAccountById('W13ZGY');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.milestones.milestones_dto.MilestonesDto;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<MilestonesDto.Milestones> response = client.milestones().getMilestonesAccountById(\"W13ZGY\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Milestones.GetMilestonesAccountByIdAsync(\"W13ZGY\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.milestones.getMilestonesAccountById('W13ZGY');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Milestones().GetMilestonesAccountByID(context.Background(), \"W13ZGY\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/milestones/labour/{labour_id}": {
+      "get": {
+        "tags": [
+          "Milestones"
+        ],
+        "summary": "List a labour's milestones",
+        "operationId": "milestones_get_milestones_labour_by_id",
+        "description": "Returns the labour's milestones under `data`, with `pagination`. A labour with no milestones returns an empty `data` list.",
+        "parameters": [
+          {
+            "name": "labour_id",
+            "in": "path",
+            "required": true,
+            "description": "The labour's `code`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The labour's milestones.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Milestones"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/milestones/labour/LAB-00003\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.milestones.get_milestones_labour_by_id(\"LAB-00003\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.milestones.getMilestonesLabourById('LAB-00003');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->milestones->getMilestonesLabourById('LAB-00003');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.milestones.milestones_dto.MilestonesDto;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<MilestonesDto.Milestones> response = client.milestones().getMilestonesLabourById(\"LAB-00003\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Milestones.GetMilestonesLabourByIdAsync(\"LAB-00003\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.milestones.getMilestonesLabourById('LAB-00003');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Milestones().GetMilestonesLabourByID(context.Background(), \"LAB-00003\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/milestones/employee/{employee_code}": {
+      "get": {
+        "tags": [
+          "Milestones"
+        ],
+        "summary": "List an employee's milestones",
+        "operationId": "milestones_get_milestones_employee_by_code",
+        "description": "Returns the employee's milestones under `data`, with `pagination`. The path takes the employee's `code`; an `emp_` id returns `404`. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+        "parameters": [
+          {
+            "name": "employee_code",
+            "in": "path",
+            "required": true,
+            "description": "The employee's `code`, not its `emp_` id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by; prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The employee's milestones.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Milestones"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No employee has that code. An `emp_` id in place of the code also returns `404`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/milestones/employee/EMP-00007?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.milestones.get_milestones_employee_by_code(\"EMP-00007\", {\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.milestones.getMilestonesEmployeeByCode('EMP-00007', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->milestones->getMilestonesEmployeeByCode('EMP-00007', ['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.milestones.milestones_dto.MilestonesDto;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<MilestonesDto.Milestones> response = client.milestones().getMilestonesEmployeeByCode(\n        \"EMP-00007\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Milestones.GetMilestonesEmployeeByCodeAsync(\n    \"EMP-00007\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.milestones.getMilestonesEmployeeByCode(\n  'EMP-00007',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Milestones().GetMilestonesEmployeeByCode(context.Background(), \"EMP-00007\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/milestones/{milestone_uuid}": {
+      "get": {
+        "tags": [
+          "Milestones"
+        ],
+        "summary": "Retrieve a milestone",
+        "operationId": "milestones_get_milestone",
+        "description": "Returns the milestone under `milestone`. A workflow's milestone definition is a different record and returns `404` here.",
+        "parameters": [
+          {
+            "name": "milestone_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The milestone's `id`, which starts with `wfm_`, or its raw uuid.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The milestone, under `milestone`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MilestoneResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No milestone has that id. The id of a workflow's milestone definition also returns `404`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/milestones/wfm_9f8e7d6c5b4a43219f8e7d6c5b4a3210\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.milestones.get_milestone(\"wfm_9f8e7d6c5b4a43219f8e7d6c5b4a3210\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.milestones.getMilestone('wfm_9f8e7d6c5b4a43219f8e7d6c5b4a3210');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->milestones->getMilestone('wfm_9f8e7d6c5b4a43219f8e7d6c5b4a3210');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.milestones().getMilestone(\"wfm_9f8e7d6c5b4a43219f8e7d6c5b4a3210\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Milestones.GetMilestoneAsync(\"wfm_9f8e7d6c5b4a43219f8e7d6c5b4a3210\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.milestones.getMilestone(\n  'wfm_9f8e7d6c5b4a43219f8e7d6c5b4a3210',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Milestones().GetMilestone(context.Background(), \"wfm_9f8e7d6c5b4a43219f8e7d6c5b4a3210\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -85640,6 +86087,65 @@
         "properties": {
           "timesheet": {
             "$ref": "#/components/schemas/TimesheetUpdated"
+          }
+        }
+      },
+      "Milestones": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array"
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/MilestonePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "MilestonePagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Rely on this rather than on `next_cursor`, which can still hold a value on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/MilestonePaginationLinks"
+          }
+        }
+      },
+      "MilestonePaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "MilestoneResponse": {
+        "type": "object",
+        "properties": {
+          "milestone": {
+            "type": "object"
           }
         }
       },
