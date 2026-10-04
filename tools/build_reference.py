@@ -12,6 +12,7 @@ import pathlib
 import re
 import sys
 import types
+import urllib.parse
 
 TOOLS = pathlib.Path(__file__).resolve().parent
 DOCS = TOOLS.parent
@@ -60,10 +61,11 @@ def curl(endpoint):
     call = endpoint.get("example_call", {})
     path = endpoint["path"]
     for name, value in call.get("path", {}).items():
-        path = path.replace("{%s}" % name, str(value))
+        path = path.replace("{%s}" % name, urllib.parse.quote(str(value), safe=""))
     query = call.get("query", "")
     if isinstance(query, dict):
-        query = "&".join("%s=%s" % (key, value) for key, value in query.items())
+        query = urllib.parse.urlencode({key: str(value).lower() if isinstance(value, bool) else value
+                                        for key, value in query.items()})
     url = "$EXSITED_BASE_URL/api/v4" + path + ("?" + query if query else "")
     method = endpoint["method"]
     lines = ["curl %s\"%s\" \\" % ("-I " if method == "HEAD" else "-X %s " % method, url),
@@ -73,13 +75,26 @@ def curl(endpoint):
         lines[-1] += " \\"
         lines.append("  -o %s" % call["output"])
     elif endpoint.get("multipart"):
-        lines[-1] += " \\"
-        lines.append("  -F \"file=@%s\"" % call.get("file", "file"))
+        parts = []
+        note = call.get("note")
+        if isinstance(note, str):
+            parts.append("  --form-string %s" % shell_quote("note=" + note))
+        elif isinstance(note, dict):
+            parts += ["  --form-string %s" % shell_quote("%s=%s" % (key, value)) for key, value in note.items()]
+        if call.get("file"):
+            parts.append("  -F \"file=@%s\"" % call["file"])
+        for part in parts:
+            lines[-1] += " \\"
+            lines.append(part)
     elif body is not None:
         lines[-1] += " \\"
         lines.append("  -H \"Content-Type: application/json\" \\")
         lines.append("  -d '%s'" % json.dumps(body, indent=2).replace("\n", "\n  "))
     return "\n".join(lines)
+
+
+def shell_quote(text):
+    return "'" + str(text).replace("'", "'\\''") + "'"
 
 
 def without_path_example(parameter):
@@ -397,6 +412,7 @@ def page(endpoint):
         "",
         endpoint["description"],
         "",
+    ] + (["<Warning>", "  " + endpoint["warning"], "</Warning>", ""] if endpoint.get("warning") else []) + [
         "<Note>%s</Note>" % note,
         "",
     ])
@@ -417,15 +433,10 @@ def code_group(setups, field, curl_tab=None, complete=False):
     return "\n".join(tabs) + "\n"
 
 
-def short_path(module, path):
-    tail = module.BASE[module.BASE.rfind("/"):]
-    return path.replace(module.BASE, "…" + tail, 1)
-
-
 def overview(module):
     rows = ["| [%s](/api-reference/%s/%s) | %s | `%s` | %s |" % (
         endpoint["title"], module.SLUG, endpoint["slug"], badge(endpoint["method"]),
-        short_path(module, endpoint["path"]), endpoint["summary"]) for endpoint in module.ENDPOINTS]
+        endpoint["path"], endpoint["summary"]) for endpoint in module.ENDPOINTS]
     lines = [
         "---",
         "title: \"%s\"" % module.TAG,
