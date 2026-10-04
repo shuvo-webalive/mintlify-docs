@@ -1,0 +1,2784 @@
+{
+  "family": "labours",
+  "tag": "Labours",
+  "slug": "labours",
+  "icon": "user-gear",
+  "base": "/labours",
+  "overview_description": "Manage labours in Exsited: labours, labour profiles and their sessions, availability, booking windows and orders.",
+  "intro": "Labours are the people or resources you book on orders, and labour profiles set their prices, sessions and availability. You can manage labours and profiles, set availability, find labours free to book and list the orders that book a labour. This area has 19 endpoints, and all seven SDKs call every one.",
+  "warning": "**A booked labour cannot be deleted, and deletes cannot be undone.** Cancel a booked labour instead; a deleted labour or labour profile then returns `404`.",
+  "notes": [
+    "**Bodies go under a wrapper key.** Labours go under `labour`, profiles under `labour_profile`, and the bulk availability update under `labours`; single records come back under `labour`, `labour_profile`, `labour_profile_session` or `labour_calendar`.",
+    "**A labour profile needs at least one session.** A create without `labour_profile_sessions` is refused with `400`.",
+    "**A labour names its profile by `name`.** Send the profile's `name` as `labour.labour_profile` when you create a labour.",
+    "**Cancel and reactivate take an empty JSON object.** Cancel sets `status` to `inactive`, reactivate sets it to `active`, and reactivating an active labour is refused.",
+    "**Some routes take the labour's `code`.** The orders route takes the `code`, the calendar takes the `id` or the `code`, and the other labour routes take the `id`.",
+    "**Date ranges are query parameters.** The availability list takes `start_date` and `end_date` as `YYYY-MM-DD`; the booking search takes them as `YYYY-MM-DD HH:MM`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_labour_availability",
+      "method": "GET",
+      "path": "/labour_availability",
+      "slug": "list-labour-availability",
+      "title": "List labour availability",
+      "summary": "Lists each labour with its schedule and sessions for a date range.",
+      "description": "Returns one page of labours under `data`, each with its `labour_profile`, `schedule_list`, `session_list`, `available_list` and `unavailable_list`. Pass `start_date` and `end_date` to set the range. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "start_date",
+          "in": "query",
+          "required": false,
+          "description": "The first day of the range, as `YYYY-MM-DD`.",
+          "schema": {
+            "type": "string",
+            "example": "2026-11-02"
+          }
+        },
+        {
+          "name": "end_date",
+          "in": "query",
+          "required": false,
+          "description": "The last day of the range, as `YYYY-MM-DD`.",
+          "schema": {
+            "type": "string",
+            "example": "2026-11-09"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of labour availability.",
+          "schema": {
+            "$ref": "#/components/schemas/LabourAvailabilityList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "start_date": "2026-11-02",
+          "end_date": "2026-11-09"
+        }
+      }
+    },
+    {
+      "key": "get_labour_profiles",
+      "method": "GET",
+      "path": "/labour_profiles",
+      "slug": "list-labour-profiles",
+      "title": "List labour profiles",
+      "summary": "Lists labour profiles, one page at a time.",
+      "description": "Returns one page of labour profiles under `data`, with `pagination` for the next page. Each profile carries its `currency`, `tax`, `sessions` (with prices, availability and working hours) and the `labours` that use it. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by; prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of labour profiles.",
+          "schema": {
+            "$ref": "#/components/schemas/LabourProfileList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_labour_profile",
+      "method": "POST",
+      "path": "/labour_profiles",
+      "slug": "create-a-labour-profile",
+      "title": "Create a labour profile",
+      "summary": "Creates a labour profile with its sessions, prices and availability.",
+      "description": "Send the profile under `labour_profile` with at least one entry in `labour_profile_sessions`; each session has its dates, `labour_profile_session_prices` and `labour_profile_session_availability`. A profile without sessions is refused with `400`. The new profile comes back under `labour_profile`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "labour_profile": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "currency": {
+                  "type": "string",
+                  "description": "The currency code, such as `AUD`."
+                },
+                "tax_inclusive": {
+                  "type": "boolean"
+                },
+                "labour_profile_sessions": {
+                  "type": "array",
+                  "description": "At least one session; a profile without sessions is refused with `400`.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "start_date": {
+                        "type": "string",
+                        "description": "The first day of the session, as `YYYY-MM-DD`."
+                      },
+                      "end_date": {
+                        "type": "string",
+                        "description": "The last day of the session, as `YYYY-MM-DD`."
+                      },
+                      "labour_profile_session_prices": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "price": {
+                              "type": "number"
+                            },
+                            "enabled_pro_rata": {
+                              "type": "boolean"
+                            },
+                            "price_type": {
+                              "type": "string",
+                              "description": "How the price applies, such as `HOURLY`."
+                            }
+                          }
+                        }
+                      },
+                      "labour_profile_session_availability": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "preferred_day": {
+                              "type": "string",
+                              "description": "The day of the week, in lower case, such as `monday`."
+                            },
+                            "start_time": {
+                              "type": "string",
+                              "description": "The start time, as `HH:MM`."
+                            },
+                            "end_time": {
+                              "type": "string",
+                              "description": "The end time, as `HH:MM`."
+                            },
+                            "available": {
+                              "type": "boolean"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "required": [
+                "labour_profile_sessions"
+              ]
+            }
+          },
+          "required": [
+            "labour_profile"
+          ]
+        },
+        "example": {
+          "labour_profile": {
+            "name": "Standard technician",
+            "display_name": "Standard technician",
+            "currency": "AUD",
+            "tax_inclusive": false,
+            "labour_profile_sessions": [
+              {
+                "name": "Business hours",
+                "start_date": "2026-11-02",
+                "end_date": "2027-11-02",
+                "labour_profile_session_prices": [
+                  {
+                    "price": 10,
+                    "enabled_pro_rata": false,
+                    "price_type": "HOURLY"
+                  }
+                ],
+                "labour_profile_session_availability": [
+                  {
+                    "preferred_day": "monday",
+                    "start_time": "08:00",
+                    "end_time": "18:00",
+                    "available": true
+                  },
+                  {
+                    "preferred_day": "tuesday",
+                    "start_time": "08:00",
+                    "end_time": "18:00",
+                    "available": true
+                  },
+                  {
+                    "preferred_day": "wednesday",
+                    "start_time": "08:00",
+                    "end_time": "18:00",
+                    "available": true
+                  },
+                  {
+                    "preferred_day": "thursday",
+                    "start_time": "08:00",
+                    "end_time": "18:00",
+                    "available": true
+                  },
+                  {
+                    "preferred_day": "friday",
+                    "start_time": "08:00",
+                    "end_time": "18:00",
+                    "available": true
+                  },
+                  {
+                    "preferred_day": "saturday",
+                    "start_time": "08:00",
+                    "end_time": "18:00",
+                    "available": true
+                  },
+                  {
+                    "preferred_day": "sunday",
+                    "start_time": "08:00",
+                    "end_time": "18:00",
+                    "available": true
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new labour profile, under `labour_profile`.",
+          "schema": {
+            "$ref": "#/components/schemas/LabourProfileViewResponse"
+          }
+        },
+        "400": {
+          "description": "The profile has no sessions."
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "labour_profile": {
+            "name": "Standard technician",
+            "display_name": "Standard technician",
+            "currency": "AUD",
+            "tax_inclusive": false,
+            "labour_profile_sessions": [
+              {
+                "name": "Business hours",
+                "start_date": "2026-11-02",
+                "end_date": "2027-11-02",
+                "labour_profile_session_prices": [
+                  {
+                    "price": 10,
+                    "enabled_pro_rata": false,
+                    "price_type": "HOURLY"
+                  }
+                ],
+                "labour_profile_session_availability": [
+                  {
+                    "preferred_day": "monday",
+                    "start_time": "08:00",
+                    "end_time": "18:00",
+                    "available": true
+                  },
+                  {
+                    "preferred_day": "tuesday",
+                    "start_time": "08:00",
+                    "end_time": "18:00",
+                    "available": true
+                  },
+                  {
+                    "preferred_day": "wednesday",
+                    "start_time": "08:00",
+                    "end_time": "18:00",
+                    "available": true
+                  },
+                  {
+                    "preferred_day": "thursday",
+                    "start_time": "08:00",
+                    "end_time": "18:00",
+                    "available": true
+                  },
+                  {
+                    "preferred_day": "friday",
+                    "start_time": "08:00",
+                    "end_time": "18:00",
+                    "available": true
+                  },
+                  {
+                    "preferred_day": "saturday",
+                    "start_time": "08:00",
+                    "end_time": "18:00",
+                    "available": true
+                  },
+                  {
+                    "preferred_day": "sunday",
+                    "start_time": "08:00",
+                    "end_time": "18:00",
+                    "available": true
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "get_labours",
+      "method": "GET",
+      "path": "/labours",
+      "slug": "list-labours",
+      "title": "List labours",
+      "summary": "Lists labours, one page at a time.",
+      "description": "Returns one page of labours under `data`, with `pagination` for the next page. Each labour carries its `id`, `code`, `name`, `status`, `labour_profile`, `labour_contacts` and availability. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by; prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of labours.",
+          "schema": {
+            "$ref": "#/components/schemas/LabourList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_labour",
+      "method": "POST",
+      "path": "/labours",
+      "slug": "create-a-labour",
+      "title": "Create a labour",
+      "summary": "Creates a labour on a labour profile and returns it under `labour`.",
+      "description": "Send the new labour under `labour` with its `name`, `display_name`, `email_address` and the `name` of its `labour_profile`. The new labour comes back under `labour`, with its `id` and `code`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "labour": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "email_address": {
+                  "type": "string"
+                },
+                "labour_profile": {
+                  "type": "string",
+                  "description": "The `name` of the labour profile to use."
+                }
+              }
+            }
+          },
+          "required": [
+            "labour"
+          ]
+        },
+        "example": {
+          "labour": {
+            "name": "Jane Citizen",
+            "display_name": "Jane Citizen",
+            "email_address": "jane@example.com",
+            "labour_profile": "Standard technician"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new labour, under `labour`.",
+          "schema": {
+            "$ref": "#/components/schemas/LabourResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "labour": {
+            "name": "Jane Citizen",
+            "display_name": "Jane Citizen",
+            "email_address": "jane@example.com",
+            "labour_profile": "Standard technician"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_labour_profile",
+      "method": "GET",
+      "path": "/labour_profiles/{labour_profile_id}",
+      "slug": "retrieve-a-labour-profile",
+      "title": "Retrieve a labour profile",
+      "summary": "Retrieves one labour profile with its sessions and labours.",
+      "description": "Returns the profile under `labour_profile`, including its `sessions`, `labours` and `activity_logs`.",
+      "parameters": [
+        {
+          "name": "labour_profile_id",
+          "in": "path",
+          "required": true,
+          "description": "The labour profile's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The labour profile, under `labour_profile`.",
+          "schema": {
+            "$ref": "#/components/schemas/LabourProfileViewResponse"
+          }
+        },
+        "404": {
+          "description": "No labour profile has that `id`, for example because it has been deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "labour_profile_id": "5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d"
+        }
+      }
+    },
+    {
+      "key": "update_labour_profile",
+      "method": "PATCH",
+      "path": "/labour_profiles/{labour_profile_id}",
+      "slug": "update-a-labour-profile",
+      "title": "Update a labour profile",
+      "summary": "Updates a labour profile's details.",
+      "description": "Send the fields to change under `labour_profile`, such as `display_name`. Read the profile afterwards to see the stored values.",
+      "parameters": [
+        {
+          "name": "labour_profile_id",
+          "in": "path",
+          "required": true,
+          "description": "The labour profile's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "labour_profile": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "tax_inclusive": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "required": [
+            "labour_profile"
+          ]
+        },
+        "example": {
+          "labour_profile": {
+            "display_name": "Senior technician"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The labour profile is updated."
+        }
+      },
+      "example_call": {
+        "path": {
+          "labour_profile_id": "5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d"
+        },
+        "body": {
+          "labour_profile": {
+            "display_name": "Senior technician"
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_labour_profile",
+      "method": "DELETE",
+      "path": "/labour_profiles/{labour_profile_id}",
+      "slug": "delete-a-labour-profile",
+      "title": "Delete a labour profile",
+      "summary": "Deletes a labour profile.",
+      "description": "Deletes the labour profile with this `id`. Reading the profile afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "labour_profile_id",
+          "in": "path",
+          "required": true,
+          "description": "The labour profile's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The labour profile is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "labour_profile_id": "5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d"
+        }
+      }
+    },
+    {
+      "key": "get_labours_available_for_booking",
+      "method": "GET",
+      "path": "/labours/available_for_booking",
+      "slug": "list-labours-available-for-booking",
+      "title": "List labours available for booking",
+      "summary": "Lists the labours free to book in a time window.",
+      "description": "Returns one page of labours under `data` that can be booked between `start_date` and `end_date`, each given as a date and time. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "start_date",
+          "in": "query",
+          "required": false,
+          "description": "The start of the booking window, as `YYYY-MM-DD HH:MM`.",
+          "schema": {
+            "type": "string",
+            "example": "2026-11-09 09:00"
+          }
+        },
+        {
+          "name": "end_date",
+          "in": "query",
+          "required": false,
+          "description": "The end of the booking window, as `YYYY-MM-DD HH:MM`.",
+          "schema": {
+            "type": "string",
+            "example": "2026-11-09 10:00"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of labours free to book.",
+          "schema": {
+            "$ref": "#/components/schemas/LabourList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "start_date": "2026-11-09 09:00",
+          "end_date": "2026-11-09 10:00"
+        }
+      }
+    },
+    {
+      "key": "update_labour",
+      "method": "PATCH",
+      "path": "/labours/{labour_uuid}",
+      "slug": "update-a-labour",
+      "title": "Update a labour",
+      "summary": "Updates a labour and returns it under `labour`.",
+      "description": "Send the fields to change under `labour`, such as `description`. The updated labour comes back under `labour`.",
+      "parameters": [
+        {
+          "name": "labour_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The labour's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "labour": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "email_address": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "labour"
+          ]
+        },
+        "example": {
+          "labour": {
+            "description": "Certified electrician"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated labour, under `labour`.",
+          "schema": {
+            "$ref": "#/components/schemas/LabourResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "labour_uuid": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d"
+        },
+        "body": {
+          "labour": {
+            "description": "Certified electrician"
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_labour",
+      "method": "DELETE",
+      "path": "/labours/{labour_uuid}",
+      "slug": "delete-a-labour",
+      "title": "Delete a labour",
+      "summary": "Deletes a labour; the response has no body.",
+      "description": "Deletes the labour with this `id`. A successful delete returns `204` with no body, and reading the labour afterwards returns `404`. A labour that has been booked on an order cannot be deleted; cancel it instead.",
+      "parameters": [
+        {
+          "name": "labour_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The labour's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The labour is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "labour_uuid": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d"
+        }
+      }
+    },
+    {
+      "key": "get_labour",
+      "method": "GET",
+      "path": "/labours/{labour_uuid}",
+      "slug": "retrieve-a-labour",
+      "title": "Retrieve a labour",
+      "summary": "Retrieves one labour with its profile, contacts and availability.",
+      "description": "Returns the labour under `labour`, including its `labour_profile`, `labour_contacts`, `labour_custom_availability` and `activity_logs`.",
+      "parameters": [
+        {
+          "name": "labour_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The labour's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The labour, under `labour`.",
+          "schema": {
+            "$ref": "#/components/schemas/LabourResponse"
+          }
+        },
+        "404": {
+          "description": "No labour has that `id`, for example because it has been deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "labour_uuid": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d"
+        }
+      }
+    },
+    {
+      "key": "cancel_labour",
+      "method": "POST",
+      "path": "/labours/{labour_id}/cancel",
+      "slug": "cancel-a-labour",
+      "title": "Cancel a labour",
+      "summary": "Makes a labour inactive and returns it under `labour`.",
+      "description": "Send an empty JSON object as the body. The labour's `status` becomes `inactive`, and the labour comes back under `labour`. Use reactivate to make it active again.",
+      "parameters": [
+        {
+          "name": "labour_id",
+          "in": "path",
+          "required": true,
+          "description": "The labour's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "description": "An empty object."
+        },
+        "example": {}
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The labour, under `labour`.",
+          "schema": {
+            "$ref": "#/components/schemas/LabourResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "labour_id": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d"
+        },
+        "body": {}
+      }
+    },
+    {
+      "key": "reactivate_labour",
+      "method": "POST",
+      "path": "/labours/{labour_id}/reactivate",
+      "slug": "reactivate-a-labour",
+      "title": "Reactivate a labour",
+      "summary": "Makes a cancelled labour active again and returns it under `labour`.",
+      "description": "Send an empty JSON object as the body. The labour's `status` becomes `active`, and the labour comes back under `labour`. Reactivating a labour that is already active is refused with a `4xx` error.",
+      "parameters": [
+        {
+          "name": "labour_id",
+          "in": "path",
+          "required": true,
+          "description": "The labour's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "description": "An empty object."
+        },
+        "example": {}
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The labour, under `labour`.",
+          "schema": {
+            "$ref": "#/components/schemas/LabourResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "labour_id": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d"
+        },
+        "body": {}
+      }
+    },
+    {
+      "key": "get_labour_orders",
+      "method": "GET",
+      "path": "/labours/{labour_uuid}/orders",
+      "slug": "list-a-labours-orders",
+      "title": "List a labour's orders",
+      "summary": "Lists the orders that book one labour.",
+      "description": "Returns one page of the orders that book this labour under `data`, with `pagination`. The path takes the labour's `code`. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "labour_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The labour's `code`.",
+          "schema": {
+            "type": "string",
+            "example": "LAB-00003"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of the labour's orders.",
+          "schema": {
+            "$ref": "#/components/schemas/LabourOrderList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "labour_uuid": "LAB-00003"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "update_labour_availability",
+      "method": "PATCH",
+      "path": "/labour_availability",
+      "slug": "update-labour-availability-in-bulk",
+      "title": "Update labour availability in bulk",
+      "summary": "Sets the availability slots of one or more labours in one call.",
+      "description": "Send `labours`, an array with one entry per labour: its `id` and the slots to set in `labour_availability` or `labour_custom_availability`. Each slot has a `preferred_day`, `start_time`, `end_time` and `available`. A successful update returns `204` with no body.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "labours": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "The labour's `id`."
+                  },
+                  "labour_availability": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "preferred_day": {
+                          "type": "string",
+                          "description": "The day of the week, in lower case, such as `monday`."
+                        },
+                        "start_time": {
+                          "type": "string",
+                          "description": "The start time, as `HH:MM`."
+                        },
+                        "end_time": {
+                          "type": "string",
+                          "description": "The end time, as `HH:MM`."
+                        },
+                        "available": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  },
+                  "labour_custom_availability": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "preferred_day": {
+                          "type": "string",
+                          "description": "The day of the week, in lower case, such as `monday`."
+                        },
+                        "start_time": {
+                          "type": "string",
+                          "description": "The start time, as `HH:MM`."
+                        },
+                        "end_time": {
+                          "type": "string",
+                          "description": "The end time, as `HH:MM`."
+                        },
+                        "available": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          },
+          "required": [
+            "labours"
+          ]
+        },
+        "example": {
+          "labours": [
+            {
+              "id": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d",
+              "labour_custom_availability": [
+                {
+                  "preferred_day": "monday",
+                  "start_time": "09:00",
+                  "end_time": "12:00",
+                  "available": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The availability is updated. No body."
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "labours": [
+            {
+              "id": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d",
+              "labour_custom_availability": [
+                {
+                  "preferred_day": "monday",
+                  "start_time": "09:00",
+                  "end_time": "12:00",
+                  "available": true
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "key": "get_labour_profile_sessions",
+      "method": "GET",
+      "path": "/labour_profiles/{labour_profile_id}/sessions",
+      "slug": "list-a-labour-profiles-sessions",
+      "title": "List a labour profile's sessions",
+      "summary": "Lists the sessions of one labour profile.",
+      "description": "Returns the profile's sessions under `data`, with `pagination`. Each session carries its dates, `prices`, `availability` and `working_hours`. A profile with no sessions returns an empty `data` list. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "labour_profile_id",
+          "in": "path",
+          "required": true,
+          "description": "The labour profile's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of the profile's sessions.",
+          "schema": {
+            "$ref": "#/components/schemas/LabourProfileSessionList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "labour_profile_id": "5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_labour_profile_session",
+      "method": "GET",
+      "path": "/labour_profiles/{labour_profile_id}/sessions/{session_id}",
+      "slug": "retrieve-a-labour-profile-session",
+      "title": "Retrieve a labour profile session",
+      "summary": "Retrieves one session of a labour profile.",
+      "description": "Returns the session under `labour_profile_session`, with its dates, `prices`, `availability` and `working_hours`.",
+      "parameters": [
+        {
+          "name": "labour_profile_id",
+          "in": "path",
+          "required": true,
+          "description": "The labour profile's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d"
+          }
+        },
+        {
+          "name": "session_id",
+          "in": "path",
+          "required": true,
+          "description": "The session's `id`, from the profile's session list.",
+          "schema": {
+            "type": "string",
+            "example": "8c0d2e4f-6a8b-4c1d-9e3f-5a7b9c1d3e5f"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The session, under `labour_profile_session`.",
+          "schema": {
+            "$ref": "#/components/schemas/LabourProfileSessionViewResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "labour_profile_id": "5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d",
+          "session_id": "8c0d2e4f-6a8b-4c1d-9e3f-5a7b9c1d3e5f"
+        }
+      }
+    },
+    {
+      "key": "get_labour_calendar",
+      "method": "GET",
+      "path": "/labours/{labour_id}/availability",
+      "slug": "retrieve-a-labours-availability-calendar",
+      "title": "Retrieve a labour's availability calendar",
+      "summary": "Retrieves one labour's availability calendar.",
+      "description": "Returns the labour's calendar under `labour_calendar`, in the same form as one entry of the labour availability list: its schedule, sessions and available and unavailable slots. The path takes the labour's `id` or its `code`.",
+      "parameters": [
+        {
+          "name": "labour_id",
+          "in": "path",
+          "required": true,
+          "description": "The labour's `id` or its `code`.",
+          "schema": {
+            "type": "string",
+            "example": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The calendar, under `labour_calendar`.",
+          "schema": {
+            "$ref": "#/components/schemas/LabourCalendarResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "labour_id": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "Labour": {
+      "type": "object",
+      "properties": {
+        "activity_logs": {
+          "type": "array"
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/LabourCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "custom_form": {
+          "$ref": "#/components/schemas/LabourCustomForm"
+        },
+        "description": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "email_address": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "image_name": {
+          "type": "null"
+        },
+        "labour_availability": {
+          "type": "array"
+        },
+        "labour_contacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourLabourContact"
+          }
+        },
+        "labour_custom_availability": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourLabourCustomAvailability"
+          }
+        },
+        "labour_profile": {
+          "$ref": "#/components/schemas/LabourLabourProfile"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/LabourLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "use_custom_availability": {
+          "type": "boolean"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "LabourCreatedBy": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourCustomForm": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourLabourContact": {
+      "type": "object",
+      "properties": {
+        "address_line_1": {
+          "type": "string"
+        },
+        "address_line_2": {
+          "type": "string"
+        },
+        "address_line_3": {
+          "type": "string"
+        },
+        "address_line_4": {
+          "type": "string"
+        },
+        "address_line_5": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "contact_type": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "designation": {
+          "type": "string"
+        },
+        "email_address": {
+          "type": "string"
+        },
+        "fax": {
+          "$ref": "#/components/schemas/LabourLabourContactFax"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "middle_name": {
+          "type": "null"
+        },
+        "mobile": {
+          "$ref": "#/components/schemas/LabourLabourContactMobile"
+        },
+        "object": {
+          "type": "string"
+        },
+        "phone": {
+          "$ref": "#/components/schemas/LabourLabourContactPhone"
+        },
+        "post_code": {
+          "type": "string"
+        },
+        "receive_email": {
+          "type": "boolean"
+        },
+        "salutation": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourLabourContactFax": {
+      "type": "object",
+      "properties": {
+        "area_code": {
+          "type": "string"
+        },
+        "country_code": {
+          "type": "string"
+        },
+        "do_not_call": {
+          "type": "boolean"
+        },
+        "full": {
+          "type": "string"
+        },
+        "number": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourLabourContactMobile": {
+      "type": "object",
+      "properties": {
+        "area_code": {
+          "type": "string"
+        },
+        "country_code": {
+          "type": "string"
+        },
+        "do_not_call": {
+          "type": "boolean"
+        },
+        "full": {
+          "type": "string"
+        },
+        "number": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourLabourContactPhone": {
+      "type": "object",
+      "properties": {
+        "area_code": {
+          "type": "string"
+        },
+        "country_code": {
+          "type": "string"
+        },
+        "do_not_call": {
+          "type": "boolean"
+        },
+        "full": {
+          "type": "string"
+        },
+        "number": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourLabourCustomAvailability": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "preferred_day": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourLabourProfile": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourResponse": {
+      "type": "object",
+      "properties": {
+        "labour": {
+          "$ref": "#/components/schemas/Labour"
+        }
+      }
+    },
+    "LabourProfileView": {
+      "type": "object",
+      "properties": {
+        "activity_logs": {
+          "type": "array"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/LabourProfileViewCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/LabourProfileViewCurrency"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "labours": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourProfileViewRow"
+          }
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/LabourProfileViewLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "max_booking_limit": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "sessions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourProfileViewSession"
+          }
+        },
+        "status": {
+          "type": "string"
+        },
+        "tax": {
+          "$ref": "#/components/schemas/LabourProfileViewTax"
+        },
+        "tax_inclusive": {
+          "type": "boolean"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "LabourProfileViewCreatedBy": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileViewCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileViewRow": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileViewLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileViewSession": {
+      "type": "object",
+      "properties": {
+        "allow_overtime": {
+          "type": "boolean"
+        },
+        "availability": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourProfileViewSessionAvailability"
+          }
+        },
+        "end_date": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "prices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourProfileViewSessionPrice"
+          }
+        },
+        "start_date": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "working_hours": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourProfileViewSessionWorkingHour"
+          }
+        }
+      }
+    },
+    "LabourProfileViewSessionAvailability": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "preferred_day": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileViewSessionPrice": {
+      "type": "object",
+      "properties": {
+        "enabled_pro_rata": {
+          "type": "boolean"
+        },
+        "hours": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourProfileViewSessionPriceHour"
+          }
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "peak_hourly": {
+          "type": "array"
+        },
+        "price": {
+          "type": "number"
+        },
+        "price_type": {
+          "type": "string"
+        },
+        "pricing_level": {
+          "$ref": "#/components/schemas/LabourProfileViewSessionPricePricingLevel"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileViewSessionPriceHour": {
+      "type": "object",
+      "properties": {
+        "end_time": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileViewSessionPricePricingLevel": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileViewSessionWorkingHour": {
+      "type": "object",
+      "properties": {
+        "end_time": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileViewTax": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileViewResponse": {
+      "type": "object",
+      "properties": {
+        "labour_profile": {
+          "$ref": "#/components/schemas/LabourProfileView"
+        }
+      }
+    },
+    "LabourAvailabilityList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourAvailability"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/LabourPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourAvailability": {
+      "type": "object",
+      "properties": {
+        "available_list": {
+          "type": "array"
+        },
+        "code": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "email_address": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "labour_profile": {
+          "$ref": "#/components/schemas/LabourAvailabilityLabourProfile"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "processed_schedule_list": {
+          "type": "object"
+        },
+        "schedule_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourAvailabilityScheduleList"
+          }
+        },
+        "session_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourAvailabilitySessionList"
+          }
+        },
+        "status": {
+          "type": "string"
+        },
+        "unavailable_list": {
+          "type": "array"
+        },
+        "use_custom_availability": {
+          "type": "boolean"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "LabourAvailabilityLabourProfile": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourAvailabilityScheduleList": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "preferred_day": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourAvailabilitySessionList": {
+      "type": "object",
+      "properties": {
+        "end_date": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "processed_schedule_list": {
+          "type": "object"
+        },
+        "schedule_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourAvailabilitySessionListScheduleList"
+          }
+        },
+        "start_date": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourAvailabilitySessionListScheduleList": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "string"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "preferred_day": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Rely on this rather than on `next_cursor`, which can still hold a value on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/LabourPaginationLinks"
+        }
+      }
+    },
+    "LabourPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourProfile"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/LabourPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfile": {
+      "type": "object",
+      "properties": {
+        "created_by": {
+          "$ref": "#/components/schemas/LabourProfileCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/LabourProfileCurrency"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "labours": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourProfileRow"
+          }
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/LabourProfileLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "max_booking_limit": {
+          "type": "null"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "sessions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourProfileSession"
+          }
+        },
+        "status": {
+          "type": "string"
+        },
+        "tax": {
+          "$ref": "#/components/schemas/LabourProfileTax"
+        },
+        "tax_inclusive": {
+          "type": "boolean"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "LabourProfileCreatedBy": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileRow": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileSession": {
+      "type": "object",
+      "properties": {
+        "allow_overtime": {
+          "type": "boolean"
+        },
+        "availability": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourProfileSessionAvailability"
+          }
+        },
+        "end_date": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "prices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourProfileSessionPrice"
+          }
+        },
+        "start_date": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "working_hours": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourProfileSessionWorkingHour"
+          }
+        }
+      }
+    },
+    "LabourProfileSessionAvailability": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "preferred_day": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileSessionPrice": {
+      "type": "object",
+      "properties": {
+        "enabled_pro_rata": {
+          "type": "boolean"
+        },
+        "hours": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourProfileSessionPriceHour"
+          }
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "peak_hourly": {
+          "type": "array"
+        },
+        "price": {
+          "type": "number"
+        },
+        "price_type": {
+          "type": "string"
+        },
+        "pricing_level": {
+          "$ref": "#/components/schemas/LabourProfileSessionPricePricingLevel"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileSessionPriceHour": {
+      "type": "object",
+      "properties": {
+        "end_time": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileSessionPricePricingLevel": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileSessionWorkingHour": {
+      "type": "object",
+      "properties": {
+        "end_time": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileTax": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Labour"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/LabourPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourOrderList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourOrder"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/LabourPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourOrder": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/LabourOrderAccount"
+        },
+        "allow_contract": {
+          "type": "boolean"
+        },
+        "billing_address": {
+          "type": "null"
+        },
+        "billing_preferences": {
+          "$ref": "#/components/schemas/LabourOrderBillingPreferences"
+        },
+        "billing_start_date": {
+          "type": "string"
+        },
+        "communication_preferences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourOrderCommunicationPreference"
+          }
+        },
+        "created_by": {
+          "type": "null"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/LabourOrderCurrency"
+        },
+        "custom_form": {
+          "$ref": "#/components/schemas/LabourOrderCustomForm"
+        },
+        "customer_purchase_order_id": {
+          "type": "null"
+        },
+        "description": {
+          "type": "null"
+        },
+        "discount_profile": {
+          "type": "null"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "invoice_note": {
+          "type": "null"
+        },
+        "last_updated_by": {
+          "type": "null"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "manager": {
+          "type": "null"
+        },
+        "name": {
+          "type": "string"
+        },
+        "next_billing_from_date": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "order_start_date": {
+          "type": "string"
+        },
+        "order_type": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "null"
+        },
+        "original_total": {
+          "type": "null"
+        },
+        "pre_order": {
+          "type": "boolean"
+        },
+        "price_tax_inclusive": {
+          "type": "boolean"
+        },
+        "quote_converted": {
+          "type": "boolean"
+        },
+        "quote_order": {
+          "type": "boolean"
+        },
+        "referral_account": {
+          "type": "null"
+        },
+        "sales_rep": {
+          "type": "null"
+        },
+        "shipping_address": {
+          "type": "null"
+        },
+        "shipping_cost": {
+          "type": "number"
+        },
+        "shipping_profile": {
+          "type": "null"
+        },
+        "status": {
+          "type": "string"
+        },
+        "time_zone": {
+          "$ref": "#/components/schemas/LabourOrderTimeZone"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "LabourOrderAccount": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourOrderBillingPreferences": {
+      "type": "object",
+      "properties": {
+        "billing_period": {
+          "type": "string"
+        },
+        "communication_profile": {
+          "type": "string"
+        },
+        "consolidate_invoice": {
+          "type": "boolean"
+        },
+        "fulfillment_mode": {
+          "type": "string"
+        },
+        "fulfillment_term": {
+          "type": "string"
+        },
+        "invoice_mode": {
+          "type": "string"
+        },
+        "invoice_term": {
+          "type": "string"
+        },
+        "payment_mode": {
+          "type": "string"
+        },
+        "payment_processor": {
+          "type": "string"
+        },
+        "payment_term": {
+          "type": "string"
+        },
+        "payment_term_alignment": {
+          "type": "string"
+        },
+        "proforma_properties": {
+          "$ref": "#/components/schemas/LabourOrderBillingPreferencesProformaProperties"
+        }
+      }
+    },
+    "LabourOrderBillingPreferencesProformaProperties": {
+      "type": "object",
+      "properties": {
+        "acceptance_date": {
+          "type": "null"
+        },
+        "acceptance_required": {
+          "type": "boolean"
+        },
+        "acceptance_term": {
+          "type": "null"
+        },
+        "payment_required": {
+          "type": "boolean"
+        },
+        "terms_and_conditions": {
+          "type": "null"
+        }
+      }
+    },
+    "LabourOrderCommunicationPreference": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "LabourOrderCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourOrderCustomForm": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourOrderTimeZone": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileSessionList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LabourProfileViewSession"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/LabourPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "LabourProfileSessionViewResponse": {
+      "type": "object",
+      "properties": {
+        "labour_profile_session": {
+          "$ref": "#/components/schemas/LabourProfileViewSession"
+        }
+      }
+    },
+    "LabourCalendarResponse": {
+      "type": "object",
+      "properties": {
+        "labour_calendar": {
+          "$ref": "#/components/schemas/LabourAvailability"
+        }
+      }
+    }
+  }
+}

@@ -146,6 +146,9 @@
     },
     {
       "name": "Receive terms"
+    },
+    {
+      "name": "Labours"
     }
   ],
   "paths": {
@@ -49443,6 +49446,1926 @@
           }
         }
       }
+    },
+    "/labour_availability": {
+      "get": {
+        "tags": [
+          "Labours"
+        ],
+        "summary": "List labour availability",
+        "operationId": "labours_get_labour_availability",
+        "description": "Returns one page of labours under `data`, each with its `labour_profile`, `schedule_list`, `session_list`, `available_list` and `unavailable_list`. Pass `start_date` and `end_date` to set the range. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "description": "The first day of the range, as `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "example": "2026-11-02"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "description": "The last day of the range, as `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "example": "2026-11-09"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of labour availability.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabourAvailabilityList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/labour_availability?start_date=2026-11-02&end_date=2026-11-09\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.labours.get_labour_availability(\n    {\"start_date\": \"2026-11-02\", \"end_date\": \"2026-11-09\"}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.labours.getLabourAvailability({start_date: '2026-11-02', end_date: '2026-11-09'});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->labours->getLabourAvailability([\n    'start_date' => '2026-11-02',\n    'end_date' => '2026-11-09',\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.labours.labours_dto.LaboursDto.LabourAvailabilityList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<LabourAvailabilityList> response = client.labours().getLabourAvailability(\n        Map.of(\"start_date\", \"2026-11-02\", \"end_date\", \"2026-11-09\"));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Labours.GetLabourAvailabilityAsync(new Dictionary<string, object?>\n{\n    [\"start_date\"] = \"2026-11-02\",\n    [\"end_date\"] = \"2026-11-09\",\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.labours.getLabourAvailability(\n  queryParams: {'start_date': '2026-11-02', 'end_date': '2026-11-09'},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Labours().GetLabourAvailability(context.Background(), map[string]any{\n\t\"start_date\": \"2026-11-02\",\n\t\"end_date\":   \"2026-11-09\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Labours"
+        ],
+        "summary": "Update labour availability in bulk",
+        "operationId": "labours_update_labour_availability",
+        "description": "Send `labours`, an array with one entry per labour: its `id` and the slots to set in `labour_availability` or `labour_custom_availability`. Each slot has a `preferred_day`, `start_time`, `end_time` and `available`. A successful update returns `204` with no body.",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "The availability is updated. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/labour_availability\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"labours\": [\n      {\n        \"id\": \"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\",\n        \"labour_custom_availability\": [\n          {\n            \"preferred_day\": \"monday\",\n            \"start_time\": \"09:00\",\n            \"end_time\": \"12:00\",\n            \"available\": true\n          }\n        ]\n      }\n    ]\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.labours.update_labour_availability(\n    {\n        \"labours\": [\n            {\n                \"id\": \"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\",\n                \"labour_custom_availability\": [\n                    {\n                        \"preferred_day\": \"monday\",\n                        \"start_time\": \"09:00\",\n                        \"end_time\": \"12:00\",\n                        \"available\": True,\n                    }\n                ],\n            }\n        ]\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.labours.updateLabourAvailability({\n    labours: [\n        {\n            id: '0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d',\n            labour_custom_availability: [\n                {preferred_day: 'monday', start_time: '09:00', end_time: '12:00', available: true},\n            ],\n        },\n    ],\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->labours->updateLabourAvailability([\n    'labours' => [\n        [\n            'id' => '0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d',\n            'labour_custom_availability' => [\n                [\n                    'preferred_day' => 'monday',\n                    'start_time' => '09:00',\n                    'end_time' => '12:00',\n                    'available' => true,\n                ],\n            ],\n        ],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.labours().updateLabourAvailability(\n        Map.of(\n                \"labours\", List.of(\n                        Map.of(\n                                \"id\", \"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\",\n                                \"labour_custom_availability\", List.of(\n                                        Map.of(\n                                                \"preferred_day\", \"monday\",\n                                                \"start_time\", \"09:00\",\n                                                \"end_time\", \"12:00\",\n                                                \"available\", true))))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Labours.UpdateLabourAvailabilityAsync(new Dictionary<string, object?>\n{\n    [\"labours\"] = new List<object?>\n    {\n        new Dictionary<string, object?>\n        {\n            [\"id\"] = \"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\",\n            [\"labour_custom_availability\"] = new List<object?>\n            {\n                new Dictionary<string, object?>\n                {\n                    [\"preferred_day\"] = \"monday\",\n                    [\"start_time\"] = \"09:00\",\n                    [\"end_time\"] = \"12:00\",\n                    [\"available\"] = true,\n                },\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.labours.updateLabourAvailability({\n  'labours': [\n    {\n      'id': '0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d',\n      'labour_custom_availability': [\n        {\n          'preferred_day': 'monday',\n          'start_time': '09:00',\n          'end_time': '12:00',\n          'available': true,\n        },\n      ],\n    },\n  ],\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Labours().UpdateLabourAvailability(context.Background(), map[string]any{\n\t\"labours\": []any{\n\t\tmap[string]any{\n\t\t\t\"id\": \"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\",\n\t\t\t\"labour_custom_availability\": []any{\n\t\t\t\tmap[string]any{\n\t\t\t\t\t\"preferred_day\": \"monday\",\n\t\t\t\t\t\"start_time\":    \"09:00\",\n\t\t\t\t\t\"end_time\":      \"12:00\",\n\t\t\t\t\t\"available\":     true,\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "labours": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "The labour's `id`."
+                        },
+                        "labour_availability": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "preferred_day": {
+                                "type": "string",
+                                "description": "The day of the week, in lower case, such as `monday`."
+                              },
+                              "start_time": {
+                                "type": "string",
+                                "description": "The start time, as `HH:MM`."
+                              },
+                              "end_time": {
+                                "type": "string",
+                                "description": "The end time, as `HH:MM`."
+                              },
+                              "available": {
+                                "type": "boolean"
+                              }
+                            }
+                          }
+                        },
+                        "labour_custom_availability": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "preferred_day": {
+                                "type": "string",
+                                "description": "The day of the week, in lower case, such as `monday`."
+                              },
+                              "start_time": {
+                                "type": "string",
+                                "description": "The start time, as `HH:MM`."
+                              },
+                              "end_time": {
+                                "type": "string",
+                                "description": "The end time, as `HH:MM`."
+                              },
+                              "available": {
+                                "type": "boolean"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "labours"
+                ]
+              },
+              "example": {
+                "labours": [
+                  {
+                    "id": "0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d",
+                    "labour_custom_availability": [
+                      {
+                        "preferred_day": "monday",
+                        "start_time": "09:00",
+                        "end_time": "12:00",
+                        "available": true
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/labour_profiles": {
+      "get": {
+        "tags": [
+          "Labours"
+        ],
+        "summary": "List labour profiles",
+        "operationId": "labours_get_labour_profiles",
+        "description": "Returns one page of labour profiles under `data`, with `pagination` for the next page. Each profile carries its `currency`, `tax`, `sessions` (with prices, availability and working hours) and the `labours` that use it. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by; prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of labour profiles.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabourProfileList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/labour_profiles?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.labours.get_labour_profiles({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.labours.getLabourProfiles({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->labours->getLabourProfiles(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.labours.labours_dto.LaboursDto.LabourProfileList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<LabourProfileList> response = client.labours().getLabourProfiles(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Labours.GetLabourProfilesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.labours.getLabourProfiles(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Labours().GetLabourProfiles(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Labours"
+        ],
+        "summary": "Create a labour profile",
+        "operationId": "labours_create_labour_profile",
+        "description": "Send the profile under `labour_profile` with at least one entry in `labour_profile_sessions`; each session has its dates, `labour_profile_session_prices` and `labour_profile_session_availability`. A profile without sessions is refused with `400`. The new profile comes back under `labour_profile`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new labour profile, under `labour_profile`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabourProfileViewResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The profile has no sessions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/labour_profiles\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"labour_profile\": {\n      \"name\": \"Standard technician\",\n      \"display_name\": \"Standard technician\",\n      \"currency\": \"AUD\",\n      \"tax_inclusive\": false,\n      \"labour_profile_sessions\": [\n        {\n          \"name\": \"Business hours\",\n          \"start_date\": \"2026-11-02\",\n          \"end_date\": \"2027-11-02\",\n          \"labour_profile_session_prices\": [\n            {\n              \"price\": 10,\n              \"enabled_pro_rata\": false,\n              \"price_type\": \"HOURLY\"\n            }\n          ],\n          \"labour_profile_session_availability\": [\n            {\n              \"preferred_day\": \"monday\",\n              \"start_time\": \"08:00\",\n              \"end_time\": \"18:00\",\n              \"available\": true\n            },\n            {\n              \"preferred_day\": \"tuesday\",\n              \"start_time\": \"08:00\",\n              \"end_time\": \"18:00\",\n              \"available\": true\n            },\n            {\n              \"preferred_day\": \"wednesday\",\n              \"start_time\": \"08:00\",\n              \"end_time\": \"18:00\",\n              \"available\": true\n            },\n            {\n              \"preferred_day\": \"thursday\",\n              \"start_time\": \"08:00\",\n              \"end_time\": \"18:00\",\n              \"available\": true\n            },\n            {\n              \"preferred_day\": \"friday\",\n              \"start_time\": \"08:00\",\n              \"end_time\": \"18:00\",\n              \"available\": true\n            },\n            {\n              \"preferred_day\": \"saturday\",\n              \"start_time\": \"08:00\",\n              \"end_time\": \"18:00\",\n              \"available\": true\n            },\n            {\n              \"preferred_day\": \"sunday\",\n              \"start_time\": \"08:00\",\n              \"end_time\": \"18:00\",\n              \"available\": true\n            }\n          ]\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.labours.create_labour_profile(\n    {\n        \"labour_profile\": {\n            \"name\": \"Standard technician\",\n            \"display_name\": \"Standard technician\",\n            \"currency\": \"AUD\",\n            \"tax_inclusive\": False,\n            \"labour_profile_sessions\": [\n                {\n                    \"name\": \"Business hours\",\n                    \"start_date\": \"2026-11-02\",\n                    \"end_date\": \"2027-11-02\",\n                    \"labour_profile_session_prices\": [\n                        {\"price\": 10, \"enabled_pro_rata\": False, \"price_type\": \"HOURLY\"}\n                    ],\n                    \"labour_profile_session_availability\": [\n                        {\n                            \"preferred_day\": \"monday\",\n                            \"start_time\": \"08:00\",\n                            \"end_time\": \"18:00\",\n                            \"available\": True,\n                        },\n                        {\n                            \"preferred_day\": \"tuesday\",\n                            \"start_time\": \"08:00\",\n                            \"end_time\": \"18:00\",\n                            \"available\": True,\n                        },\n                        {\n                            \"preferred_day\": \"wednesday\",\n                            \"start_time\": \"08:00\",\n                            \"end_time\": \"18:00\",\n                            \"available\": True,\n                        },\n                        {\n                            \"preferred_day\": \"thursday\",\n                            \"start_time\": \"08:00\",\n                            \"end_time\": \"18:00\",\n                            \"available\": True,\n                        },\n                        {\n                            \"preferred_day\": \"friday\",\n                            \"start_time\": \"08:00\",\n                            \"end_time\": \"18:00\",\n                            \"available\": True,\n                        },\n                        {\n                            \"preferred_day\": \"saturday\",\n                            \"start_time\": \"08:00\",\n                            \"end_time\": \"18:00\",\n                            \"available\": True,\n                        },\n                        {\n                            \"preferred_day\": \"sunday\",\n                            \"start_time\": \"08:00\",\n                            \"end_time\": \"18:00\",\n                            \"available\": True,\n                        },\n                    ],\n                }\n            ],\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.labours.createLabourProfile({\n    labour_profile: {\n        name: 'Standard technician',\n        display_name: 'Standard technician',\n        currency: 'AUD',\n        tax_inclusive: false,\n        labour_profile_sessions: [\n            {\n                name: 'Business hours',\n                start_date: '2026-11-02',\n                end_date: '2027-11-02',\n                labour_profile_session_prices: [{price: 10, enabled_pro_rata: false, price_type: 'HOURLY'}],\n                labour_profile_session_availability: [\n                    {preferred_day: 'monday', start_time: '08:00', end_time: '18:00', available: true},\n                    {preferred_day: 'tuesday', start_time: '08:00', end_time: '18:00', available: true},\n                    {preferred_day: 'wednesday', start_time: '08:00', end_time: '18:00', available: true},\n                    {preferred_day: 'thursday', start_time: '08:00', end_time: '18:00', available: true},\n                    {preferred_day: 'friday', start_time: '08:00', end_time: '18:00', available: true},\n                    {preferred_day: 'saturday', start_time: '08:00', end_time: '18:00', available: true},\n                    {preferred_day: 'sunday', start_time: '08:00', end_time: '18:00', available: true},\n                ],\n            },\n        ],\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->labours->createLabourProfile([\n    'labour_profile' => [\n        'name' => 'Standard technician',\n        'display_name' => 'Standard technician',\n        'currency' => 'AUD',\n        'tax_inclusive' => false,\n        'labour_profile_sessions' => [\n            [\n                'name' => 'Business hours',\n                'start_date' => '2026-11-02',\n                'end_date' => '2027-11-02',\n                'labour_profile_session_prices' => [\n                    ['price' => 10, 'enabled_pro_rata' => false, 'price_type' => 'HOURLY'],\n                ],\n                'labour_profile_session_availability' => [\n                    [\n                        'preferred_day' => 'monday',\n                        'start_time' => '08:00',\n                        'end_time' => '18:00',\n                        'available' => true,\n                    ],\n                    [\n                        'preferred_day' => 'tuesday',\n                        'start_time' => '08:00',\n                        'end_time' => '18:00',\n                        'available' => true,\n                    ],\n                    [\n                        'preferred_day' => 'wednesday',\n                        'start_time' => '08:00',\n                        'end_time' => '18:00',\n                        'available' => true,\n                    ],\n                    [\n                        'preferred_day' => 'thursday',\n                        'start_time' => '08:00',\n                        'end_time' => '18:00',\n                        'available' => true,\n                    ],\n                    [\n                        'preferred_day' => 'friday',\n                        'start_time' => '08:00',\n                        'end_time' => '18:00',\n                        'available' => true,\n                    ],\n                    [\n                        'preferred_day' => 'saturday',\n                        'start_time' => '08:00',\n                        'end_time' => '18:00',\n                        'available' => true,\n                    ],\n                    [\n                        'preferred_day' => 'sunday',\n                        'start_time' => '08:00',\n                        'end_time' => '18:00',\n                        'available' => true,\n                    ],\n                ],\n            ],\n        ],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.labours.labours_dto.LaboursDto.LabourProfileView;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<LabourProfileView> response = client.labours().createLabourProfile(\n        Map.of(\n                \"labour_profile\", Map.of(\n                        \"name\", \"Standard technician\",\n                        \"display_name\", \"Standard technician\",\n                        \"currency\", \"AUD\",\n                        \"tax_inclusive\", false,\n                        \"labour_profile_sessions\", List.of(\n                                Map.of(\n                                        \"name\", \"Business hours\",\n                                        \"start_date\", \"2026-11-02\",\n                                        \"end_date\", \"2027-11-02\",\n                                        \"labour_profile_session_prices\", List.of(\n                                                Map.of(\n                                                        \"price\", 10,\n                                                        \"enabled_pro_rata\", false,\n                                                        \"price_type\", \"HOURLY\")),\n                                        \"labour_profile_session_availability\", List.of(\n                                                Map.of(\n                                                        \"preferred_day\", \"monday\",\n                                                        \"start_time\", \"08:00\",\n                                                        \"end_time\", \"18:00\",\n                                                        \"available\", true),\n                                                Map.of(\n                                                        \"preferred_day\", \"tuesday\",\n                                                        \"start_time\", \"08:00\",\n                                                        \"end_time\", \"18:00\",\n                                                        \"available\", true),\n                                                Map.of(\n                                                        \"preferred_day\", \"wednesday\",\n                                                        \"start_time\", \"08:00\",\n                                                        \"end_time\", \"18:00\",\n                                                        \"available\", true),\n                                                Map.of(\n                                                        \"preferred_day\", \"thursday\",\n                                                        \"start_time\", \"08:00\",\n                                                        \"end_time\", \"18:00\",\n                                                        \"available\", true),\n                                                Map.of(\n                                                        \"preferred_day\", \"friday\",\n                                                        \"start_time\", \"08:00\",\n                                                        \"end_time\", \"18:00\",\n                                                        \"available\", true),\n                                                Map.of(\n                                                        \"preferred_day\", \"saturday\",\n                                                        \"start_time\", \"08:00\",\n                                                        \"end_time\", \"18:00\",\n                                                        \"available\", true),\n                                                Map.of(\n                                                        \"preferred_day\", \"sunday\",\n                                                        \"start_time\", \"08:00\",\n                                                        \"end_time\", \"18:00\",\n                                                        \"available\", true)))))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Labours.CreateLabourProfileAsync(new Dictionary<string, object?>\n{\n    [\"labour_profile\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Standard technician\",\n        [\"display_name\"] = \"Standard technician\",\n        [\"currency\"] = \"AUD\",\n        [\"tax_inclusive\"] = false,\n        [\"labour_profile_sessions\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"name\"] = \"Business hours\",\n                [\"start_date\"] = \"2026-11-02\",\n                [\"end_date\"] = \"2027-11-02\",\n                [\"labour_profile_session_prices\"] = new List<object?>\n                {\n                    new Dictionary<string, object?>\n                    {\n                        [\"price\"] = 10,\n                        [\"enabled_pro_rata\"] = false,\n                        [\"price_type\"] = \"HOURLY\",\n                    },\n                },\n                [\"labour_profile_session_availability\"] = new List<object?>\n                {\n                    new Dictionary<string, object?>\n                    {\n                        [\"preferred_day\"] = \"monday\",\n                        [\"start_time\"] = \"08:00\",\n                        [\"end_time\"] = \"18:00\",\n                        [\"available\"] = true,\n                    },\n                    new Dictionary<string, object?>\n                    {\n                        [\"preferred_day\"] = \"tuesday\",\n                        [\"start_time\"] = \"08:00\",\n                        [\"end_time\"] = \"18:00\",\n                        [\"available\"] = true,\n                    },\n                    new Dictionary<string, object?>\n                    {\n                        [\"preferred_day\"] = \"wednesday\",\n                        [\"start_time\"] = \"08:00\",\n                        [\"end_time\"] = \"18:00\",\n                        [\"available\"] = true,\n                    },\n                    new Dictionary<string, object?>\n                    {\n                        [\"preferred_day\"] = \"thursday\",\n                        [\"start_time\"] = \"08:00\",\n                        [\"end_time\"] = \"18:00\",\n                        [\"available\"] = true,\n                    },\n                    new Dictionary<string, object?>\n                    {\n                        [\"preferred_day\"] = \"friday\",\n                        [\"start_time\"] = \"08:00\",\n                        [\"end_time\"] = \"18:00\",\n                        [\"available\"] = true,\n                    },\n                    new Dictionary<string, object?>\n                    {\n                        [\"preferred_day\"] = \"saturday\",\n                        [\"start_time\"] = \"08:00\",\n                        [\"end_time\"] = \"18:00\",\n                        [\"available\"] = true,\n                    },\n                    new Dictionary<string, object?>\n                    {\n                        [\"preferred_day\"] = \"sunday\",\n                        [\"start_time\"] = \"08:00\",\n                        [\"end_time\"] = \"18:00\",\n                        [\"available\"] = true,\n                    },\n                },\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.labours.createLabourProfile({\n  'labour_profile': {\n    'name': 'Standard technician',\n    'display_name': 'Standard technician',\n    'currency': 'AUD',\n    'tax_inclusive': false,\n    'labour_profile_sessions': [\n      {\n        'name': 'Business hours',\n        'start_date': '2026-11-02',\n        'end_date': '2027-11-02',\n        'labour_profile_session_prices': [\n          {'price': 10, 'enabled_pro_rata': false, 'price_type': 'HOURLY'},\n        ],\n        'labour_profile_session_availability': [\n          {\n            'preferred_day': 'monday',\n            'start_time': '08:00',\n            'end_time': '18:00',\n            'available': true,\n          },\n          {\n            'preferred_day': 'tuesday',\n            'start_time': '08:00',\n            'end_time': '18:00',\n            'available': true,\n          },\n          {\n            'preferred_day': 'wednesday',\n            'start_time': '08:00',\n            'end_time': '18:00',\n            'available': true,\n          },\n          {\n            'preferred_day': 'thursday',\n            'start_time': '08:00',\n            'end_time': '18:00',\n            'available': true,\n          },\n          {\n            'preferred_day': 'friday',\n            'start_time': '08:00',\n            'end_time': '18:00',\n            'available': true,\n          },\n          {\n            'preferred_day': 'saturday',\n            'start_time': '08:00',\n            'end_time': '18:00',\n            'available': true,\n          },\n          {\n            'preferred_day': 'sunday',\n            'start_time': '08:00',\n            'end_time': '18:00',\n            'available': true,\n          },\n        ],\n      },\n    ],\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Labours().CreateLabourProfile(context.Background(), map[string]any{\n\t\"labour_profile\": map[string]any{\n\t\t\"name\":          \"Standard technician\",\n\t\t\"display_name\":  \"Standard technician\",\n\t\t\"currency\":      \"AUD\",\n\t\t\"tax_inclusive\": false,\n\t\t\"labour_profile_sessions\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"name\":       \"Business hours\",\n\t\t\t\t\"start_date\": \"2026-11-02\",\n\t\t\t\t\"end_date\":   \"2027-11-02\",\n\t\t\t\t\"labour_profile_session_prices\": []any{\n\t\t\t\t\tmap[string]any{\n\t\t\t\t\t\t\"price\":            10,\n\t\t\t\t\t\t\"enabled_pro_rata\": false,\n\t\t\t\t\t\t\"price_type\":       \"HOURLY\",\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\t\"labour_profile_session_availability\": []any{\n\t\t\t\t\tmap[string]any{\n\t\t\t\t\t\t\"preferred_day\": \"monday\",\n\t\t\t\t\t\t\"start_time\":    \"08:00\",\n\t\t\t\t\t\t\"end_time\":      \"18:00\",\n\t\t\t\t\t\t\"available\":     true,\n\t\t\t\t\t},\n\t\t\t\t\tmap[string]any{\n\t\t\t\t\t\t\"preferred_day\": \"tuesday\",\n\t\t\t\t\t\t\"start_time\":    \"08:00\",\n\t\t\t\t\t\t\"end_time\":      \"18:00\",\n\t\t\t\t\t\t\"available\":     true,\n\t\t\t\t\t},\n\t\t\t\t\tmap[string]any{\n\t\t\t\t\t\t\"preferred_day\": \"wednesday\",\n\t\t\t\t\t\t\"start_time\":    \"08:00\",\n\t\t\t\t\t\t\"end_time\":      \"18:00\",\n\t\t\t\t\t\t\"available\":     true,\n\t\t\t\t\t},\n\t\t\t\t\tmap[string]any{\n\t\t\t\t\t\t\"preferred_day\": \"thursday\",\n\t\t\t\t\t\t\"start_time\":    \"08:00\",\n\t\t\t\t\t\t\"end_time\":      \"18:00\",\n\t\t\t\t\t\t\"available\":     true,\n\t\t\t\t\t},\n\t\t\t\t\tmap[string]any{\n\t\t\t\t\t\t\"preferred_day\": \"friday\",\n\t\t\t\t\t\t\"start_time\":    \"08:00\",\n\t\t\t\t\t\t\"end_time\":      \"18:00\",\n\t\t\t\t\t\t\"available\":     true,\n\t\t\t\t\t},\n\t\t\t\t\tmap[string]any{\n\t\t\t\t\t\t\"preferred_day\": \"saturday\",\n\t\t\t\t\t\t\"start_time\":    \"08:00\",\n\t\t\t\t\t\t\"end_time\":      \"18:00\",\n\t\t\t\t\t\t\"available\":     true,\n\t\t\t\t\t},\n\t\t\t\t\tmap[string]any{\n\t\t\t\t\t\t\"preferred_day\": \"sunday\",\n\t\t\t\t\t\t\"start_time\":    \"08:00\",\n\t\t\t\t\t\t\"end_time\":      \"18:00\",\n\t\t\t\t\t\t\"available\":     true,\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "labour_profile": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "currency": {
+                        "type": "string",
+                        "description": "The currency code, such as `AUD`."
+                      },
+                      "tax_inclusive": {
+                        "type": "boolean"
+                      },
+                      "labour_profile_sessions": {
+                        "type": "array",
+                        "description": "At least one session; a profile without sessions is refused with `400`.",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "start_date": {
+                              "type": "string",
+                              "description": "The first day of the session, as `YYYY-MM-DD`."
+                            },
+                            "end_date": {
+                              "type": "string",
+                              "description": "The last day of the session, as `YYYY-MM-DD`."
+                            },
+                            "labour_profile_session_prices": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "price": {
+                                    "type": "number"
+                                  },
+                                  "enabled_pro_rata": {
+                                    "type": "boolean"
+                                  },
+                                  "price_type": {
+                                    "type": "string",
+                                    "description": "How the price applies, such as `HOURLY`."
+                                  }
+                                }
+                              }
+                            },
+                            "labour_profile_session_availability": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "preferred_day": {
+                                    "type": "string",
+                                    "description": "The day of the week, in lower case, such as `monday`."
+                                  },
+                                  "start_time": {
+                                    "type": "string",
+                                    "description": "The start time, as `HH:MM`."
+                                  },
+                                  "end_time": {
+                                    "type": "string",
+                                    "description": "The end time, as `HH:MM`."
+                                  },
+                                  "available": {
+                                    "type": "boolean"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "labour_profile_sessions"
+                    ]
+                  }
+                },
+                "required": [
+                  "labour_profile"
+                ]
+              },
+              "example": {
+                "labour_profile": {
+                  "name": "Standard technician",
+                  "display_name": "Standard technician",
+                  "currency": "AUD",
+                  "tax_inclusive": false,
+                  "labour_profile_sessions": [
+                    {
+                      "name": "Business hours",
+                      "start_date": "2026-11-02",
+                      "end_date": "2027-11-02",
+                      "labour_profile_session_prices": [
+                        {
+                          "price": 10,
+                          "enabled_pro_rata": false,
+                          "price_type": "HOURLY"
+                        }
+                      ],
+                      "labour_profile_session_availability": [
+                        {
+                          "preferred_day": "monday",
+                          "start_time": "08:00",
+                          "end_time": "18:00",
+                          "available": true
+                        },
+                        {
+                          "preferred_day": "tuesday",
+                          "start_time": "08:00",
+                          "end_time": "18:00",
+                          "available": true
+                        },
+                        {
+                          "preferred_day": "wednesday",
+                          "start_time": "08:00",
+                          "end_time": "18:00",
+                          "available": true
+                        },
+                        {
+                          "preferred_day": "thursday",
+                          "start_time": "08:00",
+                          "end_time": "18:00",
+                          "available": true
+                        },
+                        {
+                          "preferred_day": "friday",
+                          "start_time": "08:00",
+                          "end_time": "18:00",
+                          "available": true
+                        },
+                        {
+                          "preferred_day": "saturday",
+                          "start_time": "08:00",
+                          "end_time": "18:00",
+                          "available": true
+                        },
+                        {
+                          "preferred_day": "sunday",
+                          "start_time": "08:00",
+                          "end_time": "18:00",
+                          "available": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/labours": {
+      "get": {
+        "tags": [
+          "Labours"
+        ],
+        "summary": "List labours",
+        "operationId": "labours_get_labours",
+        "description": "Returns one page of labours under `data`, with `pagination` for the next page. Each labour carries its `id`, `code`, `name`, `status`, `labour_profile`, `labour_contacts` and availability. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by; prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of labours.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabourList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/labours?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.labours.get_labours({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.labours.getLabours({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->labours->getLabours(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.labours.labours_dto.LaboursDto.LabourList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<LabourList> response = client.labours().getLabours(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Labours.GetLaboursAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.labours.getLabours(queryParams: {'limit': 20});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Labours().GetLabours(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Labours"
+        ],
+        "summary": "Create a labour",
+        "operationId": "labours_create_labour",
+        "description": "Send the new labour under `labour` with its `name`, `display_name`, `email_address` and the `name` of its `labour_profile`. The new labour comes back under `labour`, with its `id` and `code`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new labour, under `labour`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabourResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/labours\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"labour\": {\n      \"name\": \"Jane Citizen\",\n      \"display_name\": \"Jane Citizen\",\n      \"email_address\": \"jane@example.com\",\n      \"labour_profile\": \"Standard technician\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.labours.create_labour(\n    {\n        \"labour\": {\n            \"name\": \"Jane Citizen\",\n            \"display_name\": \"Jane Citizen\",\n            \"email_address\": \"jane@example.com\",\n            \"labour_profile\": \"Standard technician\",\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.labours.createLabour({\n    labour: {\n        name: 'Jane Citizen',\n        display_name: 'Jane Citizen',\n        email_address: 'jane@example.com',\n        labour_profile: 'Standard technician',\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->labours->createLabour([\n    'labour' => [\n        'name' => 'Jane Citizen',\n        'display_name' => 'Jane Citizen',\n        'email_address' => 'jane@example.com',\n        'labour_profile' => 'Standard technician',\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.labours.labours_dto.LaboursDto.Labour;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Labour> response = client.labours().createLabour(\n        Map.of(\n                \"labour\", Map.of(\n                        \"name\", \"Jane Citizen\",\n                        \"display_name\", \"Jane Citizen\",\n                        \"email_address\", \"jane@example.com\",\n                        \"labour_profile\", \"Standard technician\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Labours.CreateLabourAsync(new Dictionary<string, object?>\n{\n    [\"labour\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Jane Citizen\",\n        [\"display_name\"] = \"Jane Citizen\",\n        [\"email_address\"] = \"jane@example.com\",\n        [\"labour_profile\"] = \"Standard technician\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.labours.createLabour({\n  'labour': {\n    'name': 'Jane Citizen',\n    'display_name': 'Jane Citizen',\n    'email_address': 'jane@example.com',\n    'labour_profile': 'Standard technician',\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Labours().CreateLabour(context.Background(), map[string]any{\n\t\"labour\": map[string]any{\n\t\t\"name\":           \"Jane Citizen\",\n\t\t\"display_name\":   \"Jane Citizen\",\n\t\t\"email_address\":  \"jane@example.com\",\n\t\t\"labour_profile\": \"Standard technician\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "labour": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "email_address": {
+                        "type": "string"
+                      },
+                      "labour_profile": {
+                        "type": "string",
+                        "description": "The `name` of the labour profile to use."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "labour"
+                ]
+              },
+              "example": {
+                "labour": {
+                  "name": "Jane Citizen",
+                  "display_name": "Jane Citizen",
+                  "email_address": "jane@example.com",
+                  "labour_profile": "Standard technician"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/labour_profiles/{labour_profile_id}": {
+      "get": {
+        "tags": [
+          "Labours"
+        ],
+        "summary": "Retrieve a labour profile",
+        "operationId": "labours_get_labour_profile",
+        "description": "Returns the profile under `labour_profile`, including its `sessions`, `labours` and `activity_logs`.",
+        "parameters": [
+          {
+            "name": "labour_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The labour profile's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The labour profile, under `labour_profile`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabourProfileViewResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No labour profile has that `id`, for example because it has been deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/labour_profiles/5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.labours.get_labour_profile(\"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.labours.getLabourProfile('5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->labours->getLabourProfile('5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.labours.labours_dto.LaboursDto.LabourProfileView;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<LabourProfileView> response = client.labours().getLabourProfile(\"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Labours.GetLabourProfileAsync(\"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.labours.getLabourProfile(\n  '5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Labours().GetLabourProfile(context.Background(), \"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Labours"
+        ],
+        "summary": "Update a labour profile",
+        "operationId": "labours_update_labour_profile",
+        "description": "Send the fields to change under `labour_profile`, such as `display_name`. Read the profile afterwards to see the stored values.",
+        "parameters": [
+          {
+            "name": "labour_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The labour profile's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The labour profile is updated."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/labour_profiles/5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"labour_profile\": {\n      \"display_name\": \"Senior technician\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.labours.update_labour_profile(\n    \"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\",\n    {\"labour_profile\": {\"display_name\": \"Senior technician\"}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.labours.updateLabourProfile('5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d', {\n    labour_profile: {display_name: 'Senior technician'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->labours->updateLabourProfile('5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d', [\n    'labour_profile' => ['display_name' => 'Senior technician'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.labours().updateLabourProfile(\n        \"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\",\n        Map.of(\"labour_profile\", Map.of(\"display_name\", \"Senior technician\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Labours.UpdateLabourProfileAsync(\n    \"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\",\n    new Dictionary<string, object?>\n    {\n        [\"labour_profile\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Senior technician\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.labours.updateLabourProfile(\n  '5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d',\n  {\n    'labour_profile': {'display_name': 'Senior technician'},\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Labours().UpdateLabourProfile(context.Background(), \"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\", map[string]any{\n\t\"labour_profile\": map[string]any{\"display_name\": \"Senior technician\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "labour_profile": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "tax_inclusive": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "labour_profile"
+                ]
+              },
+              "example": {
+                "labour_profile": {
+                  "display_name": "Senior technician"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Labours"
+        ],
+        "summary": "Delete a labour profile",
+        "operationId": "labours_delete_labour_profile",
+        "description": "Deletes the labour profile with this `id`. Reading the profile afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "labour_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The labour profile's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The labour profile is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/labour_profiles/5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.labours.delete_labour_profile(\"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.labours.deleteLabourProfile('5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->labours->deleteLabourProfile('5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.labours().deleteLabourProfile(\"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Labours.DeleteLabourProfileAsync(\"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.labours.deleteLabourProfile(\n  '5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Labours().DeleteLabourProfile(context.Background(), \"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/labours/available_for_booking": {
+      "get": {
+        "tags": [
+          "Labours"
+        ],
+        "summary": "List labours available for booking",
+        "operationId": "labours_get_labours_available_for_booking",
+        "description": "Returns one page of labours under `data` that can be booked between `start_date` and `end_date`, each given as a date and time. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "description": "The start of the booking window, as `YYYY-MM-DD HH:MM`.",
+            "schema": {
+              "type": "string",
+              "example": "2026-11-09 09:00"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "description": "The end of the booking window, as `YYYY-MM-DD HH:MM`.",
+            "schema": {
+              "type": "string",
+              "example": "2026-11-09 10:00"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of labours free to book.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabourList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/labours/available_for_booking?start_date=2026-11-09 09:00&end_date=2026-11-09 10:00\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.labours.get_labours_available_for_booking(\n    {\"start_date\": \"2026-11-09 09:00\", \"end_date\": \"2026-11-09 10:00\"}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.labours.getLaboursAvailableForBooking({\n    start_date: '2026-11-09 09:00',\n    end_date: '2026-11-09 10:00',\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->labours->getLaboursAvailableForBooking([\n    'start_date' => '2026-11-09 09:00',\n    'end_date' => '2026-11-09 10:00',\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.labours.labours_dto.LaboursDto.LabourList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<LabourList> response = client.labours().getLaboursAvailableForBooking(\n        Map.of(\"start_date\", \"2026-11-09 09:00\", \"end_date\", \"2026-11-09 10:00\"));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Labours.GetLaboursAvailableForBookingAsync(new Dictionary<string, object?>\n{\n    [\"start_date\"] = \"2026-11-09 09:00\",\n    [\"end_date\"] = \"2026-11-09 10:00\",\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.labours.getLaboursAvailableForBooking(\n  queryParams: {\n    'start_date': '2026-11-09 09:00',\n    'end_date': '2026-11-09 10:00',\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Labours().GetLaboursAvailableForBooking(context.Background(), map[string]any{\n\t\"start_date\": \"2026-11-09 09:00\",\n\t\"end_date\":   \"2026-11-09 10:00\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/labours/{labour_uuid}": {
+      "patch": {
+        "tags": [
+          "Labours"
+        ],
+        "summary": "Update a labour",
+        "operationId": "labours_update_labour",
+        "description": "Send the fields to change under `labour`, such as `description`. The updated labour comes back under `labour`.",
+        "parameters": [
+          {
+            "name": "labour_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The labour's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated labour, under `labour`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabourResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/labours/0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"labour\": {\n      \"description\": \"Certified electrician\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.labours.update_labour(\n    \"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\",\n    {\"labour\": {\"description\": \"Certified electrician\"}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.labours.updateLabour('0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d', {\n    labour: {description: 'Certified electrician'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->labours->updateLabour('0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d', [\n    'labour' => ['description' => 'Certified electrician'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.labours.labours_dto.LaboursDto.Labour;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Labour> response = client.labours().updateLabour(\n        \"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\",\n        Map.of(\"labour\", Map.of(\"description\", \"Certified electrician\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Labours.UpdateLabourAsync(\n    \"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\",\n    new Dictionary<string, object?>\n    {\n        [\"labour\"] = new Dictionary<string, object?>\n        {\n            [\"description\"] = \"Certified electrician\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.labours.updateLabour(\n  '0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d',\n  {\n    'labour': {'description': 'Certified electrician'},\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Labours().UpdateLabour(context.Background(), \"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\", map[string]any{\n\t\"labour\": map[string]any{\"description\": \"Certified electrician\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "labour": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "email_address": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "labour"
+                ]
+              },
+              "example": {
+                "labour": {
+                  "description": "Certified electrician"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Labours"
+        ],
+        "summary": "Delete a labour",
+        "operationId": "labours_delete_labour",
+        "description": "Deletes the labour with this `id`. A successful delete returns `204` with no body, and reading the labour afterwards returns `404`. A labour that has been booked on an order cannot be deleted; cancel it instead.",
+        "parameters": [
+          {
+            "name": "labour_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The labour's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The labour is deleted. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/labours/0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.labours.delete_labour(\"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.labours.deleteLabour('0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->labours->deleteLabour('0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.labours().deleteLabour(\"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Labours.DeleteLabourAsync(\"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.labours.deleteLabour(\n  '0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Labours().DeleteLabour(context.Background(), \"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Labours"
+        ],
+        "summary": "Retrieve a labour",
+        "operationId": "labours_get_labour",
+        "description": "Returns the labour under `labour`, including its `labour_profile`, `labour_contacts`, `labour_custom_availability` and `activity_logs`.",
+        "parameters": [
+          {
+            "name": "labour_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The labour's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The labour, under `labour`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabourResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No labour has that `id`, for example because it has been deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/labours/0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.labours.get_labour(\"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.labours.getLabour('0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->labours->getLabour('0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.labours.labours_dto.LaboursDto.Labour;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Labour> response = client.labours().getLabour(\"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Labours.GetLabourAsync(\"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.labours.getLabour(\n  '0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Labours().GetLabour(context.Background(), \"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/labours/{labour_id}/cancel": {
+      "post": {
+        "tags": [
+          "Labours"
+        ],
+        "summary": "Cancel a labour",
+        "operationId": "labours_cancel_labour",
+        "description": "Send an empty JSON object as the body. The labour's `status` becomes `inactive`, and the labour comes back under `labour`. Use reactivate to make it active again.",
+        "parameters": [
+          {
+            "name": "labour_id",
+            "in": "path",
+            "required": true,
+            "description": "The labour's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The labour, under `labour`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabourResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/labours/0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d/cancel\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{}'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.labours.cancel_labour(\"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\", {})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.labours.cancelLabour('0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d', {});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->labours->cancelLabour('0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d', '{}');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.labours.labours_dto.LaboursDto.Labour;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Labour> response = client.labours().cancelLabour(\n        \"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\",\n        Map.of());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Labours.CancelLabourAsync(\n    \"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\",\n    new Dictionary<string, object?>());\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.labours.cancelLabour(\n  '0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d',\n  {},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Labours().CancelLabour(context.Background(), \"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\", map[string]any{}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "An empty object."
+              },
+              "example": {}
+            }
+          }
+        }
+      }
+    },
+    "/labours/{labour_id}/reactivate": {
+      "post": {
+        "tags": [
+          "Labours"
+        ],
+        "summary": "Reactivate a labour",
+        "operationId": "labours_reactivate_labour",
+        "description": "Send an empty JSON object as the body. The labour's `status` becomes `active`, and the labour comes back under `labour`. Reactivating a labour that is already active is refused with a `4xx` error.",
+        "parameters": [
+          {
+            "name": "labour_id",
+            "in": "path",
+            "required": true,
+            "description": "The labour's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The labour, under `labour`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabourResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/labours/0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d/reactivate\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{}'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.labours.reactivate_labour(\"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\", {})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.labours.reactivateLabour('0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d', {});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->labours->reactivateLabour('0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d', '{}');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.labours.labours_dto.LaboursDto.Labour;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Labour> response = client.labours().reactivateLabour(\n        \"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\",\n        Map.of());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Labours.ReactivateLabourAsync(\n    \"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\",\n    new Dictionary<string, object?>());\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.labours.reactivateLabour(\n  '0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d',\n  {},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Labours().ReactivateLabour(context.Background(), \"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\", map[string]any{}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "An empty object."
+              },
+              "example": {}
+            }
+          }
+        }
+      }
+    },
+    "/labours/{labour_uuid}/orders": {
+      "get": {
+        "tags": [
+          "Labours"
+        ],
+        "summary": "List a labour's orders",
+        "operationId": "labours_get_labour_orders",
+        "description": "Returns one page of the orders that book this labour under `data`, with `pagination`. The path takes the labour's `code`. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+        "parameters": [
+          {
+            "name": "labour_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The labour's `code`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of the labour's orders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabourOrderList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/labours/LAB-00003/orders?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.labours.get_labour_orders(\"LAB-00003\", {\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.labours.getLabourOrders('LAB-00003', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->labours->getLabourOrders('LAB-00003', ['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.labours.labours_dto.LaboursDto.LabourOrderList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<LabourOrderList> response = client.labours().getLabourOrders(\n        \"LAB-00003\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Labours.GetLabourOrdersAsync(\n    \"LAB-00003\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.labours.getLabourOrders(\n  'LAB-00003',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Labours().GetLabourOrders(context.Background(), \"LAB-00003\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/labour_profiles/{labour_profile_id}/sessions": {
+      "get": {
+        "tags": [
+          "Labours"
+        ],
+        "summary": "List a labour profile's sessions",
+        "operationId": "labours_get_labour_profile_sessions",
+        "description": "Returns the profile's sessions under `data`, with `pagination`. Each session carries its dates, `prices`, `availability` and `working_hours`. A profile with no sessions returns an empty `data` list. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+        "parameters": [
+          {
+            "name": "labour_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The labour profile's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of the profile's sessions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabourProfileSessionList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/labour_profiles/5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d/sessions?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.labours.get_labour_profile_sessions(\n    \"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.labours.getLabourProfileSessions('5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->labours->getLabourProfileSessions('5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d', [\n    'limit' => 20,\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.labours.labours_dto.LaboursDto.LabourProfileSessionList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<LabourProfileSessionList> response = client.labours().getLabourProfileSessions(\n        \"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Labours.GetLabourProfileSessionsAsync(\n    \"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.labours.getLabourProfileSessions(\n  '5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Labours().GetLabourProfileSessions(context.Background(), \"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/labour_profiles/{labour_profile_id}/sessions/{session_id}": {
+      "get": {
+        "tags": [
+          "Labours"
+        ],
+        "summary": "Retrieve a labour profile session",
+        "operationId": "labours_get_labour_profile_session",
+        "description": "Returns the session under `labour_profile_session`, with its dates, `prices`, `availability` and `working_hours`.",
+        "parameters": [
+          {
+            "name": "labour_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The labour profile's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "description": "The session's `id`, from the profile's session list.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The session, under `labour_profile_session`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabourProfileSessionViewResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/labour_profiles/5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d/sessions/8c0d2e4f-6a8b-4c1d-9e3f-5a7b9c1d3e5f\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.labours.get_labour_profile_session(\n    \"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\", \"8c0d2e4f-6a8b-4c1d-9e3f-5a7b9c1d3e5f\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.labours.getLabourProfileSession(\n    '5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d',\n    '8c0d2e4f-6a8b-4c1d-9e3f-5a7b9c1d3e5f',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->labours->getLabourProfileSession(\n    '5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d',\n    '8c0d2e4f-6a8b-4c1d-9e3f-5a7b9c1d3e5f',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.labours.labours_dto.LaboursDto.LabourProfileSessionView;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<LabourProfileSessionView> response = client.labours().getLabourProfileSession(\n        \"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\",\n        \"8c0d2e4f-6a8b-4c1d-9e3f-5a7b9c1d3e5f\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Labours.GetLabourProfileSessionAsync(\n    \"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\",\n    \"8c0d2e4f-6a8b-4c1d-9e3f-5a7b9c1d3e5f\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.labours.getLabourProfileSession(\n  '5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d',\n  '8c0d2e4f-6a8b-4c1d-9e3f-5a7b9c1d3e5f',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Labours().GetLabourProfileSession(context.Background(), \"5e7a9c1b-3d4f-4a6b-8c0d-2e4f6a8b0c1d\", \"8c0d2e4f-6a8b-4c1d-9e3f-5a7b9c1d3e5f\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/labours/{labour_id}/availability": {
+      "get": {
+        "tags": [
+          "Labours"
+        ],
+        "summary": "Retrieve a labour's availability calendar",
+        "operationId": "labours_get_labour_calendar",
+        "description": "Returns the labour's calendar under `labour_calendar`, in the same form as one entry of the labour availability list: its schedule, sessions and available and unavailable slots. The path takes the labour's `id` or its `code`.",
+        "parameters": [
+          {
+            "name": "labour_id",
+            "in": "path",
+            "required": true,
+            "description": "The labour's `id` or its `code`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The calendar, under `labour_calendar`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabourCalendarResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/labours/0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d/availability\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.labours.get_labour_calendar(\"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.labours.getLabourCalendar('0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->labours->getLabourCalendar('0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.labours.labours_dto.LaboursDto.LabourCalendar;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<LabourCalendar> response = client.labours().getLabourCalendar(\"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Labours.GetLabourCalendarAsync(\"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.labours.getLabourCalendar(\n  '0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Labours().GetLabourCalendar(context.Background(), \"0b6f3d2a-8c4e-4f1a-9d7b-2e5c8a1f3b6d\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -79095,6 +81018,1520 @@
         "properties": {
           "receive_term": {
             "$ref": "#/components/schemas/ReceiveTerm"
+          }
+        }
+      },
+      "Labour": {
+        "type": "object",
+        "properties": {
+          "activity_logs": {
+            "type": "array"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/LabourCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "custom_form": {
+            "$ref": "#/components/schemas/LabourCustomForm"
+          },
+          "description": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "email_address": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "image_name": {
+            "type": "null"
+          },
+          "labour_availability": {
+            "type": "array"
+          },
+          "labour_contacts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourLabourContact"
+            }
+          },
+          "labour_custom_availability": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourLabourCustomAvailability"
+            }
+          },
+          "labour_profile": {
+            "$ref": "#/components/schemas/LabourLabourProfile"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/LabourLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "use_custom_availability": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "LabourCreatedBy": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourCustomForm": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourLabourContact": {
+        "type": "object",
+        "properties": {
+          "address_line_1": {
+            "type": "string"
+          },
+          "address_line_2": {
+            "type": "string"
+          },
+          "address_line_3": {
+            "type": "string"
+          },
+          "address_line_4": {
+            "type": "string"
+          },
+          "address_line_5": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "contact_type": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "designation": {
+            "type": "string"
+          },
+          "email_address": {
+            "type": "string"
+          },
+          "fax": {
+            "$ref": "#/components/schemas/LabourLabourContactFax"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "middle_name": {
+            "type": "null"
+          },
+          "mobile": {
+            "$ref": "#/components/schemas/LabourLabourContactMobile"
+          },
+          "object": {
+            "type": "string"
+          },
+          "phone": {
+            "$ref": "#/components/schemas/LabourLabourContactPhone"
+          },
+          "post_code": {
+            "type": "string"
+          },
+          "receive_email": {
+            "type": "boolean"
+          },
+          "salutation": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourLabourContactFax": {
+        "type": "object",
+        "properties": {
+          "area_code": {
+            "type": "string"
+          },
+          "country_code": {
+            "type": "string"
+          },
+          "do_not_call": {
+            "type": "boolean"
+          },
+          "full": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourLabourContactMobile": {
+        "type": "object",
+        "properties": {
+          "area_code": {
+            "type": "string"
+          },
+          "country_code": {
+            "type": "string"
+          },
+          "do_not_call": {
+            "type": "boolean"
+          },
+          "full": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourLabourContactPhone": {
+        "type": "object",
+        "properties": {
+          "area_code": {
+            "type": "string"
+          },
+          "country_code": {
+            "type": "string"
+          },
+          "do_not_call": {
+            "type": "boolean"
+          },
+          "full": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourLabourCustomAvailability": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "end_time": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "preferred_day": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourLabourProfile": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourResponse": {
+        "type": "object",
+        "properties": {
+          "labour": {
+            "$ref": "#/components/schemas/Labour"
+          }
+        }
+      },
+      "LabourProfileView": {
+        "type": "object",
+        "properties": {
+          "activity_logs": {
+            "type": "array"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/LabourProfileViewCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/LabourProfileViewCurrency"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "labours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourProfileViewRow"
+            }
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/LabourProfileViewLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "max_booking_limit": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourProfileViewSession"
+            }
+          },
+          "status": {
+            "type": "string"
+          },
+          "tax": {
+            "$ref": "#/components/schemas/LabourProfileViewTax"
+          },
+          "tax_inclusive": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "LabourProfileViewCreatedBy": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileViewCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileViewRow": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileViewLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileViewSession": {
+        "type": "object",
+        "properties": {
+          "allow_overtime": {
+            "type": "boolean"
+          },
+          "availability": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourProfileViewSessionAvailability"
+            }
+          },
+          "end_date": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "prices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourProfileViewSessionPrice"
+            }
+          },
+          "start_date": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "working_hours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourProfileViewSessionWorkingHour"
+            }
+          }
+        }
+      },
+      "LabourProfileViewSessionAvailability": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "end_time": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "preferred_day": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileViewSessionPrice": {
+        "type": "object",
+        "properties": {
+          "enabled_pro_rata": {
+            "type": "boolean"
+          },
+          "hours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourProfileViewSessionPriceHour"
+            }
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "peak_hourly": {
+            "type": "array"
+          },
+          "price": {
+            "type": "number"
+          },
+          "price_type": {
+            "type": "string"
+          },
+          "pricing_level": {
+            "$ref": "#/components/schemas/LabourProfileViewSessionPricePricingLevel"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileViewSessionPriceHour": {
+        "type": "object",
+        "properties": {
+          "end_time": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "start_time": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileViewSessionPricePricingLevel": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileViewSessionWorkingHour": {
+        "type": "object",
+        "properties": {
+          "end_time": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileViewTax": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileViewResponse": {
+        "type": "object",
+        "properties": {
+          "labour_profile": {
+            "$ref": "#/components/schemas/LabourProfileView"
+          }
+        }
+      },
+      "LabourAvailabilityList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourAvailability"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/LabourPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourAvailability": {
+        "type": "object",
+        "properties": {
+          "available_list": {
+            "type": "array"
+          },
+          "code": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "email_address": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "labour_profile": {
+            "$ref": "#/components/schemas/LabourAvailabilityLabourProfile"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "processed_schedule_list": {
+            "type": "object"
+          },
+          "schedule_list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourAvailabilityScheduleList"
+            }
+          },
+          "session_list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourAvailabilitySessionList"
+            }
+          },
+          "status": {
+            "type": "string"
+          },
+          "unavailable_list": {
+            "type": "array"
+          },
+          "use_custom_availability": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "LabourAvailabilityLabourProfile": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourAvailabilityScheduleList": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "end_time": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "preferred_day": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourAvailabilitySessionList": {
+        "type": "object",
+        "properties": {
+          "end_date": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "processed_schedule_list": {
+            "type": "object"
+          },
+          "schedule_list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourAvailabilitySessionListScheduleList"
+            }
+          },
+          "start_date": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourAvailabilitySessionListScheduleList": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "string"
+          },
+          "end_time": {
+            "type": "string"
+          },
+          "preferred_day": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Rely on this rather than on `next_cursor`, which can still hold a value on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/LabourPaginationLinks"
+          }
+        }
+      },
+      "LabourPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourProfile"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/LabourPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfile": {
+        "type": "object",
+        "properties": {
+          "created_by": {
+            "$ref": "#/components/schemas/LabourProfileCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/LabourProfileCurrency"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "labours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourProfileRow"
+            }
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/LabourProfileLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "max_booking_limit": {
+            "type": "null"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourProfileSession"
+            }
+          },
+          "status": {
+            "type": "string"
+          },
+          "tax": {
+            "$ref": "#/components/schemas/LabourProfileTax"
+          },
+          "tax_inclusive": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "LabourProfileCreatedBy": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileRow": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileSession": {
+        "type": "object",
+        "properties": {
+          "allow_overtime": {
+            "type": "boolean"
+          },
+          "availability": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourProfileSessionAvailability"
+            }
+          },
+          "end_date": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "prices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourProfileSessionPrice"
+            }
+          },
+          "start_date": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "working_hours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourProfileSessionWorkingHour"
+            }
+          }
+        }
+      },
+      "LabourProfileSessionAvailability": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "end_time": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "preferred_day": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileSessionPrice": {
+        "type": "object",
+        "properties": {
+          "enabled_pro_rata": {
+            "type": "boolean"
+          },
+          "hours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourProfileSessionPriceHour"
+            }
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "peak_hourly": {
+            "type": "array"
+          },
+          "price": {
+            "type": "number"
+          },
+          "price_type": {
+            "type": "string"
+          },
+          "pricing_level": {
+            "$ref": "#/components/schemas/LabourProfileSessionPricePricingLevel"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileSessionPriceHour": {
+        "type": "object",
+        "properties": {
+          "end_time": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "start_time": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileSessionPricePricingLevel": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileSessionWorkingHour": {
+        "type": "object",
+        "properties": {
+          "end_time": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileTax": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Labour"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/LabourPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourOrderList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourOrder"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/LabourPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourOrder": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/LabourOrderAccount"
+          },
+          "allow_contract": {
+            "type": "boolean"
+          },
+          "billing_address": {
+            "type": "null"
+          },
+          "billing_preferences": {
+            "$ref": "#/components/schemas/LabourOrderBillingPreferences"
+          },
+          "billing_start_date": {
+            "type": "string"
+          },
+          "communication_preferences": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourOrderCommunicationPreference"
+            }
+          },
+          "created_by": {
+            "type": "null"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/LabourOrderCurrency"
+          },
+          "custom_form": {
+            "$ref": "#/components/schemas/LabourOrderCustomForm"
+          },
+          "customer_purchase_order_id": {
+            "type": "null"
+          },
+          "description": {
+            "type": "null"
+          },
+          "discount_profile": {
+            "type": "null"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "invoice_note": {
+            "type": "null"
+          },
+          "last_updated_by": {
+            "type": "null"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "manager": {
+            "type": "null"
+          },
+          "name": {
+            "type": "string"
+          },
+          "next_billing_from_date": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "order_start_date": {
+            "type": "string"
+          },
+          "order_type": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "null"
+          },
+          "original_total": {
+            "type": "null"
+          },
+          "pre_order": {
+            "type": "boolean"
+          },
+          "price_tax_inclusive": {
+            "type": "boolean"
+          },
+          "quote_converted": {
+            "type": "boolean"
+          },
+          "quote_order": {
+            "type": "boolean"
+          },
+          "referral_account": {
+            "type": "null"
+          },
+          "sales_rep": {
+            "type": "null"
+          },
+          "shipping_address": {
+            "type": "null"
+          },
+          "shipping_cost": {
+            "type": "number"
+          },
+          "shipping_profile": {
+            "type": "null"
+          },
+          "status": {
+            "type": "string"
+          },
+          "time_zone": {
+            "$ref": "#/components/schemas/LabourOrderTimeZone"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "LabourOrderAccount": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourOrderBillingPreferences": {
+        "type": "object",
+        "properties": {
+          "billing_period": {
+            "type": "string"
+          },
+          "communication_profile": {
+            "type": "string"
+          },
+          "consolidate_invoice": {
+            "type": "boolean"
+          },
+          "fulfillment_mode": {
+            "type": "string"
+          },
+          "fulfillment_term": {
+            "type": "string"
+          },
+          "invoice_mode": {
+            "type": "string"
+          },
+          "invoice_term": {
+            "type": "string"
+          },
+          "payment_mode": {
+            "type": "string"
+          },
+          "payment_processor": {
+            "type": "string"
+          },
+          "payment_term": {
+            "type": "string"
+          },
+          "payment_term_alignment": {
+            "type": "string"
+          },
+          "proforma_properties": {
+            "$ref": "#/components/schemas/LabourOrderBillingPreferencesProformaProperties"
+          }
+        }
+      },
+      "LabourOrderBillingPreferencesProformaProperties": {
+        "type": "object",
+        "properties": {
+          "acceptance_date": {
+            "type": "null"
+          },
+          "acceptance_required": {
+            "type": "boolean"
+          },
+          "acceptance_term": {
+            "type": "null"
+          },
+          "payment_required": {
+            "type": "boolean"
+          },
+          "terms_and_conditions": {
+            "type": "null"
+          }
+        }
+      },
+      "LabourOrderCommunicationPreference": {
+        "type": "object",
+        "properties": {
+          "channel": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "LabourOrderCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourOrderCustomForm": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourOrderTimeZone": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileSessionList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabourProfileViewSession"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/LabourPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "LabourProfileSessionViewResponse": {
+        "type": "object",
+        "properties": {
+          "labour_profile_session": {
+            "$ref": "#/components/schemas/LabourProfileViewSession"
+          }
+        }
+      },
+      "LabourCalendarResponse": {
+        "type": "object",
+        "properties": {
+          "labour_calendar": {
+            "$ref": "#/components/schemas/LabourAvailability"
           }
         }
       },
