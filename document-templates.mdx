@@ -1,0 +1,31 @@
+---
+title: "Document templates"
+sidebarTitle: "Overview"
+description: "List, create, read, update and delete document templates, such as PDF document layouts."
+---
+
+Document templates are the settings records behind generated documents, each with a type such as `PDF_DOCUMENT`. You can list, create, read, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List document templates](/api-reference/document-templates/list-document-templates) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/document_templates` | Returns a page of document templates under `data`, with paging details under `pagination`. |
+| [Create a document template](/api-reference/document-templates/create-a-document-template) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/document_templates` | Creates a document template and returns it under `document_template`. |
+| [Retrieve a document template](/api-reference/document-templates/retrieve-a-document-template) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/document_templates/{document_template_id}` | Returns one document template by its `id`, under `document_template`. |
+| [Delete a document template](/api-reference/document-templates/delete-a-document-template) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/document_templates/{document_template_id}` | Deletes a document template. The response has no body. |
+| [Update a document template](/api-reference/document-templates/update-a-document-template) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/document_templates/{document_template_id}` | Changes the fields you send on a document template and returns it under `document_template`. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **`name` and `document_template_type` are required on a create.** For example `"document_template_type": "PDF_DOCUMENT"`.
+- **A read reports the type in `type`.** It also says whether the template is a system, custom, default or edited one.
+- **A document template `id` starts with `dt_`.**
+- **Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true.
+- **A delete returns `204` with no body.** Reading the document template afterwards returns `404`.
