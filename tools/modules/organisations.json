@@ -6,11 +6,11 @@
   "base": "/settings/organisations",
   "overview_description": "List, create, read, update and delete the child organisations below the root organisation of your Exsited instance.",
   "intro": "Child organisations are the organisations below the root organisation of your Exsited instance. You can list, create, read, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.",
-  "warning": "**Creating a child organisation changes your organisation hierarchy and assigns an existing user to it.** The create also depends on your licence.",
+  "warning": "**Creating a child organisation changes your organisation hierarchy and assigns an existing user to it.** The create also depends on your licence. Reading, creating, updating and deleting one child organisation have not been confirmed, and the fields a child organisation takes are not documented yet.",
   "notes": [
     "**Bodies and records sit under `organization`, spelled with a z.**",
     "**The root organisation is never in the listing.** Read it with `GET /settings/organisation` instead.",
-    "**The listing pages by cursor.** Records are under `data`, with `limit`, `has_more` and `next_cursor` in `pagination`.",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.",
     "**Delete returns `204`.**"
   ],
   "endpoints": [
@@ -27,7 +27,7 @@
           "name": "limit",
           "in": "query",
           "required": false,
-          "description": "The number of records per page. A `limit` of `0` returns `400`.",
+          "description": "The number of records per page.",
           "schema": {
             "type": "integer",
             "example": 20
@@ -72,7 +72,7 @@
       "slug": "create-a-child-organisation",
       "title": "Create a child organisation",
       "summary": "Creates a child organisation and returns it under `organization`.",
-      "description": "Send the organisation under `organization`, spelled with a z. A create depends on your licence, changes the organisation hierarchy and assigns an existing user. A successful call returns `201`.",
+      "description": "Send the organisation under `organization`, spelled with a z. A create depends on your licence, changes the organisation hierarchy and assigns an existing user. A successful call returns `201`. The fields a child organisation takes are not documented yet.",
       "parameters": [],
       "body": {
         "schema": {
@@ -102,7 +102,8 @@
         "body": {
           "organization": {}
         }
-      }
+      },
+      "warning": "**This call has not been confirmed.**"
     },
     {
       "key": "get_settings_organisation",
@@ -111,13 +112,13 @@
       "slug": "retrieve-a-child-organisation",
       "title": "Retrieve a child organisation",
       "summary": "Returns one child organisation by its `id`.",
-      "description": "Pass the organisation's `id` as `organisation_id`. The response is the organisation as plain JSON.",
+      "description": "Pass the organisation's `id` as `organisation_id`. The response is the organisation's fields, with no wrapper key.",
       "parameters": [
         {
           "name": "organisation_id",
           "in": "path",
           "required": true,
-          "description": "The child organisation's `id`.",
+          "description": "The child organisation's `id`, from the listing.",
           "schema": {
             "type": "string",
             "example": "ORG-0002"
@@ -135,7 +136,8 @@
         "path": {
           "organisation_id": "ORG-0002"
         }
-      }
+      },
+      "warning": "**This call has not been confirmed.**"
     },
     {
       "key": "delete_settings_organisation",
@@ -150,7 +152,7 @@
           "name": "organisation_id",
           "in": "path",
           "required": true,
-          "description": "The child organisation's `id`.",
+          "description": "The child organisation's `id`, from the listing.",
           "schema": {
             "type": "string",
             "example": "ORG-0002"
@@ -168,7 +170,8 @@
         "path": {
           "organisation_id": "ORG-0002"
         }
-      }
+      },
+      "warning": "**This call has not been confirmed.**"
     },
     {
       "key": "update_settings_organisation",
@@ -177,13 +180,13 @@
       "slug": "update-a-child-organisation",
       "title": "Update a child organisation",
       "summary": "Changes a child organisation's fields and returns it.",
-      "description": "Pass the organisation's `id` as `organisation_id` and send the fields to change under `organization`. A successful call returns `200`.",
+      "description": "Pass the organisation's `id` as `organisation_id` and send the fields to change under `organization`. A successful call returns `200`. The fields a child organisation takes are not documented yet.",
       "parameters": [
         {
           "name": "organisation_id",
           "in": "path",
           "required": true,
-          "description": "The child organisation's `id`.",
+          "description": "The child organisation's `id`, from the listing.",
           "schema": {
             "type": "string",
             "example": "ORG-0002"
@@ -221,7 +224,8 @@
         "body": {
           "organization": {}
         }
-      }
+      },
+      "warning": "**This call has not been confirmed.**"
     }
   ],
   "schemas": {}
