@@ -275,9 +275,9 @@ def token_operation():
         }}},
         "responses": {
             "200": {"description": "The access token.", "content": {"application/json": {"schema": {"type": "object", "properties": {
-                "access_token": {"type": "string", "description": "Send this as `Authorization: Bearer ACCESS_TOKEN`."},
-                "expires_in": {"type": "integer", "description": "Seconds until the token expires, for example `3600`."},
-                "refresh_token": {"type": "string", "description": "Exchanged for a new access token when this one expires."},
+                "access_token": {"type": "string", "description": "Send this as `Authorization: Bearer ACCESS_TOKEN`.", "example": "ACCESS_TOKEN"},
+                "expires_in": {"type": "integer", "description": "Seconds until the token expires, for example `3600`.", "example": 3600},
+                "refresh_token": {"type": "string", "description": "Exchanged for a new access token when this one expires.", "example": "REFRESH_TOKEN"},
             }}}}},
             "302": {"description": "The credentials were not accepted. The API redirects to its sign-in page instead of returning an error body, so this page shows `redirect to unsafe URL blocked`."},
         },
