@@ -1,0 +1,228 @@
+{
+  "family": "custom_fields",
+  "tag": "Custom fields",
+  "slug": "custom-fields",
+  "icon": "table-list",
+  "base": "/settings/custom_fields",
+  "overview_description": "List the custom fields in your Exsited settings and read one by its id.",
+  "intro": "Custom fields are the extra fields set up in your Exsited settings. This area has 2 read-only endpoints, one to list the custom fields and one to read a single field, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**This area is read only.** There are no create, update or delete calls for custom fields here.",
+    "**A custom field id starts with `cfld_`.** Pass that `id` to read one field.",
+    "**One field comes back under `custom_field`.** The listing puts its records under `data`.",
+    "**The listing pages by cursor.** Pass `limit`, then the `next_cursor` from `pagination` as `cursor` while `has_more` is true."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_custom_fields",
+      "method": "GET",
+      "path": "/settings/custom_fields",
+      "slug": "list-custom-fields",
+      "title": "List custom fields",
+      "summary": "Returns one page of the custom fields in your settings.",
+      "description": "Lists the custom fields with each one's name, type and whether it is mandatory. Records are under `data` and paging details under `pagination`. Fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by, such as `created_on`, or `-created_on` for newest first.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of custom fields, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/CustomFieldList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_settings_custom_field",
+      "method": "GET",
+      "path": "/settings/custom_fields/{custom_field_id}",
+      "slug": "retrieve-a-custom-field",
+      "title": "Retrieve a custom field",
+      "summary": "Returns one custom field, under `custom_field`.",
+      "description": "Reads a single custom field by its `cfld_` id, with its name, display name, type and status.",
+      "parameters": [
+        {
+          "name": "custom_field_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom field's `id`, which starts with `cfld_`.",
+          "schema": {
+            "type": "string",
+            "example": "cfld_1e3a5c7e9b2d4f6a8c0e1b3d5f7a9c2e"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The custom field, under `custom_field`.",
+          "schema": {
+            "$ref": "#/components/schemas/CustomFieldResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "custom_field_id": "cfld_1e3a5c7e9b2d4f6a8c0e1b3d5f7a9c2e"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "CustomField": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "is_mandatory": {
+          "type": "boolean"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "created_by": {},
+        "last_updated_by": {},
+        "version": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "CustomFieldResponse": {
+      "type": "object",
+      "properties": {
+        "custom_field": {
+          "$ref": "#/components/schemas/CustomField"
+        }
+      }
+    },
+    "CustomFieldList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CustomField"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/CustomFieldPagination"
+        }
+      }
+    },
+    "CustomFieldPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can be stale on the last page."
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "links": {
+          "$ref": "#/components/schemas/CustomFieldPaginationLinks"
+        }
+      }
+    },
+    "CustomFieldPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}
