@@ -4,11 +4,11 @@
   "slug": "purchase-orders",
   "icon": "cart-shopping",
   "base": "/purchase_orders",
-  "overview_description": "Create, change, cancel and read purchase orders, their lines, notes, files, KPIs and the invoices and payments raised from them.",
-  "intro": "A purchase order records what you are buying from a supplier. These endpoints create, update, change, cancel and reactivate purchase orders, read their lines, KPIs, purchase invoices and payments, and manage their notes and attached files. There are 23 endpoints, and all seven SDKs call every one.",
-  "warning": "**Deleting a purchase order, a note or a note file cannot be undone.** Cancel a purchase order instead if you may need it again.",
+  "overview_description": "Create, change, cancel and read purchase orders, their lines, notes, files and KPIs, and the purchase invoices and payments raised from them.",
+  "intro": "A purchase order records what you are buying from a supplier. These endpoints create, update, change, cancel and reactivate purchase orders, read their lines, KPIs, purchase invoices and payments, and manage their notes and attached files. This area has 23 endpoints, each available in all seven SDKs.",
+  "warning": "**Deleting a purchase order or a note cannot be undone.** Cancel a purchase order instead if you may need it again. Deleting a note file currently returns `404`.",
   "notes": [
-    "**Every write body is wrapped in `purchase_order`.** The one exception is the purchase invoice create, which is wrapped in `purchase_invoice`; the cancel and reactivate calls take an empty object.",
+    "**Every JSON write body is wrapped in `purchase_order`.** The exceptions are the purchase invoice create, wrapped in `purchase_invoice`, and the note create, a multipart form; the cancel and reactivate calls take an empty object.",
     "**The note calls take the purchase order's `code`, not its `id`.** That covers listing, creating, reading and deleting notes and their files.",
     "**A new purchase order is `active`.** Send `\"draft\": true` in the create body to save it as a draft instead.",
     "**Cancelling sets the status to `inactive`.** Reactivating sets it back to `active`.",
@@ -214,7 +214,7 @@
       "slug": "list-notes-across-purchase-orders",
       "title": "List notes across purchase orders",
       "summary": "Returns one page of notes from every purchase order.",
-      "description": "Lists the notes of all purchase orders together, one page at a time, under `data`. Use the per order notes list to see one purchase order's notes. Other fields filter the list as `filter_<field>` or `filter_<field>_<operator>`.",
+      "description": "Lists the notes of all purchase orders together, one page at a time, under `data`. Use the per-order notes list to see one purchase order's notes. Other fields filter the list as `filter_<field>` or `filter_<field>_<operator>`.",
       "parameters": [
         {
           "name": "limit",
@@ -279,7 +279,7 @@
           "description": "The purchase order's `id`.",
           "schema": {
             "type": "string",
-            "example": "PO-0001"
+            "example": "PURCHASE_ORDER_ID"
           }
         }
       ],
@@ -292,7 +292,7 @@
       },
       "example_call": {
         "path": {
-          "purchase_order_id": "PO-0001"
+          "purchase_order_id": "PURCHASE_ORDER_ID"
         }
       }
     },
@@ -312,7 +312,7 @@
           "description": "The purchase order's `id`.",
           "schema": {
             "type": "string",
-            "example": "PO-0001"
+            "example": "PURCHASE_ORDER_ID"
           }
         }
       ],
@@ -351,7 +351,7 @@
       },
       "example_call": {
         "path": {
-          "purchase_order_id": "PO-0001"
+          "purchase_order_id": "PURCHASE_ORDER_ID"
         },
         "body": {
           "purchase_order": {
@@ -376,7 +376,7 @@
           "description": "The purchase order's `id`.",
           "schema": {
             "type": "string",
-            "example": "PO-0001"
+            "example": "PURCHASE_ORDER_ID"
           }
         }
       ],
@@ -395,7 +395,7 @@
       },
       "example_call": {
         "path": {
-          "purchase_order_id": "PO-0001"
+          "purchase_order_id": "PURCHASE_ORDER_ID"
         }
       }
     },
@@ -415,7 +415,7 @@
           "description": "The purchase order's `id`.",
           "schema": {
             "type": "string",
-            "example": "PO-0001"
+            "example": "PURCHASE_ORDER_ID"
           }
         }
       ],
@@ -436,7 +436,7 @@
       },
       "example_call": {
         "path": {
-          "purchase_order_id": "PO-0001"
+          "purchase_order_id": "PURCHASE_ORDER_ID"
         },
         "body": {}
       }
@@ -448,7 +448,7 @@
       "slug": "change-a-purchase-orders-lines",
       "title": "Change a purchase order's lines",
       "summary": "Adds or changes lines on a purchase order and returns it under `purchase_order`.",
-      "description": "Changes the lines of the purchase order, wrapped in `purchase_order.lines`. Each entry has an `op`: `add` with an `item_id` and `item_quantity` adds a line, and `change` with the line's dashed `uuid` changes its quantity or price.",
+      "description": "Changes the lines of the purchase order, wrapped in `purchase_order.lines`. Each entry has an `op`: `add` with an `item_id` and `item_quantity` adds a line, and `change` with the line's `id` written as a UUID (drop the prefix before `_` and add dashes in the 8-4-4-4-12 pattern) changes its quantity or price.",
       "parameters": [
         {
           "name": "purchase_order_id",
@@ -457,7 +457,7 @@
           "description": "The purchase order's `id`.",
           "schema": {
             "type": "string",
-            "example": "PO-0001"
+            "example": "PURCHASE_ORDER_ID"
           }
         }
       ],
@@ -483,7 +483,7 @@
                       },
                       "uuid": {
                         "type": "string",
-                        "description": "For `change`: the line's `uuid`, in dashed form."
+                        "description": "For `change`: the line's `id` written as a UUID: drop the prefix before `_` and add dashes in the 8-4-4-4-12 pattern."
                       },
                       "item_id": {
                         "type": "string",
@@ -541,7 +541,7 @@
       },
       "example_call": {
         "path": {
-          "purchase_order_id": "PO-0001"
+          "purchase_order_id": "PURCHASE_ORDER_ID"
         },
         "body": {
           "purchase_order": {
@@ -572,7 +572,7 @@
           "description": "The purchase order's `id`.",
           "schema": {
             "type": "string",
-            "example": "PO-0001"
+            "example": "PURCHASE_ORDER_ID"
           }
         }
       ],
@@ -588,7 +588,7 @@
       },
       "example_call": {
         "path": {
-          "purchase_order_id": "PO-0001"
+          "purchase_order_id": "PURCHASE_ORDER_ID"
         }
       }
     },
@@ -608,7 +608,7 @@
           "description": "The purchase order's `id`.",
           "schema": {
             "type": "string",
-            "example": "PO-0001"
+            "example": "PURCHASE_ORDER_ID"
           }
         },
         {
@@ -653,7 +653,7 @@
       },
       "example_call": {
         "path": {
-          "purchase_order_id": "PO-0001"
+          "purchase_order_id": "PURCHASE_ORDER_ID"
         },
         "query": {
           "limit": 20
@@ -804,7 +804,7 @@
           "description": "The purchase order's `id`.",
           "schema": {
             "type": "string",
-            "example": "PO-0001"
+            "example": "PURCHASE_ORDER_ID"
           }
         }
       ],
@@ -835,7 +835,7 @@
       },
       "example_call": {
         "path": {
-          "purchase_order_id": "PO-0001"
+          "purchase_order_id": "PURCHASE_ORDER_ID"
         },
         "body": {
           "purchase_invoice": {}
@@ -858,7 +858,7 @@
           "description": "The purchase order's `id`.",
           "schema": {
             "type": "string",
-            "example": "PO-0001"
+            "example": "PURCHASE_ORDER_ID"
           }
         },
         {
@@ -903,7 +903,7 @@
       },
       "example_call": {
         "path": {
-          "purchase_order_id": "PO-0001"
+          "purchase_order_id": "PURCHASE_ORDER_ID"
         },
         "query": {
           "limit": 20
@@ -926,7 +926,7 @@
           "description": "The purchase order's `id`.",
           "schema": {
             "type": "string",
-            "example": "PO-0001"
+            "example": "PURCHASE_ORDER_ID"
           }
         },
         {
@@ -971,7 +971,7 @@
       },
       "example_call": {
         "path": {
-          "purchase_order_id": "PO-0001"
+          "purchase_order_id": "PURCHASE_ORDER_ID"
         },
         "query": {
           "limit": 20
@@ -994,7 +994,7 @@
           "description": "The purchase order's `id`.",
           "schema": {
             "type": "string",
-            "example": "PO-0001"
+            "example": "PURCHASE_ORDER_ID"
           }
         }
       ],
@@ -1015,7 +1015,7 @@
       },
       "example_call": {
         "path": {
-          "purchase_order_id": "PO-0001"
+          "purchase_order_id": "PURCHASE_ORDER_ID"
         },
         "body": {}
       }
@@ -1036,7 +1036,7 @@
           "description": "The purchase order's `id`.",
           "schema": {
             "type": "string",
-            "example": "PO-0001"
+            "example": "PURCHASE_ORDER_ID"
           }
         },
         {
@@ -1062,7 +1062,7 @@
       },
       "example_call": {
         "path": {
-          "purchase_order_id": "PO-0001",
+          "purchase_order_id": "PURCHASE_ORDER_ID",
           "purchase_order_line_uuid": "line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c"
         }
       }
@@ -1314,7 +1314,7 @@
           "description": "The purchase order's `id`.",
           "schema": {
             "type": "string",
-            "example": "PO-0001"
+            "example": "PURCHASE_ORDER_ID"
           }
         }
       ],
@@ -1330,7 +1330,7 @@
       },
       "example_call": {
         "path": {
-          "purchase_order_id": "PO-0001"
+          "purchase_order_id": "PURCHASE_ORDER_ID"
         }
       }
     },
@@ -1342,6 +1342,7 @@
       "title": "Delete a purchase order note file",
       "summary": "Removes one attachment from a purchase order note. Nothing comes back.",
       "description": "Deletes one file from the note. Address the purchase order by its `code` and the file by its `uuid`. The call returns `204` with no body.",
+      "warning": "**Deleting a note file currently fails.** This call currently returns `404` \"attachment not found\", even for a file the note's file list shows.",
       "parameters": [
         {
           "name": "purchase_order_id",
@@ -1381,7 +1382,7 @@
           "description": "The file is removed from the note."
         },
         "404": {
-          "description": "Attachment not found. This call can return `404` even for a file the note's file list shows."
+          "description": "Attachment not found. This call currently returns `404` for every attachment, including ones the note's file list shows."
         }
       },
       "example_call": {
