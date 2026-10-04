@@ -143,6 +143,9 @@
     },
     {
       "name": "ABA files"
+    },
+    {
+      "name": "Receive terms"
     }
   ],
   "paths": {
@@ -48973,6 +48976,473 @@
           }
         }
       }
+    },
+    "/settings/receive_terms": {
+      "get": {
+        "tags": [
+          "Receive terms"
+        ],
+        "summary": "List receive terms",
+        "operationId": "receive_terms_get_settings_receive_terms",
+        "description": "Lists the receive terms set up on the account, one page at a time, under `data`. Other fields filter the list as `filter_<field>` or `filter_<field>_<operator>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of receive terms.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReceiveTermList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/receive_terms?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.receive_terms.get_settings_receive_terms({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.receiveTerms.getSettingsReceiveTerms({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->receiveTerms->getSettingsReceiveTerms(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.receive_terms.receive_terms_dto.ReceiveTermsDto.SettingsReceiveTermList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsReceiveTermList> response = client.receiveTerms().getSettingsReceiveTerms(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReceiveTerms.GetSettingsReceiveTermsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.receiveTerms.getSettingsReceiveTerms(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReceiveTerms().GetSettingsReceiveTerms(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Receive terms"
+        ],
+        "summary": "Create a receive term",
+        "operationId": "receive_terms_create_settings_receive_term",
+        "description": "Creates a receive term from a `name`, `display_name`, `period` and `duration`, wrapped in `receive_term`. Send `period` in upper case, such as `MONTHLY`; it comes back in lower case.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new receive term, under `receive_term`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReceiveTermResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/receive_terms\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"receive_term\": {\n      \"name\": \"net-30\",\n      \"display_name\": \"Net 30\",\n      \"period\": \"MONTHLY\",\n      \"duration\": 1\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.receive_terms.create_settings_receive_term(\n    {\n        \"receive_term\": {\n            \"name\": \"net-30\",\n            \"display_name\": \"Net 30\",\n            \"period\": \"MONTHLY\",\n            \"duration\": 1,\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.receiveTerms.createSettingsReceiveTerm({\n    receive_term: {name: 'net-30', display_name: 'Net 30', period: 'MONTHLY', duration: 1},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->receiveTerms->createSettingsReceiveTerm([\n    'receive_term' => [\n        'name' => 'net-30',\n        'display_name' => 'Net 30',\n        'period' => 'MONTHLY',\n        'duration' => 1,\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.receive_terms.receive_terms_dto.ReceiveTermsDto.SettingsReceiveTerm;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsReceiveTerm> response = client.receiveTerms().createSettingsReceiveTerm(\n        Map.of(\n                \"receive_term\", Map.of(\n                        \"name\", \"net-30\",\n                        \"display_name\", \"Net 30\",\n                        \"period\", \"MONTHLY\",\n                        \"duration\", 1)));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReceiveTerms.CreateSettingsReceiveTermAsync(new Dictionary<string, object?>\n{\n    [\"receive_term\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"net-30\",\n        [\"display_name\"] = \"Net 30\",\n        [\"period\"] = \"MONTHLY\",\n        [\"duration\"] = 1,\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.receiveTerms.createSettingsReceiveTerm({\n  'receive_term': {\n    'name': 'net-30',\n    'display_name': 'Net 30',\n    'period': 'MONTHLY',\n    'duration': 1,\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReceiveTerms().CreateSettingsReceiveTerm(context.Background(), map[string]any{\n\t\"receive_term\": map[string]any{\n\t\t\"name\":         \"net-30\",\n\t\t\"display_name\": \"Net 30\",\n\t\t\"period\":       \"MONTHLY\",\n\t\t\"duration\":     1,\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "receive_term": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "period": {
+                        "type": "string",
+                        "description": "The period unit, in upper case, such as `MONTHLY`."
+                      },
+                      "duration": {
+                        "type": "integer",
+                        "description": "How many periods the term lasts."
+                      },
+                      "description": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "receive_term"
+                ]
+              },
+              "example": {
+                "receive_term": {
+                  "name": "net-30",
+                  "display_name": "Net 30",
+                  "period": "MONTHLY",
+                  "duration": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/receive_terms/{receive_term_id}": {
+      "get": {
+        "tags": [
+          "Receive terms"
+        ],
+        "summary": "Retrieve a receive term",
+        "operationId": "receive_terms_get_settings_receive_term",
+        "description": "Returns the receive term with its name, period, duration and status under `receive_term`.",
+        "parameters": [
+          {
+            "name": "receive_term_id",
+            "in": "path",
+            "required": true,
+            "description": "The receive term's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The receive term, under `receive_term`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReceiveTermResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No receive term has that `id`, for example after it is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/receive_terms/RT-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.receive_terms.get_settings_receive_term(\"RT-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.receiveTerms.getSettingsReceiveTerm('RT-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->receiveTerms->getSettingsReceiveTerm('RT-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.receive_terms.receive_terms_dto.ReceiveTermsDto.SettingsReceiveTerm;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsReceiveTerm> response = client.receiveTerms().getSettingsReceiveTerm(\"RT-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReceiveTerms.GetSettingsReceiveTermAsync(\"RT-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.receiveTerms.getSettingsReceiveTerm('RT-0001');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReceiveTerms().GetSettingsReceiveTerm(context.Background(), \"RT-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Receive terms"
+        ],
+        "summary": "Delete a receive term",
+        "operationId": "receive_terms_delete_settings_receive_term",
+        "description": "Deletes the receive term. The call returns `204` with no body, and reading it afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "receive_term_id",
+            "in": "path",
+            "required": true,
+            "description": "The receive term's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The receive term is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/receive_terms/RT-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.receive_terms.delete_settings_receive_term(\"RT-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.receiveTerms.deleteSettingsReceiveTerm('RT-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->receiveTerms->deleteSettingsReceiveTerm('RT-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.receiveTerms().deleteSettingsReceiveTerm(\"RT-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReceiveTerms.DeleteSettingsReceiveTermAsync(\"RT-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.receiveTerms.deleteSettingsReceiveTerm(\n  'RT-0001',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReceiveTerms().DeleteSettingsReceiveTerm(context.Background(), \"RT-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Receive terms"
+        ],
+        "summary": "Update a receive term",
+        "operationId": "receive_terms_update_settings_receive_term",
+        "description": "Updates fields of the receive term, such as `display_name` and `description`, wrapped in `receive_term`. Set `status` to `active` or `inactive` to enable or disable it.",
+        "parameters": [
+          {
+            "name": "receive_term_id",
+            "in": "path",
+            "required": true,
+            "description": "The receive term's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated receive term, under `receive_term`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReceiveTermResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/receive_terms/RT-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"receive_term\": {\n      \"display_name\": \"Net 30 days\",\n      \"description\": \"Goods received within one month.\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.receive_terms.update_settings_receive_term(\n    \"RT-0001\",\n    {\n        \"receive_term\": {\n            \"display_name\": \"Net 30 days\",\n            \"description\": \"Goods received within one month.\",\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.receiveTerms.updateSettingsReceiveTerm('RT-0001', {\n    receive_term: {display_name: 'Net 30 days', description: 'Goods received within one month.'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->receiveTerms->updateSettingsReceiveTerm('RT-0001', [\n    'receive_term' => [\n        'display_name' => 'Net 30 days',\n        'description' => 'Goods received within one month.',\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.receive_terms.receive_terms_dto.ReceiveTermsDto.SettingsReceiveTerm;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsReceiveTerm> response = client.receiveTerms().updateSettingsReceiveTerm(\n        \"RT-0001\",\n        Map.of(\n                \"receive_term\", Map.of(\n                        \"display_name\", \"Net 30 days\",\n                        \"description\", \"Goods received within one month.\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReceiveTerms.UpdateSettingsReceiveTermAsync(\n    \"RT-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"receive_term\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Net 30 days\",\n            [\"description\"] = \"Goods received within one month.\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.receiveTerms.updateSettingsReceiveTerm(\n  'RT-0001',\n  {\n    'receive_term': {\n      'display_name': 'Net 30 days',\n      'description': 'Goods received within one month.',\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReceiveTerms().UpdateSettingsReceiveTerm(context.Background(), \"RT-0001\", map[string]any{\n\t\"receive_term\": map[string]any{\n\t\t\"display_name\": \"Net 30 days\",\n\t\t\"description\":  \"Goods received within one month.\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "receive_term": {
+                    "type": "object",
+                    "properties": {
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "description": "`active` or `inactive`.",
+                        "enum": [
+                          "active",
+                          "inactive"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "receive_term"
+                ]
+              },
+              "example": {
+                "receive_term": {
+                  "display_name": "Net 30 days",
+                  "description": "Goods received within one month."
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -78522,6 +78992,109 @@
           },
           "url": {
             "type": "string"
+          }
+        }
+      },
+      "ReceiveTerm": {
+        "type": "object",
+        "properties": {
+          "created_by": {},
+          "created_on": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "integer"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "period": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "ReceiveTermPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "ReceiveTermPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size the API applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can be set on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": "string",
+            "description": "The cursor of the previous page."
+          },
+          "links": {
+            "$ref": "#/components/schemas/ReceiveTermPaginationLinks"
+          }
+        }
+      },
+      "ReceiveTermList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReceiveTerm"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/ReceiveTermPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "ReceiveTermResponse": {
+        "type": "object",
+        "properties": {
+          "receive_term": {
+            "$ref": "#/components/schemas/ReceiveTerm"
           }
         }
       },
