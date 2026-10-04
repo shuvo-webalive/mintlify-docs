@@ -1,0 +1,26 @@
+---
+title: "Attribute attachments"
+sidebarTitle: "Overview"
+description: "Download the file stored in a custom attribute of the file type, as base64 text."
+---
+
+An attribute attachment is the file a custom attribute of the file type holds for an account. This area has 1 endpoint, which returns that file as base64 text, and all seven SDKs call it.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Retrieve an attribute attachment](/api-reference/attribute-attachments/retrieve-an-attribute-attachment) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/attribute_attachment/{file_uuid}` | Returns the file a custom file attribute holds, as base64 text. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **The path is singular.** Call `/attribute_attachment/{file_uuid}`, not a plural form.
+- **The file comes back as base64 with no wrapper key.** The body is `{"base64": "..."}`, so decode the `base64` value to get the file's bytes.
+- **Use the uuid the account's file attribute links to.** An account's file attribute points at this path; take the `file_uuid` from there.
+- **An unknown uuid returns 404.** The error code is `resource_not_found`.
