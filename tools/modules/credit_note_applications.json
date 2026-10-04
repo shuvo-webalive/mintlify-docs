@@ -5,7 +5,7 @@
   "icon": "money-check-dollar",
   "base": "/credit_note_applications",
   "overview_description": "Read the records of credit notes applied to invoices, across all invoices or for one invoice.",
-  "intro": "A credit note application records part of a credit note being spent against an invoice through a payment. This area has 3 read endpoints: list all applications, retrieve one, and list one invoice's applications. All seven SDKs call every one.",
+  "intro": "A credit note application records part of a credit note being spent against an invoice through a payment. This area has 3 read endpoints: list all applications, retrieve one, and list one invoice's applications. Every SDK supports all of them.",
   "warning": null,
   "notes": [
     "**Applications are read only here.** One is created when a payment spends a credit note, by listing the credit note's `code` and an `amount` under `credit_applied`.",
@@ -21,7 +21,7 @@
       "slug": "list-credit-note-applications",
       "title": "List credit note applications",
       "summary": "Returns one page of credit note applications across all invoices.",
-      "description": "Lists every credit note application, one page at a time, under `data`. Each record names its `credit_note`, the `payment` it made and the `amount` applied. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+      "description": "Lists every credit note application, one page at a time, under `data`. Each record names its `credit_note`, the `payment` it made and the `amount` applied. To filter, add `filter_<field>=<value>`, or `filter_<field>_<operator>=<value>` with an operator such as `gte` or `contains`.",
       "parameters": [
         {
           "name": "limit",
@@ -113,7 +113,7 @@
       "slug": "list-an-invoices-credit-note-applications",
       "title": "List an invoice's credit note applications",
       "summary": "Returns one page of the credit note applications made to one invoice.",
-      "description": "Lists the credit note applications made against the invoice, one page at a time, under `data`. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+      "description": "Lists the credit note applications made against the invoice, one page at a time, under `data`. To filter, add `filter_<field>=<value>`, or `filter_<field>_<operator>=<value>` with an operator such as `gte` or `contains`.",
       "parameters": [
         {
           "name": "invoice_id",
@@ -211,12 +211,6 @@
         "credit_note": {
           "$ref": "#/components/schemas/CreditNoteApplicationDetail"
         },
-        "credit_note_id": {
-          "type": "string"
-        },
-        "date": {
-          "type": "string"
-        },
         "href": {
           "type": "string"
         },
@@ -236,25 +230,17 @@
         "payment": {
           "$ref": "#/components/schemas/CreditNoteApplicationPayment"
         },
-        "payment_id": {
-          "type": "string"
-        },
         "primaryId": {
-          "type": "integer"
+          "type": "integer",
+          "description": "An internal number. Use `id` to identify the application."
         },
         "refund": {
           "$ref": "#/components/schemas/CreditNoteApplicationRefund"
-        },
-        "refund_id": {
-          "type": "string"
         },
         "remaining_balance": {
           "type": "number"
         },
         "status": {
-          "type": "string"
-        },
-        "uuid": {
           "type": "string"
         },
         "version": {
@@ -346,29 +332,6 @@
         },
         "links": {
           "$ref": "#/components/schemas/CreditNoteApplicationPaginationLinks"
-        },
-        "records": {
-          "type": "integer",
-          "description": "The total number of matching records, not the length of this page."
-        },
-        "offset": {
-          "type": "integer"
-        },
-        "next_page": {
-          "type": "string",
-          "description": "On the last page this is the string `NULL`, not JSON null."
-        },
-        "previous_page": {
-          "type": "string"
-        },
-        "has_next": {
-          "type": "boolean"
-        },
-        "has_prev": {
-          "type": "boolean"
-        },
-        "per_page": {
-          "type": "integer"
         }
       }
     },
@@ -418,7 +381,8 @@
           "$ref": "#/components/schemas/CreditNoteApplicationReadPayment"
         },
         "primaryId": {
-          "type": "integer"
+          "type": "integer",
+          "description": "An internal number. Use `id` to identify the application."
         },
         "refund": {
           "$ref": "#/components/schemas/CreditNoteApplicationReadRefund"
