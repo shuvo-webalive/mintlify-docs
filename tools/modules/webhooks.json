@@ -1,0 +1,54 @@
+{
+  "family": "webhooks",
+  "tag": "Webhooks",
+  "slug": "webhooks",
+  "icon": "bell",
+  "base": "/webhooks",
+  "overview_description": "Read one webhook delivery from your Exsited instance by the whk_ id it carries.",
+  "intro": "Each webhook delivery carries a `whk_` id, and you can read one delivery by that id. No endpoint lists deliveries. This area has 1 endpoint, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**Deliveries are read one at a time by their `whk_` id.** `GET /webhooks` without an id is refused, so keep the id each delivery carries.",
+    "**A well formed id is `whk_` followed by 32 characters.**",
+    "**An unknown id returns `404` with the code `resource_not_found`.**"
+  ],
+  "endpoints": [
+    {
+      "key": "get_webhook",
+      "method": "GET",
+      "path": "/webhooks/{webhook_id}",
+      "slug": "retrieve-a-webhook-delivery",
+      "title": "Retrieve a webhook delivery",
+      "summary": "Returns one webhook delivery by its `whk_` id.",
+      "description": "Pass the `whk_` id the delivery carries as `webhook_id`. No endpoint lists deliveries, so keep the id from each one. An unknown id returns `404` with the code `resource_not_found`.",
+      "parameters": [
+        {
+          "name": "webhook_id",
+          "in": "path",
+          "required": true,
+          "description": "The delivery's id: `whk_` followed by 32 characters.",
+          "schema": {
+            "type": "string",
+            "example": "whk_5f2c9a1e7b3d4c6f8a0e1b2d3c4f5a6b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The webhook delivery."
+        },
+        "404": {
+          "description": "No delivery has that id; the error code is `resource_not_found`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "webhook_id": "whk_5f2c9a1e7b3d4c6f8a0e1b2d3c4f5a6b"
+        }
+      }
+    }
+  ],
+  "schemas": {}
+}
