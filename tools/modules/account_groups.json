@@ -1,0 +1,423 @@
+{
+  "family": "account_groups",
+  "tag": "Account groups",
+  "slug": "account-groups",
+  "icon": "user-group",
+  "base": "/settings/account_groups",
+  "overview_description": "List, create, read, update and delete the account groups you sort accounts into.",
+  "intro": "Account groups sort your accounts into sets, such as wholesale or retail customers. Here you list, create, read, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**A group is named by its `ag_` id.** List account groups returns each group's `id`.",
+    "**`name` is required to create a group.** The new group comes back under `account_group`.",
+    "**One group comes back under `account_group`; a listing comes back under `data`.** A listing also carries `pagination`; pass `pagination.next_cursor` as `cursor` while `has_more` is `true`.",
+    "**Only a group no account uses can be deleted.**",
+    "**Updating or deleting a group can fail with `500`.** It does so even for a group just created, so a group you create may not be removable through the API."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_account_groups",
+      "method": "GET",
+      "path": "/settings/account_groups",
+      "slug": "list-account-groups",
+      "title": "List account groups",
+      "summary": "Lists your account groups, a page at a time.",
+      "description": "Returns the groups under `data`, with `pagination` for the next page. Other fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most account groups to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` from the previous page, to fetch the next page.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by, such as `created_on`. Prefix it with `-` for descending order, as in `-created_on`.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of account groups.",
+          "schema": {
+            "$ref": "#/components/schemas/AccountGroupList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_account_group",
+      "method": "POST",
+      "path": "/settings/account_groups",
+      "slug": "create-an-account-group",
+      "title": "Create an account group",
+      "summary": "Creates an account group and returns it under `account_group`.",
+      "description": "`name` is required. The new group comes back under `account_group`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "account_group"
+          ],
+          "properties": {
+            "account_group": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The group's name. Required to create a group."
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "account_group": {
+            "name": "Wholesale"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new group, under `account_group`.",
+          "schema": {
+            "$ref": "#/components/schemas/AccountGroupResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "account_group": {
+            "name": "Wholesale"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_account_group",
+      "method": "GET",
+      "path": "/settings/account_groups/{account_group_id}",
+      "slug": "retrieve-an-account-group",
+      "title": "Retrieve an account group",
+      "summary": "Returns one account group, under `account_group`.",
+      "description": "Name the group by its `ag_` id.",
+      "parameters": [
+        {
+          "name": "account_group_id",
+          "in": "path",
+          "required": true,
+          "description": "The account group's `ag_` id.",
+          "schema": {
+            "type": "string",
+            "example": "ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The group, under `account_group`.",
+          "schema": {
+            "$ref": "#/components/schemas/AccountGroupResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "account_group_id": "ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_account_group",
+      "method": "DELETE",
+      "path": "/settings/account_groups/{account_group_id}",
+      "slug": "delete-an-account-group",
+      "title": "Delete an account group",
+      "summary": "Deletes an account group that no account uses.",
+      "description": "Only a group no account uses can be deleted. A successful delete returns `204` with no content. This call can return `500`, even for a group just created.",
+      "parameters": [
+        {
+          "name": "account_group_id",
+          "in": "path",
+          "required": true,
+          "description": "The account group's `ag_` id.",
+          "schema": {
+            "type": "string",
+            "example": "ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The group is deleted."
+        },
+        "500": {
+          "description": "The server could not delete the group."
+        }
+      },
+      "example_call": {
+        "path": {
+          "account_group_id": "ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b"
+        }
+      }
+    },
+    {
+      "key": "update_settings_account_group",
+      "method": "PATCH",
+      "path": "/settings/account_groups/{account_group_id}",
+      "slug": "update-an-account-group",
+      "title": "Update an account group",
+      "summary": "Changes an account group's fields or its status.",
+      "description": "Send only the fields to change. This call can return `500`, even for a group just created.",
+      "parameters": [
+        {
+          "name": "account_group_id",
+          "in": "path",
+          "required": true,
+          "description": "The account group's `ag_` id.",
+          "schema": {
+            "type": "string",
+            "example": "ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "account_group"
+          ],
+          "properties": {
+            "account_group": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The group's name. Required to create a group."
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "account_group": {
+            "display_name": "Wholesale customers"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The group is updated."
+        },
+        "500": {
+          "description": "The server could not update the group."
+        }
+      },
+      "example_call": {
+        "path": {
+          "account_group_id": "ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b"
+        },
+        "body": {
+          "account_group": {
+            "display_name": "Wholesale customers"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "AccountGroup": {
+      "type": "object",
+      "description": "One account group.",
+      "properties": {
+        "accounting_code": {},
+        "custom_attributes": {
+          "type": "array"
+        },
+        "description": {},
+        "display_name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The group's `ag_` id."
+        },
+        "invoice_account_media": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "managed_by": {},
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "pricing_level": {},
+        "state_rule": {
+          "$ref": "#/components/schemas/AccountGroupStateRule"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "AccountGroupStateRule": {
+      "type": "object",
+      "description": "A link to the group's state rule.",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "AccountGroupResponse": {
+      "type": "object",
+      "properties": {
+        "account_group": {
+          "$ref": "#/components/schemas/AccountGroup"
+        }
+      }
+    },
+    "AccountGroupList": {
+      "type": "object",
+      "description": "One page of account groups.",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/AccountGroup"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/AccountGroupPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "AccountGroupPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer"
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Rely on this rather than `next_cursor`."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass this as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/AccountGroupPaginationLinks"
+        },
+        "records": {
+          "type": "integer"
+        },
+        "offset": {
+          "type": "integer"
+        },
+        "next_page": {
+          "type": "string"
+        },
+        "previous_page": {
+          "type": "string"
+        },
+        "has_next": {
+          "type": "boolean"
+        },
+        "has_prev": {
+          "type": "boolean"
+        },
+        "per_page": {
+          "type": "integer"
+        }
+      }
+    },
+    "AccountGroupPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

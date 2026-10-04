@@ -29,6 +29,9 @@
     },
     {
       "name": "Account emails"
+    },
+    {
+      "name": "Account groups"
     }
   ],
   "paths": {
@@ -7732,6 +7735,469 @@
           }
         ]
       }
+    },
+    "/settings/account_groups": {
+      "get": {
+        "tags": [
+          "Account groups"
+        ],
+        "summary": "List account groups",
+        "operationId": "account_groups_get_settings_account_groups",
+        "description": "Returns the groups under `data`, with `pagination` for the next page. Other fields filter as `filter_<field>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most account groups to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` from the previous page, to fetch the next page.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by, such as `created_on`. Prefix it with `-` for descending order, as in `-created_on`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of account groups.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountGroupList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/account_groups?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.account_groups.get_settings_account_groups({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.accountGroups.getSettingsAccountGroups({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->accountGroups->getSettingsAccountGroups(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.account_groups.account_groups_dto.AccountGroupsDto.SettingsAccountGroupList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsAccountGroupList> response = client.accountGroups().getSettingsAccountGroups(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AccountGroups.GetSettingsAccountGroupsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.accountGroups.getSettingsAccountGroups(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AccountGroups().GetSettingsAccountGroups(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Account groups"
+        ],
+        "summary": "Create an account group",
+        "operationId": "account_groups_create_settings_account_group",
+        "description": "`name` is required. The new group comes back under `account_group`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new group, under `account_group`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountGroupResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/account_groups\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"account_group\": {\n      \"name\": \"Wholesale\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.account_groups.create_settings_account_group(\n    {\"account_group\": {\"name\": \"Wholesale\"}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.accountGroups.createSettingsAccountGroup({account_group: {name: 'Wholesale'}});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->accountGroups->createSettingsAccountGroup([\n    'account_group' => ['name' => 'Wholesale'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.account_groups.account_groups_dto.AccountGroupsDto.SettingsAccountGroup;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsAccountGroup> response = client.accountGroups().createSettingsAccountGroup(\n        Map.of(\"account_group\", Map.of(\"name\", \"Wholesale\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AccountGroups.CreateSettingsAccountGroupAsync(new Dictionary<string, object?>\n{\n    [\"account_group\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Wholesale\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.accountGroups.createSettingsAccountGroup({\n  'account_group': {'name': 'Wholesale'},\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AccountGroups().CreateSettingsAccountGroup(context.Background(), map[string]any{\n\t\"account_group\": map[string]any{\"name\": \"Wholesale\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "account_group"
+                ],
+                "properties": {
+                  "account_group": {
+                    "type": "object",
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The group's name. Required to create a group."
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "account_group": {
+                  "name": "Wholesale"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/account_groups/{account_group_id}": {
+      "get": {
+        "tags": [
+          "Account groups"
+        ],
+        "summary": "Retrieve an account group",
+        "operationId": "account_groups_get_settings_account_group",
+        "description": "Name the group by its `ag_` id.",
+        "parameters": [
+          {
+            "name": "account_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The account group's `ag_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The group, under `account_group`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountGroupResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/account_groups/ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.account_groups.get_settings_account_group(\n    \"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.accountGroups.getSettingsAccountGroup('ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->accountGroups->getSettingsAccountGroup('ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.account_groups.account_groups_dto.AccountGroupsDto.SettingsAccountGroup;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsAccountGroup> response = client.accountGroups().getSettingsAccountGroup(\n        \"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AccountGroups.GetSettingsAccountGroupAsync(\"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.accountGroups.getSettingsAccountGroup(\n  'ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AccountGroups().GetSettingsAccountGroup(context.Background(), \"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Account groups"
+        ],
+        "summary": "Delete an account group",
+        "operationId": "account_groups_delete_settings_account_group",
+        "description": "Only a group no account uses can be deleted. A successful delete returns `204` with no content. This call can return `500`, even for a group just created.",
+        "parameters": [
+          {
+            "name": "account_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The account group's `ag_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The group is deleted."
+          },
+          "500": {
+            "description": "The server could not delete the group.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/account_groups/ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.account_groups.delete_settings_account_group(\n    \"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.accountGroups.deleteSettingsAccountGroup('ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->accountGroups->deleteSettingsAccountGroup(\n    'ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.accountGroups().deleteSettingsAccountGroup(\"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AccountGroups.DeleteSettingsAccountGroupAsync(\"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.accountGroups.deleteSettingsAccountGroup(\n  'ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AccountGroups().DeleteSettingsAccountGroup(context.Background(), \"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Account groups"
+        ],
+        "summary": "Update an account group",
+        "operationId": "account_groups_update_settings_account_group",
+        "description": "Send only the fields to change. This call can return `500`, even for a group just created.",
+        "parameters": [
+          {
+            "name": "account_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The account group's `ag_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The group is updated."
+          },
+          "500": {
+            "description": "The server could not update the group.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/account_groups/ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"account_group\": {\n      \"display_name\": \"Wholesale customers\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.account_groups.update_settings_account_group(\n    \"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\",\n    {\"account_group\": {\"display_name\": \"Wholesale customers\"}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.accountGroups.updateSettingsAccountGroup('ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b', {\n    account_group: {display_name: 'Wholesale customers'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->accountGroups->updateSettingsAccountGroup(\n    'ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b',\n    ['account_group' => ['display_name' => 'Wholesale customers']],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.accountGroups().updateSettingsAccountGroup(\n        \"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\",\n        Map.of(\"account_group\", Map.of(\"display_name\", \"Wholesale customers\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AccountGroups.UpdateSettingsAccountGroupAsync(\n    \"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\",\n    new Dictionary<string, object?>\n    {\n        [\"account_group\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Wholesale customers\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.accountGroups.updateSettingsAccountGroup(\n  'ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b',\n  {\n    'account_group': {'display_name': 'Wholesale customers'},\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AccountGroups().UpdateSettingsAccountGroup(context.Background(), \"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\", map[string]any{\n\t\"account_group\": map[string]any{\"display_name\": \"Wholesale customers\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "account_group"
+                ],
+                "properties": {
+                  "account_group": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The group's name. Required to create a group."
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "account_group": {
+                  "display_name": "Wholesale customers"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -12074,6 +12540,145 @@
           "workflow_stage": {},
           "workflow_status": {},
           "workflow_status_uuid": {}
+        }
+      },
+      "AccountGroup": {
+        "type": "object",
+        "description": "One account group.",
+        "properties": {
+          "accounting_code": {},
+          "custom_attributes": {
+            "type": "array"
+          },
+          "description": {},
+          "display_name": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "The group's `ag_` id."
+          },
+          "invoice_account_media": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "managed_by": {},
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "pricing_level": {},
+          "state_rule": {
+            "$ref": "#/components/schemas/AccountGroupStateRule"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "AccountGroupStateRule": {
+        "type": "object",
+        "description": "A link to the group's state rule.",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "AccountGroupResponse": {
+        "type": "object",
+        "properties": {
+          "account_group": {
+            "$ref": "#/components/schemas/AccountGroup"
+          }
+        }
+      },
+      "AccountGroupList": {
+        "type": "object",
+        "description": "One page of account groups.",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountGroup"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/AccountGroupPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "AccountGroupPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer"
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Rely on this rather than `next_cursor`."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass this as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/AccountGroupPaginationLinks"
+          },
+          "records": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "next_page": {
+            "type": "string"
+          },
+          "previous_page": {
+            "type": "string"
+          },
+          "has_next": {
+            "type": "boolean"
+          },
+          "has_prev": {
+            "type": "boolean"
+          },
+          "per_page": {
+            "type": "integer"
+          }
+        }
+      },
+      "AccountGroupPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
         }
       },
       "Error": {
