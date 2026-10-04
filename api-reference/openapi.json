@@ -140,6 +140,9 @@
     },
     {
       "name": "Return vendor authorizations"
+    },
+    {
+      "name": "ABA files"
     }
   ],
   "paths": {
@@ -48877,6 +48880,98 @@
             "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnVendorAuthorizations().DeleteReturnVendorAuthorizationNoteFile(context.Background(), \"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
           }
         ]
+      }
+    },
+    "/aba_file/generate": {
+      "post": {
+        "tags": [
+          "ABA files"
+        ],
+        "summary": "Generate an ABA file",
+        "operationId": "aba_files_generate_aba_file",
+        "description": "Generates an ABA file from transactions. Send the transactions under `aba_file.transactions`, for example the `id` of a purchase payment.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The ABA file is generated."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/aba_file/generate\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"aba_file\": {\n      \"transactions\": [\n        \"PP-0001\"\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.aba_files.generate_aba_file(\n    {\"aba_file\": {\"transactions\": [\"PP-0001\"]}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.abaFiles.generateAbaFile({aba_file: {transactions: ['PP-0001']}});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->abaFiles->generateAbaFile(['aba_file' => ['transactions' => ['PP-0001']]]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.abaFiles().generateAbaFile(\n        Map.of(\"aba_file\", Map.of(\"transactions\", List.of(\"PP-0001\"))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AbaFiles.GenerateAbaFileAsync(new Dictionary<string, object?>\n{\n    [\"aba_file\"] = new Dictionary<string, object?>\n    {\n        [\"transactions\"] = new List<object?>\n        {\n            \"PP-0001\",\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.abaFiles.generateAbaFile({\n  'aba_file': {\n    'transactions': ['PP-0001'],\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AbaFiles().GenerateABAFile(context.Background(), map[string]any{\n\t\"aba_file\": map[string]any{\n\t\t\"transactions\": []any{\"PP-0001\"},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "aba_file": {
+                    "type": "object",
+                    "properties": {
+                      "transactions": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "The transactions to include, such as purchase payment ids."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "aba_file"
+                ]
+              },
+              "example": {
+                "aba_file": {
+                  "transactions": [
+                    "PP-0001"
+                  ]
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
