@@ -1,0 +1,27 @@
+---
+title: "System events"
+sidebarTitle: "Overview"
+description: "List the base system events defined on your instance, or retrieve one by its id."
+---
+
+System events are the base events the platform defines, such as the events workflows and custom events build on. You can list them and retrieve one. This area has 2 endpoints, and all seven Exsited SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List system events](/api-reference/system-events/list-system-events) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/system_events` | Lists the base system events, one page at a time. |
+| [Retrieve a system event](/api-reference/system-events/retrieve-a-system-event) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/system_events/{system_event_id}` | Retrieves one system event by its `evt_` id. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **System events are read only.** They are the base events the platform defines; there are no writes in this area.
+- **System event ids start with `evt_`.** A custom event's `base_event` takes an `se_` id instead, so a listed id here is not accepted there.
+- **One system event comes back under `system_event`.** A listing puts its records under `data`.
+- **Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.
