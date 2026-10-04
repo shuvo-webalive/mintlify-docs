@@ -1,0 +1,32 @@
+---
+title: "Billing periods"
+sidebarTitle: "Overview"
+description: "List, create, read, update and delete billing periods, each built on a time period."
+---
+
+A billing period is a settings record built on a time period, with a name, a period and a duration. You can list, create, read, update and delete billing periods. This area has 5 endpoints, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List billing periods](/api-reference/billing-periods/list-billing-periods) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/billing_periods` | Returns a page of billing periods under `data`, with paging details under `pagination`. |
+| [Create a billing period](/api-reference/billing-periods/create-a-billing-period) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/billing_periods` | Creates a billing period and returns it under `billing_period`. |
+| [Retrieve a billing period](/api-reference/billing-periods/retrieve-a-billing-period) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/billing_periods/{billing_period_id}` | Returns one billing period by its `id`, under `billing_period`. |
+| [Delete a billing period](/api-reference/billing-periods/delete-a-billing-period) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/billing_periods/{billing_period_id}` | Deletes a billing period. The response has no body. |
+| [Update a billing period](/api-reference/billing-periods/update-a-billing-period) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/billing_periods/{billing_period_id}` | Changes the fields you send on a billing period and returns it under `billing_period`. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **A create takes the time period's hyphenated uuid, not its `tp_` id.** For a time period `tp_580762f904bd2bd26d3d7e71ae87aa72`, send `580762f9-04bd-2bd2-6d3d-7e71ae87aa72` as `time_period`.
+- **`name` and `time_period` are required on a create.** Both go under the `billing_period` key.
+- **An update returns `time_period` in place of `period` and `duration`.** Read the billing period again to see those two fields.
+- **A billing period `id` starts with `bp_`.**
+- **Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true.
+- **A delete returns `204` with no body.** Reading the billing period afterwards returns `404`.
