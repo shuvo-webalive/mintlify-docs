@@ -4,7 +4,11 @@ sidebarTitle: "Overview"
 description: "Create, read, update and delete workflows, and read their stages, milestones and component instance history."
 ---
 
-Workflows define the stages and milestones a record moves through. Use these endpoints to create and change workflows and to read their stages, milestones and the workflow history of custom component instances. This area has 15 endpoints, and all seven Exsited SDKs call every one.
+Workflows define the stages and milestones a record moves through. Use these endpoints to create and change workflows and to read their stages, milestones and the workflow history of custom component instances. This area has 15 endpoints, and all seven SDKs call every one.
+
+<Warning>
+  **Creating a workflow currently fails.** `POST /workflows` returns `500` and creates nothing, so updating and deleting a workflow have not been confirmed either.
+</Warning>
 
 ## At a glance
 
@@ -23,8 +27,8 @@ Workflows define the stages and milestones a record moves through. Use these end
 | [List a component instance's workflow history](/api-reference/workflows/list-a-component-instances-workflow-history) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/workflows/custom_components/{component_uuid}/{object_code}/history` | Lists the workflow history of one custom component instance, one page at a time. |
 | [List a component instance's milestones](/api-reference/workflows/list-a-component-instances-milestones) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/workflows/custom_components/{component_uuid}/{object_code}/milestones` | Lists the workflow milestones of one custom component instance, one page at a time. |
 | [Retrieve a component instance's milestone](/api-reference/workflows/retrieve-a-component-instances-milestone) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/workflows/custom_components/{component_uuid}/{object_code}/milestones/{milestone_id}` | Retrieves one workflow milestone of a custom component instance, by its `wfmi_` id. |
-| [Retrieve a component instance's workflow history by code](/api-reference/workflows/retrieve-a-component-instances-workflow-history-by-code) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/workflow/component/{component_object_id}/history` | Retrieves the workflow history of one custom component instance, named by its code. |
-| [Retrieve a component instance's milestones by code](/api-reference/workflows/retrieve-a-component-instances-milestones-by-code) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/workflow/component/{component_uuid}/{component_object_id}/milestone` | Retrieves the workflow milestones of one custom component instance, named by the component's uuid and the instance's code. |
+| [List a component instance's workflow history by instance code](/api-reference/workflows/list-a-component-instances-workflow-history-by-instance-code) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/workflow/component/{component_object_id}/history` | Lists the workflow history of one custom component instance, named by its code alone. |
+| [List a component instance's milestones by settings uuid](/api-reference/workflows/list-a-component-instances-milestones-by-settings-uuid) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/workflow/component/{component_uuid}/{component_object_id}/milestone` | Lists the workflow milestones of one custom component instance, named by the component's settings uuid and the instance's code. |
 
 ## Before you call
 
@@ -38,4 +42,5 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 - **A new workflow starts as a draft.** An update can move a draft to active, and move an active workflow to inactive and back.
 - **A workflow is read by its `wf_` id or its `code`.** The milestone listing takes the `wf_` id in its `workflow_uuid` slot.
 - **Component instance routes take the component's dashed uuid.** Under `/workflows/custom_components`, `component_uuid` is the hex of the `cmp_` id with the dashes put back and `object_code` is the instance's `code`; the `cmp_` id and the bare hex return `404`.
+- **Deleting a milestone sits in this area.** `DELETE /milestones/{milestone_uuid}` is listed with the workflow endpoints.
 - **Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.
