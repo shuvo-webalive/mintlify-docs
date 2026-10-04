@@ -38066,7 +38066,7 @@
         ],
         "summary": "Update rental asset availability",
         "operationId": "rental_assets_update_rental_asset_availability",
-        "description": "Send a `rental_assets` list. Each entry names an asset by `id` and carries `rental_asset_availability` for weekly hours or `rental_asset_custom_availability` for custom hours. An entry with only the `id` is accepted. In the tested flow, the asset's `use_custom_availability` is set to `true` before custom hours are sent.",
+        "description": "Send a `rental_assets` list. Each entry names an asset by `id` and carries `rental_asset_availability` for weekly hours or `rental_asset_custom_availability` for custom hours. An entry with only the `id` is accepted. Set the asset's `use_custom_availability` to `true` (Update a rental asset) before sending custom hours; whether it is required is not documented.",
         "parameters": [],
         "responses": {
           "204": {
@@ -38338,42 +38338,42 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/rental_asset_profiles\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"rental_asset_profile\": {\n      \"name\": \"Standard daily rate\",\n      \"display_name\": \"Standard daily rate\",\n      \"currency\": \"AUD\",\n      \"rental_asset_profile_sessions\": [\n        {\n          \"name\": \"Spring season\",\n          \"start_date\": \"2026-10-05\",\n          \"end_date\": \"2026-12-30\",\n          \"rental_asset_profile_session_prices\": [\n            {\n              \"price\": 1.0,\n              \"price_type\": \"DAILY\",\n              \"enabled_pro_rata\": false\n            }\n          ],\n          \"rental_asset_profile_session_availability\": [\n            {\n              \"preferred_day\": \"Monday\",\n              \"available\": true,\n              \"start_time\": \"09:00\",\n              \"end_time\": \"17:00\"\n            }\n          ]\n        }\n      ]\n    }\n  }'"
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/rental_asset_profiles\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"rental_asset_profile\": {\n      \"name\": \"Standard daily rate\",\n      \"display_name\": \"Standard daily rate\",\n      \"currency\": \"AUD\",\n      \"rental_asset_profile_sessions\": [\n        {\n          \"name\": \"Spring season\",\n          \"start_date\": \"2026-11-02\",\n          \"end_date\": \"2026-12-30\",\n          \"rental_asset_profile_session_prices\": [\n            {\n              \"price\": 1.0,\n              \"price_type\": \"DAILY\",\n              \"enabled_pro_rata\": false\n            }\n          ],\n          \"rental_asset_profile_session_availability\": [\n            {\n              \"preferred_day\": \"Monday\",\n              \"available\": true,\n              \"start_time\": \"09:00\",\n              \"end_time\": \"17:00\"\n            }\n          ]\n        }\n      ]\n    }\n  }'"
           },
           {
             "lang": "python",
             "label": "Python",
-            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.rental_assets.create_rental_asset_profile(\n    {\n        \"rental_asset_profile\": {\n            \"name\": \"Standard daily rate\",\n            \"display_name\": \"Standard daily rate\",\n            \"currency\": \"AUD\",\n            \"rental_asset_profile_sessions\": [\n                {\n                    \"name\": \"Spring season\",\n                    \"start_date\": \"2026-10-05\",\n                    \"end_date\": \"2026-12-30\",\n                    \"rental_asset_profile_session_prices\": [\n                        {\"price\": 1.0, \"price_type\": \"DAILY\", \"enabled_pro_rata\": False}\n                    ],\n                    \"rental_asset_profile_session_availability\": [\n                        {\n                            \"preferred_day\": \"Monday\",\n                            \"available\": True,\n                            \"start_time\": \"09:00\",\n                            \"end_time\": \"17:00\",\n                        }\n                    ],\n                }\n            ],\n        }\n    }\n)\nprint(response.data)\n"
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.rental_assets.create_rental_asset_profile(\n    {\n        \"rental_asset_profile\": {\n            \"name\": \"Standard daily rate\",\n            \"display_name\": \"Standard daily rate\",\n            \"currency\": \"AUD\",\n            \"rental_asset_profile_sessions\": [\n                {\n                    \"name\": \"Spring season\",\n                    \"start_date\": \"2026-11-02\",\n                    \"end_date\": \"2026-12-30\",\n                    \"rental_asset_profile_session_prices\": [\n                        {\"price\": 1.0, \"price_type\": \"DAILY\", \"enabled_pro_rata\": False}\n                    ],\n                    \"rental_asset_profile_session_availability\": [\n                        {\n                            \"preferred_day\": \"Monday\",\n                            \"available\": True,\n                            \"start_time\": \"09:00\",\n                            \"end_time\": \"17:00\",\n                        }\n                    ],\n                }\n            ],\n        }\n    }\n)\nprint(response.data)\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.rentalAssets.createRentalAssetProfile({\n    rental_asset_profile: {\n        name: 'Standard daily rate',\n        display_name: 'Standard daily rate',\n        currency: 'AUD',\n        rental_asset_profile_sessions: [\n            {\n                name: 'Spring season',\n                start_date: '2026-10-05',\n                end_date: '2026-12-30',\n                rental_asset_profile_session_prices: [{price: 1.0, price_type: 'DAILY', enabled_pro_rata: false}],\n                rental_asset_profile_session_availability: [\n                    {preferred_day: 'Monday', available: true, start_time: '09:00', end_time: '17:00'},\n                ],\n            },\n        ],\n    },\n});\nconsole.log(response.data);\n"
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.rentalAssets.createRentalAssetProfile({\n    rental_asset_profile: {\n        name: 'Standard daily rate',\n        display_name: 'Standard daily rate',\n        currency: 'AUD',\n        rental_asset_profile_sessions: [\n            {\n                name: 'Spring season',\n                start_date: '2026-11-02',\n                end_date: '2026-12-30',\n                rental_asset_profile_session_prices: [{price: 1.0, price_type: 'DAILY', enabled_pro_rata: false}],\n                rental_asset_profile_session_availability: [\n                    {preferred_day: 'Monday', available: true, start_time: '09:00', end_time: '17:00'},\n                ],\n            },\n        ],\n    },\n});\nconsole.log(response.data);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->rentalAssets->createRentalAssetProfile([\n    'rental_asset_profile' => [\n        'name' => 'Standard daily rate',\n        'display_name' => 'Standard daily rate',\n        'currency' => 'AUD',\n        'rental_asset_profile_sessions' => [\n            [\n                'name' => 'Spring season',\n                'start_date' => '2026-10-05',\n                'end_date' => '2026-12-30',\n                'rental_asset_profile_session_prices' => [\n                    ['price' => 1.0, 'price_type' => 'DAILY', 'enabled_pro_rata' => false],\n                ],\n                'rental_asset_profile_session_availability' => [\n                    [\n                        'preferred_day' => 'Monday',\n                        'available' => true,\n                        'start_time' => '09:00',\n                        'end_time' => '17:00',\n                    ],\n                ],\n            ],\n        ],\n    ],\n]);\nprint_r($response->data);\n"
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->rentalAssets->createRentalAssetProfile([\n    'rental_asset_profile' => [\n        'name' => 'Standard daily rate',\n        'display_name' => 'Standard daily rate',\n        'currency' => 'AUD',\n        'rental_asset_profile_sessions' => [\n            [\n                'name' => 'Spring season',\n                'start_date' => '2026-11-02',\n                'end_date' => '2026-12-30',\n                'rental_asset_profile_session_prices' => [\n                    ['price' => 1.0, 'price_type' => 'DAILY', 'enabled_pro_rata' => false],\n                ],\n                'rental_asset_profile_session_availability' => [\n                    [\n                        'preferred_day' => 'Monday',\n                        'available' => true,\n                        'start_time' => '09:00',\n                        'end_time' => '17:00',\n                    ],\n                ],\n            ],\n        ],\n    ],\n]);\nprint_r($response->data);\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.rental_assets.rental_assets_dto.RentalAssetsDto.RentalAssetProfileView;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<RentalAssetProfileView> response = client.rentalAssets().createRentalAssetProfile(\n        Map.of(\n                \"rental_asset_profile\", Map.of(\n                        \"name\", \"Standard daily rate\",\n                        \"display_name\", \"Standard daily rate\",\n                        \"currency\", \"AUD\",\n                        \"rental_asset_profile_sessions\", List.of(\n                                Map.of(\n                                        \"name\", \"Spring season\",\n                                        \"start_date\", \"2026-10-05\",\n                                        \"end_date\", \"2026-12-30\",\n                                        \"rental_asset_profile_session_prices\", List.of(\n                                                Map.of(\n                                                        \"price\", 1.0,\n                                                        \"price_type\", \"DAILY\",\n                                                        \"enabled_pro_rata\", false)),\n                                        \"rental_asset_profile_session_availability\", List.of(\n                                                Map.of(\n                                                        \"preferred_day\", \"Monday\",\n                                                        \"available\", true,\n                                                        \"start_time\", \"09:00\",\n                                                        \"end_time\", \"17:00\")))))));\nSystem.out.println(response.getMap());\n"
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.rental_assets.rental_assets_dto.RentalAssetsDto.RentalAssetProfileView;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<RentalAssetProfileView> response = client.rentalAssets().createRentalAssetProfile(\n        Map.of(\n                \"rental_asset_profile\", Map.of(\n                        \"name\", \"Standard daily rate\",\n                        \"display_name\", \"Standard daily rate\",\n                        \"currency\", \"AUD\",\n                        \"rental_asset_profile_sessions\", List.of(\n                                Map.of(\n                                        \"name\", \"Spring season\",\n                                        \"start_date\", \"2026-11-02\",\n                                        \"end_date\", \"2026-12-30\",\n                                        \"rental_asset_profile_session_prices\", List.of(\n                                                Map.of(\n                                                        \"price\", 1.0,\n                                                        \"price_type\", \"DAILY\",\n                                                        \"enabled_pro_rata\", false)),\n                                        \"rental_asset_profile_session_availability\", List.of(\n                                                Map.of(\n                                                        \"preferred_day\", \"Monday\",\n                                                        \"available\", true,\n                                                        \"start_time\", \"09:00\",\n                                                        \"end_time\", \"17:00\")))))));\nSystem.out.println(response.getMap());\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.RentalAssets.CreateRentalAssetProfileAsync(new Dictionary<string, object?>\n{\n    [\"rental_asset_profile\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Standard daily rate\",\n        [\"display_name\"] = \"Standard daily rate\",\n        [\"currency\"] = \"AUD\",\n        [\"rental_asset_profile_sessions\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"name\"] = \"Spring season\",\n                [\"start_date\"] = \"2026-10-05\",\n                [\"end_date\"] = \"2026-12-30\",\n                [\"rental_asset_profile_session_prices\"] = new List<object?>\n                {\n                    new Dictionary<string, object?>\n                    {\n                        [\"price\"] = 1.0,\n                        [\"price_type\"] = \"DAILY\",\n                        [\"enabled_pro_rata\"] = false,\n                    },\n                },\n                [\"rental_asset_profile_session_availability\"] = new List<object?>\n                {\n                    new Dictionary<string, object?>\n                    {\n                        [\"preferred_day\"] = \"Monday\",\n                        [\"available\"] = true,\n                        [\"start_time\"] = \"09:00\",\n                        [\"end_time\"] = \"17:00\",\n                    },\n                },\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.RentalAssets.CreateRentalAssetProfileAsync(new Dictionary<string, object?>\n{\n    [\"rental_asset_profile\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Standard daily rate\",\n        [\"display_name\"] = \"Standard daily rate\",\n        [\"currency\"] = \"AUD\",\n        [\"rental_asset_profile_sessions\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"name\"] = \"Spring season\",\n                [\"start_date\"] = \"2026-11-02\",\n                [\"end_date\"] = \"2026-12-30\",\n                [\"rental_asset_profile_session_prices\"] = new List<object?>\n                {\n                    new Dictionary<string, object?>\n                    {\n                        [\"price\"] = 1.0,\n                        [\"price_type\"] = \"DAILY\",\n                        [\"enabled_pro_rata\"] = false,\n                    },\n                },\n                [\"rental_asset_profile_session_availability\"] = new List<object?>\n                {\n                    new Dictionary<string, object?>\n                    {\n                        [\"preferred_day\"] = \"Monday\",\n                        [\"available\"] = true,\n                        [\"start_time\"] = \"09:00\",\n                        [\"end_time\"] = \"17:00\",\n                    },\n                },\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.rentalAssets.createRentalAssetProfile({\n  'rental_asset_profile': {\n    'name': 'Standard daily rate',\n    'display_name': 'Standard daily rate',\n    'currency': 'AUD',\n    'rental_asset_profile_sessions': [\n      {\n        'name': 'Spring season',\n        'start_date': '2026-10-05',\n        'end_date': '2026-12-30',\n        'rental_asset_profile_session_prices': [\n          {'price': 1.0, 'price_type': 'DAILY', 'enabled_pro_rata': false},\n        ],\n        'rental_asset_profile_session_availability': [\n          {\n            'preferred_day': 'Monday',\n            'available': true,\n            'start_time': '09:00',\n            'end_time': '17:00',\n          },\n        ],\n      },\n    ],\n  },\n});\nprint(response.map);\n"
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.rentalAssets.createRentalAssetProfile({\n  'rental_asset_profile': {\n    'name': 'Standard daily rate',\n    'display_name': 'Standard daily rate',\n    'currency': 'AUD',\n    'rental_asset_profile_sessions': [\n      {\n        'name': 'Spring season',\n        'start_date': '2026-11-02',\n        'end_date': '2026-12-30',\n        'rental_asset_profile_session_prices': [\n          {'price': 1.0, 'price_type': 'DAILY', 'enabled_pro_rata': false},\n        ],\n        'rental_asset_profile_session_availability': [\n          {\n            'preferred_day': 'Monday',\n            'available': true,\n            'start_time': '09:00',\n            'end_time': '17:00',\n          },\n        ],\n      },\n    ],\n  },\n});\nprint(response.map);\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.RentalAssets().CreateRentalAssetProfile(context.Background(), map[string]any{\n\t\"rental_asset_profile\": map[string]any{\n\t\t\"name\":         \"Standard daily rate\",\n\t\t\"display_name\": \"Standard daily rate\",\n\t\t\"currency\":     \"AUD\",\n\t\t\"rental_asset_profile_sessions\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"name\":       \"Spring season\",\n\t\t\t\t\"start_date\": \"2026-10-05\",\n\t\t\t\t\"end_date\":   \"2026-12-30\",\n\t\t\t\t\"rental_asset_profile_session_prices\": []any{\n\t\t\t\t\tmap[string]any{\n\t\t\t\t\t\t\"price\":            1.0,\n\t\t\t\t\t\t\"price_type\":       \"DAILY\",\n\t\t\t\t\t\t\"enabled_pro_rata\": false,\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\t\"rental_asset_profile_session_availability\": []any{\n\t\t\t\t\tmap[string]any{\n\t\t\t\t\t\t\"preferred_day\": \"Monday\",\n\t\t\t\t\t\t\"available\":     true,\n\t\t\t\t\t\t\"start_time\":    \"09:00\",\n\t\t\t\t\t\t\"end_time\":      \"17:00\",\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.RentalAssets().CreateRentalAssetProfile(context.Background(), map[string]any{\n\t\"rental_asset_profile\": map[string]any{\n\t\t\"name\":         \"Standard daily rate\",\n\t\t\"display_name\": \"Standard daily rate\",\n\t\t\"currency\":     \"AUD\",\n\t\t\"rental_asset_profile_sessions\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"name\":       \"Spring season\",\n\t\t\t\t\"start_date\": \"2026-11-02\",\n\t\t\t\t\"end_date\":   \"2026-12-30\",\n\t\t\t\t\"rental_asset_profile_session_prices\": []any{\n\t\t\t\t\tmap[string]any{\n\t\t\t\t\t\t\"price\":            1.0,\n\t\t\t\t\t\t\"price_type\":       \"DAILY\",\n\t\t\t\t\t\t\"enabled_pro_rata\": false,\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\t\"rental_asset_profile_session_availability\": []any{\n\t\t\t\t\tmap[string]any{\n\t\t\t\t\t\t\"preferred_day\": \"Monday\",\n\t\t\t\t\t\t\"available\":     true,\n\t\t\t\t\t\t\"start_time\":    \"09:00\",\n\t\t\t\t\t\t\"end_time\":      \"17:00\",\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
           }
         ],
         "requestBody": {
@@ -38475,7 +38475,7 @@
                   "rental_asset_profile_sessions": [
                     {
                       "name": "Spring season",
-                      "start_date": "2026-10-05",
+                      "start_date": "2026-11-02",
                       "end_date": "2026-12-30",
                       "rental_asset_profile_session_prices": [
                         {
@@ -38782,7 +38782,7 @@
         ],
         "summary": "Update a rental asset profile",
         "operationId": "rental_assets_update_rental_asset_profile",
-        "description": "Send the fields to change under `rental_asset_profile`, such as `display_name`. Read the profile afterwards to see the stored values.",
+        "description": "Send the fields to change under `rental_asset_profile`, such as `display_name`. Read the profile afterwards to see the stored values. The `200` status has not been confirmed.",
         "parameters": [
           {
             "name": "rental_asset_profile_id",
@@ -38876,7 +38876,7 @@
         ],
         "summary": "Delete a rental asset profile",
         "operationId": "rental_assets_delete_rental_asset_profile",
-        "description": "Deletes the profile. Reading it afterwards returns `404`.",
+        "description": "Deletes the profile; a later read returns `404`. It is not documented whether a profile that rental assets still use can be deleted.",
         "parameters": [
           {
             "name": "rental_asset_profile_id",
@@ -39199,7 +39199,7 @@
         ],
         "summary": "Cancel a rental asset",
         "operationId": "rental_assets_cancel_rental_asset",
-        "description": "Send an empty object as the body. The asset comes back under `rental_asset`, and its `status` reads `inactive`. Cancelling an asset that is already cancelled is refused with a `4xx` status.",
+        "description": "Send an empty object as the body. The asset comes back under `rental_asset`; a later read shows `status` `inactive`. Cancelling an asset that is already cancelled is refused with a `4xx` status.",
         "parameters": [
           {
             "name": "rental_asset_id",
@@ -39286,7 +39286,7 @@
         ],
         "summary": "Reactivate a rental asset",
         "operationId": "rental_assets_reactivate_rental_asset",
-        "description": "Send an empty object as the body. The asset comes back under `rental_asset`, and its `status` reads `active`.",
+        "description": "Send an empty object as the body. The asset comes back under `rental_asset`; a later read shows `status` `active`.",
         "parameters": [
           {
             "name": "rental_asset_id",
@@ -104244,7 +104244,7 @@
           },
           "max_booking_limit": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "name": {
             "type": "string"
@@ -104269,7 +104269,7 @@
           },
           "tax": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "version": {
             "type": "integer"
@@ -104290,7 +104290,7 @@
           },
           "image_name": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "name": {
             "type": "string"
@@ -104387,7 +104387,7 @@
           },
           "pricing_level": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "rental_asset_profile_session_price_hours": {
             "type": "array"
@@ -104500,11 +104500,11 @@
           },
           "image_name": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "item": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_updated_by": {
             "$ref": "#/components/schemas/RentalAssetLastUpdatedBy"
@@ -104695,7 +104695,7 @@
           },
           "max_booking_limit": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "name": {
             "type": "string"
@@ -104720,7 +104720,7 @@
           },
           "tax": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "version": {
             "type": "integer"
@@ -104741,7 +104741,7 @@
           },
           "image_name": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "name": {
             "type": "string"
@@ -104838,7 +104838,7 @@
           },
           "pricing_level": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "rental_asset_profile_session_price_hours": {
             "type": "array"
@@ -105092,22 +105092,6 @@
           },
           "links": {
             "$ref": "#/components/schemas/RentalAssetPaginationLinks"
-          },
-          "records": {
-            "type": "integer",
-            "description": "Offset pages only: total matching records, not the page's length."
-          },
-          "offset": {
-            "type": "integer",
-            "description": "Offset pages only."
-          },
-          "next_page": {
-            "type": "string",
-            "description": "Offset pages only: the literal string `NULL` at the end of a listing, not JSON null."
-          },
-          "previous_page": {
-            "type": "string",
-            "description": "Offset pages only."
           }
         }
       },
