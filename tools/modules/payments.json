@@ -5,13 +5,14 @@
   "icon": "credit-card",
   "base": "/payments",
   "overview_description": "Record, read, update and delete payments against invoices, and manage the notes and files on them.",
-  "intro": "A payment records money received against one or more invoices, by processor, credit note or gift certificate. This area has 15 endpoints: create, read, update and delete payments, list them by invoice or order, and manage their notes and files. All seven SDKs call every one.",
-  "warning": "**Creating a payment with a `payment_applied` entry whose processor holds a card token charges the card.**",
+  "intro": "A payment records money received against one or more invoices, by processor, credit note or gift certificate. This area has 15 endpoints: create, read, update and delete payments, list them by invoice or order, and manage their notes and files. Every SDK supports all of them.",
+  "warning": "**Creating a payment can charge a card.** If a `payment_applied` entry names a processor that holds a saved card token, the card is charged.",
   "notes": [
     "**Write bodies go under a `payment` key.** Creating a payment accepts only `id`, `date`, `origin`, `payment_note`, `note`, `invoices`, `payment_applied`, `credit_applied`, `gift_certificates` and `custom_attributes`; any other key returns `400`.",
+    "**A payment's `invoices` name each invoice by its `inv_` uuid.** Creating a payment takes the invoice's `id`, such as `INV-0001`, but reads return the `inv_` uuid in that field.",
     "**Listings page by cursor.** Records are under `data`. Pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is `true`.",
     "**Deleting a note takes its uuid, not its `id`.** Reads take the note's `id`; the delete takes the hex part of that `id` as a dashed uuid.",
-    "**Reading a payment through an invoice does not check the invoice.** Any payment is returned under any invoice that exists.",
+    "**Reading a payment through an invoice does not check that the payment belongs to it.** Any payment is returned under any invoice that exists.",
     "**Note text goes in a form field.** Creating a note sends a multipart form with the text as `note` and any attachment as `file`."
   ],
   "endpoints": [
@@ -22,7 +23,7 @@
       "slug": "list-payments",
       "title": "List payments",
       "summary": "Returns one page of payments.",
-      "description": "Lists every payment, one page at a time, under `data`. Each record carries its `status`, `reconcile_status`, the money received under `payment_applied`, any credit or gift certificate spent, and the `invoices` it paid. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+      "description": "Lists every payment, one page at a time, under `data`. Each record carries its `status`, `reconcile_status`, the money received under `payment_applied`, any credit or gift certificate spent, and the `invoices` it paid. To filter, add `filter_<field>=<value>`, or `filter_<field>_<operator>=<value>` with an operator such as `gte` or `contains`.",
       "parameters": [
         {
           "name": "limit",
@@ -68,6 +69,164 @@
         "path": {},
         "query": {
           "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_payment",
+      "method": "POST",
+      "path": "/payments",
+      "slug": "create-a-payment",
+      "title": "Create a payment",
+      "summary": "Records a payment against one or more invoices and returns it.",
+      "description": "Records a payment from the fields under `payment`. Only the keys shown are accepted; any other returns `400`. A `payment_applied` entry whose processor holds a card token charges the card.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "payment": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "origin": {
+                  "type": "string"
+                },
+                "payment_note": {
+                  "type": "string"
+                },
+                "note": {
+                  "type": "string"
+                },
+                "invoices": {
+                  "type": "array",
+                  "description": "The invoices the payment is for.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "The invoice's `id`."
+                      },
+                      "applied": {
+                        "type": "string",
+                        "description": "The amount applied to this invoice."
+                      }
+                    }
+                  }
+                },
+                "payment_applied": {
+                  "type": "array",
+                  "description": "The money received, by processor.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "processor": {
+                        "type": "string",
+                        "description": "The payment processor, such as `Cash`."
+                      },
+                      "amount": {
+                        "type": "string"
+                      },
+                      "reference": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "credit_applied": {
+                  "type": "array",
+                  "description": "Credit notes spent on the payment.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "type": "string",
+                        "description": "The credit note's `code`."
+                      },
+                      "amount": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                },
+                "gift_certificates": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "custom_attributes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "payment"
+          ]
+        },
+        "example": {
+          "payment": {
+            "date": "2026-10-01",
+            "payment_note": "October invoice",
+            "payment_applied": [
+              {
+                "processor": "Cash",
+                "amount": "10.00",
+                "reference": "RCPT-1001"
+              }
+            ],
+            "invoices": [
+              {
+                "id": "INV-0001",
+                "applied": "10.00"
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new payment, under `payment`.",
+          "schema": {
+            "$ref": "#/components/schemas/PaymentReadResponse"
+          }
+        },
+        "400": {
+          "description": "The body has a key the payment does not accept."
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "payment": {
+            "date": "2026-10-01",
+            "payment_note": "October invoice",
+            "payment_applied": [
+              {
+                "processor": "Cash",
+                "amount": "10.00",
+                "reference": "RCPT-1001"
+              }
+            ],
+            "invoices": [
+              {
+                "id": "INV-0001",
+                "applied": "10.00"
+              }
+            ]
+          }
         }
       }
     },
@@ -514,7 +673,7 @@
         "201": {
           "description": "The new note, under `note`.",
           "schema": {
-            "$ref": "#/components/schemas/PaymentNotesResponse"
+            "$ref": "#/components/schemas/PaymentNoteReadResponse"
           }
         }
       },
@@ -562,7 +721,7 @@
         "200": {
           "description": "The note, under `note`.",
           "schema": {
-            "$ref": "#/components/schemas/PaymentNotesResponse"
+            "$ref": "#/components/schemas/PaymentNoteReadResponse"
           }
         }
       },
@@ -672,164 +831,6 @@
           "payment_id": "PAY-0001",
           "payment_note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d",
           "payment_file_id": "6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f"
-        }
-      }
-    },
-    {
-      "key": "create_payment",
-      "method": "POST",
-      "path": "/payments",
-      "slug": "create-a-payment",
-      "title": "Create a payment",
-      "summary": "Records a payment against one or more invoices and returns it.",
-      "description": "Records a payment from the fields under `payment`. Only the keys shown are accepted; any other returns `400`. A `payment_applied` entry whose processor holds a card token charges the card.",
-      "parameters": [],
-      "body": {
-        "schema": {
-          "type": "object",
-          "properties": {
-            "payment": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "string"
-                },
-                "date": {
-                  "type": "string",
-                  "format": "date"
-                },
-                "origin": {
-                  "type": "string"
-                },
-                "payment_note": {
-                  "type": "string"
-                },
-                "note": {
-                  "type": "string"
-                },
-                "invoices": {
-                  "type": "array",
-                  "description": "The invoices the payment is for.",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "description": "The invoice's `id`."
-                      },
-                      "applied": {
-                        "type": "string",
-                        "description": "The amount applied to this invoice."
-                      }
-                    }
-                  }
-                },
-                "payment_applied": {
-                  "type": "array",
-                  "description": "The money received, by processor.",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "processor": {
-                        "type": "string",
-                        "description": "The payment processor, such as `Cash`."
-                      },
-                      "amount": {
-                        "type": "string"
-                      },
-                      "reference": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "credit_applied": {
-                  "type": "array",
-                  "description": "Credit notes spent on the payment.",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "code": {
-                        "type": "string",
-                        "description": "The credit note's `code`."
-                      },
-                      "amount": {
-                        "type": "number"
-                      }
-                    }
-                  }
-                },
-                "gift_certificates": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
-                  }
-                },
-                "custom_attributes": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
-                  }
-                }
-              }
-            }
-          },
-          "required": [
-            "payment"
-          ]
-        },
-        "example": {
-          "payment": {
-            "date": "2026-10-01",
-            "payment_note": "October invoice",
-            "payment_applied": [
-              {
-                "processor": "Cash",
-                "amount": "10.00",
-                "reference": "RCPT-1001"
-              }
-            ],
-            "invoices": [
-              {
-                "id": "INV-0001",
-                "applied": "10.00"
-              }
-            ]
-          }
-        }
-      },
-      "multipart": false,
-      "responses": {
-        "201": {
-          "description": "The new payment, under `payment`.",
-          "schema": {
-            "$ref": "#/components/schemas/PaymentReadResponse"
-          }
-        },
-        "400": {
-          "description": "The body has a key the payment does not accept."
-        }
-      },
-      "example_call": {
-        "path": {},
-        "body": {
-          "payment": {
-            "date": "2026-10-01",
-            "payment_note": "October invoice",
-            "payment_applied": [
-              {
-                "processor": "Cash",
-                "amount": "10.00",
-                "reference": "RCPT-1001"
-              }
-            ],
-            "invoices": [
-              {
-                "id": "INV-0001",
-                "applied": "10.00"
-              }
-            ]
-          }
         }
       }
     },
@@ -1135,29 +1136,6 @@
         },
         "links": {
           "$ref": "#/components/schemas/PaymentPaginationLinks"
-        },
-        "records": {
-          "type": "integer",
-          "description": "The total number of matching records, not the length of this page."
-        },
-        "offset": {
-          "type": "integer"
-        },
-        "next_page": {
-          "type": "string",
-          "description": "On the last page this is the string `NULL`, not JSON null."
-        },
-        "previous_page": {
-          "type": "string"
-        },
-        "has_next": {
-          "type": "boolean"
-        },
-        "has_prev": {
-          "type": "boolean"
-        },
-        "per_page": {
-          "type": "integer"
         }
       }
     },
@@ -1611,20 +1589,20 @@
         }
       }
     },
-    "PaymentNotes": {
+    "PaymentNoteRead": {
       "type": "object",
       "properties": {
         "attachments": {
           "type": "array",
           "items": {
-            "$ref": "#/components/schemas/PaymentNotesAttachment"
+            "$ref": "#/components/schemas/PaymentNoteReadAttachment"
           }
         },
         "content": {
           "type": "string"
         },
         "created_by": {
-          "$ref": "#/components/schemas/PaymentNotesCreatedBy"
+          "$ref": "#/components/schemas/PaymentNoteReadCreatedBy"
         },
         "created_on": {
           "type": "string"
@@ -1642,7 +1620,7 @@
           "type": "string"
         },
         "payment": {
-          "$ref": "#/components/schemas/PaymentNotesDetail"
+          "$ref": "#/components/schemas/PaymentNoteReadDetail"
         },
         "user": {},
         "version": {
@@ -1651,12 +1629,12 @@
         "watchers": {
           "type": "array",
           "items": {
-            "$ref": "#/components/schemas/PaymentNotesWatcher"
+            "$ref": "#/components/schemas/PaymentNoteReadWatcher"
           }
         }
       }
     },
-    "PaymentNotesAttachment": {
+    "PaymentNoteReadAttachment": {
       "type": "object",
       "properties": {
         "content_type": {
@@ -1676,7 +1654,7 @@
         }
       }
     },
-    "PaymentNotesCreatedBy": {
+    "PaymentNoteReadCreatedBy": {
       "type": "object",
       "properties": {
         "name": {
@@ -1687,7 +1665,7 @@
         }
       }
     },
-    "PaymentNotesDetail": {
+    "PaymentNoteReadDetail": {
       "type": "object",
       "properties": {
         "href": {
@@ -1701,7 +1679,7 @@
         }
       }
     },
-    "PaymentNotesWatcher": {
+    "PaymentNoteReadWatcher": {
       "type": "object",
       "properties": {
         "email": {
@@ -1715,11 +1693,11 @@
         }
       }
     },
-    "PaymentNotesResponse": {
+    "PaymentNoteReadResponse": {
       "type": "object",
       "properties": {
         "note": {
-          "$ref": "#/components/schemas/PaymentNotes"
+          "$ref": "#/components/schemas/PaymentNoteRead"
         }
       }
     },

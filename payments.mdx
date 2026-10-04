@@ -4,10 +4,10 @@ sidebarTitle: "Overview"
 description: "Record, read, update and delete payments against invoices, and manage the notes and files on them."
 ---
 
-A payment records money received against one or more invoices, by processor, credit note or gift certificate. This area has 15 endpoints: create, read, update and delete payments, list them by invoice or order, and manage their notes and files. All seven SDKs call every one.
+A payment records money received against one or more invoices, by processor, credit note or gift certificate. This area has 15 endpoints: create, read, update and delete payments, list them by invoice or order, and manage their notes and files. Every SDK supports all of them.
 
 <Warning>
-  **Creating a payment with a `payment_applied` entry whose processor holds a card token charges the card.**
+  **Creating a payment can charge a card.** If a `payment_applied` entry names a processor that holds a saved card token, the card is charged.
 </Warning>
 
 ## At a glance
@@ -15,6 +15,7 @@ A payment records money received against one or more invoices, by processor, cre
 | Endpoint | Method | Path | What it does |
 | --- | --- | --- | --- |
 | [List payments](/api-reference/payments/list-payments) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/payments` | Returns one page of payments. |
+| [Create a payment](/api-reference/payments/create-a-payment) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/payments` | Records a payment against one or more invoices and returns it. |
 | [List notes across all payments](/api-reference/payments/list-notes-across-all-payments) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/payments/notes` | Returns one page of notes from every payment. |
 | [Delete a payment](/api-reference/payments/delete-a-payment) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `/payments/{payment_id}` | Deletes a payment. |
 | [Update a payment](/api-reference/payments/update-a-payment) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `/payments/{payment_id}` | Changes a payment's note and returns the payment. |
@@ -26,7 +27,6 @@ A payment records money received against one or more invoices, by processor, cre
 | [Retrieve a payment note](/api-reference/payments/retrieve-a-payment-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/payments/{payment_id}/notes/{payment_note_id}` | Returns one note on a payment. |
 | [Delete a payment note](/api-reference/payments/delete-a-payment-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `/payments/{payment_id}/notes/{payment_note_id}` | Deletes a note, and its files, from a payment. |
 | [Retrieve a payment note file](/api-reference/payments/retrieve-a-payment-note-file) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/payments/{payment_id}/notes/{payment_note_id}/files/{payment_file_id}` | Returns the details of one file attached to a payment note, not the file's contents. |
-| [Create a payment](/api-reference/payments/create-a-payment) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/payments` | Records a payment against one or more invoices and returns it. |
 | [Retrieve a payment through an invoice](/api-reference/payments/retrieve-a-payment-through-an-invoice) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/invoices/{invoice_id}/payments/{payment_id}` | Returns one payment by its `id`, reached through an invoice. |
 | [List a payment note's files](/api-reference/payments/list-a-payment-notes-files) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/payments/{payment_id}/notes/{payment_note_id}/files` | Returns the files attached to a note on a payment. |
 
@@ -39,7 +39,8 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 ## Things to know
 
 - **Write bodies go under a `payment` key.** Creating a payment accepts only `id`, `date`, `origin`, `payment_note`, `note`, `invoices`, `payment_applied`, `credit_applied`, `gift_certificates` and `custom_attributes`; any other key returns `400`.
+- **A payment's `invoices` name each invoice by its `inv_` uuid.** Creating a payment takes the invoice's `id`, such as `INV-0001`, but reads return the `inv_` uuid in that field.
 - **Listings page by cursor.** Records are under `data`. Pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is `true`.
 - **Deleting a note takes its uuid, not its `id`.** Reads take the note's `id`; the delete takes the hex part of that `id` as a dashed uuid.
-- **Reading a payment through an invoice does not check the invoice.** Any payment is returned under any invoice that exists.
+- **Reading a payment through an invoice does not check that the payment belongs to it.** Any payment is returned under any invoice that exists.
 - **Note text goes in a form field.** Creating a note sends a multipart form with the text as `note` and any attachment as `file`.
