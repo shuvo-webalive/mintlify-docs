@@ -1,0 +1,228 @@
+{
+  "family": "organisations",
+  "tag": "Child organisations",
+  "slug": "child-organisations",
+  "icon": "sitemap",
+  "base": "/settings/organisations",
+  "overview_description": "List, create, read, update and delete the child organisations below the root organisation of your Exsited instance.",
+  "intro": "Child organisations are the organisations below the root organisation of your Exsited instance. You can list, create, read, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.",
+  "warning": "**Creating a child organisation changes your organisation hierarchy and assigns an existing user to it.** The create also depends on your licence.",
+  "notes": [
+    "**Bodies and records sit under `organization`, spelled with a z.**",
+    "**The root organisation is never in the listing.** Read it with `GET /settings/organisation` instead.",
+    "**The listing pages by cursor.** Records are under `data`, with `limit`, `has_more` and `next_cursor` in `pagination`.",
+    "**Delete returns `204`.**"
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_organisations",
+      "method": "GET",
+      "path": "/settings/organisations",
+      "slug": "list-child-organisations",
+      "title": "List child organisations",
+      "summary": "Returns one page of the child organisations on your instance; the root is never included.",
+      "description": "Records are under `data`, and the listing pages by cursor. The root organisation is not in this list; read it with `GET /settings/organisation`. Other fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The number of records per page. A `limit` of `0` returns `400`.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to read the next page.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by; prefix it with `-` for descending order.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of child organisations, under `data`, with `pagination`."
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_organisation",
+      "method": "POST",
+      "path": "/settings/organisations",
+      "slug": "create-a-child-organisation",
+      "title": "Create a child organisation",
+      "summary": "Creates a child organisation and returns it under `organization`.",
+      "description": "Send the organisation under `organization`, spelled with a z. A create depends on your licence, changes the organisation hierarchy and assigns an existing user. A successful call returns `201`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "organization": {
+              "type": "object",
+              "properties": {},
+              "description": "The organisation's fields."
+            }
+          },
+          "required": [
+            "organization"
+          ]
+        },
+        "example": {
+          "organization": {}
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new child organisation, under `organization`."
+        }
+      },
+      "example_call": {
+        "body": {
+          "organization": {}
+        }
+      }
+    },
+    {
+      "key": "get_settings_organisation",
+      "method": "GET",
+      "path": "/settings/organisations/{organisation_id}",
+      "slug": "retrieve-a-child-organisation",
+      "title": "Retrieve a child organisation",
+      "summary": "Returns one child organisation by its `id`.",
+      "description": "Pass the organisation's `id` as `organisation_id`. The response is the organisation as plain JSON.",
+      "parameters": [
+        {
+          "name": "organisation_id",
+          "in": "path",
+          "required": true,
+          "description": "The child organisation's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "ORG-0002"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The child organisation."
+        }
+      },
+      "example_call": {
+        "path": {
+          "organisation_id": "ORG-0002"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_organisation",
+      "method": "DELETE",
+      "path": "/settings/organisations/{organisation_id}",
+      "slug": "delete-a-child-organisation",
+      "title": "Delete a child organisation",
+      "summary": "Deletes a child organisation and returns no body.",
+      "description": "Pass the organisation's `id` as `organisation_id`. A successful call returns `204`.",
+      "parameters": [
+        {
+          "name": "organisation_id",
+          "in": "path",
+          "required": true,
+          "description": "The child organisation's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "ORG-0002"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The child organisation is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "organisation_id": "ORG-0002"
+        }
+      }
+    },
+    {
+      "key": "update_settings_organisation",
+      "method": "PATCH",
+      "path": "/settings/organisations/{organisation_id}",
+      "slug": "update-a-child-organisation",
+      "title": "Update a child organisation",
+      "summary": "Changes a child organisation's fields and returns it.",
+      "description": "Pass the organisation's `id` as `organisation_id` and send the fields to change under `organization`. A successful call returns `200`.",
+      "parameters": [
+        {
+          "name": "organisation_id",
+          "in": "path",
+          "required": true,
+          "description": "The child organisation's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "ORG-0002"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "organization": {
+              "type": "object",
+              "properties": {},
+              "description": "The organisation's fields."
+            }
+          },
+          "required": [
+            "organization"
+          ]
+        },
+        "example": {
+          "organization": {}
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated child organisation."
+        }
+      },
+      "example_call": {
+        "path": {
+          "organisation_id": "ORG-0002"
+        },
+        "body": {
+          "organization": {}
+        }
+      }
+    }
+  ],
+  "schemas": {}
+}

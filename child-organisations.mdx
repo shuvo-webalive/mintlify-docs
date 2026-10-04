@@ -1,0 +1,34 @@
+---
+title: "Child organisations"
+sidebarTitle: "Overview"
+description: "List, create, read, update and delete the child organisations below the root organisation of your Exsited instance."
+---
+
+Child organisations are the organisations below the root organisation of your Exsited instance. You can list, create, read, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.
+
+<Warning>
+  **Creating a child organisation changes your organisation hierarchy and assigns an existing user to it.** The create also depends on your licence.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List child organisations](/api-reference/child-organisations/list-child-organisations) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/organisations` | Returns one page of the child organisations on your instance; the root is never included. |
+| [Create a child organisation](/api-reference/child-organisations/create-a-child-organisation) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/organisations` | Creates a child organisation and returns it under `organization`. |
+| [Retrieve a child organisation](/api-reference/child-organisations/retrieve-a-child-organisation) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/organisations/{organisation_id}` | Returns one child organisation by its `id`. |
+| [Delete a child organisation](/api-reference/child-organisations/delete-a-child-organisation) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/organisations/{organisation_id}` | Deletes a child organisation and returns no body. |
+| [Update a child organisation](/api-reference/child-organisations/update-a-child-organisation) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/organisations/{organisation_id}` | Changes a child organisation's fields and returns it. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Bodies and records sit under `organization`, spelled with a z.**
+- **The root organisation is never in the listing.** Read it with `GET /settings/organisation` instead.
+- **The listing pages by cursor.** Records are under `data`, with `limit`, `has_more` and `next_cursor` in `pagination`.
+- **Delete returns `204`.**
