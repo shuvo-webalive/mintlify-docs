@@ -1,0 +1,44 @@
+---
+title: "Credit notes"
+sidebarTitle: "Overview"
+description: "Create, read, update, apply and delete credit notes, and read their balance items, applications and notes."
+---
+
+A credit note holds credit owed to an account, raised against an invoice or by an overpayment, that can be applied to invoices or refunded. This area has 14 endpoints: create, read, update, apply and delete credit notes, read their balance items and applications, and manage their notes and files. All seven SDKs call every one.
+
+<Warning>
+  **Applying a credit note records a payment against each invoice it names, and the call returns the credit note rather than those payments.**
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List credit notes](/api-reference/credit-notes/list-credit-notes) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/credit_notes` | Returns one page of credit notes. |
+| [Retrieve a credit note](/api-reference/credit-notes/retrieve-a-credit-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/credit_notes/{credit_note_id}` | Returns one credit note by its `id`. |
+| [Update a credit note](/api-reference/credit-notes/update-a-credit-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/credit_notes/{credit_note_id}` | Changes a credit note's fields, such as its custom attributes, and returns it. |
+| [Create a credit note](/api-reference/credit-notes/create-a-credit-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/credit_notes` | Credits an invoice by an amount and creates a credit note. |
+| [Delete a credit note](/api-reference/credit-notes/delete-a-credit-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/credit_notes/{credit_note_id}` | Deletes a credit note. |
+| [Apply a credit note to invoices](/api-reference/credit-notes/apply-a-credit-note-to-invoices) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/credit_notes/{credit_note_id}/apply` | Spends a credit note against one or more invoices and returns the credit note. |
+| [Retrieve a credit note's balance items](/api-reference/credit-notes/retrieve-a-credit-notes-balance-items) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/credit_notes/{credit_note_id}/items` | Returns what a credit note has credited and refunded, by source. |
+| [List a credit note's applications](/api-reference/credit-notes/list-a-credit-notes-applications) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/credit_notes/{credit_note_id}/credit_note_applications` | Returns the applications of one credit note. |
+| [List a credit note's notes](/api-reference/credit-notes/list-a-credit-notes-notes) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/credit_notes/{credit_note_id}/notes` | Returns one page of the notes on a credit note. |
+| [Retrieve a credit note note](/api-reference/credit-notes/retrieve-a-credit-note-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/credit_notes/{credit_note_id}/notes/{note_id}` | Returns one note on a credit note. |
+| [Create a credit note note](/api-reference/credit-notes/create-a-credit-note-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/credit_notes/{credit_note_id}/notes` | Adds a note, and optionally a file, to a credit note. |
+| [Delete a credit note note](/api-reference/credit-notes/delete-a-credit-note-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/credit_notes/{credit_note_id}/notes/{note_id}` | Deletes a note from a credit note. |
+| [List a credit note note's files](/api-reference/credit-notes/list-a-credit-note-notes-files) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/credit_notes/{credit_note_id}/notes/{note_id}/files` | Returns the files attached to a note on a credit note. |
+| [Retrieve a credit note note file](/api-reference/credit-notes/retrieve-a-credit-note-note-file) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/credit_notes/{credit_note_id}/notes/{note_id}/files/{file_id}` | Returns the details of one file attached to a note, not the file's contents. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Creating a credit note takes only `invoice_id` and `amount`.** Both go under `credit_note`, and any other key returns `400`. The amount is drawn from the invoice's active payments, oldest first.
+- **Applying takes only `invoices`.** Each entry of `credit_note.invoices` takes `invoice_id` and `amount` and nothing else.
+- **A credit note with an active refund cannot be deleted.** The delete is refused with `400` and the code `in_use`. It accepts the `cn_` id or the credit note's code.
+- **Items and applications are not paged.** Both come back under `credit_note`, carrying only `object`, `href` and their own list.
+- **Money comes back as text.** `initial_amount`, `refund_amount` and `remaining_amount` are strings.

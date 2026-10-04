@@ -68,6 +68,9 @@
     },
     {
       "name": "Refunds"
+    },
+    {
+      "name": "Credit notes"
     }
   ],
   "paths": {
@@ -23299,6 +23302,1254 @@
           }
         ]
       }
+    },
+    "/credit_notes": {
+      "get": {
+        "tags": [
+          "Credit notes"
+        ],
+        "summary": "List credit notes",
+        "operationId": "credit_notes_get_credit_notes",
+        "description": "Lists every credit note, one page at a time, under `data`. Each record carries its `code`, the `initial_amount`, `refund_amount` and `remaining_amount` as strings, and whether it is `refundable`. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of credit notes, under `data`, with `pagination`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditNoteList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/credit_notes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.credit_notes.get_credit_notes({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.creditNotes.getCreditNotes({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->creditNotes->getCreditNotes(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.credit_notes.credit_notes_dto.CreditNotesDto.CreditNoteList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<CreditNoteList> response = client.creditNotes().getCreditNotes(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CreditNotes.GetCreditNotesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.creditNotes.getCreditNotes(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CreditNotes().GetCreditNotes(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Credit notes"
+        ],
+        "summary": "Create a credit note",
+        "operationId": "credit_notes_create_credit_note",
+        "description": "Creates a credit note for an invoice. The body takes only `invoice_id` and `amount` under `credit_note`; any other key returns `400`. The amount is drawn from the invoice's active payments, oldest first. Creating a credit note schedules the credit note issued communication.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The credit note is created."
+          },
+          "400": {
+            "description": "The body has a key other than `invoice_id` and `amount`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/credit_notes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"credit_note\": {\n      \"invoice_id\": \"INV-0001\",\n      \"amount\": 5\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.credit_notes.create_credit_note(\n    {\"credit_note\": {\"invoice_id\": \"INV-0001\", \"amount\": 5}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.creditNotes.createCreditNote({credit_note: {invoice_id: 'INV-0001', amount: 5}});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->creditNotes->createCreditNote([\n    'credit_note' => ['invoice_id' => 'INV-0001', 'amount' => 5],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.creditNotes().createCreditNote(\n        Map.of(\"credit_note\", Map.of(\"invoice_id\", \"INV-0001\", \"amount\", 5)));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CreditNotes.CreateCreditNoteAsync(new Dictionary<string, object?>\n{\n    [\"credit_note\"] = new Dictionary<string, object?>\n    {\n        [\"invoice_id\"] = \"INV-0001\",\n        [\"amount\"] = 5,\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.creditNotes.createCreditNote({\n  'credit_note': {'invoice_id': 'INV-0001', 'amount': 5},\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CreditNotes().CreateCreditNote(context.Background(), map[string]any{\n\t\"credit_note\": map[string]any{\"invoice_id\": \"INV-0001\", \"amount\": 5},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "credit_note": {
+                    "type": "object",
+                    "properties": {
+                      "invoice_id": {
+                        "type": "string",
+                        "description": "The `id` of the invoice to credit."
+                      },
+                      "amount": {
+                        "type": "number",
+                        "description": "The amount to credit."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "credit_note"
+                ]
+              },
+              "example": {
+                "credit_note": {
+                  "invoice_id": "INV-0001",
+                  "amount": 5
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credit_notes/{credit_note_id}": {
+      "get": {
+        "tags": [
+          "Credit notes"
+        ],
+        "summary": "Retrieve a credit note",
+        "operationId": "credit_notes_get_credit_note",
+        "description": "Fetches a single credit note, named by its `cn_` id or its code, with its account, currency, payment, invoices and amounts. Amounts such as `remaining_amount` are strings.",
+        "parameters": [
+          {
+            "name": "credit_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The credit note's `id`, which starts with `cn_`, or its `code`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The credit note, under `credit_note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditNoteReadResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/credit_notes/cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.credit_notes.get_credit_note(\"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.creditNotes.getCreditNote('cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->creditNotes->getCreditNote('cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.credit_notes.credit_notes_dto.CreditNotesDto.CreditNoteRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<CreditNoteRead> response = client.creditNotes().getCreditNote(\"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CreditNotes.GetCreditNoteAsync(\"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.creditNotes.getCreditNote(\n  'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CreditNotes().GetCreditNote(context.Background(), \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Credit notes"
+        ],
+        "summary": "Update a credit note",
+        "operationId": "credit_notes_update_credit_note",
+        "description": "Updates the fields sent under `credit_note`, such as `custom_attributes`, and returns the credit note.",
+        "parameters": [
+          {
+            "name": "credit_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The credit note's `id`, which starts with `cn_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated credit note, under `credit_note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditNoteReadResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/credit_notes/cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"credit_note\": {\n      \"custom_attributes\": []\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.credit_notes.update_credit_note(\n    \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\", {\"credit_note\": {\"custom_attributes\": []}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.creditNotes.updateCreditNote('cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d', {\n    credit_note: {custom_attributes: []},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->creditNotes->updateCreditNote('cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d', [\n    'credit_note' => ['custom_attributes' => []],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.credit_notes.credit_notes_dto.CreditNotesDto.CreditNoteRead;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<CreditNoteRead> response = client.creditNotes().updateCreditNote(\n        \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\",\n        Map.of(\"credit_note\", Map.of(\"custom_attributes\", List.of())));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CreditNotes.UpdateCreditNoteAsync(\n    \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\",\n    new Dictionary<string, object?>\n    {\n        [\"credit_note\"] = new Dictionary<string, object?>\n        {\n            [\"custom_attributes\"] = new List<object?>(),\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.creditNotes.updateCreditNote(\n  'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n  {\n    'credit_note': {'custom_attributes': []},\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CreditNotes().UpdateCreditNote(context.Background(), \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\", map[string]any{\n\t\"credit_note\": map[string]any{\"custom_attributes\": []any{}},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "credit_note": {
+                    "type": "object",
+                    "properties": {
+                      "custom_attributes": {
+                        "type": "array",
+                        "items": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "credit_note"
+                ]
+              },
+              "example": {
+                "credit_note": {
+                  "custom_attributes": []
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Credit notes"
+        ],
+        "summary": "Delete a credit note",
+        "operationId": "credit_notes_delete_credit_note",
+        "description": "Deletes the credit note, named by its `cn_` id or its code. A credit note with an active refund is refused with `400` and the code `in_use`. Your API client needs the `DELETE_CREDIT_NOTE` permission.",
+        "parameters": [
+          {
+            "name": "credit_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The credit note's `id`, which starts with `cn_`, or its `code`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The credit note is deleted. The response has no body."
+          },
+          "400": {
+            "description": "The credit note has an active refund (`in_use`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Your API client does not have the `DELETE_CREDIT_NOTE` permission.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/credit_notes/cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.credit_notes.delete_credit_note(\"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.creditNotes.deleteCreditNote('cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->creditNotes->deleteCreditNote('cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.creditNotes().deleteCreditNote(\"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CreditNotes.DeleteCreditNoteAsync(\"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.creditNotes.deleteCreditNote(\n  'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CreditNotes().DeleteCreditNote(context.Background(), \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/credit_notes/{credit_note_id}/apply": {
+      "post": {
+        "tags": [
+          "Credit notes"
+        ],
+        "summary": "Apply a credit note to invoices",
+        "operationId": "credit_notes_apply_credit_note",
+        "description": "Applies the credit note to each invoice listed under `credit_note.invoices`, each entry with only `invoice_id` and `amount`. It records a payment against each invoice and a journal posting, and returns the credit note.",
+        "parameters": [
+          {
+            "name": "credit_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The credit note's `id`, which starts with `cn_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The credit note after the application."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/credit_notes/cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d/apply\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"credit_note\": {\n      \"invoices\": [\n        {\n          \"invoice_id\": \"INV-0001\",\n          \"amount\": 5\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.credit_notes.apply_credit_note(\n    \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\",\n    {\"credit_note\": {\"invoices\": [{\"invoice_id\": \"INV-0001\", \"amount\": 5}]}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.creditNotes.applyCreditNote('cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d', {\n    credit_note: {invoices: [{invoice_id: 'INV-0001', amount: 5}]},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->creditNotes->applyCreditNote('cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d', [\n    'credit_note' => ['invoices' => [['invoice_id' => 'INV-0001', 'amount' => 5]]],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.creditNotes().applyCreditNote(\n        \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\",\n        Map.of(\n                \"credit_note\", Map.of(\n                        \"invoices\", List.of(Map.of(\"invoice_id\", \"INV-0001\", \"amount\", 5)))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CreditNotes.ApplyCreditNoteAsync(\n    \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\",\n    new Dictionary<string, object?>\n    {\n        [\"credit_note\"] = new Dictionary<string, object?>\n        {\n            [\"invoices\"] = new List<object?>\n            {\n                new Dictionary<string, object?>\n                {\n                    [\"invoice_id\"] = \"INV-0001\",\n                    [\"amount\"] = 5,\n                },\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.creditNotes.applyCreditNote(\n  'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n  {\n    'credit_note': {\n      'invoices': [\n        {'invoice_id': 'INV-0001', 'amount': 5},\n      ],\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CreditNotes().ApplyCreditNote(context.Background(), \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\", map[string]any{\n\t\"credit_note\": map[string]any{\n\t\t\"invoices\": []any{\n\t\t\tmap[string]any{\"invoice_id\": \"INV-0001\", \"amount\": 5},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "credit_note": {
+                    "type": "object",
+                    "properties": {
+                      "invoices": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "invoice_id": {
+                              "type": "string"
+                            },
+                            "amount": {
+                              "type": "number"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "credit_note"
+                ]
+              },
+              "example": {
+                "credit_note": {
+                  "invoices": [
+                    {
+                      "invoice_id": "INV-0001",
+                      "amount": 5
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credit_notes/{credit_note_id}/items": {
+      "get": {
+        "tags": [
+          "Credit notes"
+        ],
+        "summary": "Retrieve a credit note's balance items",
+        "operationId": "credit_notes_get_credit_note_items",
+        "description": "Fetches the credit note's balance rows under `credit_note.items`. Each row splits the credit and refund totals by source, such as payment method, gift certificate or invoice credit, each amount a string. This is not a paged listing.",
+        "parameters": [
+          {
+            "name": "credit_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The credit note's `id`, which starts with `cn_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The balance rows, under `credit_note.items`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditNoteItemsResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/credit_notes/cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d/items\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.credit_notes.get_credit_note_items(\n    \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.creditNotes.getCreditNoteItems('cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->creditNotes->getCreditNoteItems('cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.credit_notes.credit_notes_dto.CreditNotesDto.CreditNoteItems;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<CreditNoteItems> response = client.creditNotes().getCreditNoteItems(\"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CreditNotes.GetCreditNoteItemsAsync(\"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.creditNotes.getCreditNoteItems(\n  'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CreditNotes().GetCreditNoteItems(context.Background(), \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/credit_notes/{credit_note_id}/credit_note_applications": {
+      "get": {
+        "tags": [
+          "Credit notes"
+        ],
+        "summary": "List a credit note's applications",
+        "operationId": "credit_notes_get_credit_note_credit_note_applications",
+        "description": "Fetches the credit note's applications under `credit_note.applications`. This is not a paged listing: every application comes back at once.",
+        "parameters": [
+          {
+            "name": "credit_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The credit note's `id`, which starts with `cn_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The applications, under `credit_note.applications`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditNoteApplicationsResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/credit_notes/cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d/credit_note_applications\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.credit_notes.get_credit_note_credit_note_applications(\n    \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.creditNotes.getCreditNoteCreditNoteApplications('cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->creditNotes->getCreditNoteCreditNoteApplications(\n    'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.credit_notes.credit_notes_dto.CreditNotesDto.CreditNoteApplications;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<CreditNoteApplications> response = client.creditNotes().getCreditNoteCreditNoteApplications(\n        \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CreditNotes.GetCreditNoteCreditNoteApplicationsAsync(\"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.creditNotes.getCreditNoteCreditNoteApplications(\n  'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CreditNotes().GetCreditNoteCreditNoteApplications(context.Background(), \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/credit_notes/{credit_note_id}/notes": {
+      "get": {
+        "tags": [
+          "Credit notes"
+        ],
+        "summary": "List a credit note's notes",
+        "operationId": "credit_notes_get_credit_note_notes",
+        "description": "Lists the credit note's notes, one page at a time, under `data`.",
+        "parameters": [
+          {
+            "name": "credit_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The credit note's `id`, which starts with `cn_`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of notes, under `data`, with `pagination`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditNoteNoteList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/credit_notes/cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d/notes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.credit_notes.get_credit_note_notes(\n    \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.creditNotes.getCreditNoteNotes('cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->creditNotes->getCreditNoteNotes('cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d', [\n    'limit' => 20,\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.credit_notes.credit_notes_dto.CreditNotesDto.CreditNoteNoteList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<CreditNoteNoteList> response = client.creditNotes().getCreditNoteNotes(\n        \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CreditNotes.GetCreditNoteNotesAsync(\n    \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.creditNotes.getCreditNoteNotes(\n  'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CreditNotes().GetCreditNoteNotes(context.Background(), \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Credit notes"
+        ],
+        "summary": "Create a credit note note",
+        "operationId": "credit_notes_create_credit_note_note",
+        "description": "Sends a multipart form: the text as the `note` field and any attachment as `file`. Your API client needs the `CREATE_CREDIT_NOTE_NOTE` permission.",
+        "parameters": [
+          {
+            "name": "credit_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The credit note's `id`, which starts with `cn_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The note is created."
+          },
+          "403": {
+            "description": "Your API client does not have the `CREATE_CREDIT_NOTE_NOTE` permission.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/credit_notes/cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d/notes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -F \"file=@receipt.pdf\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.credit_notes.create_credit_note_note(\n    \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\",\n    \"Customer asked for a copy by post.\",\n    files={\"file\": open(\"receipt.pdf\", \"rb\")},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {readFileSync} from 'node:fs';\nimport {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.creditNotes.createCreditNoteNote(\n    'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n    'Customer asked for a copy by post.',\n    {files: {file: ['receipt.pdf', readFileSync('receipt.pdf')]}},\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->creditNotes->createCreditNoteNote(\n    'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n    'Customer asked for a copy by post.',\n    ['file' => ['receipt.pdf', fopen('receipt.pdf', 'r')]],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.client.RequestOptions;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.creditNotes().createCreditNoteNote(\n        \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\",\n        \"Customer asked for a copy by post.\",\n        Map.of(\"file\", Path.of(\"receipt.pdf\")),\n        RequestOptions.none());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CreditNotes.CreateCreditNoteNoteAsync(\n    \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\",\n    \"Customer asked for a copy by post.\",\n    new Dictionary<string, object?> { [\"file\"] = new object?[] { \"receipt.pdf\", File.ReadAllBytes(\"receipt.pdf\") } });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'dart:io';\n\nimport 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.creditNotes.createCreditNoteNote(\n  'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n  'Customer asked for a copy by post.',\n  files: {\n    'file': ['receipt.pdf', File('receipt.pdf').readAsBytesSync()],\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nfile, err := os.ReadFile(\"receipt.pdf\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.CreditNotes().CreateCreditNoteNote(context.Background(), \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\", \"Customer asked for a copy by post.\", map[string]any{\"file\": []any{\"receipt.pdf\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "note"
+                ],
+                "properties": {
+                  "note": {
+                    "type": "string",
+                    "description": "The note text."
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "An optional file to attach to the note."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credit_notes/{credit_note_id}/notes/{note_id}": {
+      "get": {
+        "tags": [
+          "Credit notes"
+        ],
+        "summary": "Retrieve a credit note note",
+        "operationId": "credit_notes_get_credit_note_note",
+        "description": "Fetches a single note by its `note_` id.",
+        "parameters": [
+          {
+            "name": "credit_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The credit note's `id`, which starts with `cn_`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, which starts with `note_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note, under `note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditNoteNoteResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/credit_notes/cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d/notes/note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.credit_notes.get_credit_note_note(\n    \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.creditNotes.getCreditNoteNote(\n    'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->creditNotes->getCreditNoteNote(\n    'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.credit_notes.credit_notes_dto.CreditNotesDto.CreditNoteNote;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<CreditNoteNote> response = client.creditNotes().getCreditNoteNote(\n        \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CreditNotes.GetCreditNoteNoteAsync(\n    \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.creditNotes.getCreditNoteNote(\n  'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n  'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CreditNotes().GetCreditNoteNote(context.Background(), \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Credit notes"
+        ],
+        "summary": "Delete a credit note note",
+        "operationId": "credit_notes_delete_credit_note_note",
+        "description": "Deletes the note, named by its `note_` id.",
+        "parameters": [
+          {
+            "name": "credit_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The credit note's `id`, which starts with `cn_`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, which starts with `note_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The note is deleted. The response has no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/credit_notes/cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d/notes/note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.credit_notes.delete_credit_note_note(\n    \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.creditNotes.deleteCreditNoteNote(\n    'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->creditNotes->deleteCreditNoteNote(\n    'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.creditNotes().deleteCreditNoteNote(\n        \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CreditNotes.DeleteCreditNoteNoteAsync(\n    \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.creditNotes.deleteCreditNoteNote(\n  'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n  'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CreditNotes().DeleteCreditNoteNote(context.Background(), \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/credit_notes/{credit_note_id}/notes/{note_id}/files": {
+      "get": {
+        "tags": [
+          "Credit notes"
+        ],
+        "summary": "List a credit note note's files",
+        "operationId": "credit_notes_get_credit_note_note_files",
+        "description": "Lists the note's attachments under `data`.",
+        "parameters": [
+          {
+            "name": "credit_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The credit note's `id`, which starts with `cn_`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, which starts with `note_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note's files, under `data`."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/credit_notes/cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d/notes/note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d/files\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.credit_notes.get_credit_note_note_files(\n    \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.creditNotes.getCreditNoteNoteFiles(\n    'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->creditNotes->getCreditNoteNoteFiles(\n    'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.creditNotes().getCreditNoteNoteFiles(\n        \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CreditNotes.GetCreditNoteNoteFilesAsync(\n    \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.creditNotes.getCreditNoteNoteFiles(\n  'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n  'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CreditNotes().GetCreditNoteNoteFiles(context.Background(), \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/credit_notes/{credit_note_id}/notes/{note_id}/files/{file_id}": {
+      "get": {
+        "tags": [
+          "Credit notes"
+        ],
+        "summary": "Retrieve a credit note note file",
+        "operationId": "credit_notes_get_credit_note_note_file",
+        "description": "Fetches a JSON description of the attachment under `file`, not the file's bytes.",
+        "parameters": [
+          {
+            "name": "credit_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The credit note's `id`, which starts with `cn_`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, which starts with `note_`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The attachment's `uuid`, from the note's `attachments`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file's details, under `file`."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/credit_notes/cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d/notes/note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d/files/6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.credit_notes.get_credit_note_note_file(\n    \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n    \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\",\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.creditNotes.getCreditNoteNoteFile(\n    'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n    '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->creditNotes->getCreditNoteNoteFile(\n    'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n    '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.creditNotes().getCreditNoteNoteFile(\n        \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n        \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CreditNotes.GetCreditNoteNoteFileAsync(\n    \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n    \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.creditNotes.getCreditNoteNoteFile(\n  'cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d',\n  'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n  '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CreditNotes().GetCreditNoteNoteFile(context.Background(), \"cn_8a1d2c3b4e5f4a6b9c7d0e1f2a3b4c5d\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -35500,6 +36751,675 @@
         "properties": {
           "file": {
             "$ref": "#/components/schemas/RefundNoteFile"
+          }
+        }
+      },
+      "CreditNoteList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreditNote"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/CreditNotePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNote": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/CreditNoteAccount"
+          },
+          "account_id": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/CreditNoteCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/CreditNoteCurrency"
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreditNoteCustomAttribute"
+            }
+          },
+          "custom_objects": {
+            "type": "array",
+            "items": {}
+          },
+          "date": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "initial_amount": {
+            "type": "string"
+          },
+          "invoice_id": {
+            "type": "string"
+          },
+          "invoices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreditNoteInvoice"
+            }
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/CreditNoteLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "payment": {
+            "$ref": "#/components/schemas/CreditNotePayment"
+          },
+          "payment_id": {
+            "type": "string"
+          },
+          "refund_amount": {
+            "type": "string"
+          },
+          "refundable": {
+            "type": "boolean"
+          },
+          "remaining_amount": {
+            "type": "string"
+          },
+          "remaining_balance": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "updated_by": {
+            "type": "string"
+          },
+          "updated_on": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "CreditNoteAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteCustomAttribute": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "value": {}
+        }
+      },
+      "CreditNoteInvoice": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNotePayment": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNotePagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can be stale on the last page."
+          },
+          "next_cursor": {
+            "type": "string"
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/CreditNotePaginationLinks"
+          },
+          "records": {
+            "type": "integer",
+            "description": "The total number of matching records, not the length of this page."
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "next_page": {
+            "type": "string",
+            "description": "On the last page this is the string `NULL`, not JSON null."
+          },
+          "previous_page": {
+            "type": "string"
+          },
+          "has_next": {
+            "type": "boolean"
+          },
+          "has_prev": {
+            "type": "boolean"
+          },
+          "per_page": {
+            "type": "integer"
+          }
+        }
+      },
+      "CreditNotePaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteRead": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/CreditNoteReadAccount"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/CreditNoteReadCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/CreditNoteReadCurrency"
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreditNoteReadCustomAttribute"
+            }
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "initial_amount": {
+            "type": "string"
+          },
+          "invoices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreditNoteReadInvoice"
+            }
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/CreditNoteReadLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "payment": {
+            "$ref": "#/components/schemas/CreditNoteReadPayment"
+          },
+          "refund_amount": {
+            "type": "string"
+          },
+          "refundable": {
+            "type": "boolean"
+          },
+          "remaining_amount": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "CreditNoteReadAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteReadCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteReadCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteReadCustomAttribute": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "value": {}
+        }
+      },
+      "CreditNoteReadInvoice": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteReadLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteReadPayment": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteReadResponse": {
+        "type": "object",
+        "properties": {
+          "credit_note": {
+            "$ref": "#/components/schemas/CreditNoteRead"
+          }
+        }
+      },
+      "CreditNoteItems": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreditNoteItem"
+            }
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteItem": {
+        "type": "object",
+        "properties": {
+          "credit_note_from_blank_method": {
+            "type": "string"
+          },
+          "credit_note_from_credit_note": {
+            "type": "string"
+          },
+          "credit_note_from_gift_certificate": {
+            "type": "string"
+          },
+          "credit_note_from_invoice_credit": {
+            "type": "string"
+          },
+          "credit_note_from_payment_method": {
+            "type": "string"
+          },
+          "credit_note_total": {
+            "type": "string"
+          },
+          "invoice": {},
+          "object": {
+            "type": "string"
+          },
+          "refund_from_blank_method": {
+            "type": "string"
+          },
+          "refund_from_credit_note": {
+            "type": "string"
+          },
+          "refund_from_gift_certificate": {
+            "type": "string"
+          },
+          "refund_from_invoice_credit": {
+            "type": "string"
+          },
+          "refund_from_payment_method": {
+            "type": "string"
+          },
+          "refund_total": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteItemsResponse": {
+        "type": "object",
+        "properties": {
+          "credit_note": {
+            "$ref": "#/components/schemas/CreditNoteItems"
+          }
+        }
+      },
+      "CreditNoteApplications": {
+        "type": "object",
+        "properties": {
+          "applications": {
+            "type": "array",
+            "items": {}
+          },
+          "href": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteApplicationsResponse": {
+        "type": "object",
+        "properties": {
+          "credit_note": {
+            "$ref": "#/components/schemas/CreditNoteApplications"
+          }
+        }
+      },
+      "CreditNoteNoteList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreditNoteNote"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/CreditNotePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteNote": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {}
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/CreditNoteNoteCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "credit_note": {
+            "$ref": "#/components/schemas/CreditNoteNoteDetail"
+          },
+          "group": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "user": {},
+          "version": {
+            "type": "integer"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {}
+          }
+        }
+      },
+      "CreditNoteNoteCreatedBy": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteNoteDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteNoteResponse": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "$ref": "#/components/schemas/CreditNoteNote"
           }
         }
       },
