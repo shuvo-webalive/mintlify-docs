@@ -149,6 +149,9 @@
     },
     {
       "name": "Labours"
+    },
+    {
+      "name": "Tasks"
     }
   ],
   "paths": {
@@ -51366,6 +51369,1684 @@
           }
         ]
       }
+    },
+    "/tasks": {
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "List tasks",
+        "operationId": "tasks_get_tasks",
+        "description": "Returns one page of tasks under `data`, with `pagination` for the next page. Each task carries its `id`, `code`, `name`, `status`, `task_status`, `priority`, dates and hours. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by; prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of tasks.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/tasks?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.tasks.get_tasks({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.tasks.getTasks({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->tasks->getTasks(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.tasks.tasks_dto.TasksDto.TaskList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<TaskList> response = client.tasks().getTasks(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Tasks.GetTasksAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.tasks.getTasks(queryParams: {'limit': 20});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Tasks().GetTasks(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Create a task",
+        "operationId": "tasks_create_task",
+        "description": "Send the new task under `work_task`. `name` is required, and a key the API does not know is refused. The new task comes back with `201` under `work_task`, in the same form as retrieving it.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new task, under `work_task`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskViewResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/tasks\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"work_task\": {\n      \"name\": \"Repair fence\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.tasks.create_task({\"work_task\": {\"name\": \"Repair fence\"}})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.tasks.createTask({work_task: {name: 'Repair fence'}});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->tasks->createTask(['work_task' => ['name' => 'Repair fence']]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.tasks.tasks_dto.TasksDto.TaskView;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<TaskView> response = client.tasks().createTask(\n        Map.of(\"work_task\", Map.of(\"name\", \"Repair fence\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Tasks.CreateTaskAsync(new Dictionary<string, object?>\n{\n    [\"work_task\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Repair fence\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.tasks.createTask({\n  'work_task': {'name': 'Repair fence'},\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Tasks().CreateTask(context.Background(), map[string]any{\n\t\"work_task\": map[string]any{\"name\": \"Repair fence\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "work_task": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The task's name."
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "priority": {
+                        "type": "string"
+                      },
+                      "start_date": {
+                        "type": "string"
+                      },
+                      "due_date": {
+                        "type": "string"
+                      },
+                      "estimated_hours": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ]
+                  }
+                },
+                "required": [
+                  "work_task"
+                ]
+              },
+              "example": {
+                "work_task": {
+                  "name": "Repair fence"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/{task_id}": {
+      "delete": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Delete a task",
+        "operationId": "tasks_delete_task",
+        "description": "Deletes the task with this `id`. A successful delete returns `204` with no body, and reading the task afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "The task's `id`, which starts with `wt_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The task is deleted. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/tasks/wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.tasks.delete_task(\"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.tasks.deleteTask('wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->tasks->deleteTask('wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.tasks().deleteTask(\"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Tasks.DeleteTaskAsync(\"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.tasks.deleteTask(\n  'wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Tasks().DeleteTask(context.Background(), \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Retrieve a task",
+        "operationId": "tasks_get_task",
+        "description": "Returns the task under `work_task`, including its `checklist`, its `assignees` (employees, labours, operators and account contacts) and its `alerts`.",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "The task's `id`, which starts with `wt_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The task, under `work_task`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskViewResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No task has that `id`, for example because it has been deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/tasks/wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.tasks.get_task(\"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.tasks.getTask('wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->tasks->getTask('wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.tasks.tasks_dto.TasksDto.TaskView;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<TaskView> response = client.tasks().getTask(\"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Tasks.GetTaskAsync(\"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.tasks.getTask(\n  'wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Tasks().GetTask(context.Background(), \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Update a task",
+        "operationId": "tasks_update_task",
+        "description": "Send the fields to change under `work_task`, such as `description`. The updated task comes back under `work_task`.",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "The task's `id`, which starts with `wt_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated task, under `work_task`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskViewResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/tasks/wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"work_task\": {\n      \"description\": \"Replace the damaged fence panels\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.tasks.update_task(\n    \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\",\n    {\"work_task\": {\"description\": \"Replace the damaged fence panels\"}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.tasks.updateTask('wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b', {\n    work_task: {description: 'Replace the damaged fence panels'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->tasks->updateTask('wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b', [\n    'work_task' => ['description' => 'Replace the damaged fence panels'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.tasks.tasks_dto.TasksDto.TaskView;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<TaskView> response = client.tasks().updateTask(\n        \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\",\n        Map.of(\"work_task\", Map.of(\"description\", \"Replace the damaged fence panels\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Tasks.UpdateTaskAsync(\n    \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\",\n    new Dictionary<string, object?>\n    {\n        [\"work_task\"] = new Dictionary<string, object?>\n        {\n            [\"description\"] = \"Replace the damaged fence panels\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.tasks.updateTask(\n  'wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b',\n  {\n    'work_task': {'description': 'Replace the damaged fence panels'},\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Tasks().UpdateTask(context.Background(), \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\", map[string]any{\n\t\"work_task\": map[string]any{\n\t\t\"description\": \"Replace the damaged fence panels\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "work_task": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "priority": {
+                        "type": "string"
+                      },
+                      "start_date": {
+                        "type": "string"
+                      },
+                      "due_date": {
+                        "type": "string"
+                      },
+                      "estimated_hours": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "work_task"
+                ]
+              },
+              "example": {
+                "work_task": {
+                  "description": "Replace the damaged fence panels"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/{task_id}/checklist": {
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "List a task's checklist items",
+        "operationId": "tasks_get_task_checklist",
+        "description": "Returns `work_task` holding only `checklist`, the array of the task's checklist items.",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "The task's `id`, which starts with `wt_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The task's checklist, under `work_task.checklist`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskChecklistResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/tasks/wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b/checklist\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.tasks.get_task_checklist(\"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.tasks.getTaskChecklist('wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->tasks->getTaskChecklist('wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.tasks.tasks_dto.TasksDto.TaskView;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<TaskView> response = client.tasks().getTaskChecklist(\"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Tasks.GetTaskChecklistAsync(\"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.tasks.getTaskChecklist(\n  'wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Tasks().GetTaskChecklist(context.Background(), \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Add checklist items to a task",
+        "operationId": "tasks_create_task_checklist",
+        "description": "Send the new items as an array under `checklist`, each with a `name`. The whole task comes back under `work_task`, with the new items at the end of its `checklist`.",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "The task's `id`, which starts with `wt_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The task with its updated checklist, under `work_task`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskViewResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/tasks/wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b/checklist\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"checklist\": [\n      {\n        \"name\": \"Measure the fence line\"\n      }\n    ]\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.tasks.create_task_checklist(\n    \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\",\n    {\"checklist\": [{\"name\": \"Measure the fence line\"}]},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.tasks.createTaskChecklist('wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b', {\n    checklist: [{name: 'Measure the fence line'}],\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->tasks->createTaskChecklist('wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b', [\n    'checklist' => [['name' => 'Measure the fence line']],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.tasks.tasks_dto.TasksDto.TaskView;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<TaskView> response = client.tasks().createTaskChecklist(\n        \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\",\n        Map.of(\"checklist\", List.of(Map.of(\"name\", \"Measure the fence line\"))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Tasks.CreateTaskChecklistAsync(\n    \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\",\n    new Dictionary<string, object?>\n    {\n        [\"checklist\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"name\"] = \"Measure the fence line\",\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.tasks.createTaskChecklist(\n  'wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b',\n  {\n    'checklist': [\n      {'name': 'Measure the fence line'},\n    ],\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Tasks().CreateTaskChecklist(context.Background(), \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\", map[string]any{\n\t\"checklist\": []any{\n\t\tmap[string]any{\"name\": \"Measure the fence line\"},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "checklist": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "checklist"
+                ]
+              },
+              "example": {
+                "checklist": [
+                  {
+                    "name": "Measure the fence line"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/{task_id}/notes": {
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "List a task's notes",
+        "operationId": "tasks_get_task_notes",
+        "description": "Returns the task's notes under `data`, with `pagination`. The path takes the task's `code`; a `wt_` id returns `404`. A task with no notes returns an empty `data` list.",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "The task's `code`. The note routes look the task up by its code, and a `wt_` id returns `404`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of the task's notes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskNoteList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No task has that code. A `wt_` id in place of the code also returns `404`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/tasks/TASK-00012/notes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.tasks.get_task_notes(\"TASK-00012\", {\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.tasks.getTaskNotes('TASK-00012', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->tasks->getTaskNotes('TASK-00012', ['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.tasks.tasks_dto.TasksDto.TaskNoteList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<TaskNoteList> response = client.tasks().getTaskNotes(\"TASK-00012\", Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Tasks.GetTaskNotesAsync(\n    \"TASK-00012\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.tasks.getTaskNotes(\n  'TASK-00012',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Tasks().GetTaskNotes(context.Background(), \"TASK-00012\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Add a note to a task",
+        "operationId": "tasks_create_task_note",
+        "description": "Send a multipart form with the note's text as `note` and, optionally, a `file` to attach. The path takes the task's `code`. The new note comes back under `note`, with its `id`.",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "The task's `code`. The note routes look the task up by its code, and a `wt_` id returns `404`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The new note, under `note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskNoteResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/tasks/TASK-00012/notes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -F \"file=@site-visit.txt\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.tasks.create_task_note(\n    \"TASK-00012\",\n    \"<p>Call the client back on Monday.</p>\",\n    files={\"file\": open(\"site-visit.txt\", \"rb\")},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {readFileSync} from 'node:fs';\nimport {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.tasks.createTaskNote('TASK-00012', '<p>Call the client back on Monday.</p>', {\n    files: {file: ['site-visit.txt', readFileSync('site-visit.txt')]},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->tasks->createTaskNote('TASK-00012', '<p>Call the client back on Monday.</p>', [\n    'file' => ['site-visit.txt', fopen('site-visit.txt', 'r')],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.client.RequestOptions;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.tasks().createTaskNote(\n        \"TASK-00012\",\n        \"<p>Call the client back on Monday.</p>\",\n        Map.of(\"file\", Path.of(\"site-visit.txt\")),\n        RequestOptions.none());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Tasks.CreateTaskNoteAsync(\n    \"TASK-00012\",\n    \"<p>Call the client back on Monday.</p>\",\n    new Dictionary<string, object?> { [\"file\"] = new object?[] { \"site-visit.txt\", File.ReadAllBytes(\"site-visit.txt\") } });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'dart:io';\n\nimport 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.tasks.createTaskNote(\n  'TASK-00012',\n  '<p>Call the client back on Monday.</p>',\n  files: {\n    'file': ['site-visit.txt', File('site-visit.txt').readAsBytesSync()],\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nfile, err := os.ReadFile(\"site-visit.txt\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.Tasks().CreateTaskNote(context.Background(), \"TASK-00012\", \"<p>Call the client back on Monday.</p>\", map[string]any{\"file\": []any{\"site-visit.txt\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "note": {
+                    "type": "string",
+                    "description": "The note's text, such as `<p>Call the client back.</p>`."
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "An optional file to attach to the note."
+                  }
+                },
+                "required": [
+                  "note"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/{task_id}/checklist/{task_checklist_uuid}": {
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Retrieve a checklist item",
+        "operationId": "tasks_get_task_checklist_by_uuid",
+        "description": "Returns `work_task` holding only `checklist`, which here is the single checklist item as an object rather than an array.",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "The task's `id`, which starts with `wt_`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "task_checklist_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The checklist item's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The checklist item, under `work_task.checklist`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskChecklistItemResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/tasks/wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b/checklist/3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.tasks.get_task_checklist_by_uuid(\n    \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\", \"3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.tasks.getTaskChecklistByUuid(\n    'wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b',\n    '3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->tasks->getTaskChecklistByUuid(\n    'wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b',\n    '3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.tasks.tasks_dto.TasksDto.TaskView;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<TaskView> response = client.tasks().getTaskChecklistByUuid(\n        \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\",\n        \"3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Tasks.GetTaskChecklistByUuidAsync(\n    \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\",\n    \"3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.tasks.getTaskChecklistByUuid(\n  'wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b',\n  '3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Tasks().GetTaskChecklistByUUID(context.Background(), \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\", \"3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Delete a checklist item",
+        "operationId": "tasks_delete_task_checklist_by_uuid",
+        "description": "Deletes the checklist item with this `id` from the task. A successful delete returns `204` with no body. An item whose status is `COMPLETED` cannot be deleted and returns `409`.",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "The task's `id`, which starts with `wt_`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "task_checklist_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The checklist item's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The checklist item is deleted. No body."
+          },
+          "409": {
+            "description": "The checklist item is `COMPLETED` and cannot be deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/tasks/wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b/checklist/3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.tasks.delete_task_checklist_by_uuid(\n    \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\", \"3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.tasks.deleteTaskChecklistByUuid(\n    'wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b',\n    '3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->tasks->deleteTaskChecklistByUuid(\n    'wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b',\n    '3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.tasks().deleteTaskChecklistByUuid(\n        \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\",\n        \"3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Tasks.DeleteTaskChecklistByUuidAsync(\n    \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\",\n    \"3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.tasks.deleteTaskChecklistByUuid(\n  'wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b',\n  '3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Tasks().DeleteTaskChecklistByUUID(context.Background(), \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\", \"3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Update a checklist item",
+        "operationId": "tasks_update_task_checklist_by_uuid",
+        "description": "Send the fields to change under `checklist`, as an object, such as a new `name`. The path takes the task's `id` or `code`. The task comes back under `work_task`.",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "The task's `id`, which starts with `wt_`, or its `code`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "task_checklist_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The checklist item's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The task, under `work_task`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskViewResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/tasks/wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b/checklist/3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"checklist\": {\n      \"name\": \"Measure and mark the fence line\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.tasks.update_task_checklist_by_uuid(\n    \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\",\n    \"3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b\",\n    {\"checklist\": {\"name\": \"Measure and mark the fence line\"}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.tasks.updateTaskChecklistByUuid(\n    'wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b',\n    '3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b',\n    {checklist: {name: 'Measure and mark the fence line'}},\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->tasks->updateTaskChecklistByUuid(\n    'wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b',\n    '3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b',\n    ['checklist' => ['name' => 'Measure and mark the fence line']],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.tasks.tasks_dto.TasksDto.TaskView;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<TaskView> response = client.tasks().updateTaskChecklistByUuid(\n        \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\",\n        \"3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b\",\n        Map.of(\"checklist\", Map.of(\"name\", \"Measure and mark the fence line\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Tasks.UpdateTaskChecklistByUuidAsync(\n    \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\",\n    \"3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b\",\n    new Dictionary<string, object?>\n    {\n        [\"checklist\"] = new Dictionary<string, object?>\n        {\n            [\"name\"] = \"Measure and mark the fence line\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.tasks.updateTaskChecklistByUuid(\n  'wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b',\n  '3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b',\n  {\n    'checklist': {'name': 'Measure and mark the fence line'},\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Tasks().UpdateTaskChecklistByUUID(context.Background(), \"wt_2e4f6a8b0c1d4e3f9a7b5c3d1e0f2a4b\", \"3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b\", map[string]any{\n\t\"checklist\": map[string]any{\"name\": \"Measure and mark the fence line\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "checklist": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "checklist"
+                ]
+              },
+              "example": {
+                "checklist": {
+                  "name": "Measure and mark the fence line"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/{task_id}/notes/{task_note_id}": {
+      "delete": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Delete a task note",
+        "operationId": "tasks_delete_task_note",
+        "description": "Deletes the note with this `id` from the task. The path takes the task's `code`; a `wt_` id returns `404`. After the delete, the task's note list no longer holds the note.",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "The task's `code`. The note routes look the task up by its code, and a `wt_` id returns `404`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "task_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/tasks/TASK-00012/notes/6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.tasks.delete_task_note(\n    \"TASK-00012\", \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.tasks.deleteTaskNote('TASK-00012', '6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->tasks->deleteTaskNote('TASK-00012', '6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.tasks().deleteTaskNote(\"TASK-00012\", \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Tasks.DeleteTaskNoteAsync(\n    \"TASK-00012\",\n    \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.tasks.deleteTaskNote(\n  'TASK-00012',\n  '6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Tasks().DeleteTaskNote(context.Background(), \"TASK-00012\", \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Retrieve a task note",
+        "operationId": "tasks_get_task_note",
+        "description": "Returns the note under `note`, with its `id` and `content`. The path takes the task's `code`; a `wt_` id returns `404`.",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "The task's `code`. The note routes look the task up by its code, and a `wt_` id returns `404`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "task_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note, under `note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskNoteResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No task has that code, or the task has no note with that `id`. A `wt_` id in place of the code also returns `404`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/tasks/TASK-00012/notes/6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.tasks.get_task_note(\n    \"TASK-00012\", \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.tasks.getTaskNote('TASK-00012', '6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->tasks->getTaskNote('TASK-00012', '6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.tasks().getTaskNote(\"TASK-00012\", \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Tasks.GetTaskNoteAsync(\n    \"TASK-00012\",\n    \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.tasks.getTaskNote(\n  'TASK-00012',\n  '6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Tasks().GetTaskNote(context.Background(), \"TASK-00012\", \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Update a task note",
+        "operationId": "tasks_update_task_note",
+        "description": "Send a multipart form with the new text as `note` and, optionally, a `file` to attach, as for adding a note. The path takes the task's `code`. The note comes back under `note`.",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "The task's `code`. The note routes look the task up by its code, and a `wt_` id returns `404`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "task_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated note, under `note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskNoteResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/tasks/TASK-00012/notes/6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -F \"file=@site-visit.txt\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.tasks.update_task_note(\n    \"TASK-00012\",\n    \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\",\n    \"<p>Client confirmed Monday.</p>\",\n    files={\"file\": open(\"site-visit.txt\", \"rb\")},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {readFileSync} from 'node:fs';\nimport {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.tasks.updateTaskNote(\n    'TASK-00012',\n    '6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f',\n    '<p>Client confirmed Monday.</p>',\n    {files: {file: ['site-visit.txt', readFileSync('site-visit.txt')]}},\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->tasks->updateTaskNote(\n    'TASK-00012',\n    '6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f',\n    '<p>Client confirmed Monday.</p>',\n    ['file' => ['site-visit.txt', fopen('site-visit.txt', 'r')]],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.client.RequestOptions;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.tasks().updateTaskNote(\n        \"TASK-00012\",\n        \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\",\n        \"<p>Client confirmed Monday.</p>\",\n        Map.of(\"file\", Path.of(\"site-visit.txt\")),\n        RequestOptions.none());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Tasks.UpdateTaskNoteAsync(\n    \"TASK-00012\",\n    \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\",\n    \"<p>Client confirmed Monday.</p>\",\n    new Dictionary<string, object?> { [\"file\"] = new object?[] { \"site-visit.txt\", File.ReadAllBytes(\"site-visit.txt\") } });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'dart:io';\n\nimport 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.tasks.updateTaskNote(\n  'TASK-00012',\n  '6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f',\n  '<p>Client confirmed Monday.</p>',\n  files: {\n    'file': ['site-visit.txt', File('site-visit.txt').readAsBytesSync()],\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nfile, err := os.ReadFile(\"site-visit.txt\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.Tasks().UpdateTaskNote(context.Background(), \"TASK-00012\", \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\", \"<p>Client confirmed Monday.</p>\", map[string]any{\"file\": []any{\"site-visit.txt\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "note": {
+                    "type": "string",
+                    "description": "The note's text, such as `<p>Call the client back.</p>`."
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "An optional file to attach to the note."
+                  }
+                },
+                "required": [
+                  "note"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/{task_code}/notes/{note_id}/files/{file_id}": {
+      "delete": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Delete a task note file",
+        "operationId": "tasks_delete_task_note_file",
+        "description": "Deletes the attachment with this `uuid` from the note. The path takes the task's `code` and the file's `uuid` from the note's file list. A successful delete returns `204` with no body.",
+        "parameters": [
+          {
+            "name": "task_code",
+            "in": "path",
+            "required": true,
+            "description": "The task's `code`. A `wt_` id returns `404` on the note routes.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The attachment's `uuid`, from the note's file list.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The file is deleted. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/tasks/TASK-00012/notes/6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f/files/9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.tasks.delete_task_note_file(\n    \"TASK-00012\",\n    \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\",\n    \"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d\",\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.tasks.deleteTaskNoteFile(\n    'TASK-00012',\n    '6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f',\n    '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->tasks->deleteTaskNoteFile(\n    'TASK-00012',\n    '6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f',\n    '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.tasks().deleteTaskNoteFile(\n        \"TASK-00012\",\n        \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\",\n        \"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Tasks.DeleteTaskNoteFileAsync(\n    \"TASK-00012\",\n    \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\",\n    \"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.tasks.deleteTaskNoteFile(\n  'TASK-00012',\n  '6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f',\n  '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Tasks().DeleteTaskNoteFile(context.Background(), \"TASK-00012\", \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\", \"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Retrieve a task note file",
+        "operationId": "tasks_get_task_note_file",
+        "description": "Returns a description of the attachment under `file`: its `uuid`, `filename`, `content_type`, `size` and `href`. It does not return the file's contents.",
+        "parameters": [
+          {
+            "name": "task_code",
+            "in": "path",
+            "required": true,
+            "description": "The task's `code`. A `wt_` id returns `404` on the note routes.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The attachment's `uuid`, from the note's file list.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file's details, under `file`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskNoteFileResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/tasks/TASK-00012/notes/6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f/files/9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.tasks.get_task_note_file(\n    \"TASK-00012\",\n    \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\",\n    \"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d\",\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.tasks.getTaskNoteFile(\n    'TASK-00012',\n    '6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f',\n    '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->tasks->getTaskNoteFile(\n    'TASK-00012',\n    '6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f',\n    '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.tasks().getTaskNoteFile(\n        \"TASK-00012\",\n        \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\",\n        \"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Tasks.GetTaskNoteFileAsync(\n    \"TASK-00012\",\n    \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\",\n    \"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.tasks.getTaskNoteFile(\n  'TASK-00012',\n  '6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f',\n  '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Tasks().GetTaskNoteFile(context.Background(), \"TASK-00012\", \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\", \"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/tasks/{task_code}/notes/{note_id}/files": {
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "List a task note's files",
+        "operationId": "tasks_get_task_note_files",
+        "description": "Returns the note's attachments under `data`, with `pagination`. Each attachment carries its `uuid`, `filename`, `content_type`, `size` and `href`. The path takes the task's `code`.",
+        "parameters": [
+          {
+            "name": "task_code",
+            "in": "path",
+            "required": true,
+            "description": "The task's `code`. A `wt_` id returns `404` on the note routes.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note's files.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskNoteFileList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/tasks/TASK-00012/notes/6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f/files\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.tasks.get_task_note_files(\n    \"TASK-00012\", \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.tasks.getTaskNoteFiles('TASK-00012', '6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->tasks->getTaskNoteFiles('TASK-00012', '6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.tasks().getTaskNoteFiles(\"TASK-00012\", \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Tasks.GetTaskNoteFilesAsync(\n    \"TASK-00012\",\n    \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.tasks.getTaskNoteFiles(\n  'TASK-00012',\n  '6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Tasks().GetTaskNoteFiles(context.Background(), \"TASK-00012\", \"6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -82532,6 +84213,542 @@
         "properties": {
           "labour_calendar": {
             "$ref": "#/components/schemas/LabourAvailability"
+          }
+        }
+      },
+      "TaskView": {
+        "type": "object",
+        "properties": {
+          "activity_logs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskViewActivityLog"
+            }
+          },
+          "actual_hours": {
+            "type": "null"
+          },
+          "alerts": {
+            "type": "array"
+          },
+          "assignees": {
+            "$ref": "#/components/schemas/TaskViewAssignees"
+          },
+          "checklist": {
+            "type": [
+              "array",
+              "object"
+            ],
+            "description": "The checklist items: an array on the task and on the checklist list, and a single item object when you retrieve one checklist item."
+          },
+          "code": {
+            "type": "string"
+          },
+          "completed_at": {
+            "type": "string"
+          },
+          "completed_by": {
+            "$ref": "#/components/schemas/TaskViewCompletedBy"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/TaskViewCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "custom_attributes": {
+            "type": "array"
+          },
+          "description": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "due_date": {
+            "type": "string"
+          },
+          "estimated_hours": {
+            "type": "integer"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/TaskViewLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "milestone": {
+            "type": "null"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "parent_task": {
+            "type": "null"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "resource": {
+            "type": "null"
+          },
+          "sort_order": {
+            "type": "integer"
+          },
+          "start_after": {
+            "type": "null"
+          },
+          "start_date": {
+            "type": "string"
+          },
+          "state": {
+            "type": "null"
+          },
+          "status": {
+            "type": "string"
+          },
+          "task_status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "workflow": {
+            "type": "null"
+          }
+        }
+      },
+      "TaskViewActivityLog": {
+        "type": "object",
+        "properties": {
+          "activity": {
+            "type": "string"
+          }
+        }
+      },
+      "TaskViewAssignees": {
+        "type": "object",
+        "properties": {
+          "manually_added_account_contacts": {
+            "type": "array"
+          },
+          "selected_account_contacts": {
+            "type": "array"
+          },
+          "selected_employees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskViewAssigneesSelectedEmployee"
+            }
+          },
+          "selected_labours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskViewAssigneesSelectedLabour"
+            }
+          },
+          "selected_operators": {
+            "type": "array"
+          }
+        }
+      },
+      "TaskViewAssigneesSelectedEmployee": {
+        "type": "object",
+        "properties": {
+          "display_order": {
+            "type": "integer"
+          },
+          "email": {
+            "type": "string"
+          },
+          "employee_code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "responsibility": {
+            "type": "null"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "TaskViewAssigneesSelectedLabour": {
+        "type": "object",
+        "properties": {
+          "display_order": {
+            "type": "integer"
+          },
+          "email": {
+            "type": "string"
+          },
+          "labour_code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "responsibility": {
+            "type": "null"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "TaskViewCompletedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "TaskViewCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "TaskViewLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "TaskViewResponse": {
+        "type": "object",
+        "properties": {
+          "work_task": {
+            "$ref": "#/components/schemas/TaskView"
+          }
+        }
+      },
+      "TaskChecklistResponse": {
+        "type": "object",
+        "properties": {
+          "work_task": {
+            "type": "object",
+            "properties": {
+              "checklist": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/TaskChecklistItem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "TaskChecklistItemResponse": {
+        "type": "object",
+        "properties": {
+          "work_task": {
+            "type": "object",
+            "properties": {
+              "checklist": {
+                "$ref": "#/components/schemas/TaskChecklistItem"
+              }
+            }
+          }
+        }
+      },
+      "TaskChecklistItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "TaskNote": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string",
+            "description": "The note's text, as sent in `note`."
+          }
+        }
+      },
+      "TaskNoteResponse": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "$ref": "#/components/schemas/TaskNote"
+          }
+        }
+      },
+      "TaskNoteFile": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "content_type": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "href": {
+            "type": "string"
+          }
+        }
+      },
+      "TaskNoteFileList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskNoteFile"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/TaskPagination"
+          }
+        }
+      },
+      "TaskNoteFileResponse": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "$ref": "#/components/schemas/TaskNoteFile"
+          }
+        }
+      },
+      "TaskList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Task"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/TaskPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "Task": {
+        "type": "object",
+        "properties": {
+          "actual_hours": {
+            "type": "null"
+          },
+          "code": {
+            "type": "string"
+          },
+          "completed_at": {
+            "type": "string"
+          },
+          "completed_by": {
+            "$ref": "#/components/schemas/TaskCompletedBy"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/TaskCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "custom_attributes": {
+            "type": "array"
+          },
+          "description": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "due_date": {
+            "type": "string"
+          },
+          "estimated_hours": {
+            "type": "integer"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/TaskLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "milestone": {
+            "type": "null"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "parent_task": {
+            "type": "null"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "resource": {
+            "type": "null"
+          },
+          "sort_order": {
+            "type": "integer"
+          },
+          "start_after": {
+            "type": "null"
+          },
+          "start_date": {
+            "type": "string"
+          },
+          "state": {
+            "type": "null"
+          },
+          "status": {
+            "type": "string"
+          },
+          "task_status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "workflow": {
+            "type": "null"
+          }
+        }
+      },
+      "TaskCompletedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "TaskCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "TaskLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "TaskPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Rely on this rather than on `next_cursor`, which can still hold a value on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/TaskPaginationLinks"
+          }
+        }
+      },
+      "TaskPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "TaskNoteList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array"
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/TaskPagination"
+          },
+          "url": {
+            "type": "string"
           }
         }
       },
