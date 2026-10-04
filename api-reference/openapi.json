@@ -35,6 +35,9 @@
     },
     {
       "name": "Communications"
+    },
+    {
+      "name": "Communication profiles"
     }
   ],
   "paths": {
@@ -8316,6 +8319,454 @@
           }
         }
       }
+    },
+    "/settings/communication_profiles": {
+      "get": {
+        "tags": [
+          "Communication profiles"
+        ],
+        "summary": "List communication profiles",
+        "operationId": "communication_profiles_get_settings_communication_profiles",
+        "description": "Returns the profiles under `data`, with `pagination` for the next page. Other fields filter as `filter_<field>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most communication profiles to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` from the previous page, to fetch the next page.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by, such as `created_on`. Prefix it with `-` for descending order, as in `-created_on`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of communication profiles.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunicationProfileList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/communication_profiles?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.communication_profiles.get_settings_communication_profiles(\n    {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.communicationProfiles.getSettingsCommunicationProfiles({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->communicationProfiles->getSettingsCommunicationProfiles(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.communication_profiles.communication_profiles_dto.CommunicationProfilesDto.SettingsCommunicationProfileList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsCommunicationProfileList> response = client.communicationProfiles().getSettingsCommunicationProfiles(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CommunicationProfiles.GetSettingsCommunicationProfilesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.communicationProfiles\n    .getSettingsCommunicationProfiles(queryParams: {'limit': 20});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CommunicationProfiles().GetSettingsCommunicationProfiles(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Communication profiles"
+        ],
+        "summary": "Create a communication profile",
+        "operationId": "communication_profiles_create_settings_communication_profile",
+        "description": "Send the profile under `communication_profile`. `name` is required. The new profile's messages are copied from the profile named in `copy_from`, or from the default profile when `copy_from` is left out.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new profile, under `communication_profile`."
+          },
+          "500": {
+            "description": "The server could not create the profile.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/communication_profiles\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"communication_profile\": {\n      \"name\": \"Wholesale notices\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.communication_profiles.create_settings_communication_profile(\n    {\"communication_profile\": {\"name\": \"Wholesale notices\"}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.communicationProfiles.createSettingsCommunicationProfile({\n    communication_profile: {name: 'Wholesale notices'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->communicationProfiles->createSettingsCommunicationProfile([\n    'communication_profile' => ['name' => 'Wholesale notices'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.communicationProfiles().createSettingsCommunicationProfile(\n        Map.of(\"communication_profile\", Map.of(\"name\", \"Wholesale notices\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CommunicationProfiles.CreateSettingsCommunicationProfileAsync(new Dictionary<string, object?>\n{\n    [\"communication_profile\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Wholesale notices\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.communicationProfiles\n    .createSettingsCommunicationProfile({\n      'communication_profile': {'name': 'Wholesale notices'},\n    });\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CommunicationProfiles().CreateSettingsCommunicationProfile(context.Background(), map[string]any{\n\t\"communication_profile\": map[string]any{\"name\": \"Wholesale notices\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "communication_profile"
+                ],
+                "properties": {
+                  "communication_profile": {
+                    "type": "object",
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The profile's name. Required."
+                      },
+                      "copy_from": {
+                        "type": "string",
+                        "description": "The profile to copy messages from. The default profile is used when this is left out."
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "communication_profile": {
+                  "name": "Wholesale notices"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/communication_profiles/{communication_profile_id}": {
+      "get": {
+        "tags": [
+          "Communication profiles"
+        ],
+        "summary": "Retrieve a communication profile",
+        "operationId": "communication_profiles_get_settings_communication_profile",
+        "description": "Name the profile by its `cmp_` id.",
+        "parameters": [
+          {
+            "name": "communication_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The communication profile's `cmp_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The profile, under `communication_profile`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunicationProfileResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No profile has that id, for example after it is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/communication_profiles/cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.communication_profiles.get_settings_communication_profile(\n    \"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.communicationProfiles.getSettingsCommunicationProfile(\n    'cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->communicationProfiles->getSettingsCommunicationProfile(\n    'cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.communication_profiles.communication_profiles_dto.CommunicationProfilesDto.SettingsCommunicationProfile;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsCommunicationProfile> response = client.communicationProfiles().getSettingsCommunicationProfile(\n        \"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CommunicationProfiles.GetSettingsCommunicationProfileAsync(\"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.communicationProfiles\n    .getSettingsCommunicationProfile('cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CommunicationProfiles().GetSettingsCommunicationProfile(context.Background(), \"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Communication profiles"
+        ],
+        "summary": "Delete a communication profile",
+        "operationId": "communication_profiles_delete_settings_communication_profile",
+        "description": "Marks the profile deleted and returns `204` with no content. The default profile cannot be deleted. Retrieving a deleted profile returns `404`.",
+        "parameters": [
+          {
+            "name": "communication_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The communication profile's `cmp_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The profile is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/communication_profiles/cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.communication_profiles.delete_settings_communication_profile(\n    \"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.communicationProfiles.deleteSettingsCommunicationProfile(\n    'cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->communicationProfiles->deleteSettingsCommunicationProfile(\n    'cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.communicationProfiles().deleteSettingsCommunicationProfile(\n        \"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CommunicationProfiles.DeleteSettingsCommunicationProfileAsync(\"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.communicationProfiles\n    .deleteSettingsCommunicationProfile(\n      'cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e',\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CommunicationProfiles().DeleteSettingsCommunicationProfile(context.Background(), \"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Communication profiles"
+        ],
+        "summary": "Update a communication profile",
+        "operationId": "communication_profiles_update_settings_communication_profile",
+        "description": "Send only the fields to change, under `communication_profile`. The profile comes back under `communication_profile`.",
+        "parameters": [
+          {
+            "name": "communication_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The communication profile's `cmp_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The profile, under `communication_profile`."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/communication_profiles/cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"communication_profile\": {\n      \"display_name\": \"Wholesale notices\",\n      \"description\": \"Messages for wholesale accounts\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.communication_profiles.update_settings_communication_profile(\n    \"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\",\n    {\n        \"communication_profile\": {\n            \"display_name\": \"Wholesale notices\",\n            \"description\": \"Messages for wholesale accounts\",\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.communicationProfiles.updateSettingsCommunicationProfile(\n    'cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e',\n    {communication_profile: {display_name: 'Wholesale notices', description: 'Messages for wholesale accounts'}},\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->communicationProfiles->updateSettingsCommunicationProfile(\n    'cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e',\n    [\n        'communication_profile' => [\n            'display_name' => 'Wholesale notices',\n            'description' => 'Messages for wholesale accounts',\n        ],\n    ],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.communicationProfiles().updateSettingsCommunicationProfile(\n        \"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\",\n        Map.of(\n                \"communication_profile\", Map.of(\n                        \"display_name\", \"Wholesale notices\",\n                        \"description\", \"Messages for wholesale accounts\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CommunicationProfiles.UpdateSettingsCommunicationProfileAsync(\n    \"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\",\n    new Dictionary<string, object?>\n    {\n        [\"communication_profile\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Wholesale notices\",\n            [\"description\"] = \"Messages for wholesale accounts\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.communicationProfiles\n    .updateSettingsCommunicationProfile(\n      'cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e',\n      {\n        'communication_profile': {\n          'display_name': 'Wholesale notices',\n          'description': 'Messages for wholesale accounts',\n        },\n      },\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CommunicationProfiles().UpdateSettingsCommunicationProfile(context.Background(), \"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\", map[string]any{\n\t\"communication_profile\": map[string]any{\n\t\t\"display_name\": \"Wholesale notices\",\n\t\t\"description\":  \"Messages for wholesale accounts\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "communication_profile"
+                ],
+                "properties": {
+                  "communication_profile": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "communication_profile": {
+                  "display_name": "Wholesale notices",
+                  "description": "Messages for wholesale accounts"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -12789,6 +13240,125 @@
         }
       },
       "AccountGroupPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "CommunicationProfile": {
+        "type": "object",
+        "description": "One communication profile.",
+        "properties": {
+          "created_by": {},
+          "created_on": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "The profile's `cmp_` id."
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "CommunicationProfileResponse": {
+        "type": "object",
+        "properties": {
+          "communication_profile": {
+            "$ref": "#/components/schemas/CommunicationProfile"
+          }
+        }
+      },
+      "CommunicationProfileList": {
+        "type": "object",
+        "description": "One page of communication profiles.",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommunicationProfile"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/CommunicationProfilePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "CommunicationProfilePagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer"
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Rely on this rather than `next_cursor`."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass this as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/CommunicationProfilePaginationLinks"
+          },
+          "records": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "next_page": {
+            "type": "string"
+          },
+          "previous_page": {
+            "type": "string"
+          },
+          "has_next": {
+            "type": "boolean"
+          },
+          "has_prev": {
+            "type": "boolean"
+          },
+          "per_page": {
+            "type": "integer"
+          }
+        }
+      },
+      "CommunicationProfilePaginationLinks": {
         "type": "object",
         "properties": {
           "next": {

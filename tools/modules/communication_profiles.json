@@ -1,0 +1,393 @@
+{
+  "family": "communication_profiles",
+  "tag": "Communication profiles",
+  "slug": "communication-profiles",
+  "icon": "comments",
+  "base": "/settings/communication_profiles",
+  "overview_description": "List, create, read, update and delete the communication profiles that hold your account messages.",
+  "intro": "A communication profile holds a set of messages and channel settings that accounts use. Here you list, create, read, update and delete profiles. This area has 5 endpoints, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**A profile is named by its `cmp_` id.** List communication profiles returns each profile's `id`.",
+    "**`name` is required to create a profile.** Its messages are copied from the profile in `copy_from`, or from the default profile.",
+    "**One profile comes back under `communication_profile`; a listing comes back under `data`.** A listing also carries `pagination`; pass `pagination.next_cursor` as `cursor` while `has_more` is `true`.",
+    "**The default profile cannot be deleted.** A delete marks the profile deleted, and reading it then returns `404`.",
+    "**Creating a profile can fail with `500`.**"
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_communication_profiles",
+      "method": "GET",
+      "path": "/settings/communication_profiles",
+      "slug": "list-communication-profiles",
+      "title": "List communication profiles",
+      "summary": "Lists your communication profiles, a page at a time.",
+      "description": "Returns the profiles under `data`, with `pagination` for the next page. Other fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most communication profiles to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` from the previous page, to fetch the next page.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by, such as `created_on`. Prefix it with `-` for descending order, as in `-created_on`.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of communication profiles.",
+          "schema": {
+            "$ref": "#/components/schemas/CommunicationProfileList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_communication_profile",
+      "method": "POST",
+      "path": "/settings/communication_profiles",
+      "slug": "create-a-communication-profile",
+      "title": "Create a communication profile",
+      "summary": "Creates a communication profile and returns it under `communication_profile`.",
+      "description": "Send the profile under `communication_profile`. `name` is required. The new profile's messages are copied from the profile named in `copy_from`, or from the default profile when `copy_from` is left out.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "communication_profile"
+          ],
+          "properties": {
+            "communication_profile": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The profile's name. Required."
+                },
+                "copy_from": {
+                  "type": "string",
+                  "description": "The profile to copy messages from. The default profile is used when this is left out."
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "communication_profile": {
+            "name": "Wholesale notices"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new profile, under `communication_profile`."
+        },
+        "500": {
+          "description": "The server could not create the profile."
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "communication_profile": {
+            "name": "Wholesale notices"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_communication_profile",
+      "method": "GET",
+      "path": "/settings/communication_profiles/{communication_profile_id}",
+      "slug": "retrieve-a-communication-profile",
+      "title": "Retrieve a communication profile",
+      "summary": "Returns one communication profile, under `communication_profile`.",
+      "description": "Name the profile by its `cmp_` id.",
+      "parameters": [
+        {
+          "name": "communication_profile_id",
+          "in": "path",
+          "required": true,
+          "description": "The communication profile's `cmp_` id.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The profile, under `communication_profile`.",
+          "schema": {
+            "$ref": "#/components/schemas/CommunicationProfileResponse"
+          }
+        },
+        "404": {
+          "description": "No profile has that id, for example after it is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "communication_profile_id": "cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_communication_profile",
+      "method": "DELETE",
+      "path": "/settings/communication_profiles/{communication_profile_id}",
+      "slug": "delete-a-communication-profile",
+      "title": "Delete a communication profile",
+      "summary": "Deletes a communication profile that is not the default.",
+      "description": "Marks the profile deleted and returns `204` with no content. The default profile cannot be deleted. Retrieving a deleted profile returns `404`.",
+      "parameters": [
+        {
+          "name": "communication_profile_id",
+          "in": "path",
+          "required": true,
+          "description": "The communication profile's `cmp_` id.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The profile is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "communication_profile_id": "cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e"
+        }
+      }
+    },
+    {
+      "key": "update_settings_communication_profile",
+      "method": "PATCH",
+      "path": "/settings/communication_profiles/{communication_profile_id}",
+      "slug": "update-a-communication-profile",
+      "title": "Update a communication profile",
+      "summary": "Changes a communication profile's fields and channel settings.",
+      "description": "Send only the fields to change, under `communication_profile`. The profile comes back under `communication_profile`.",
+      "parameters": [
+        {
+          "name": "communication_profile_id",
+          "in": "path",
+          "required": true,
+          "description": "The communication profile's `cmp_` id.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "communication_profile"
+          ],
+          "properties": {
+            "communication_profile": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "communication_profile": {
+            "display_name": "Wholesale notices",
+            "description": "Messages for wholesale accounts"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The profile, under `communication_profile`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "communication_profile_id": "cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e"
+        },
+        "body": {
+          "communication_profile": {
+            "display_name": "Wholesale notices",
+            "description": "Messages for wholesale accounts"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "CommunicationProfile": {
+      "type": "object",
+      "description": "One communication profile.",
+      "properties": {
+        "created_by": {},
+        "created_on": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The profile's `cmp_` id."
+        },
+        "last_updated_by": {},
+        "last_updated_on": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "CommunicationProfileResponse": {
+      "type": "object",
+      "properties": {
+        "communication_profile": {
+          "$ref": "#/components/schemas/CommunicationProfile"
+        }
+      }
+    },
+    "CommunicationProfileList": {
+      "type": "object",
+      "description": "One page of communication profiles.",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CommunicationProfile"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/CommunicationProfilePagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "CommunicationProfilePagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer"
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Rely on this rather than `next_cursor`."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass this as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/CommunicationProfilePaginationLinks"
+        },
+        "records": {
+          "type": "integer"
+        },
+        "offset": {
+          "type": "integer"
+        },
+        "next_page": {
+          "type": "string"
+        },
+        "previous_page": {
+          "type": "string"
+        },
+        "has_next": {
+          "type": "boolean"
+        },
+        "has_prev": {
+          "type": "boolean"
+        },
+        "per_page": {
+          "type": "integer"
+        }
+      }
+    },
+    "CommunicationProfilePaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
