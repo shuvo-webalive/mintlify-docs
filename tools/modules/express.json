@@ -1,0 +1,671 @@
+{
+  "family": "express",
+  "tag": "Express",
+  "slug": "express",
+  "icon": "bolt",
+  "base": "/express",
+  "overview_description": "Create an active order and its invoice for an existing account in a single Exsited API call.",
+  "intro": "Express creates a complete order for an account in one request: the order, its lines and its invoice. This area has 1 endpoint, and all seven SDKs call it.",
+  "warning": null,
+  "notes": [
+    "**The body sits under `account`.** Name the account by `id` and nest the order under `account.order`.",
+    "**The order is created active.** The new order's `status` is `active`, and one invoice is raised for it straight away.",
+    "**The response sits under `express`.** It holds the order as `get_order` reads it, including `lines`, `kpis` and `billing_preferences`.",
+    "**Each line names an item by `item_id`.** `item_price_snapshot.pricing_rule.price` sets the line's price, and `tax_exempt_when_sold` removes tax from the line."
+  ],
+  "endpoints": [
+    {
+      "key": "create_express",
+      "method": "POST",
+      "path": "/express",
+      "slug": "create-an-express-order",
+      "title": "Create an express order",
+      "summary": "Creates an active order for an existing account in one call and returns it under `express`.",
+      "description": "Send the account's `id` and the order to create under `account.order`. The order is created as `active` and its invoice is raised in the same call. A line with `tax_exempt_when_sold` set to `true` adds no tax, so the order's `total` equals its `subtotal`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "account": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "The account's `id`, such as `W13ZGY`."
+                },
+                "order": {
+                  "type": "object",
+                  "properties": {
+                    "price_tax_inclusive": {
+                      "type": "boolean"
+                    },
+                    "properties": {
+                      "type": "object",
+                      "properties": {
+                        "fulfillment_mode": {
+                          "type": "string"
+                        },
+                        "fulfillment_term": {
+                          "type": "string"
+                        }
+                      },
+                      "description": "The order's billing and fulfillment settings."
+                    },
+                    "lines": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "item_id": {
+                            "type": "string",
+                            "description": "The item's `id`."
+                          },
+                          "item_order_quantity": {
+                            "type": "integer"
+                          },
+                          "item_price_snapshot": {
+                            "type": "object",
+                            "properties": {
+                              "pricing_rule": {
+                                "type": "object",
+                                "properties": {
+                                  "price": {
+                                    "type": "number"
+                                  }
+                                }
+                              }
+                            },
+                            "description": "Overrides the item's price on this line."
+                          },
+                          "tax_exempt_when_sold": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "description": "The order to create for the account."
+                }
+              },
+              "required": [
+                "id",
+                "order"
+              ]
+            }
+          },
+          "required": [
+            "account"
+          ]
+        },
+        "example": {
+          "account": {
+            "id": "W13ZGY",
+            "order": {
+              "price_tax_inclusive": false,
+              "properties": {
+                "fulfillment_mode": "MANUAL",
+                "fulfillment_term": "IMMEDIATELY"
+              },
+              "lines": [
+                {
+                  "item_id": "ITEM-0001",
+                  "item_order_quantity": 2,
+                  "item_price_snapshot": {
+                    "pricing_rule": {
+                      "price": 1.5
+                    }
+                  },
+                  "tax_exempt_when_sold": true
+                }
+              ]
+            }
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new order, under `express`.",
+          "schema": {
+            "$ref": "#/components/schemas/ExpressResponse"
+          }
+        }
+      },
+      "example_call": {
+        "body": {
+          "account": {
+            "id": "W13ZGY",
+            "order": {
+              "price_tax_inclusive": false,
+              "properties": {
+                "fulfillment_mode": "MANUAL",
+                "fulfillment_term": "IMMEDIATELY"
+              },
+              "lines": [
+                {
+                  "item_id": "ITEM-0001",
+                  "item_order_quantity": 2,
+                  "item_price_snapshot": {
+                    "pricing_rule": {
+                      "price": 1.5
+                    }
+                  },
+                  "tax_exempt_when_sold": true
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "Express": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/ExpressAccount"
+        },
+        "activity_logs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ExpressActivityLog"
+          }
+        },
+        "allow_contract": {
+          "type": "boolean"
+        },
+        "billing_address": {},
+        "billing_preferences": {
+          "$ref": "#/components/schemas/ExpressBillingPreferences"
+        },
+        "billing_start_date": {
+          "type": "string"
+        },
+        "communication_preferences": {
+          "type": "array"
+        },
+        "created_by": {},
+        "created_on": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/ExpressCurrency"
+        },
+        "custom_attributes": {
+          "type": "array"
+        },
+        "custom_form": {
+          "$ref": "#/components/schemas/ExpressCustomForm"
+        },
+        "customer_purchase_order_id": {},
+        "description": {},
+        "discount_profile": {},
+        "display_name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "invoice_note": {},
+        "kpis": {
+          "$ref": "#/components/schemas/ExpressKpis"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {},
+        "lines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ExpressLine"
+          }
+        },
+        "manager": {},
+        "name": {
+          "type": "string"
+        },
+        "next_billing_from_date": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "order_start_date": {
+          "type": "string"
+        },
+        "order_type": {
+          "type": "string"
+        },
+        "origin": {},
+        "original_total": {
+          "type": "string"
+        },
+        "pre_order": {
+          "type": "boolean"
+        },
+        "price_tax_inclusive": {
+          "type": "boolean"
+        },
+        "quote_converted": {
+          "type": "boolean"
+        },
+        "quote_order": {
+          "type": "boolean"
+        },
+        "referral_account": {},
+        "sales_rep": {},
+        "shipping_address": {},
+        "shipping_cost": {
+          "type": "number"
+        },
+        "shipping_line_items": {
+          "type": "array"
+        },
+        "shipping_profile": {},
+        "status": {
+          "type": "string"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "string"
+        },
+        "time_zone": {
+          "$ref": "#/components/schemas/ExpressTimeZone"
+        },
+        "total": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "ExpressAccount": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ExpressActivityLog": {
+      "type": "object",
+      "properties": {
+        "activity": {
+          "type": "string"
+        }
+      }
+    },
+    "ExpressBillingPreferences": {
+      "type": "object",
+      "properties": {
+        "billing_period": {
+          "type": "string"
+        },
+        "communication_profile": {
+          "type": "string"
+        },
+        "consolidate_invoice": {
+          "type": "boolean"
+        },
+        "fulfillment_mode": {
+          "type": "string"
+        },
+        "fulfillment_term": {
+          "type": "string"
+        },
+        "invoice_mode": {
+          "type": "string"
+        },
+        "invoice_term": {
+          "type": "string"
+        },
+        "payment_mode": {
+          "type": "string"
+        },
+        "payment_processor": {
+          "type": "string"
+        },
+        "payment_term": {
+          "type": "string"
+        },
+        "payment_term_alignment": {
+          "type": "string"
+        },
+        "proforma_properties": {
+          "$ref": "#/components/schemas/ExpressBillingPreferencesProformaProperties"
+        }
+      }
+    },
+    "ExpressBillingPreferencesProformaProperties": {
+      "type": "object",
+      "properties": {
+        "acceptance_date": {},
+        "acceptance_required": {
+          "type": "boolean"
+        },
+        "acceptance_term": {},
+        "payment_required": {
+          "type": "boolean"
+        },
+        "terms_and_conditions": {}
+      }
+    },
+    "ExpressCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ExpressCustomForm": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ExpressKpis": {
+      "type": "object",
+      "properties": {
+        "deleted_at": {},
+        "estimated_total": {
+          "type": "string"
+        },
+        "last_cancelled_at": {},
+        "last_changed_at": {},
+        "last_invoice_issue_date": {},
+        "last_invoice_total": {
+          "type": "string"
+        },
+        "last_reactivated_at": {},
+        "monthly_recurring_revenue": {
+          "type": "string"
+        },
+        "next_invoice_issue_date": {},
+        "object": {
+          "type": "string"
+        },
+        "start_date": {},
+        "total_collected": {
+          "type": "string"
+        },
+        "total_due": {
+          "type": "string"
+        },
+        "total_invoice": {
+          "type": "integer"
+        },
+        "total_outstanding": {
+          "type": "string"
+        },
+        "total_revenue": {
+          "type": "string"
+        }
+      }
+    },
+    "ExpressLine": {
+      "type": "object",
+      "properties": {
+        "charge_item_uuid": {
+          "type": "string"
+        },
+        "expected_delivery_date": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "item": {
+          "$ref": "#/components/schemas/ExpressLineItem"
+        },
+        "item_accounting_code": {
+          "$ref": "#/components/schemas/ExpressLineItemAccountingCode"
+        },
+        "item_charge_type": {
+          "type": "string"
+        },
+        "item_custom_attributes": {
+          "type": "array"
+        },
+        "item_description": {
+          "type": "string"
+        },
+        "item_invoice_note": {
+          "type": "string"
+        },
+        "item_order_quantity": {
+          "type": "integer"
+        },
+        "item_price_snapshot": {
+          "$ref": "#/components/schemas/ExpressLineItemPriceSnapshot"
+        },
+        "item_price_tax": {
+          "$ref": "#/components/schemas/ExpressLineItemPriceTax"
+        },
+        "item_sale_tax_configuration": {
+          "$ref": "#/components/schemas/ExpressLineItemSaleTaxConfiguration"
+        },
+        "item_type": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "pre_order_stock_details": {
+          "$ref": "#/components/schemas/ExpressLinePreOrderStockDetails"
+        },
+        "shipping_cost": {
+          "type": "number"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "string"
+        },
+        "tax_exempt_when_sold": {
+          "type": "boolean"
+        },
+        "total": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "ExpressLineItem": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "ExpressLineItemAccountingCode": {
+      "type": "object",
+      "properties": {
+        "sales_revenue": {
+          "type": "string"
+        }
+      }
+    },
+    "ExpressLineItemPriceSnapshot": {
+      "type": "object",
+      "properties": {
+        "pricing_rule": {
+          "$ref": "#/components/schemas/ExpressLineItemPriceSnapshotPricingRule"
+        }
+      }
+    },
+    "ExpressLineItemPriceSnapshotPricingRule": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "type": "number"
+        },
+        "price_period": {
+          "type": "string"
+        },
+        "price_type": {
+          "type": "string"
+        },
+        "pricing_level": {
+          "type": "string"
+        },
+        "pricing_method": {
+          "type": "string"
+        },
+        "pricing_schedule": {
+          "type": "string"
+        },
+        "uom": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "warehouse": {
+          "type": "string"
+        }
+      }
+    },
+    "ExpressLineItemPriceTax": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "rate": {
+          "type": "number"
+        }
+      }
+    },
+    "ExpressLineItemSaleTaxConfiguration": {
+      "type": "object",
+      "properties": {
+        "sale_price_is_based_on": {
+          "type": "string"
+        },
+        "tax_code": {
+          "$ref": "#/components/schemas/ExpressLineItemSaleTaxConfigurationTaxCode"
+        }
+      }
+    },
+    "ExpressLineItemSaleTaxConfigurationTaxCode": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        },
+        "rate": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "ExpressLinePreOrderStockDetails": {
+      "type": "object",
+      "properties": {
+        "pending_reserve": {
+          "type": "string"
+        },
+        "reserved": {
+          "type": "string"
+        },
+        "sold": {
+          "type": "string"
+        }
+      }
+    },
+    "ExpressTimeZone": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ExpressResponse": {
+      "type": "object",
+      "properties": {
+        "express": {
+          "$ref": "#/components/schemas/Express"
+        }
+      }
+    }
+  }
+}
