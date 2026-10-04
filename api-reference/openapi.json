@@ -86,6 +86,9 @@
     },
     {
       "name": "Units of measurement"
+    },
+    {
+      "name": "Zones"
     }
   ],
   "paths": {
@@ -30436,6 +30439,477 @@
           }
         }
       }
+    },
+    "/settings/zones": {
+      "get": {
+        "tags": [
+          "Zones"
+        ],
+        "summary": "List zones",
+        "operationId": "zones_get_settings_zones",
+        "description": "Returns zones under `data`, each with its `name`, `display_name`, `description` and `status`. Set the page size with `limit` and fetch the next page with `cursor`. Other fields filter as `filter_<field>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` to sort descending, as in `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of zones, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZoneList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/zones?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.zones.get_settings_zones({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.zones.getSettingsZones({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->zones->getSettingsZones(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.zones.zones_dto.ZonesDto.SettingsZoneList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsZoneList> response = client.zones().getSettingsZones(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Zones.GetSettingsZonesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.zones.getSettingsZones(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Zones().GetSettingsZones(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Zones"
+        ],
+        "summary": "Create a zone",
+        "operationId": "zones_create_settings_zone",
+        "description": "Send the zone under `zone` with its `name` and a `country_list` of one or more country ids.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new zone, under `zone`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZoneResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/zones\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"zone\": {\n      \"name\": \"Australia and New Zealand\",\n      \"country_list\": [\n        \"country_4f3e2d1c0b0a99887766554433221100\"\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.zones.create_settings_zone(\n    {\n        \"zone\": {\n            \"name\": \"Australia and New Zealand\",\n            \"country_list\": [\"country_4f3e2d1c0b0a99887766554433221100\"],\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.zones.createSettingsZone({\n    zone: {name: 'Australia and New Zealand', country_list: ['country_4f3e2d1c0b0a99887766554433221100']},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->zones->createSettingsZone([\n    'zone' => [\n        'name' => 'Australia and New Zealand',\n        'country_list' => ['country_4f3e2d1c0b0a99887766554433221100'],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.zones.zones_dto.ZonesDto.SettingsZone;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsZone> response = client.zones().createSettingsZone(\n        Map.of(\n                \"zone\", Map.of(\n                        \"name\", \"Australia and New Zealand\",\n                        \"country_list\", List.of(\"country_4f3e2d1c0b0a99887766554433221100\"))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Zones.CreateSettingsZoneAsync(new Dictionary<string, object?>\n{\n    [\"zone\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Australia and New Zealand\",\n        [\"country_list\"] = new List<object?>\n        {\n            \"country_4f3e2d1c0b0a99887766554433221100\",\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.zones.createSettingsZone({\n  'zone': {\n    'name': 'Australia and New Zealand',\n    'country_list': ['country_4f3e2d1c0b0a99887766554433221100'],\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Zones().CreateSettingsZone(context.Background(), map[string]any{\n\t\"zone\": map[string]any{\n\t\t\"name\":         \"Australia and New Zealand\",\n\t\t\"country_list\": []any{\"country_4f3e2d1c0b0a99887766554433221100\"},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "zone": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "country_list": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Country ids, one at least."
+                      }
+                    },
+                    "required": [
+                      "country_list"
+                    ]
+                  }
+                },
+                "required": [
+                  "zone"
+                ]
+              },
+              "example": {
+                "zone": {
+                  "name": "Australia and New Zealand",
+                  "country_list": [
+                    "country_4f3e2d1c0b0a99887766554433221100"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/zones/{zone_id}": {
+      "get": {
+        "tags": [
+          "Zones"
+        ],
+        "summary": "Retrieve a zone",
+        "operationId": "zones_get_settings_zone",
+        "description": "Returns the zone under `zone`, with its `name`, `display_name`, `description` and `status`.",
+        "parameters": [
+          {
+            "name": "zone_id",
+            "in": "path",
+            "required": true,
+            "description": "The zone's `id`, such as `zn_` followed by 32 hex digits.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The zone, under `zone`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZoneResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No zone has that `id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/zones/zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.zones.get_settings_zone(\"zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.zones.getSettingsZone('zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->zones->getSettingsZone('zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.zones.zones_dto.ZonesDto.SettingsZone;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsZone> response = client.zones().getSettingsZone(\"zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Zones.GetSettingsZoneAsync(\"zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.zones.getSettingsZone(\n  'zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Zones().GetSettingsZone(context.Background(), \"zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Zones"
+        ],
+        "summary": "Delete a zone",
+        "operationId": "zones_delete_settings_zone",
+        "description": "Deletes the zone with that `id`; a later read of it returns `404`.",
+        "parameters": [
+          {
+            "name": "zone_id",
+            "in": "path",
+            "required": true,
+            "description": "The zone's `id`, such as `zn_` followed by 32 hex digits.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The zone is deleted. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/zones/zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.zones.delete_settings_zone(\"zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.zones.deleteSettingsZone('zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->zones->deleteSettingsZone('zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.zones().deleteSettingsZone(\"zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Zones.DeleteSettingsZoneAsync(\"zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.zones.deleteSettingsZone(\n  'zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Zones().DeleteSettingsZone(context.Background(), \"zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Zones"
+        ],
+        "summary": "Update a zone",
+        "operationId": "zones_update_settings_zone",
+        "description": "Send the changes under `zone`, such as a new `display_name` or `description`.",
+        "parameters": [
+          {
+            "name": "zone_id",
+            "in": "path",
+            "required": true,
+            "description": "The zone's `id`, such as `zn_` followed by 32 hex digits.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The zone, under `zone`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZoneResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/zones/zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"zone\": {\n      \"display_name\": \"ANZ\",\n      \"description\": \"Australia and New Zealand\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.zones.update_settings_zone(\n    \"zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9\",\n    {\"zone\": {\"display_name\": \"ANZ\", \"description\": \"Australia and New Zealand\"}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.zones.updateSettingsZone('zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9', {\n    zone: {display_name: 'ANZ', description: 'Australia and New Zealand'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->zones->updateSettingsZone('zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9', [\n    'zone' => ['display_name' => 'ANZ', 'description' => 'Australia and New Zealand'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.zones.zones_dto.ZonesDto.SettingsZone;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsZone> response = client.zones().updateSettingsZone(\n        \"zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9\",\n        Map.of(\"zone\", Map.of(\"display_name\", \"ANZ\", \"description\", \"Australia and New Zealand\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Zones.UpdateSettingsZoneAsync(\n    \"zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9\",\n    new Dictionary<string, object?>\n    {\n        [\"zone\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"ANZ\",\n            [\"description\"] = \"Australia and New Zealand\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.zones.updateSettingsZone(\n  'zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9',\n  {\n    'zone': {\n      'display_name': 'ANZ',\n      'description': 'Australia and New Zealand',\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Zones().UpdateSettingsZone(context.Background(), \"zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9\", map[string]any{\n\t\"zone\": map[string]any{\n\t\t\"display_name\": \"ANZ\",\n\t\t\"description\":  \"Australia and New Zealand\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "zone": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "country_list": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Country ids."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "zone"
+                ]
+              },
+              "example": {
+                "zone": {
+                  "display_name": "ANZ",
+                  "description": "Australia and New Zealand"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -45196,6 +45670,100 @@
         "properties": {
           "uom": {
             "$ref": "#/components/schemas/Uom"
+          }
+        }
+      },
+      "ZoneList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zone"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/ZonePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "Zone": {
+        "type": "object",
+        "properties": {
+          "created_by": {},
+          "created_on": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "The zone's prefixed `id`, such as `zn_` followed by 32 hex digits."
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "ZonePagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size the API applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "next": {
+                "type": "string"
+              },
+              "prev": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "ZoneResponse": {
+        "type": "object",
+        "properties": {
+          "zone": {
+            "$ref": "#/components/schemas/Zone"
           }
         }
       },

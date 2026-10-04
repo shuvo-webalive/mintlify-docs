@@ -1,0 +1,390 @@
+{
+  "family": "zones",
+  "tag": "Zones",
+  "slug": "zones",
+  "icon": "globe",
+  "base": "/settings/zones",
+  "overview_description": "List, read, create, update and delete zones, the named groups of countries that shipping rules apply to.",
+  "intro": "A zone is a named group of countries. Shipping rules name zones in their configuration. These endpoints list, read, create, update and delete zones. This area has 5 endpoints, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**A zone needs at least one country.** `country_list` takes country `id` values, the `country_` ids that `GET /settings/countries` returns.",
+    "**Writes are wrapped in `zone`, and one zone comes back under `zone`.** A new zone's `display_name` is set from its `name`.",
+    "**Zone ids are prefixed with `zn_`.** A shipping rule configuration names a zone by its dashed uuid instead, built from the 32 hex digits after `zn_`.",
+    "**The listing pages by cursor.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor` until `has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_zones",
+      "method": "GET",
+      "path": "/settings/zones",
+      "slug": "list-zones",
+      "title": "List zones",
+      "summary": "Returns a page of zones.",
+      "description": "Returns zones under `data`, each with its `name`, `display_name`, `description` and `status`. Set the page size with `limit` and fetch the next page with `cursor`. Other fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` to sort descending, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of zones, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/ZoneList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_zone",
+      "method": "POST",
+      "path": "/settings/zones",
+      "slug": "create-a-zone",
+      "title": "Create a zone",
+      "summary": "Creates a zone from a name and a list of countries, and returns it.",
+      "description": "Send the zone under `zone` with its `name` and a `country_list` of one or more country ids.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "zone": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "country_list": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Country ids, one at least."
+                }
+              },
+              "required": [
+                "country_list"
+              ]
+            }
+          },
+          "required": [
+            "zone"
+          ]
+        },
+        "example": {
+          "zone": {
+            "name": "Australia and New Zealand",
+            "country_list": [
+              "country_4f3e2d1c0b0a99887766554433221100"
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new zone, under `zone`.",
+          "schema": {
+            "$ref": "#/components/schemas/ZoneResponse"
+          }
+        }
+      },
+      "example_call": {
+        "body": {
+          "zone": {
+            "name": "Australia and New Zealand",
+            "country_list": [
+              "country_4f3e2d1c0b0a99887766554433221100"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_zone",
+      "method": "GET",
+      "path": "/settings/zones/{zone_id}",
+      "slug": "retrieve-a-zone",
+      "title": "Retrieve a zone",
+      "summary": "Returns one zone by its `id`.",
+      "description": "Returns the zone under `zone`, with its `name`, `display_name`, `description` and `status`.",
+      "parameters": [
+        {
+          "name": "zone_id",
+          "in": "path",
+          "required": true,
+          "description": "The zone's `id`, such as `zn_` followed by 32 hex digits.",
+          "schema": {
+            "type": "string",
+            "example": "zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The zone, under `zone`.",
+          "schema": {
+            "$ref": "#/components/schemas/ZoneResponse"
+          }
+        },
+        "404": {
+          "description": "No zone has that `id`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "zone_id": "zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_zone",
+      "method": "DELETE",
+      "path": "/settings/zones/{zone_id}",
+      "slug": "delete-a-zone",
+      "title": "Delete a zone",
+      "summary": "Deletes a zone. A successful call returns `204` with no body.",
+      "description": "Deletes the zone with that `id`; a later read of it returns `404`.",
+      "parameters": [
+        {
+          "name": "zone_id",
+          "in": "path",
+          "required": true,
+          "description": "The zone's `id`, such as `zn_` followed by 32 hex digits.",
+          "schema": {
+            "type": "string",
+            "example": "zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The zone is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "zone_id": "zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9"
+        }
+      }
+    },
+    {
+      "key": "update_settings_zone",
+      "method": "PATCH",
+      "path": "/settings/zones/{zone_id}",
+      "slug": "update-a-zone",
+      "title": "Update a zone",
+      "summary": "Changes a zone's details and returns the zone.",
+      "description": "Send the changes under `zone`, such as a new `display_name` or `description`.",
+      "parameters": [
+        {
+          "name": "zone_id",
+          "in": "path",
+          "required": true,
+          "description": "The zone's `id`, such as `zn_` followed by 32 hex digits.",
+          "schema": {
+            "type": "string",
+            "example": "zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "zone": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "country_list": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Country ids."
+                }
+              }
+            }
+          },
+          "required": [
+            "zone"
+          ]
+        },
+        "example": {
+          "zone": {
+            "display_name": "ANZ",
+            "description": "Australia and New Zealand"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The zone, under `zone`.",
+          "schema": {
+            "$ref": "#/components/schemas/ZoneResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "zone_id": "zn_0a1b2c3d4e5f60718293a4b5c6d7e8f9"
+        },
+        "body": {
+          "zone": {
+            "display_name": "ANZ",
+            "description": "Australia and New Zealand"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "ZoneList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Zone"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ZonePagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "Zone": {
+      "type": "object",
+      "properties": {
+        "created_by": {},
+        "created_on": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The zone's prefixed `id`, such as `zn_` followed by 32 hex digits."
+        },
+        "last_updated_by": {},
+        "last_updated_on": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "ZonePagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size the API applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "type": "object",
+          "properties": {
+            "next": {
+              "type": "string"
+            },
+            "prev": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "ZoneResponse": {
+      "type": "object",
+      "properties": {
+        "zone": {
+          "$ref": "#/components/schemas/Zone"
+        }
+      }
+    }
+  }
+}
