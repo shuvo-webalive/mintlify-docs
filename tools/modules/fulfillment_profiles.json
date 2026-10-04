@@ -1,0 +1,416 @@
+{
+  "family": "fulfillment_profiles",
+  "tag": "Fulfillment profiles",
+  "slug": "fulfillment-profiles",
+  "icon": "clipboard-list",
+  "base": "/settings/fulfillment_profiles",
+  "overview_description": "List, read, create, update and delete fulfillment profiles, each a named set of fulfillment statuses.",
+  "intro": "A fulfillment profile is a named set of fulfillment statuses. These endpoints list, read, create, update and delete profiles. This area has 5 endpoints, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**A profile needs at least one status.** `statuses` lists each status with a `name` and a `status_index`, starting at `0`.",
+    "**Writes are wrapped in `fulfillment_profile`, and one profile comes back under `fulfillment_profile`.**",
+    "**Each profile carries a `version` number.** It is an integer.",
+    "**The listing pages by cursor.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor` until `has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_fulfillment_profiles",
+      "method": "GET",
+      "path": "/settings/fulfillment_profiles",
+      "slug": "list-fulfillment-profiles",
+      "title": "List fulfillment profiles",
+      "summary": "Returns a page of fulfillment profiles.",
+      "description": "Returns profiles under `data`, each with its `name`, `display_name`, `description`, `status` and `version`. Set the page size with `limit` and fetch the next page with `cursor`. Other fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` to sort descending, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of fulfillment profiles, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/FulfillmentProfileList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_fulfillment_profile",
+      "method": "POST",
+      "path": "/settings/fulfillment_profiles",
+      "slug": "create-a-fulfillment-profile",
+      "title": "Create a fulfillment profile",
+      "summary": "Creates a fulfillment profile with its statuses and returns it.",
+      "description": "Send the profile under `fulfillment_profile` with its `name` and a `statuses` list of one or more statuses.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "fulfillment_profile": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "statuses": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "status_index": {
+                        "type": "integer",
+                        "description": "The status's position, from `0`."
+                      }
+                    }
+                  },
+                  "description": "The profile's statuses. One at least on a create."
+                }
+              },
+              "required": [
+                "statuses"
+              ]
+            }
+          },
+          "required": [
+            "fulfillment_profile"
+          ]
+        },
+        "example": {
+          "fulfillment_profile": {
+            "name": "Standard fulfillment",
+            "statuses": [
+              {
+                "name": "Open",
+                "status_index": 0
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new fulfillment profile, under `fulfillment_profile`.",
+          "schema": {
+            "$ref": "#/components/schemas/FulfillmentProfileResponse"
+          }
+        }
+      },
+      "example_call": {
+        "body": {
+          "fulfillment_profile": {
+            "name": "Standard fulfillment",
+            "statuses": [
+              {
+                "name": "Open",
+                "status_index": 0
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_fulfillment_profile",
+      "method": "GET",
+      "path": "/settings/fulfillment_profiles/{fulfillment_profile_id}",
+      "slug": "retrieve-a-fulfillment-profile",
+      "title": "Retrieve a fulfillment profile",
+      "summary": "Returns one fulfillment profile by its `id`.",
+      "description": "Returns the profile under `fulfillment_profile`, with its `name`, `display_name`, `description`, `status` and `version`.",
+      "parameters": [
+        {
+          "name": "fulfillment_profile_id",
+          "in": "path",
+          "required": true,
+          "description": "The fulfillment profile's `id`, from the listing.",
+          "schema": {
+            "type": "string",
+            "example": "fp_5d6e7f8091a2b3c4d5e6f708192a3b4c"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The fulfillment profile, under `fulfillment_profile`.",
+          "schema": {
+            "$ref": "#/components/schemas/FulfillmentProfileResponse"
+          }
+        },
+        "404": {
+          "description": "No fulfillment profile has that `id`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "fulfillment_profile_id": "fp_5d6e7f8091a2b3c4d5e6f708192a3b4c"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_fulfillment_profile",
+      "method": "DELETE",
+      "path": "/settings/fulfillment_profiles/{fulfillment_profile_id}",
+      "slug": "delete-a-fulfillment-profile",
+      "title": "Delete a fulfillment profile",
+      "summary": "Deletes a fulfillment profile. A successful call returns `204` with no body.",
+      "description": "Deletes the profile with that `id`; a later read of it returns `404`.",
+      "parameters": [
+        {
+          "name": "fulfillment_profile_id",
+          "in": "path",
+          "required": true,
+          "description": "The fulfillment profile's `id`, from the listing.",
+          "schema": {
+            "type": "string",
+            "example": "fp_5d6e7f8091a2b3c4d5e6f708192a3b4c"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The fulfillment profile is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "fulfillment_profile_id": "fp_5d6e7f8091a2b3c4d5e6f708192a3b4c"
+        }
+      }
+    },
+    {
+      "key": "update_settings_fulfillment_profile",
+      "method": "PATCH",
+      "path": "/settings/fulfillment_profiles/{fulfillment_profile_id}",
+      "slug": "update-a-fulfillment-profile",
+      "title": "Update a fulfillment profile",
+      "summary": "Changes a fulfillment profile and returns it.",
+      "description": "Send the changes under `fulfillment_profile`, such as a new `display_name` or `description`.",
+      "parameters": [
+        {
+          "name": "fulfillment_profile_id",
+          "in": "path",
+          "required": true,
+          "description": "The fulfillment profile's `id`, from the listing.",
+          "schema": {
+            "type": "string",
+            "example": "fp_5d6e7f8091a2b3c4d5e6f708192a3b4c"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "fulfillment_profile": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "statuses": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "status_index": {
+                        "type": "integer",
+                        "description": "The status's position, from `0`."
+                      }
+                    }
+                  },
+                  "description": "The profile's statuses. One at least on a create."
+                }
+              }
+            }
+          },
+          "required": [
+            "fulfillment_profile"
+          ]
+        },
+        "example": {
+          "fulfillment_profile": {
+            "display_name": "Standard fulfillment",
+            "description": "Open, packed and sent"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated fulfillment profile, under `fulfillment_profile`.",
+          "schema": {
+            "$ref": "#/components/schemas/FulfillmentProfileResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "fulfillment_profile_id": "fp_5d6e7f8091a2b3c4d5e6f708192a3b4c"
+        },
+        "body": {
+          "fulfillment_profile": {
+            "display_name": "Standard fulfillment",
+            "description": "Open, packed and sent"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "FulfillmentProfileList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/FulfillmentProfile"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/FulfillmentProfilePagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "FulfillmentProfile": {
+      "type": "object",
+      "properties": {
+        "created_by": {},
+        "created_on": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "FulfillmentProfilePagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size the API applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "type": "object",
+          "properties": {
+            "next": {
+              "type": "string"
+            },
+            "prev": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "FulfillmentProfileResponse": {
+      "type": "object",
+      "properties": {
+        "fulfillment_profile": {
+          "$ref": "#/components/schemas/FulfillmentProfile"
+        }
+      }
+    }
+  }
+}
