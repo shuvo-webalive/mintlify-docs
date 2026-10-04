@@ -5,13 +5,13 @@
   "icon": "credit-card",
   "base": "/purchase_payments",
   "overview_description": "Record, update, delete and read payments to suppliers, with their notes, files and the purchase credit notes they raise.",
-  "intro": "A purchase payment records money paid to a supplier against purchase invoices. These endpoints record, update, delete and read purchase payments, list the purchase credit notes a payment raised, and manage payment notes and their files. There are 15 endpoints, and all seven SDKs call every one.",
-  "warning": "**Deleting a purchase payment, a note or a note file cannot be undone.**",
+  "intro": "A purchase payment records money paid to a supplier against purchase invoices. These endpoints record, update, delete and read purchase payments, list the purchase credit notes a payment raised, and manage payment notes and their files. This area has 15 endpoints, each available in all seven SDKs.",
+  "warning": "**Deleting a purchase payment or a note cannot be undone.** Deleting a note file currently returns `404`.",
   "notes": [
-    "**Every write body is wrapped in `purchase_payment`.** Amounts are decimal strings such as `\"1.00\"`.",
+    "**Every JSON write body is wrapped in `purchase_payment`, and amounts are decimal strings such as `\"1.00\"`.** The note create and update are multipart forms.",
     "**A payment needs `payment_method_applications`.** Each entry names a payment processor by `id` and an amount.",
-    "**Paying more than the invoices take raises a purchase credit note.** List it with the purchase credit notes call on the payment.",
-    "**The invoice scoped create pays the invoice in the path.** Send only `payment_method_applications` to it.",
+    "**Paying more than the invoices take raises a purchase credit note.** It appears in the purchase credit notes list with this payment under `purchase_payment`.",
+    "**The invoice-scoped create pays the invoice in the path.** Send only `payment_method_applications` to it.",
     "**Listings page by cursor.** Records are under `data`; pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`."
   ],
   "endpoints": [
@@ -521,7 +521,7 @@
           }
         },
         "example": {
-          "note": "<p>Goods received in full.</p>",
+          "note": "<p>Remittance advice sent to supplier.</p>",
           "file": "delivery-note.pdf"
         }
       },
@@ -538,7 +538,7 @@
         "path": {
           "purchase_payment_id": "PP-0001"
         },
-        "note": "<p>Goods received in full.</p>",
+        "note": "<p>Remittance advice sent to supplier.</p>",
         "file": "delivery-note.pdf"
       }
     },
@@ -890,7 +890,7 @@
           }
         },
         "example": {
-          "note": "<p>Goods received in full.</p>",
+          "note": "<p>Remittance advice sent to supplier.</p>",
           "file": "delivery-note.pdf"
         }
       },
@@ -908,7 +908,7 @@
           "purchase_payment_id": "PP-0001",
           "pp_note_id": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
         },
-        "note": "<p>Goods received in full.</p>",
+        "note": "<p>Remittance advice sent to supplier.</p>",
         "file": "delivery-note.pdf"
       }
     },
@@ -919,7 +919,8 @@
       "slug": "delete-a-purchase-payment-note-file",
       "title": "Delete a purchase payment note file",
       "summary": "Removes one attachment from a purchase payment note. Nothing comes back.",
-      "description": "Deletes one file from the note, addressed by its `uuid`. The call returns `204` with no body.",
+      "description": "Deletes one file from the note, addressed by its `uuid`. A successful call returns `204` with no body.",
+      "warning": "**Deleting a note file currently fails.** This call currently returns `404` \"attachment not found\", even for a file the note's file list shows.",
       "parameters": [
         {
           "name": "purchase_payment_id",
@@ -959,7 +960,7 @@
           "description": "The file is removed from the note."
         },
         "404": {
-          "description": "Attachment not found. This call can return `404` even for a file the note's file list shows."
+          "description": "Attachment not found. This call currently returns `404` for every attachment, including ones the note's file list shows."
         }
       },
       "example_call": {
