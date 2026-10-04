@@ -1,0 +1,34 @@
+{
+  "sdk": "php",
+  "module": "external_databases",
+  "endpoints": {
+    "get_external_databases": {
+      "function": "getExternalDatabases",
+      "code": "$response = $client->externalDatabases->getExternalDatabases();\nprint_r($response->data);\n"
+    },
+    "create_external_database": {
+      "function": "createExternalDatabase",
+      "code": "$response = $client->externalDatabases->createExternalDatabase([\n    'external_database' => [\n        'name' => 'acmedb',\n        'tables' => [\n            [\n                'table_name' => 'contacts',\n                'fields' => ['company'],\n                'records' => [['record' => [['field' => 'company', 'value' => 'Acme Pty Ltd']]]],\n            ],\n        ],\n    ],\n]);\nprint_r($response->data);\n"
+    },
+    "get_external_database": {
+      "function": "getExternalDatabase",
+      "code": "$response = $client->externalDatabases->getExternalDatabase('acmedb');\nprint_r($response->data);\n"
+    },
+    "create_external_database_insert_record": {
+      "function": "createExternalDatabaseInsertRecord",
+      "code": "$response = $client->externalDatabases->createExternalDatabaseInsertRecord('acmedb', [\n    'table_name' => 'contacts',\n    'records' => [['record' => [['field' => 'company', 'value' => 'Example Holdings']]]],\n]);\nprint_r($response->data);\n"
+    },
+    "create_external_database_search": {
+      "function": "createExternalDatabaseSearch",
+      "code": "$response = $client->externalDatabases->createExternalDatabaseSearch('acmedb', [\n    'table_name' => 'contacts',\n]);\nprint_r($response->data);\n"
+    },
+    "update_external_database_update_records": {
+      "function": "updateExternalDatabaseUpdateRecords",
+      "code": "$response = $client->externalDatabases->updateExternalDatabaseUpdateRecords('acmedb', [\n    'table_name' => 'contacts',\n    'update_fields' => [['field_name' => 'company', 'field_value' => 'Acme Group']],\n    'where_condition' => [\n        'field_name' => 'company',\n        'operator' => '=',\n        'field_value' => 'Acme Pty Ltd',\n    ],\n]);\nprint_r($response->data);\n"
+    },
+    "get_external_database_table": {
+      "function": "getExternalDatabaseTable",
+      "code": "$response = $client->externalDatabases->getExternalDatabaseTable('acmedb', 'contacts');\nprint_r($response->data);\n"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "sdk": "js",
+  "module": "external_databases",
+  "endpoints": {
+    "get_external_databases": {
+      "function": "externalDatabases.getExternalDatabases",
+      "code": "const response = await client.externalDatabases.getExternalDatabases();\nconsole.log(response.data);\n"
+    },
+    "create_external_database": {
+      "function": "externalDatabases.createExternalDatabase",
+      "code": "const response = await client.externalDatabases.createExternalDatabase({\n    external_database: {\n        name: 'acmedb',\n        tables: [\n            {\n                table_name: 'contacts',\n                fields: ['company'],\n                records: [{record: [{field: 'company', value: 'Acme Pty Ltd'}]}],\n            },\n        ],\n    },\n});\nconsole.log(response.data);\n"
+    },
+    "get_external_database": {
+      "function": "externalDatabases.getExternalDatabase",
+      "code": "const response = await client.externalDatabases.getExternalDatabase('acmedb');\nconsole.log(response.data);\n"
+    },
+    "create_external_database_insert_record": {
+      "function": "externalDatabases.createExternalDatabaseInsertRecord",
+      "code": "const response = await client.externalDatabases.createExternalDatabaseInsertRecord('acmedb', {\n    table_name: 'contacts',\n    records: [{record: [{field: 'company', value: 'Example Holdings'}]}],\n});\nconsole.log(response.data);\n"
+    },
+    "create_external_database_search": {
+      "function": "externalDatabases.createExternalDatabaseSearch",
+      "code": "const response = await client.externalDatabases.createExternalDatabaseSearch('acmedb', {table_name: 'contacts'});\nconsole.log(response.data);\n"
+    },
+    "update_external_database_update_records": {
+      "function": "externalDatabases.updateExternalDatabaseUpdateRecords",
+      "code": "const response = await client.externalDatabases.updateExternalDatabaseUpdateRecords('acmedb', {\n    table_name: 'contacts',\n    update_fields: [{field_name: 'company', field_value: 'Acme Group'}],\n    where_condition: {field_name: 'company', operator: '=', field_value: 'Acme Pty Ltd'},\n});\nconsole.log(response.data);\n"
+    },
+    "get_external_database_table": {
+      "function": "externalDatabases.getExternalDatabaseTable",
+      "code": "const response = await client.externalDatabases.getExternalDatabaseTable('acmedb', 'contacts');\nconsole.log(response.data);\n"
+    }
+  }
+}
