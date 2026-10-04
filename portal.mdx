@@ -1,0 +1,37 @@
+---
+title: "Portal"
+sidebarTitle: "Overview"
+description: "Log portal users in, change, set and reset their passwords, and activate or validate portal accounts."
+---
+
+The portal endpoints act for the people who sign in to your customer portal. You can log a portal user in, change or set their password, request a reset link, reset a password with a code, and activate or validate an account with a code. This area has 7 endpoints, and all seven SDKs call every one.
+
+<Warning>
+  **Setting a portal password by email does not ask for the current password, and the old password cannot be put back.**
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Activate a portal account](/api-reference/portal/activate-a-portal-account) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/portal/activate` | Activates a portal account with an activation code. |
+| [Change a portal password](/api-reference/portal/change-a-portal-password) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/portal/change_password` | Changes a portal user's password when you send the current one, and returns a message. |
+| [Log in a portal user](/api-reference/portal/log-in-a-portal-user) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/portal/login` | Checks a portal user's email and password and returns the user with the portals they can open. |
+| [Reset a portal password with a code](/api-reference/portal/reset-a-portal-password-with-a-code) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/portal/reset` | Sets a new portal password using a reset code. |
+| [Request a portal password reset link](/api-reference/portal/request-a-portal-password-reset-link) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/portal/reset_link` | Asks for a password reset link for a portal user's email and returns a message. |
+| [Validate a portal account with a code](/api-reference/portal/validate-a-portal-account-with-a-code) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/portal/validate` | Validates a portal account with a code. |
+| [Set a portal password by email](/api-reference/portal/set-a-portal-password-by-email) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/portal/change` | Sets a portal user's password from their email alone, without the current password. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Every request body sits under a `portal` key.** A login, for example, sends `{"portal": {"email": "jane@example.com", "password": "..."}}`.
+- **A portal user is an account with portal access.** Create the account with `grant_portal_access` set to `true` and a `grant_portal_password`, then log in with its `email_address` and that password.
+- **A wrong password returns `400`.** After a password change, a login with the old password is refused.
+- **A reset link request for an unknown email returns `202`.** The call does not fail when no portal user has that email.
+- **Setting a password by email returns `202`.** `POST /portal/change` takes `email` and `password` only.

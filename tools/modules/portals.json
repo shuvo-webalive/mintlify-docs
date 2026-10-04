@@ -1,0 +1,480 @@
+{
+  "family": "portals",
+  "tag": "Portal",
+  "slug": "portal",
+  "icon": "door-open",
+  "base": "/portal",
+  "overview_description": "Log portal users in, change, set and reset their passwords, and activate or validate portal accounts.",
+  "intro": "The portal endpoints act for the people who sign in to your customer portal. You can log a portal user in, change or set their password, request a reset link, reset a password with a code, and activate or validate an account with a code. This area has 7 endpoints, and all seven SDKs call every one.",
+  "warning": "**Setting a portal password by email does not ask for the current password, and the old password cannot be put back.**",
+  "notes": [
+    "**Every request body sits under a `portal` key.** A login, for example, sends `{\"portal\": {\"email\": \"jane@example.com\", \"password\": \"...\"}}`.",
+    "**A portal user is an account with portal access.** Create the account with `grant_portal_access` set to `true` and a `grant_portal_password`, then log in with its `email_address` and that password.",
+    "**A wrong password returns `400`.** After a password change, a login with the old password is refused.",
+    "**A reset link request for an unknown email returns `202`.** The call does not fail when no portal user has that email.",
+    "**Setting a password by email returns `202`.** `POST /portal/change` takes `email` and `password` only."
+  ],
+  "endpoints": [
+    {
+      "key": "activate_portal",
+      "method": "POST",
+      "path": "/portal/activate",
+      "slug": "activate-a-portal-account",
+      "title": "Activate a portal account",
+      "summary": "Activates a portal account with an activation code.",
+      "description": "Send the activation `code` under `portal`. A successful call returns `200`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "portal": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "description": "The code to check."
+                }
+              }
+            }
+          },
+          "required": [
+            "portal"
+          ]
+        },
+        "example": {
+          "portal": {
+            "code": "abc123def456"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The activation is accepted."
+        }
+      },
+      "example_call": {
+        "body": {
+          "portal": {
+            "code": "abc123def456"
+          }
+        }
+      }
+    },
+    {
+      "key": "create_portal_change_password",
+      "method": "POST",
+      "path": "/portal/change_password",
+      "slug": "change-a-portal-password",
+      "title": "Change a portal password",
+      "summary": "Changes a portal user's password when you send the current one, and returns a message.",
+      "description": "Send the portal user's `email`, their `current_password` and the `new_password` under `portal`. After the change, a login with the old password returns `400`. The response holds a `message` under `portal`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "portal": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "The portal user's email address."
+                },
+                "current_password": {
+                  "type": "string"
+                },
+                "new_password": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "portal"
+          ]
+        },
+        "example": {
+          "portal": {
+            "email": "jane@example.com",
+            "current_password": "OldPassw0rd!",
+            "new_password": "NewPassw0rd!"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The password is changed; a `message` under `portal`.",
+          "schema": {
+            "$ref": "#/components/schemas/PortalChangePasswordResponse"
+          }
+        }
+      },
+      "example_call": {
+        "body": {
+          "portal": {
+            "email": "jane@example.com",
+            "current_password": "OldPassw0rd!",
+            "new_password": "NewPassw0rd!"
+          }
+        }
+      }
+    },
+    {
+      "key": "create_portal_login",
+      "method": "POST",
+      "path": "/portal/login",
+      "slug": "log-in-a-portal-user",
+      "title": "Log in a portal user",
+      "summary": "Checks a portal user's email and password and returns the user with the portals they can open.",
+      "description": "Send the portal user's `email` and `password` under `portal`. The response holds the `user` under `portal`, with their name, email address and a `portals` list naming each account they can open. A password that is not the user's current one returns `400`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "portal": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "The portal user's email address."
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "portal"
+          ]
+        },
+        "example": {
+          "portal": {
+            "email": "jane@example.com",
+            "password": "Passw0rd!"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The portal user, under `portal.user`.",
+          "schema": {
+            "$ref": "#/components/schemas/PortalLoginResponse"
+          }
+        },
+        "400": {
+          "description": "The password is not the portal user's current password."
+        }
+      },
+      "example_call": {
+        "body": {
+          "portal": {
+            "email": "jane@example.com",
+            "password": "Passw0rd!"
+          }
+        }
+      }
+    },
+    {
+      "key": "create_portal_reset",
+      "method": "POST",
+      "path": "/portal/reset",
+      "slug": "reset-a-portal-password-with-a-code",
+      "title": "Reset a portal password with a code",
+      "summary": "Sets a new portal password using a reset code.",
+      "description": "Send the reset `code`, the portal user's `email` and the new `password` under `portal`. A successful call returns `200`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "portal": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "description": "The code to check."
+                },
+                "email": {
+                  "type": "string",
+                  "description": "The portal user's email address."
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "portal"
+          ]
+        },
+        "example": {
+          "portal": {
+            "code": "abc123def456",
+            "email": "jane@example.com",
+            "password": "NewPassw0rd!"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The reset is accepted."
+        }
+      },
+      "example_call": {
+        "body": {
+          "portal": {
+            "code": "abc123def456",
+            "email": "jane@example.com",
+            "password": "NewPassw0rd!"
+          }
+        }
+      }
+    },
+    {
+      "key": "create_portal_reset_link",
+      "method": "POST",
+      "path": "/portal/reset_link",
+      "slug": "request-a-portal-password-reset-link",
+      "title": "Request a portal password reset link",
+      "summary": "Asks for a password reset link for a portal user's email and returns a message.",
+      "description": "Send the portal user's `email` under `portal`. The response holds a `message` and an `object` key. An email that belongs to no portal user returns `202`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "portal": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "The portal user's email address."
+                }
+              }
+            }
+          },
+          "required": [
+            "portal"
+          ]
+        },
+        "example": {
+          "portal": {
+            "email": "jane@example.com"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The reset link request is accepted; a `message`.",
+          "schema": {
+            "$ref": "#/components/schemas/PortalResetLink"
+          }
+        },
+        "202": {
+          "description": "No portal user has that email."
+        }
+      },
+      "example_call": {
+        "body": {
+          "portal": {
+            "email": "jane@example.com"
+          }
+        }
+      }
+    },
+    {
+      "key": "create_portal_validate",
+      "method": "POST",
+      "path": "/portal/validate",
+      "slug": "validate-a-portal-account-with-a-code",
+      "title": "Validate a portal account with a code",
+      "summary": "Validates a portal account with a code.",
+      "description": "Send the `code` under `portal`. A successful call returns `200`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "portal": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "description": "The code to check."
+                }
+              }
+            }
+          },
+          "required": [
+            "portal"
+          ]
+        },
+        "example": {
+          "portal": {
+            "code": "abc123def456"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The validation is accepted."
+        }
+      },
+      "example_call": {
+        "body": {
+          "portal": {
+            "code": "abc123def456"
+          }
+        }
+      }
+    },
+    {
+      "key": "set_portal_password",
+      "method": "POST",
+      "path": "/portal/change",
+      "slug": "set-a-portal-password-by-email",
+      "title": "Set a portal password by email",
+      "summary": "Sets a portal user's password from their email alone, without the current password.",
+      "description": "Send the portal user's `email` and the new `password` under `portal`. No current password is asked for, and the old password cannot be put back afterwards. A successful call returns `202`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "portal": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "The portal user's email address."
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "portal"
+          ]
+        },
+        "example": {
+          "portal": {
+            "email": "jane@example.com",
+            "password": "NewPassw0rd!"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "202": {
+          "description": "The new password is accepted."
+        }
+      },
+      "example_call": {
+        "body": {
+          "portal": {
+            "email": "jane@example.com",
+            "password": "NewPassw0rd!"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "PortalLoginResponse": {
+      "type": "object",
+      "properties": {
+        "portal": {
+          "$ref": "#/components/schemas/PortalLogin"
+        }
+      }
+    },
+    "PortalLogin": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/components/schemas/PortalLoginUser"
+        }
+      }
+    },
+    "PortalLoginUser": {
+      "type": "object",
+      "properties": {
+        "email_address": {
+          "type": "string"
+        },
+        "grant_access_portal": {
+          "type": "boolean"
+        },
+        "image_uri": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "portals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PortalLoginUserPortal"
+          },
+          "description": "Each account the user can open in the portal."
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "PortalLoginUserPortal": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "PortalChangePasswordResponse": {
+      "type": "object",
+      "properties": {
+        "portal": {
+          "$ref": "#/components/schemas/PortalChangePassword"
+        }
+      }
+    },
+    "PortalChangePassword": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "PortalResetLink": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
