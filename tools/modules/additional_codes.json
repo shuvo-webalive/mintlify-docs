@@ -5,13 +5,13 @@
   "icon": "tags",
   "base": "/settings/additional_codes",
   "overview_description": "List, create, read, update and delete additional codes, the data sets used on purchase order lines.",
-  "intro": "Additional codes are the data sets used on purchase order lines. You can list, create, read, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.",
+  "intro": "Additional codes are the extra reference codes you can set on purchase order lines. You can list, create, read, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.",
   "warning": null,
   "notes": [
     "**Requests and responses wrap the record in `additional_code`.** A create sends `{\"additional_code\": {...}}` and a read returns the record under the same key.",
     "**`name` is the one required field on a create.**",
     "**An additional code `id` starts with `ac_`.** Use that `id` in the path of a read, an update or a delete.",
-    "**Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true.",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.",
     "**A delete returns `204` with no body.** Reading the additional code afterwards returns `404`."
   ],
   "endpoints": [
@@ -132,7 +132,7 @@
       "slug": "retrieve-an-additional-code",
       "title": "Retrieve an additional code",
       "summary": "Returns one additional code by its `id`, under `additional_code`.",
-      "description": "Reads the additional code with this `ac_` `id`. The `id` is the one a listing or a create returns.",
+      "description": "Reads the additional code with this `ac_` `id`.",
       "parameters": [
         {
           "name": "additional_code_id",
@@ -204,7 +204,7 @@
       "slug": "update-an-additional-code",
       "title": "Update an additional code",
       "summary": "Changes the fields or the status of an additional code.",
-      "description": "Send the fields to change under `additional_code`. You can change its fields or its `status`.",
+      "description": "Send the fields to change under `additional_code`. You can change its fields or its `status`. This call currently returns `500`; read the additional code again to see whether the change is stored.",
       "parameters": [
         {
           "name": "additional_code_id",
@@ -251,6 +251,9 @@
       "responses": {
         "200": {
           "description": "The additional code is updated."
+        },
+        "500": {
+          "description": "The update failed."
         }
       },
       "example_call": {
@@ -263,7 +266,8 @@
             "description": "Project reference for purchase lines"
           }
         }
-      }
+      },
+      "warning": "**This call currently returns `500`.** Read the additional code again to see whether the change is stored."
     }
   ],
   "schemas": {
