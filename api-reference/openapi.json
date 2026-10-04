@@ -176,6 +176,9 @@
     },
     {
       "name": "Workflows"
+    },
+    {
+      "name": "Workflow settings"
     }
   ],
   "paths": {
@@ -57379,6 +57382,176 @@
           }
         ]
       }
+    },
+    "/settings/workflows": {
+      "get": {
+        "tags": [
+          "Workflow settings"
+        ],
+        "summary": "List workflow settings",
+        "operationId": "settings_workflows_get_settings_workflows",
+        "description": "Returns a page of workflows under `data`, with cursor `pagination`. This listing is read only; create and change workflows under `/workflows`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of workflows.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsWorkflowList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/workflows?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.settings_workflows.get_settings_workflows({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.settingsWorkflows.getSettingsWorkflows({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->settingsWorkflows->getSettingsWorkflows(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.settings_workflows.settings_workflows_dto.SettingsWorkflowsDto.SettingsWorkflowList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsWorkflowList> response = client.settingsWorkflows().getSettingsWorkflows(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.SettingsWorkflows.GetSettingsWorkflowsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.settingsWorkflows.getSettingsWorkflows(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.SettingsWorkflows().GetSettingsWorkflows(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/settings/workflows/{workflow_id}": {
+      "get": {
+        "tags": [
+          "Workflow settings"
+        ],
+        "summary": "Retrieve a workflow setting",
+        "operationId": "settings_workflows_get_settings_workflow",
+        "description": "Returns the workflow under `workflow`. Use the `id` a listed workflow carries.",
+        "parameters": [
+          {
+            "name": "workflow_id",
+            "in": "path",
+            "required": true,
+            "description": "The workflow's `id`, as the listing shows it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The workflow, under `workflow`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsWorkflowResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/workflows/wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.settings_workflows.get_settings_workflow(\n    \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.settingsWorkflows.getSettingsWorkflow('wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->settingsWorkflows->getSettingsWorkflow('wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.settings_workflows.settings_workflows_dto.SettingsWorkflowsDto.SettingsWorkflow;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsWorkflow> response = client.settingsWorkflows().getSettingsWorkflow(\n        \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.SettingsWorkflows.GetSettingsWorkflowAsync(\"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.settingsWorkflows.getSettingsWorkflow(\n  'wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.SettingsWorkflows().GetSettingsWorkflow(context.Background(), \"wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -90622,6 +90795,136 @@
         }
       },
       "WorkflowPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "prev": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "SettingsWorkflow": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "The workflow's id."
+          },
+          "status": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "code": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "description": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "entity": {
+            "type": "string"
+          },
+          "event": {
+            "type": "string"
+          },
+          "is_pre_built": {
+            "type": "boolean"
+          },
+          "enable_stage": {
+            "type": "boolean"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "created_by": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "last_updated_by": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "href": {
+            "type": "string"
+          }
+        }
+      },
+      "SettingsWorkflowResponse": {
+        "type": "object",
+        "properties": {
+          "workflow": {
+            "$ref": "#/components/schemas/SettingsWorkflow"
+          }
+        }
+      },
+      "SettingsWorkflowList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "description": "Always `list`."
+          },
+          "url": {
+            "type": "string",
+            "description": "The path this page was read from."
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SettingsWorkflow"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/SettingsWorkflowPagination"
+          }
+        }
+      },
+      "SettingsWorkflowPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "links": {
+            "$ref": "#/components/schemas/SettingsWorkflowPaginationLinks"
+          }
+        }
+      },
+      "SettingsWorkflowPaginationLinks": {
         "type": "object",
         "properties": {
           "next": {
