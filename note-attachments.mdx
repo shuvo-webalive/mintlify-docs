@@ -1,0 +1,29 @@
+---
+title: "Note attachments"
+sidebarTitle: "Overview"
+description: "Download the file attached to any note, as base64, by the attachment's uuid."
+---
+
+Note attachments are the files added to notes on accounts, orders, invoices and other records. You can download any of them by its uuid. This area has 1 endpoint, and all seven Exsited SDKs call it.
+
+<Warning>
+  **An attachment stays readable after its note, and the record the note belongs to, are deleted.** Only the attachment's own status is checked.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Retrieve a note attachment](/api-reference/note-attachments/retrieve-a-note-attachment) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/note_attachment/{attachment_uuid}` | Retrieves the file attached to any note, as base64. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **One route serves the attachments of every note.** It does not matter which record the note belongs to.
+- **The path is singular.** Use `/note_attachment/{attachment_uuid}`.
+- **The file comes back as base64.** Decode `note_attachment.base64` to get the bytes; `name` and `size` sit beside it.

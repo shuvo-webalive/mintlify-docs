@@ -1,0 +1,87 @@
+{
+  "family": "note_attachments",
+  "tag": "Note attachments",
+  "slug": "note-attachments",
+  "icon": "paperclip",
+  "base": "/note_attachment",
+  "overview_description": "Download the file attached to any note, as base64, by the attachment's uuid.",
+  "intro": "Note attachments are the files added to notes on accounts, orders, invoices and other records. You can download any of them by its uuid. This area has 1 endpoint, and all seven Exsited SDKs call it.",
+  "warning": "**An attachment stays readable after its note, and the record the note belongs to, are deleted.** Only the attachment's own status is checked.",
+  "notes": [
+    "**One route serves the attachments of every note.** It does not matter which record the note belongs to.",
+    "**The path is singular.** Use `/note_attachment/{attachment_uuid}`.",
+    "**The file comes back as base64.** Decode `note_attachment.base64` to get the bytes; `name` and `size` sit beside it."
+  ],
+  "endpoints": [
+    {
+      "key": "get_note_attachment",
+      "method": "GET",
+      "path": "/note_attachment/{attachment_uuid}",
+      "slug": "retrieve-a-note-attachment",
+      "title": "Retrieve a note attachment",
+      "summary": "Retrieves the file attached to any note, as base64.",
+      "description": "Name the file by the `uuid` a note's `attachments` entry carries, whatever record the note belongs to. The file comes back under `note_attachment`, with its `name`, `size` and its contents in `base64`.",
+      "parameters": [
+        {
+          "name": "attachment_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The `uuid` from a note's `attachments` entry.",
+          "schema": {
+            "type": "string",
+            "example": "6b8d0f2a-4c6e-4a8b-9d1f-3a5c7e9b1d3f"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The attachment, under `note_attachment`.",
+          "schema": {
+            "$ref": "#/components/schemas/NoteAttachmentResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "attachment_uuid": "6b8d0f2a-4c6e-4a8b-9d1f-3a5c7e9b1d3f"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "NoteAttachment": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The attachment's uuid, the same value as in the path."
+        },
+        "name": {
+          "type": "string",
+          "description": "The file name."
+        },
+        "size": {
+          "type": "integer",
+          "description": "The file size."
+        },
+        "base64": {
+          "type": "string",
+          "description": "The file itself, base64 encoded."
+        }
+      }
+    },
+    "NoteAttachmentResponse": {
+      "type": "object",
+      "properties": {
+        "note_attachment": {
+          "$ref": "#/components/schemas/NoteAttachment"
+        }
+      }
+    }
+  }
+}

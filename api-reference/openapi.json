@@ -212,6 +212,9 @@
     },
     {
       "name": "Note groups"
+    },
+    {
+      "name": "Note attachments"
     }
   ],
   "paths": {
@@ -62339,6 +62342,81 @@
           }
         ]
       }
+    },
+    "/note_attachment/{attachment_uuid}": {
+      "get": {
+        "tags": [
+          "Note attachments"
+        ],
+        "summary": "Retrieve a note attachment",
+        "operationId": "note_attachments_get_note_attachment",
+        "description": "Name the file by the `uuid` a note's `attachments` entry carries, whatever record the note belongs to. The file comes back under `note_attachment`, with its `name`, `size` and its contents in `base64`.",
+        "parameters": [
+          {
+            "name": "attachment_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The `uuid` from a note's `attachments` entry.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The attachment, under `note_attachment`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteAttachmentResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/note_attachment/6b8d0f2a-4c6e-4a8b-9d1f-3a5c7e9b1d3f\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.note_attachments.get_note_attachment(\n    \"6b8d0f2a-4c6e-4a8b-9d1f-3a5c7e9b1d3f\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.noteAttachments.getNoteAttachment('6b8d0f2a-4c6e-4a8b-9d1f-3a5c7e9b1d3f');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->noteAttachments->getNoteAttachment('6b8d0f2a-4c6e-4a8b-9d1f-3a5c7e9b1d3f');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.note_attachments.note_attachments_dto.NoteAttachmentsDto.NoteAttachment;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<NoteAttachment> response = client.noteAttachments().getNoteAttachment(\n        \"6b8d0f2a-4c6e-4a8b-9d1f-3a5c7e9b1d3f\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.NoteAttachments.GetNoteAttachmentAsync(\"6b8d0f2a-4c6e-4a8b-9d1f-3a5c7e9b1d3f\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.noteAttachments.getNoteAttachment(\n  '6b8d0f2a-4c6e-4a8b-9d1f-3a5c7e9b1d3f',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.NoteAttachments().GetNoteAttachment(context.Background(), \"6b8d0f2a-4c6e-4a8b-9d1f-3a5c7e9b1d3f\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -97014,6 +97092,38 @@
               "string",
               "null"
             ]
+          }
+        }
+      },
+      "NoteAttachment": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "The attachment's uuid, the same value as in the path."
+          },
+          "name": {
+            "type": "string",
+            "description": "The file name."
+          },
+          "size": {
+            "type": "integer",
+            "description": "The file size."
+          },
+          "base64": {
+            "type": "string",
+            "description": "The file itself, base64 encoded."
+          }
+        }
+      },
+      "NoteAttachmentResponse": {
+        "type": "object",
+        "properties": {
+          "note_attachment": {
+            "$ref": "#/components/schemas/NoteAttachment"
           }
         }
       },
