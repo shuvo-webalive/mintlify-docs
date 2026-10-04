@@ -1,0 +1,37 @@
+---
+title: "Item receipts"
+sidebarTitle: "Overview"
+description: "Record items received against a purchase order's lines, then list, read, update and delete item receipts."
+---
+
+An item receipt records items received against the lines of a purchase order. These endpoints create, list, read, update and delete receipts, list a purchase order's receipts, and delete a receipt's note. This area has 7 endpoints, and all seven SDKs call every one.
+
+<Warning>
+  **A completed item receipt cannot be deleted.** The delete is refused with `400` `stock_committed`.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List item receipts](/api-reference/item-receipts/list-item-receipts) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/item_receipts` | Returns a page of item receipts. |
+| [Create an item receipt](/api-reference/item-receipts/create-an-item-receipt) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/item_receipts` | Records items received against a purchase order's lines and returns the receipt. |
+| [Update an item receipt](/api-reference/item-receipts/update-an-item-receipt) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/item_receipts/{item_receipt_id}` | Changes an item receipt's details and returns the receipt. |
+| [Retrieve an item receipt](/api-reference/item-receipts/retrieve-an-item-receipt) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/item_receipts/{item_receipt_id}` | Returns one item receipt by its `id`. |
+| [List a purchase order's item receipts](/api-reference/item-receipts/list-a-purchase-orders-item-receipts) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/purchase_orders/{purchase_order_id}…/item_receipts` | Returns the item receipts recorded against one purchase order. |
+| [Delete an item receipt](/api-reference/item-receipts/delete-an-item-receipt) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/item_receipts/{item_receipt_id}` | Deletes an item receipt. A successful call returns `204` with no body. |
+| [Delete an item receipt note](/api-reference/item-receipts/delete-an-item-receipt-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/item_receipts/{item_receipt_id}/notes/{note_id}` | Deletes a note from an item receipt. A successful call returns `204` with no body. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Writes are wrapped in `item_receipt`.** A create names the `purchase_order`, a `receipt_status` such as `STARTED`, a `receipt_date`, and `lines`, each with a `purchase_order_line` id and a `receipt_quantity`.
+- **Receipt ids start with `ir_`, and note ids with `note_`.** Pass them in the paths as they are.
+- **The update changes a receipt's details.** It takes fields such as `tracking_number`, `receipt_note` and `receipt_date`, and raises the receipt's `version`.
+- **No endpoint lists or creates a receipt's notes.** Only the note delete exists here.
+- **The listing pages by cursor.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor` until `has_more` is `false`.

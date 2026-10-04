@@ -1,0 +1,34 @@
+{
+  "sdk": "dotnet",
+  "module": "item_receipts",
+  "endpoints": {
+    "get_item_receipts": {
+      "function": "ItemReceipts.GetItemReceiptsAsync",
+      "code": "var response = await client.ItemReceipts.GetItemReceiptsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "create_item_receipt": {
+      "function": "ItemReceipts.CreateItemReceiptAsync",
+      "code": "var response = await client.ItemReceipts.CreateItemReceiptAsync(new Dictionary<string, object?>\n{\n    [\"item_receipt\"] = new Dictionary<string, object?>\n    {\n        [\"purchase_order\"] = \"PO-0001\",\n        [\"receipt_status\"] = \"STARTED\",\n        [\"receipt_date\"] = \"2026-10-01\",\n        [\"lines\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"purchase_order_line\"] = \"d4c3b2a1-0f9e-4d8c-b7a6-958473625140\",\n                [\"receipt_quantity\"] = 1,\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "update_item_receipt": {
+      "function": "ItemReceipts.UpdateItemReceiptAsync",
+      "code": "var response = await client.ItemReceipts.UpdateItemReceiptAsync(\n    \"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\",\n    new Dictionary<string, object?>\n    {\n        [\"item_receipt\"] = new Dictionary<string, object?>\n        {\n            [\"tracking_number\"] = \"TRK-0001\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_item_receipt": {
+      "function": "ItemReceipts.GetItemReceiptAsync",
+      "code": "var response = await client.ItemReceipts.GetItemReceiptAsync(\"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_order_item_receipts": {
+      "function": "ItemReceipts.GetPurchaseOrderItemReceiptsAsync",
+      "code": "var response = await client.ItemReceipts.GetPurchaseOrderItemReceiptsAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "delete_item_receipt": {
+      "function": "ItemReceipts.DeleteItemReceiptAsync",
+      "code": "var response = await client.ItemReceipts.DeleteItemReceiptAsync(\"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "delete_item_receipt_note": {
+      "function": "ItemReceipts.DeleteItemReceiptNoteAsync",
+      "code": "var response = await client.ItemReceipts.DeleteItemReceiptNoteAsync(\n    \"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\",\n    \"note_c2d3e4f5061728394a5b6c7d8e9f0011\");\n\nConsole.WriteLine(response.Json);\n"
+    }
+  }
+}

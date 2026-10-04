@@ -1,0 +1,960 @@
+{
+  "family": "item_receipts",
+  "tag": "Item receipts",
+  "slug": "item-receipts",
+  "icon": "dolly",
+  "base": "/item_receipts",
+  "overview_description": "Record items received against a purchase order's lines, then list, read, update and delete item receipts.",
+  "intro": "An item receipt records items received against the lines of a purchase order. These endpoints create, list, read, update and delete receipts, list a purchase order's receipts, and delete a receipt's note. This area has 7 endpoints, and all seven SDKs call every one.",
+  "warning": "**A completed item receipt cannot be deleted.** The delete is refused with `400` `stock_committed`.",
+  "notes": [
+    "**Writes are wrapped in `item_receipt`.** A create names the `purchase_order`, a `receipt_status` such as `STARTED`, a `receipt_date`, and `lines`, each with a `purchase_order_line` id and a `receipt_quantity`.",
+    "**Receipt ids start with `ir_`, and note ids with `note_`.** Pass them in the paths as they are.",
+    "**The update changes a receipt's details.** It takes fields such as `tracking_number`, `receipt_note` and `receipt_date`, and raises the receipt's `version`.",
+    "**No endpoint lists or creates a receipt's notes.** Only the note delete exists here.",
+    "**The listing pages by cursor.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor` until `has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_item_receipts",
+      "method": "GET",
+      "path": "/item_receipts",
+      "slug": "list-item-receipts",
+      "title": "List item receipts",
+      "summary": "Returns a page of item receipts.",
+      "description": "Returns receipts under `data`, each with its purchase order, `receipt_status`, `receipt_date`, `tracking_number` and `lines`. Set the page size with `limit` and fetch the next page with `cursor`. Other fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of item receipts, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemReceiptList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_item_receipt",
+      "method": "POST",
+      "path": "/item_receipts",
+      "slug": "create-an-item-receipt",
+      "title": "Create an item receipt",
+      "summary": "Records items received against a purchase order's lines and returns the receipt.",
+      "description": "Send the receipt under `item_receipt`: the `purchase_order` id, a `receipt_status` such as `STARTED`, the `receipt_date`, and `lines` listing each purchase order line by its id with the `receipt_quantity` received.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item_receipt": {
+              "type": "object",
+              "properties": {
+                "purchase_order": {
+                  "type": "string",
+                  "description": "The purchase order's `id`."
+                },
+                "receipt_status": {
+                  "type": "string",
+                  "description": "Such as `STARTED`."
+                },
+                "receipt_date": {
+                  "type": "string",
+                  "description": "The date received, as `YYYY-MM-DD`."
+                },
+                "tracking_number": {
+                  "type": "string"
+                },
+                "receipt_note": {
+                  "type": "string"
+                },
+                "lines": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "purchase_order_line": {
+                        "type": "string",
+                        "description": "The purchase order line's `id`."
+                      },
+                      "receipt_quantity": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "purchase_order_line",
+                      "receipt_quantity"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "purchase_order",
+                "lines"
+              ]
+            }
+          },
+          "required": [
+            "item_receipt"
+          ]
+        },
+        "example": {
+          "item_receipt": {
+            "purchase_order": "PO-0001",
+            "receipt_status": "STARTED",
+            "receipt_date": "2026-10-01",
+            "lines": [
+              {
+                "purchase_order_line": "d4c3b2a1-0f9e-4d8c-b7a6-958473625140",
+                "receipt_quantity": 1
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The new receipt, under `item_receipt`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemReceiptsResponse"
+          }
+        }
+      },
+      "example_call": {
+        "body": {
+          "item_receipt": {
+            "purchase_order": "PO-0001",
+            "receipt_status": "STARTED",
+            "receipt_date": "2026-10-01",
+            "lines": [
+              {
+                "purchase_order_line": "d4c3b2a1-0f9e-4d8c-b7a6-958473625140",
+                "receipt_quantity": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "update_item_receipt",
+      "method": "PATCH",
+      "path": "/item_receipts/{item_receipt_id}",
+      "slug": "update-an-item-receipt",
+      "title": "Update an item receipt",
+      "summary": "Changes an item receipt's details and returns the receipt.",
+      "description": "Send the changes under `item_receipt`, such as a new `tracking_number`, `receipt_note` or `receipt_date`. The receipt comes back under `item_receipt` with a higher `version`.",
+      "parameters": [
+        {
+          "name": "item_receipt_id",
+          "in": "path",
+          "required": true,
+          "description": "The receipt's `id`, which starts with `ir_`.",
+          "schema": {
+            "type": "string",
+            "example": "ir_4e5f60718293a4b5c6d7e8f90a1b2c3d"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item_receipt": {
+              "type": "object",
+              "properties": {
+                "tracking_number": {
+                  "type": "string"
+                },
+                "receipt_note": {
+                  "type": "string"
+                },
+                "receipt_date": {
+                  "type": "string",
+                  "description": "As `YYYY-MM-DD`."
+                }
+              }
+            }
+          },
+          "required": [
+            "item_receipt"
+          ]
+        },
+        "example": {
+          "item_receipt": {
+            "tracking_number": "TRK-0001"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated receipt, under `item_receipt`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemReceiptUpdatedResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_receipt_id": "ir_4e5f60718293a4b5c6d7e8f90a1b2c3d"
+        },
+        "body": {
+          "item_receipt": {
+            "tracking_number": "TRK-0001"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_item_receipt",
+      "method": "GET",
+      "path": "/item_receipts/{item_receipt_id}",
+      "slug": "retrieve-an-item-receipt",
+      "title": "Retrieve an item receipt",
+      "summary": "Returns one item receipt by its `id`.",
+      "description": "Returns the receipt under `item_receipt`, with its purchase order, status, dates, `tracking_number` and `lines`.",
+      "parameters": [
+        {
+          "name": "item_receipt_id",
+          "in": "path",
+          "required": true,
+          "description": "The receipt's `id`, which starts with `ir_`.",
+          "schema": {
+            "type": "string",
+            "example": "ir_4e5f60718293a4b5c6d7e8f90a1b2c3d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The receipt, under `item_receipt`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemReceiptResponse"
+          }
+        },
+        "404": {
+          "description": "No item receipt has that `id`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_receipt_id": "ir_4e5f60718293a4b5c6d7e8f90a1b2c3d"
+        }
+      }
+    },
+    {
+      "key": "get_purchase_order_item_receipts",
+      "method": "GET",
+      "path": "/purchase_orders/{purchase_order_id}/item_receipts",
+      "slug": "list-a-purchase-orders-item-receipts",
+      "title": "List a purchase order's item receipts",
+      "summary": "Returns the item receipts recorded against one purchase order.",
+      "description": "Returns the purchase order's receipts in `item_receipts`, with a `pagination` block, under `purchase_order`.",
+      "parameters": [
+        {
+          "name": "purchase_order_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase order's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PO-0001"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The receipts, under `purchase_order.item_receipts`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemReceiptPurchaseOrderItemReceiptsResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_order_id": "PO-0001"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "delete_item_receipt",
+      "method": "DELETE",
+      "path": "/item_receipts/{item_receipt_id}",
+      "slug": "delete-an-item-receipt",
+      "title": "Delete an item receipt",
+      "summary": "Deletes an item receipt. A successful call returns `204` with no body.",
+      "description": "Deletes the receipt with that `ir_` id; a later read of it returns `404`. A completed receipt cannot be deleted.",
+      "parameters": [
+        {
+          "name": "item_receipt_id",
+          "in": "path",
+          "required": true,
+          "description": "The receipt's `id`, which starts with `ir_`.",
+          "schema": {
+            "type": "string",
+            "example": "ir_4e5f60718293a4b5c6d7e8f90a1b2c3d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The receipt is deleted. No body."
+        },
+        "400": {
+          "description": "The receipt is completed (`stock_committed`)."
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_receipt_id": "ir_4e5f60718293a4b5c6d7e8f90a1b2c3d"
+        }
+      }
+    },
+    {
+      "key": "delete_item_receipt_note",
+      "method": "DELETE",
+      "path": "/item_receipts/{item_receipt_id}/notes/{note_id}",
+      "slug": "delete-an-item-receipt-note",
+      "title": "Delete an item receipt note",
+      "summary": "Deletes a note from an item receipt. A successful call returns `204` with no body.",
+      "description": "Pass the receipt's `ir_` id and the note's `note_` id. No endpoint lists or creates a receipt's notes.",
+      "parameters": [
+        {
+          "name": "item_receipt_id",
+          "in": "path",
+          "required": true,
+          "description": "The receipt's `id`, which starts with `ir_`.",
+          "schema": {
+            "type": "string",
+            "example": "ir_4e5f60718293a4b5c6d7e8f90a1b2c3d"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, which starts with `note_`.",
+          "schema": {
+            "type": "string",
+            "example": "note_c2d3e4f5061728394a5b6c7d8e9f0011"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The note is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_receipt_id": "ir_4e5f60718293a4b5c6d7e8f90a1b2c3d",
+          "note_id": "note_c2d3e4f5061728394a5b6c7d8e9f0011"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "ItemReceiptList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemReceipt"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ItemReceiptPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemReceipt": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/ItemReceiptCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The receipt's `id`, which starts with `ir_`."
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/ItemReceiptLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemReceiptLine"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "purchase_order": {
+          "$ref": "#/components/schemas/ItemReceiptPurchaseOrder"
+        },
+        "receipt_date": {
+          "type": "string"
+        },
+        "receipt_note": {
+          "type": "string"
+        },
+        "receipt_status": {
+          "type": "string",
+          "description": "Such as `started`."
+        },
+        "receive_completed": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string"
+        },
+        "tracking_number": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "ItemReceiptCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemReceiptLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemReceiptLine": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/components/schemas/ItemReceiptLineDetail"
+        },
+        "pending_return_quantity": {
+          "type": "number"
+        },
+        "purchase_order_line": {
+          "$ref": "#/components/schemas/ItemReceiptLinePurchaseOrderLine"
+        },
+        "receipt_quantity": {
+          "type": "number"
+        },
+        "received_quantity": {
+          "type": "number"
+        },
+        "returned_quantity": {
+          "type": "number"
+        },
+        "uom": {
+          "$ref": "#/components/schemas/ItemReceiptLineUom"
+        },
+        "warehouse": {
+          "$ref": "#/components/schemas/ItemReceiptLineWarehouse"
+        }
+      }
+    },
+    "ItemReceiptLineDetail": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemReceiptLinePurchaseOrderLine": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemReceiptLineUom": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemReceiptLineWarehouse": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemReceiptPurchaseOrder": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemReceiptPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size the API applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "type": "object",
+          "properties": {
+            "next": {
+              "type": "string"
+            },
+            "prev": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "ItemReceipts": {
+      "type": "object",
+      "properties": {
+        "activity_logs": {
+          "type": "array"
+        },
+        "created_by": {
+          "type": "string"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "purchase_order_id": {
+          "type": "string"
+        },
+        "receipt_status": {
+          "type": "string"
+        },
+        "receipts": {
+          "type": "array"
+        },
+        "tracking_number": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemReceiptsResponse": {
+      "type": "object",
+      "properties": {
+        "item_receipt": {
+          "$ref": "#/components/schemas/ItemReceipts"
+        }
+      }
+    },
+    "ItemReceiptUpdated": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/ItemReceiptUpdatedCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/ItemReceiptUpdatedLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemReceiptUpdatedLine"
+          }
+        },
+        "note": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "purchase_order": {
+          "$ref": "#/components/schemas/ItemReceiptUpdatedPurchaseOrder"
+        },
+        "purchase_order_id": {
+          "type": "string"
+        },
+        "receipt_date": {
+          "type": "string"
+        },
+        "receipt_note": {},
+        "receipt_status": {
+          "type": "string"
+        },
+        "receipts": {
+          "type": "array"
+        },
+        "receive_completed": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string"
+        },
+        "tracking_number": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer",
+          "description": "Goes up with each change."
+        }
+      }
+    },
+    "ItemReceiptUpdatedCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemReceiptUpdatedLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemReceiptUpdatedLine": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/components/schemas/ItemReceiptUpdatedLineDetail"
+        },
+        "pending_return_quantity": {
+          "type": "number"
+        },
+        "purchase_order_line": {
+          "$ref": "#/components/schemas/ItemReceiptUpdatedLinePurchaseOrderLine"
+        },
+        "receipt_quantity": {
+          "type": "number"
+        },
+        "received_quantity": {
+          "type": "number"
+        },
+        "returned_quantity": {
+          "type": "number"
+        },
+        "uom": {
+          "$ref": "#/components/schemas/ItemReceiptUpdatedLineUom"
+        },
+        "warehouse": {
+          "$ref": "#/components/schemas/ItemReceiptUpdatedLineWarehouse"
+        }
+      }
+    },
+    "ItemReceiptUpdatedLineDetail": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemReceiptUpdatedLinePurchaseOrderLine": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemReceiptUpdatedLineUom": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemReceiptUpdatedLineWarehouse": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemReceiptUpdatedPurchaseOrder": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemReceiptUpdatedResponse": {
+      "type": "object",
+      "properties": {
+        "item_receipt": {
+          "$ref": "#/components/schemas/ItemReceiptUpdated"
+        }
+      }
+    },
+    "ItemReceiptResponse": {
+      "type": "object",
+      "properties": {
+        "item_receipt": {
+          "$ref": "#/components/schemas/ItemReceipt"
+        }
+      }
+    },
+    "ItemReceiptPurchaseOrderItemReceipts": {
+      "type": "object",
+      "properties": {
+        "item_receipts": {
+          "type": "array"
+        },
+        "pagination": {
+          "type": "object"
+        }
+      }
+    },
+    "ItemReceiptPurchaseOrderItemReceiptsResponse": {
+      "type": "object",
+      "properties": {
+        "purchase_order": {
+          "$ref": "#/components/schemas/ItemReceiptPurchaseOrderItemReceipts"
+        }
+      }
+    }
+  }
+}
