@@ -1,0 +1,402 @@
+{
+  "family": "uom",
+  "tag": "Units of measurement",
+  "slug": "units-of-measurement",
+  "icon": "ruler",
+  "base": "/settings/uom",
+  "overview_description": "List, read, create, update and delete the units of measurement, such as length units, that your settings define.",
+  "intro": "Units of measurement are the settings records for units, each with a `type` such as `LENGTH`, a number of `decimal_places` and a `rounding` rule. These endpoints list, read, create, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**One unit comes back under `uom`.** The path uses `uom` for one unit and for many: `/settings/uom` lists them and `/settings/uom/{uom_id}` reads one.",
+    "**Writes are wrapped in `uom`.** A create sends a `name` and a `type`, such as `LENGTH`.",
+    "**`status` takes `active` or `inactive`.** Send it on the update to turn a unit on or off.",
+    "**Shipping packages refer to a unit by its bare uuid.** A shipping package's `*_uom` fields take the unit's uuid, not its prefixed `id`.",
+    "**The listing pages by cursor.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor` until `has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_uoms",
+      "method": "GET",
+      "path": "/settings/uom",
+      "slug": "list-units-of-measurement",
+      "title": "List units of measurement",
+      "summary": "Returns a page of units of measurement.",
+      "description": "Returns units under `data`, each with its `name`, `type`, `decimal_places`, `rounding` and `status`. Set the page size with `limit` and fetch the next page with `cursor`. Other fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` to sort descending, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of units, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/UomList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_uom",
+      "method": "POST",
+      "path": "/settings/uom",
+      "slug": "create-a-unit-of-measurement",
+      "title": "Create a unit of measurement",
+      "summary": "Creates a unit of measurement and returns it under `uom`.",
+      "description": "Send the unit under `uom`, with its `name` and `type`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "uom": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "The kind of unit, such as `LENGTH`."
+                },
+                "decimal_places": {
+                  "type": "integer"
+                },
+                "rounding": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "uom"
+          ]
+        },
+        "example": {
+          "uom": {
+            "name": "Centimetre",
+            "type": "LENGTH"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new unit, under `uom`."
+        }
+      },
+      "example_call": {
+        "body": {
+          "uom": {
+            "name": "Centimetre",
+            "type": "LENGTH"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_uom",
+      "method": "GET",
+      "path": "/settings/uom/{uom_id}",
+      "slug": "retrieve-a-unit-of-measurement",
+      "title": "Retrieve a unit of measurement",
+      "summary": "Returns one unit of measurement by its `id`.",
+      "description": "Returns the unit under `uom`, with its `name`, `type`, `decimal_places`, `rounding` and `status`.",
+      "parameters": [
+        {
+          "name": "uom_id",
+          "in": "path",
+          "required": true,
+          "description": "The unit's `id`, from the listing.",
+          "schema": {
+            "type": "string",
+            "example": "uom_1a2b3c4d5e6f708192a3b4c5d6e7f809"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The unit, under `uom`.",
+          "schema": {
+            "$ref": "#/components/schemas/UomResponse"
+          }
+        },
+        "404": {
+          "description": "No unit has that `id`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "uom_id": "uom_1a2b3c4d5e6f708192a3b4c5d6e7f809"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_uom",
+      "method": "DELETE",
+      "path": "/settings/uom/{uom_id}",
+      "slug": "delete-a-unit-of-measurement",
+      "title": "Delete a unit of measurement",
+      "summary": "Deletes a unit of measurement. A successful call returns `204` with no body.",
+      "description": "Deletes the unit with that `id`; a later read of it returns `404`.",
+      "parameters": [
+        {
+          "name": "uom_id",
+          "in": "path",
+          "required": true,
+          "description": "The unit's `id`, from the listing.",
+          "schema": {
+            "type": "string",
+            "example": "uom_1a2b3c4d5e6f708192a3b4c5d6e7f809"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The unit is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "uom_id": "uom_1a2b3c4d5e6f708192a3b4c5d6e7f809"
+        }
+      }
+    },
+    {
+      "key": "update_settings_uom",
+      "method": "PATCH",
+      "path": "/settings/uom/{uom_id}",
+      "slug": "update-a-unit-of-measurement",
+      "title": "Update a unit of measurement",
+      "summary": "Changes a unit of measurement, or turns it on or off, and returns it.",
+      "description": "Send the changes under `uom`. Set `status` to `active` or `inactive` to turn the unit on or off.",
+      "parameters": [
+        {
+          "name": "uom_id",
+          "in": "path",
+          "required": true,
+          "description": "The unit's `id`, from the listing.",
+          "schema": {
+            "type": "string",
+            "example": "uom_1a2b3c4d5e6f708192a3b4c5d6e7f809"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "uom": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "The kind of unit, such as `LENGTH`."
+                },
+                "decimal_places": {
+                  "type": "integer"
+                },
+                "rounding": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "description": "`active` or `inactive`."
+                }
+              }
+            }
+          },
+          "required": [
+            "uom"
+          ]
+        },
+        "example": {
+          "uom": {
+            "display_name": "Centimetre",
+            "description": "Metric length unit"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated unit, under `uom`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "uom_id": "uom_1a2b3c4d5e6f708192a3b4c5d6e7f809"
+        },
+        "body": {
+          "uom": {
+            "display_name": "Centimetre",
+            "description": "Metric length unit"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "UomList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Uom"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/UomPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "Uom": {
+      "type": "object",
+      "properties": {
+        "created_by": {},
+        "created_on": {
+          "type": "string"
+        },
+        "custom_type": {},
+        "decimal_places": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "rounding": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "description": "`active` or `inactive`."
+        },
+        "type": {
+          "type": "string",
+          "description": "The kind of unit, such as `LENGTH`."
+        },
+        "type_display_text": {
+          "type": "string"
+        }
+      }
+    },
+    "UomPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size the API applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "type": "object",
+          "properties": {
+            "next": {
+              "type": "string"
+            },
+            "prev": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "UomResponse": {
+      "type": "object",
+      "properties": {
+        "uom": {
+          "$ref": "#/components/schemas/Uom"
+        }
+      }
+    }
+  }
+}

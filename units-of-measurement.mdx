@@ -1,0 +1,31 @@
+---
+title: "Units of measurement"
+sidebarTitle: "Overview"
+description: "List, read, create, update and delete the units of measurement, such as length units, that your settings define."
+---
+
+Units of measurement are the settings records for units, each with a `type` such as `LENGTH`, a number of `decimal_places` and a `rounding` rule. These endpoints list, read, create, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List units of measurement](/api-reference/units-of-measurement/list-units-of-measurement) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/uom` | Returns a page of units of measurement. |
+| [Create a unit of measurement](/api-reference/units-of-measurement/create-a-unit-of-measurement) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/uom` | Creates a unit of measurement and returns it under `uom`. |
+| [Retrieve a unit of measurement](/api-reference/units-of-measurement/retrieve-a-unit-of-measurement) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/uom/{uom_id}` | Returns one unit of measurement by its `id`. |
+| [Delete a unit of measurement](/api-reference/units-of-measurement/delete-a-unit-of-measurement) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/uom/{uom_id}` | Deletes a unit of measurement. A successful call returns `204` with no body. |
+| [Update a unit of measurement](/api-reference/units-of-measurement/update-a-unit-of-measurement) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/uom/{uom_id}` | Changes a unit of measurement, or turns it on or off, and returns it. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **One unit comes back under `uom`.** The path uses `uom` for one unit and for many: `/settings/uom` lists them and `/settings/uom/{uom_id}` reads one.
+- **Writes are wrapped in `uom`.** A create sends a `name` and a `type`, such as `LENGTH`.
+- **`status` takes `active` or `inactive`.** Send it on the update to turn a unit on or off.
+- **Shipping packages refer to a unit by its bare uuid.** A shipping package's `*_uom` fields take the unit's uuid, not its prefixed `id`.
+- **The listing pages by cursor.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor` until `has_more` is `false`.

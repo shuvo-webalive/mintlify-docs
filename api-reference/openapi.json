@@ -83,6 +83,9 @@
     },
     {
       "name": "Inventory adjustments"
+    },
+    {
+      "name": "Units of measurement"
     }
   ],
   "paths": {
@@ -29971,6 +29974,468 @@
           }
         ]
       }
+    },
+    "/settings/uom": {
+      "get": {
+        "tags": [
+          "Units of measurement"
+        ],
+        "summary": "List units of measurement",
+        "operationId": "uom_get_settings_uoms",
+        "description": "Returns units under `data`, each with its `name`, `type`, `decimal_places`, `rounding` and `status`. Set the page size with `limit` and fetch the next page with `cursor`. Other fields filter as `filter_<field>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` to sort descending, as in `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of units, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UomList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/uom?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.uom.get_settings_uoms({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.uom.getSettingsUoms({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->uom->getSettingsUoms(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.uom.uom_dto.UomDto.SettingsUomList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsUomList> response = client.uom().getSettingsUoms(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Uom.GetSettingsUomsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.uom.getSettingsUoms(queryParams: {'limit': 20});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Uom().GetSettingsUoms(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Units of measurement"
+        ],
+        "summary": "Create a unit of measurement",
+        "operationId": "uom_create_settings_uom",
+        "description": "Send the unit under `uom`, with its `name` and `type`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new unit, under `uom`."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/uom\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"uom\": {\n      \"name\": \"Centimetre\",\n      \"type\": \"LENGTH\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.uom.create_settings_uom(\n    {\"uom\": {\"name\": \"Centimetre\", \"type\": \"LENGTH\"}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.uom.createSettingsUom({uom: {name: 'Centimetre', type: 'LENGTH'}});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->uom->createSettingsUom([\n    'uom' => ['name' => 'Centimetre', 'type' => 'LENGTH'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.uom().createSettingsUom(\n        Map.of(\"uom\", Map.of(\"name\", \"Centimetre\", \"type\", \"LENGTH\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Uom.CreateSettingsUomAsync(new Dictionary<string, object?>\n{\n    [\"uom\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Centimetre\",\n        [\"type\"] = \"LENGTH\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.uom.createSettingsUom({\n  'uom': {'name': 'Centimetre', 'type': 'LENGTH'},\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Uom().CreateSettingsUom(context.Background(), map[string]any{\n\t\"uom\": map[string]any{\"name\": \"Centimetre\", \"type\": \"LENGTH\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uom": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string",
+                        "description": "The kind of unit, such as `LENGTH`."
+                      },
+                      "decimal_places": {
+                        "type": "integer"
+                      },
+                      "rounding": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "uom"
+                ]
+              },
+              "example": {
+                "uom": {
+                  "name": "Centimetre",
+                  "type": "LENGTH"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/uom/{uom_id}": {
+      "get": {
+        "tags": [
+          "Units of measurement"
+        ],
+        "summary": "Retrieve a unit of measurement",
+        "operationId": "uom_get_settings_uom",
+        "description": "Returns the unit under `uom`, with its `name`, `type`, `decimal_places`, `rounding` and `status`.",
+        "parameters": [
+          {
+            "name": "uom_id",
+            "in": "path",
+            "required": true,
+            "description": "The unit's `id`, from the listing.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The unit, under `uom`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UomResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No unit has that `id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/uom/uom_1a2b3c4d5e6f708192a3b4c5d6e7f809\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.uom.get_settings_uom(\"uom_1a2b3c4d5e6f708192a3b4c5d6e7f809\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.uom.getSettingsUom('uom_1a2b3c4d5e6f708192a3b4c5d6e7f809');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->uom->getSettingsUom('uom_1a2b3c4d5e6f708192a3b4c5d6e7f809');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.uom.uom_dto.UomDto.SettingsUom;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsUom> response = client.uom().getSettingsUom(\"uom_1a2b3c4d5e6f708192a3b4c5d6e7f809\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Uom.GetSettingsUomAsync(\"uom_1a2b3c4d5e6f708192a3b4c5d6e7f809\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.uom.getSettingsUom(\n  'uom_1a2b3c4d5e6f708192a3b4c5d6e7f809',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Uom().GetSettingsUom(context.Background(), \"uom_1a2b3c4d5e6f708192a3b4c5d6e7f809\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Units of measurement"
+        ],
+        "summary": "Delete a unit of measurement",
+        "operationId": "uom_delete_settings_uom",
+        "description": "Deletes the unit with that `id`; a later read of it returns `404`.",
+        "parameters": [
+          {
+            "name": "uom_id",
+            "in": "path",
+            "required": true,
+            "description": "The unit's `id`, from the listing.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The unit is deleted. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/uom/uom_1a2b3c4d5e6f708192a3b4c5d6e7f809\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.uom.delete_settings_uom(\"uom_1a2b3c4d5e6f708192a3b4c5d6e7f809\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.uom.deleteSettingsUom('uom_1a2b3c4d5e6f708192a3b4c5d6e7f809');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->uom->deleteSettingsUom('uom_1a2b3c4d5e6f708192a3b4c5d6e7f809');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.uom().deleteSettingsUom(\"uom_1a2b3c4d5e6f708192a3b4c5d6e7f809\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Uom.DeleteSettingsUomAsync(\"uom_1a2b3c4d5e6f708192a3b4c5d6e7f809\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.uom.deleteSettingsUom(\n  'uom_1a2b3c4d5e6f708192a3b4c5d6e7f809',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Uom().DeleteSettingsUom(context.Background(), \"uom_1a2b3c4d5e6f708192a3b4c5d6e7f809\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Units of measurement"
+        ],
+        "summary": "Update a unit of measurement",
+        "operationId": "uom_update_settings_uom",
+        "description": "Send the changes under `uom`. Set `status` to `active` or `inactive` to turn the unit on or off.",
+        "parameters": [
+          {
+            "name": "uom_id",
+            "in": "path",
+            "required": true,
+            "description": "The unit's `id`, from the listing.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated unit, under `uom`."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/uom/uom_1a2b3c4d5e6f708192a3b4c5d6e7f809\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"uom\": {\n      \"display_name\": \"Centimetre\",\n      \"description\": \"Metric length unit\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.uom.update_settings_uom(\n    \"uom_1a2b3c4d5e6f708192a3b4c5d6e7f809\",\n    {\"uom\": {\"display_name\": \"Centimetre\", \"description\": \"Metric length unit\"}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.uom.updateSettingsUom('uom_1a2b3c4d5e6f708192a3b4c5d6e7f809', {\n    uom: {display_name: 'Centimetre', description: 'Metric length unit'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->uom->updateSettingsUom('uom_1a2b3c4d5e6f708192a3b4c5d6e7f809', [\n    'uom' => ['display_name' => 'Centimetre', 'description' => 'Metric length unit'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.uom().updateSettingsUom(\n        \"uom_1a2b3c4d5e6f708192a3b4c5d6e7f809\",\n        Map.of(\"uom\", Map.of(\"display_name\", \"Centimetre\", \"description\", \"Metric length unit\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Uom.UpdateSettingsUomAsync(\n    \"uom_1a2b3c4d5e6f708192a3b4c5d6e7f809\",\n    new Dictionary<string, object?>\n    {\n        [\"uom\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Centimetre\",\n            [\"description\"] = \"Metric length unit\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.uom.updateSettingsUom(\n  'uom_1a2b3c4d5e6f708192a3b4c5d6e7f809',\n  {\n    'uom': {\n      'display_name': 'Centimetre',\n      'description': 'Metric length unit',\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Uom().UpdateSettingsUom(context.Background(), \"uom_1a2b3c4d5e6f708192a3b4c5d6e7f809\", map[string]any{\n\t\"uom\": map[string]any{\n\t\t\"display_name\": \"Centimetre\",\n\t\t\"description\":  \"Metric length unit\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uom": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string",
+                        "description": "The kind of unit, such as `LENGTH`."
+                      },
+                      "decimal_places": {
+                        "type": "integer"
+                      },
+                      "rounding": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "description": "`active` or `inactive`."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "uom"
+                ]
+              },
+              "example": {
+                "uom": {
+                  "display_name": "Centimetre",
+                  "description": "Metric length unit"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -44623,6 +45088,114 @@
         "properties": {
           "inventory_adjustment": {
             "$ref": "#/components/schemas/InventoryAdjustment"
+          }
+        }
+      },
+      "UomList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Uom"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/UomPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "Uom": {
+        "type": "object",
+        "properties": {
+          "created_by": {},
+          "created_on": {
+            "type": "string"
+          },
+          "custom_type": {},
+          "decimal_places": {
+            "type": "integer"
+          },
+          "description": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "rounding": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "description": "`active` or `inactive`."
+          },
+          "type": {
+            "type": "string",
+            "description": "The kind of unit, such as `LENGTH`."
+          },
+          "type_display_text": {
+            "type": "string"
+          }
+        }
+      },
+      "UomPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size the API applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "next": {
+                "type": "string"
+              },
+              "prev": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "UomResponse": {
+        "type": "object",
+        "properties": {
+          "uom": {
+            "$ref": "#/components/schemas/Uom"
           }
         }
       },
