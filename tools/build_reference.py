@@ -68,7 +68,7 @@ def curl(endpoint):
     method = endpoint["method"]
     lines = ["curl %s\"%s\" \\" % ("-I " if method == "HEAD" else "-X %s " % method, url),
              "  -H \"Authorization: Bearer $ACCESS_TOKEN\""]
-    body = call.get("body", endpoint.get("body", {}).get("example"))
+    body = call.get("body", (endpoint.get("body") or {}).get("example"))
     if call.get("output"):
         lines[-1] += " \\"
         lines.append("  -o %s" % call["output"])
