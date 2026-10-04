@@ -8,12 +8,12 @@
   "intro": "A custom feature is a component you define, such as a service contract attached to accounts, with its own form of custom attributes. This area has 6 endpoints to list, create, read, update and delete features and to set a feature's form layout, and all seven SDKs call every one.",
   "warning": null,
   "notes": [
-    "**The path is singular.** Call `/custom_feature`; the `href`, `url` and `links.next` values in responses name `/custom_features`, which returns 405.",
+    "**The path is singular.** Call `/custom_feature`; the `href`, `url` and `links.next` values in responses name `/custom_features`, which returns `405`.",
     "**Writes send their fields under `component`.** The create and update bodies wrap the fields in `component`, and the feature comes back under `custom_feature`.",
     "**A custom feature id starts with `cmp_`.** It is the same id the custom components area uses for a component definition.",
-    "**The listing returns active features only, paged by cursor.** Pass `limit`, then the `next_cursor` from `pagination` as `cursor` while `has_more` is true.",
+    "**The listing returns active features only.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.",
     "**The form layout call takes `configuration` with no other wrapper.** It sets `settings.form_layout` and the attributes in `column_1` and `column_2`.",
-    "**A deleted feature returns 404.** The delete itself returns 204 with no body."
+    "**A deleted feature returns `404`.** The delete itself returns `204` with no body."
   ],
   "endpoints": [
     {
@@ -189,7 +189,7 @@
       "slug": "delete-a-custom-feature",
       "title": "Delete a custom feature",
       "summary": "Deletes a custom feature and returns no body.",
-      "description": "Removes the custom feature with this `cmp_` id. A successful call returns 204 with an empty body, and reading the feature afterwards returns 404.",
+      "description": "Removes the custom feature with this `cmp_` id. A successful call returns `204` with an empty body, and reading the feature afterwards returns `404`.",
       "parameters": [
         {
           "name": "custom_feature_id",
@@ -290,7 +290,7 @@
       "slug": "set-a-custom-features-form-layout-and-attributes",
       "title": "Set a custom feature's form layout and attributes",
       "summary": "Sets the form layout of a custom feature and the attributes in each column, and returns the feature.",
-      "description": "Customizes the form of an existing feature. Send `configuration` with `settings.form_layout`, such as `TWO_COLS`, and the entries of `column_1` and `column_2`: each entry is an `ATTRIBUTE`, named by a custom attribute's `name`, or a `LABEL`. The feature comes back under `custom_feature`.",
+      "description": "Sets the form of an existing feature. Send `configuration` with `settings.form_layout`, such as `TWO_COLS`, and the entries of `column_1` and `column_2`: each entry is an `ATTRIBUTE`, named by a custom attribute's `name`, or a `LABEL`. The feature comes back under `custom_feature`.",
       "parameters": [
         {
           "name": "custom_feature_id",
@@ -336,10 +336,12 @@
                             "description": "The custom attribute's `name`, or the label text."
                           },
                           "required": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Sent as the string `\"true\"` or `\"false\"`."
                           },
                           "show_in_list_view": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Sent as the string `\"true\"` or `\"false\"`."
                           }
                         },
                         "required": [
@@ -367,10 +369,12 @@
                             "description": "The custom attribute's `name`, or the label text."
                           },
                           "required": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Sent as the string `\"true\"` or `\"false\"`."
                           },
                           "show_in_list_view": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Sent as the string `\"true\"` or `\"false\"`."
                           }
                         },
                         "required": [
