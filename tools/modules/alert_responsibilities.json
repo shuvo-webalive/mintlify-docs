@@ -5,8 +5,8 @@
   "icon": "user-gear",
   "base": "/settings/alert_responsibilities",
   "overview_description": "Create, read, update and delete alert responsibilities from the settings area.",
-  "intro": "Alert responsibility settings manage who is responsible for alerts, from the settings area. They are the same records the Alert responsibilities area serves. This area has 5 endpoints, and all seven Exsited SDKs call every one.",
-  "warning": null,
+  "intro": "Alert responsibility settings manage who is responsible for alerts, from the settings area. They are the same records the Alert responsibilities area serves. Only the listing has been confirmed; a create, update or delete returns `403` without the `MANAGE_ALERT_RESPONSIBILITY` permission. This area has 5 endpoints, and all seven SDKs call every one.",
+  "warning": "**Only the listing in this area has been confirmed.** The single read and the writes have not been confirmed on these paths; the Alert responsibilities area serves the same records.",
   "notes": [
     "**These are the same records as the Alert responsibilities area.** `/settings/alert_responsibilities` and `/alert_responsibility` serve the same alert responsibilities.",
     "**Writes need the `MANAGE_ALERT_RESPONSIBILITY` permission.** Without it, a create, update or delete returns `403`.",
@@ -18,8 +18,8 @@
       "key": "get_settings_alert_responsibilities",
       "method": "GET",
       "path": "/settings/alert_responsibilities",
-      "slug": "list-alert-responsibility-settings",
-      "title": "List alert responsibility settings",
+      "slug": "list-alert-responsibilities-settings-path",
+      "title": "List alert responsibilities (settings path)",
       "summary": "Lists the alert responsibilities from the settings area, one page at a time.",
       "description": "Returns a page of alert responsibilities under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
       "parameters": [
@@ -73,8 +73,8 @@
       "key": "create_settings_alert_responsibility",
       "method": "POST",
       "path": "/settings/alert_responsibilities",
-      "slug": "create-an-alert-responsibility-setting",
-      "title": "Create an alert responsibility setting",
+      "slug": "create-an-alert-responsibility-settings-path",
+      "title": "Create an alert responsibility (settings path)",
       "summary": "Creates an alert responsibility from the settings area.",
       "description": "`name` is required. Your API client needs the `MANAGE_ALERT_RESPONSIBILITY` permission.",
       "parameters": [],
@@ -120,14 +120,15 @@
             "name": "Billing alerts"
           }
         }
-      }
+      },
+      "warning": "**This call has not been confirmed.** The same record can be handled under `/alert_responsibility`."
     },
     {
       "key": "get_settings_alert_responsibility",
       "method": "GET",
       "path": "/settings/alert_responsibilities/{alert_responsibility_id}",
-      "slug": "retrieve-an-alert-responsibility-setting",
-      "title": "Retrieve an alert responsibility setting",
+      "slug": "retrieve-an-alert-responsibility-settings-path",
+      "title": "Retrieve an alert responsibility (settings path)",
       "summary": "Retrieves one alert responsibility from the settings area by its `ar_` id.",
       "description": "Returns the alert responsibility under `alert_responsibility`.",
       "parameters": [
@@ -153,14 +154,15 @@
         "path": {
           "alert_responsibility_id": "ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b"
         }
-      }
+      },
+      "warning": "**This call has not been confirmed.** The same record can be handled under `/alert_responsibility`."
     },
     {
       "key": "delete_settings_alert_responsibility",
       "method": "DELETE",
       "path": "/settings/alert_responsibilities/{alert_responsibility_id}",
-      "slug": "delete-an-alert-responsibility-setting",
-      "title": "Delete an alert responsibility setting",
+      "slug": "delete-an-alert-responsibility-settings-path",
+      "title": "Delete an alert responsibility (settings path)",
       "summary": "Deletes an alert responsibility from the settings area. Nothing comes back.",
       "description": "Returns `204` with no body. Your API client needs the `MANAGE_ALERT_RESPONSIBILITY` permission.",
       "parameters": [
@@ -189,14 +191,15 @@
         "path": {
           "alert_responsibility_id": "ar_3e5a7c9b1d0f4e2a4c6b8d0e2f4a6c8b"
         }
-      }
+      },
+      "warning": "**This call has not been confirmed.** The same record can be handled under `/alert_responsibility`."
     },
     {
       "key": "update_settings_alert_responsibility",
       "method": "PATCH",
       "path": "/settings/alert_responsibilities/{alert_responsibility_id}",
-      "slug": "update-an-alert-responsibility-setting",
-      "title": "Update an alert responsibility setting",
+      "slug": "update-an-alert-responsibility-settings-path",
+      "title": "Update an alert responsibility (settings path)",
       "summary": "Changes an alert responsibility's fields or its status from the settings area.",
       "description": "Send the fields to change. Your API client needs the `MANAGE_ALERT_RESPONSIBILITY` permission.",
       "parameters": [
@@ -258,7 +261,8 @@
             "display_name": "Billing alerts team"
           }
         }
-      }
+      },
+      "warning": "**This call has not been confirmed.** The same record can be handled under `/alert_responsibility`."
     }
   ],
   "schemas": {
