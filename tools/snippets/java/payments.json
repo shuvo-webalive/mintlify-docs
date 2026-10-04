@@ -6,6 +6,10 @@
       "function": "payments().getPayments",
       "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentList;\nimport java.util.Map;\n\nApiResponse<PaymentList> response = client.payments().getPayments(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
     },
+    "create_payment": {
+      "function": "payments().createPayment",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentRead;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse<PaymentRead> response = client.payments().createPayment(\n        Map.of(\n                \"payment\", Map.of(\n                        \"date\", \"2026-10-01\",\n                        \"payment_note\", \"October invoice\",\n                        \"payment_applied\", List.of(\n                                Map.of(\n                                        \"processor\", \"Cash\",\n                                        \"amount\", \"10.00\",\n                                        \"reference\", \"RCPT-1001\")),\n                        \"invoices\", List.of(Map.of(\"id\", \"INV-0001\", \"applied\", \"10.00\")))));\nSystem.out.println(response.getMap());\n"
+    },
     "get_payments_notes": {
       "function": "payments().getPaymentsNotes",
       "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentsNoteList;\nimport java.util.Map;\n\nApiResponse<PaymentsNoteList> response = client.payments().getPaymentsNotes(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
@@ -49,10 +53,6 @@
     "get_payment_note_file": {
       "function": "payments().getPaymentNoteFile",
       "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentNoteFile;\n\nApiResponse<PaymentNoteFile> response = client.payments().getPaymentNoteFile(\n        \"PAY-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n        \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\nSystem.out.println(response.getMap());\n"
-    },
-    "create_payment": {
-      "function": "payments().createPayment",
-      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentRead;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse<PaymentRead> response = client.payments().createPayment(\n        Map.of(\n                \"payment\", Map.of(\n                        \"date\", \"2026-10-01\",\n                        \"payment_note\", \"October invoice\",\n                        \"payment_applied\", List.of(\n                                Map.of(\n                                        \"processor\", \"Cash\",\n                                        \"amount\", \"10.00\",\n                                        \"reference\", \"RCPT-1001\")),\n                        \"invoices\", List.of(Map.of(\"id\", \"INV-0001\", \"applied\", \"10.00\")))));\nSystem.out.println(response.getMap());\n"
     },
     "get_invoice_payment": {
       "function": "payments().getInvoicePayment",

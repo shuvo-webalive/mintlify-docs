@@ -6,6 +6,10 @@
    "function": "Payments.GetPayments",
    "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Payments().GetPayments(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
   },
+  "create_payment": {
+   "function": "Payments.CreatePayment",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Payments().CreatePayment(context.Background(), map[string]any{\n\t\"payment\": map[string]any{\n\t\t\"date\":         \"2026-10-01\",\n\t\t\"payment_note\": \"October invoice\",\n\t\t\"payment_applied\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"processor\": \"Cash\",\n\t\t\t\t\"amount\":    \"10.00\",\n\t\t\t\t\"reference\": \"RCPT-1001\",\n\t\t\t},\n\t\t},\n\t\t\"invoices\": []any{\n\t\t\tmap[string]any{\"id\": \"INV-0001\", \"applied\": \"10.00\"},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
   "get_payments_notes": {
    "function": "Payments.GetPaymentsNotes",
    "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Payments().GetPaymentsNotes(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
@@ -49,10 +53,6 @@
   "get_payment_note_file": {
    "function": "Payments.GetPaymentNoteFile",
    "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Payments().GetPaymentNoteFile(context.Background(), \"PAY-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
-  },
-  "create_payment": {
-   "function": "Payments.CreatePayment",
-   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Payments().CreatePayment(context.Background(), map[string]any{\n\t\"payment\": map[string]any{\n\t\t\"date\":         \"2026-10-01\",\n\t\t\"payment_note\": \"October invoice\",\n\t\t\"payment_applied\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"processor\": \"Cash\",\n\t\t\t\t\"amount\":    \"10.00\",\n\t\t\t\t\"reference\": \"RCPT-1001\",\n\t\t\t},\n\t\t},\n\t\t\"invoices\": []any{\n\t\t\tmap[string]any{\"id\": \"INV-0001\", \"applied\": \"10.00\"},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
   },
   "get_invoice_payment": {
    "function": "Payments.GetInvoicePayment",
