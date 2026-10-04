@@ -1,0 +1,55 @@
+{
+  "family": "attribute_attachments",
+  "tag": "Attribute attachments",
+  "slug": "attribute-attachments",
+  "icon": "paperclip",
+  "base": "/attribute_attachment",
+  "overview_description": "Download the file stored in a custom attribute of the file type, as base64 text.",
+  "intro": "An attribute attachment is the file a custom attribute of the file type holds for an account. This area has 1 endpoint, which returns that file as base64 text, and all seven SDKs call it.",
+  "warning": null,
+  "notes": [
+    "**The path is singular.** Call `/attribute_attachment/{file_uuid}`, not a plural form.",
+    "**The file comes back as base64 with no wrapper key.** The body is `{\"base64\": \"...\"}`, so decode the `base64` value to get the file's bytes.",
+    "**Use the uuid the account's file attribute links to.** An account's file attribute points at this path; take the `file_uuid` from there.",
+    "**An unknown uuid returns 404.** The error code is `resource_not_found`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_attribute_attachment",
+      "method": "GET",
+      "path": "/attribute_attachment/{file_uuid}",
+      "slug": "retrieve-an-attribute-attachment",
+      "title": "Retrieve an attribute attachment",
+      "summary": "Returns the file a custom file attribute holds, as base64 text.",
+      "description": "Reads the file that an account's file attribute links to. The body holds one key, `base64`, whose value is the file's content encoded as base64. Decode it to get the original bytes.",
+      "parameters": [
+        {
+          "name": "file_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The file's `uuid`, the value an account's file attribute links to. A dashed uuid.",
+          "schema": {
+            "type": "string",
+            "example": "4d6f8a0c-2e1b-4d3f-9a5c-7e9b1d3f5a2c"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The file's content, as `{\"base64\": \"...\"}`."
+        },
+        "404": {
+          "description": "No file has that `uuid`. The error code is `resource_not_found`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "file_uuid": "4d6f8a0c-2e1b-4d3f-9a5c-7e9b1d3f5a2c"
+        }
+      }
+    }
+  ],
+  "schemas": {}
+}

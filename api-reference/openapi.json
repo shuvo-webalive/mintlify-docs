@@ -269,6 +269,9 @@
     },
     {
       "name": "Custom forms"
+    },
+    {
+      "name": "Attribute attachments"
     }
   ],
   "paths": {
@@ -81436,6 +81439,84 @@
             }
           }
         }
+      }
+    },
+    "/attribute_attachment/{file_uuid}": {
+      "get": {
+        "tags": [
+          "Attribute attachments"
+        ],
+        "summary": "Retrieve an attribute attachment",
+        "operationId": "attribute_attachments_get_attribute_attachment",
+        "description": "Reads the file that an account's file attribute links to. The body holds one key, `base64`, whose value is the file's content encoded as base64. Decode it to get the original bytes.",
+        "parameters": [
+          {
+            "name": "file_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The file's `uuid`, the value an account's file attribute links to. A dashed uuid.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file's content, as `{\"base64\": \"...\"}`."
+          },
+          "404": {
+            "description": "No file has that `uuid`. The error code is `resource_not_found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/attribute_attachment/4d6f8a0c-2e1b-4d3f-9a5c-7e9b1d3f5a2c\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.attribute_attachments.get_attribute_attachment(\n    \"4d6f8a0c-2e1b-4d3f-9a5c-7e9b1d3f5a2c\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.attributeAttachments.getAttributeAttachment('4d6f8a0c-2e1b-4d3f-9a5c-7e9b1d3f5a2c');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->attributeAttachments->getAttributeAttachment(\n    '4d6f8a0c-2e1b-4d3f-9a5c-7e9b1d3f5a2c',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.attributeAttachments().getAttributeAttachment(\n        \"4d6f8a0c-2e1b-4d3f-9a5c-7e9b1d3f5a2c\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AttributeAttachments.GetAttributeAttachmentAsync(\"4d6f8a0c-2e1b-4d3f-9a5c-7e9b1d3f5a2c\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.attributeAttachments.getAttributeAttachment(\n  '4d6f8a0c-2e1b-4d3f-9a5c-7e9b1d3f5a2c',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AttributeAttachments().GetAttributeAttachment(context.Background(), \"4d6f8a0c-2e1b-4d3f-9a5c-7e9b1d3f5a2c\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
       }
     }
   },
