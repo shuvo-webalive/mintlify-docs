@@ -137,6 +137,9 @@
     },
     {
       "name": "Purchase express"
+    },
+    {
+      "name": "Return vendor authorizations"
     }
   ],
   "paths": {
@@ -48199,6 +48202,682 @@
           }
         }
       }
+    },
+    "/return_vendor_authorizations": {
+      "post": {
+        "tags": [
+          "Return vendor authorizations"
+        ],
+        "summary": "Create a return vendor authorization",
+        "operationId": "return_vendor_authorizations_create_return_vendor_authorization",
+        "description": "Creates a return vendor authorization for lines of a purchase order, wrapped in `return_vendor_authorization`. Name the purchase order by its `id`, and each line by its `purchase_order_line` id with the `rva_qty` to return. Send `create_as_draft: true` to save it as a draft.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new return vendor authorization, under `return_vendor_authorization`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnVendorAuthorizationResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The server can fail with `500` on this call.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/return_vendor_authorizations\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"return_vendor_authorization\": {\n      \"purchase_order\": \"PO-0001\",\n      \"create_as_draft\": true,\n      \"lines\": [\n        {\n          \"purchase_order_line\": \"line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c\",\n          \"rva_qty\": 1\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.return_vendor_authorizations.create_return_vendor_authorization(\n    {\n        \"return_vendor_authorization\": {\n            \"purchase_order\": \"PO-0001\",\n            \"create_as_draft\": True,\n            \"lines\": [\n                {\n                    \"purchase_order_line\": \"line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c\",\n                    \"rva_qty\": 1,\n                }\n            ],\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnVendorAuthorizations.createReturnVendorAuthorization({\n    return_vendor_authorization: {\n        purchase_order: 'PO-0001',\n        create_as_draft: true,\n        lines: [{purchase_order_line: 'line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c', rva_qty: 1}],\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnVendorAuthorizations->createReturnVendorAuthorization([\n    'return_vendor_authorization' => [\n        'purchase_order' => 'PO-0001',\n        'create_as_draft' => true,\n        'lines' => [\n            ['purchase_order_line' => 'line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c', 'rva_qty' => 1],\n        ],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.return_vendor_authorizations.return_vendor_authorizations_dto.ReturnVendorAuthorizationsDto.ReturnVendorAuthorizationView;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReturnVendorAuthorizationView> response = client.returnVendorAuthorizations().createReturnVendorAuthorization(\n        Map.of(\n                \"return_vendor_authorization\", Map.of(\n                        \"purchase_order\", \"PO-0001\",\n                        \"create_as_draft\", true,\n                        \"lines\", List.of(\n                                Map.of(\n                                        \"purchase_order_line\", \"line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c\",\n                                        \"rva_qty\", 1)))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnVendorAuthorizations.CreateReturnVendorAuthorizationAsync(new Dictionary<string, object?>\n{\n    [\"return_vendor_authorization\"] = new Dictionary<string, object?>\n    {\n        [\"purchase_order\"] = \"PO-0001\",\n        [\"create_as_draft\"] = true,\n        [\"lines\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"purchase_order_line\"] = \"line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c\",\n                [\"rva_qty\"] = 1,\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnVendorAuthorizations\n    .createReturnVendorAuthorization({\n      'return_vendor_authorization': {\n        'purchase_order': 'PO-0001',\n        'create_as_draft': true,\n        'lines': [\n          {\n            'purchase_order_line': 'line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c',\n            'rva_qty': 1,\n          },\n        ],\n      },\n    });\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnVendorAuthorizations().CreateReturnVendorAuthorization(context.Background(), map[string]any{\n\t\"return_vendor_authorization\": map[string]any{\n\t\t\"purchase_order\":  \"PO-0001\",\n\t\t\"create_as_draft\": true,\n\t\t\"lines\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"purchase_order_line\": \"line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c\",\n\t\t\t\t\"rva_qty\":             1,\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "return_vendor_authorization": {
+                    "type": "object",
+                    "properties": {
+                      "purchase_order": {
+                        "type": "string",
+                        "description": "The purchase order's `id`."
+                      },
+                      "create_as_draft": {
+                        "type": "boolean",
+                        "description": "`true` saves the return as a draft."
+                      },
+                      "lines": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "purchase_order_line": {
+                              "type": "string",
+                              "description": "The purchase order line's `id`, from the purchase order's lines list."
+                            },
+                            "rva_qty": {
+                              "type": "number",
+                              "description": "How many units to return."
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "return_vendor_authorization"
+                ]
+              },
+              "example": {
+                "return_vendor_authorization": {
+                  "purchase_order": "PO-0001",
+                  "create_as_draft": true,
+                  "lines": [
+                    {
+                      "purchase_order_line": "line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c",
+                      "rva_qty": 1
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Return vendor authorizations"
+        ],
+        "summary": "List return vendor authorizations",
+        "operationId": "return_vendor_authorizations_get_return_vendor_authorizations",
+        "description": "Lists the returns to suppliers, one page at a time, under `data`. Pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter the list as `filter_<field>` or `filter_<field>_<operator>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of return vendor authorizations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnVendorAuthorizationList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/return_vendor_authorizations?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.return_vendor_authorizations.get_return_vendor_authorizations(\n    {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnVendorAuthorizations.getReturnVendorAuthorizations({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnVendorAuthorizations->getReturnVendorAuthorizations(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.return_vendor_authorizations.return_vendor_authorizations_dto.ReturnVendorAuthorizationsDto.ReturnVendorAuthorizationList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReturnVendorAuthorizationList> response = client.returnVendorAuthorizations().getReturnVendorAuthorizations(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnVendorAuthorizations.GetReturnVendorAuthorizationsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnVendorAuthorizations\n    .getReturnVendorAuthorizations(queryParams: {'limit': 20});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnVendorAuthorizations().GetReturnVendorAuthorizations(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/return_vendor_authorizations/{rva_id}": {
+      "delete": {
+        "tags": [
+          "Return vendor authorizations"
+        ],
+        "summary": "Delete a draft return vendor authorization",
+        "operationId": "return_vendor_authorizations_delete_return_vendor_authorization",
+        "description": "Deletes the return vendor authorization, addressed by its `rva_` id. Only a draft can be deleted. The call returns `204` with no body, and reading it afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "rva_id",
+            "in": "path",
+            "required": true,
+            "description": "The return vendor authorization's `rva_` id. A code returns `404`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The return vendor authorization is deleted."
+          },
+          "400": {
+            "description": "`stock_committed`: the return is not a draft.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No return vendor authorization has that `rva_` id. A code also returns `404` here.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/return_vendor_authorizations/rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.return_vendor_authorizations.delete_return_vendor_authorization(\n    \"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnVendorAuthorizations.deleteReturnVendorAuthorization(\n    'rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnVendorAuthorizations->deleteReturnVendorAuthorization(\n    'rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.returnVendorAuthorizations().deleteReturnVendorAuthorization(\n        \"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnVendorAuthorizations.DeleteReturnVendorAuthorizationAsync(\"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnVendorAuthorizations\n    .deleteReturnVendorAuthorization('rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnVendorAuthorizations().DeleteReturnVendorAuthorization(context.Background(), \"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Return vendor authorizations"
+        ],
+        "summary": "Update a return vendor authorization",
+        "operationId": "return_vendor_authorizations_update_return_vendor_authorization",
+        "description": "Updates the header of the return vendor authorization, wrapped in `return_vendor_authorization`: `rva_date`, `note` and `custom_attributes`. Address it by its `rva_` id or its code.",
+        "parameters": [
+          {
+            "name": "rva_id",
+            "in": "path",
+            "required": true,
+            "description": "The return vendor authorization's `rva_` id, or its code.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated return vendor authorization, under `return_vendor_authorization`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnVendorAuthorizationResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/return_vendor_authorizations/rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"return_vendor_authorization\": {\n      \"note\": \"Two cartons arrived damaged.\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.return_vendor_authorizations.update_return_vendor_authorization(\n    \"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\",\n    {\"return_vendor_authorization\": {\"note\": \"Two cartons arrived damaged.\"}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnVendorAuthorizations.updateReturnVendorAuthorization(\n    'rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d',\n    {return_vendor_authorization: {note: 'Two cartons arrived damaged.'}},\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnVendorAuthorizations->updateReturnVendorAuthorization(\n    'rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d',\n    ['return_vendor_authorization' => ['note' => 'Two cartons arrived damaged.']],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.return_vendor_authorizations.return_vendor_authorizations_dto.ReturnVendorAuthorizationsDto.ReturnVendorAuthorizationView;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReturnVendorAuthorizationView> response = client.returnVendorAuthorizations().updateReturnVendorAuthorization(\n        \"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\",\n        Map.of(\"return_vendor_authorization\", Map.of(\"note\", \"Two cartons arrived damaged.\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnVendorAuthorizations.UpdateReturnVendorAuthorizationAsync(\n    \"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\",\n    new Dictionary<string, object?>\n    {\n        [\"return_vendor_authorization\"] = new Dictionary<string, object?>\n        {\n            [\"note\"] = \"Two cartons arrived damaged.\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnVendorAuthorizations\n    .updateReturnVendorAuthorization('rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d', {\n      'return_vendor_authorization': {'note': 'Two cartons arrived damaged.'},\n    });\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnVendorAuthorizations().UpdateReturnVendorAuthorization(context.Background(), \"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\", map[string]any{\n\t\"return_vendor_authorization\": map[string]any{\"note\": \"Two cartons arrived damaged.\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "return_vendor_authorization": {
+                    "type": "object",
+                    "properties": {
+                      "rva_date": {
+                        "type": "string"
+                      },
+                      "note": {
+                        "type": "string"
+                      },
+                      "custom_attributes": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "return_vendor_authorization"
+                ]
+              },
+              "example": {
+                "return_vendor_authorization": {
+                  "note": "Two cartons arrived damaged."
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Return vendor authorizations"
+        ],
+        "summary": "Retrieve a return vendor authorization",
+        "operationId": "return_vendor_authorizations_get_return_vendor_authorization",
+        "description": "Returns the return vendor authorization with its supplier, purchase order, status, `lines` and `receive_rvas` under `return_vendor_authorization`. Address it by its `rva_` id or its code; both return the same record.",
+        "parameters": [
+          {
+            "name": "rva_id",
+            "in": "path",
+            "required": true,
+            "description": "The return vendor authorization's `rva_` id, or its code.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The return vendor authorization, under `return_vendor_authorization`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnVendorAuthorizationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No return vendor authorization has that id, for example after it is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/return_vendor_authorizations/rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.return_vendor_authorizations.get_return_vendor_authorization(\n    \"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnVendorAuthorizations.getReturnVendorAuthorization(\n    'rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnVendorAuthorizations->getReturnVendorAuthorization(\n    'rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.return_vendor_authorizations.return_vendor_authorizations_dto.ReturnVendorAuthorizationsDto.ReturnVendorAuthorizationView;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReturnVendorAuthorizationView> response = client.returnVendorAuthorizations().getReturnVendorAuthorization(\n        \"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnVendorAuthorizations.GetReturnVendorAuthorizationAsync(\"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnVendorAuthorizations\n    .getReturnVendorAuthorization('rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnVendorAuthorizations().GetReturnVendorAuthorization(context.Background(), \"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/return_vendor_authorizations/{rva_id}/notes/{note_id}": {
+      "delete": {
+        "tags": [
+          "Return vendor authorizations"
+        ],
+        "summary": "Delete a return vendor authorization note",
+        "operationId": "return_vendor_authorizations_delete_return_vendor_authorization_note",
+        "description": "Deletes the note, addressed by the return's `rva_` id and the note's `id`. No endpoint lists or creates these notes, so you need the note's `id` already. The call returns `204` with no body.",
+        "parameters": [
+          {
+            "name": "rva_id",
+            "in": "path",
+            "required": true,
+            "description": "The return vendor authorization's `rva_` id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The note is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/return_vendor_authorizations/rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d/notes/note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.return_vendor_authorizations.delete_return_vendor_authorization_note(\n    \"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnVendorAuthorizations.deleteReturnVendorAuthorizationNote(\n    'rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnVendorAuthorizations->deleteReturnVendorAuthorizationNote(\n    'rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.returnVendorAuthorizations().deleteReturnVendorAuthorizationNote(\n        \"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\",\n        \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnVendorAuthorizations.DeleteReturnVendorAuthorizationNoteAsync(\n    \"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnVendorAuthorizations\n    .deleteReturnVendorAuthorizationNote(\n      'rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d',\n      'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnVendorAuthorizations().DeleteReturnVendorAuthorizationNote(context.Background(), \"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/return_vendor_authorizations/{rva_id}/notes/{note_id}/files/{file_id}": {
+      "delete": {
+        "tags": [
+          "Return vendor authorizations"
+        ],
+        "summary": "Delete a return vendor authorization note file",
+        "operationId": "return_vendor_authorizations_delete_return_vendor_authorization_note_file",
+        "description": "Deletes one file from the note. No endpoint lists these notes, so you need the note's `id` and the file's `id` already. The call returns `204` with no body.",
+        "parameters": [
+          {
+            "name": "rva_id",
+            "in": "path",
+            "required": true,
+            "description": "The return vendor authorization's `rva_` id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The attachment's `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The file is removed from the note."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/return_vendor_authorizations/rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d/notes/note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a/files/6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = (\n    client.return_vendor_authorizations.delete_return_vendor_authorization_note_file(\n        \"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\",\n        \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n        \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\",\n    )\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.returnVendorAuthorizations.deleteReturnVendorAuthorizationNoteFile(\n    'rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    '6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->returnVendorAuthorizations->deleteReturnVendorAuthorizationNoteFile(\n    'rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    '6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.returnVendorAuthorizations().deleteReturnVendorAuthorizationNoteFile(\n        \"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\",\n        \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n        \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ReturnVendorAuthorizations.DeleteReturnVendorAuthorizationNoteFileAsync(\n    \"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.returnVendorAuthorizations\n    .deleteReturnVendorAuthorizationNoteFile(\n      'rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d',\n      'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n      '6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e',\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ReturnVendorAuthorizations().DeleteReturnVendorAuthorizationNoteFile(context.Background(), \"rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -77531,6 +78210,223 @@
         "properties": {
           "purchase_express": {
             "$ref": "#/components/schemas/PurchaseExpress"
+          }
+        }
+      },
+      "ReturnVendorAuthorizationView": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/ReturnVendorAuthorizationAccount"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/ReturnVendorAuthorizationCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "item_count": {
+            "type": "integer"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "note": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "purchase_order": {
+            "$ref": "#/components/schemas/ReturnVendorAuthorizationPurchaseOrder"
+          },
+          "return_status": {
+            "type": "string"
+          },
+          "rva_date": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "lines": {
+            "type": "array",
+            "items": {}
+          },
+          "receive_rvas": {
+            "type": "array",
+            "items": {}
+          }
+        }
+      },
+      "ReturnVendorAuthorizationAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnVendorAuthorizationCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnVendorAuthorizationPurchaseOrder": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnVendorAuthorizationResponse": {
+        "type": "object",
+        "properties": {
+          "return_vendor_authorization": {
+            "$ref": "#/components/schemas/ReturnVendorAuthorizationView"
+          }
+        }
+      },
+      "ReturnVendorAuthorization": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/ReturnVendorAuthorizationAccount"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/ReturnVendorAuthorizationCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "item_count": {
+            "type": "integer"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "note": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "purchase_order": {
+            "$ref": "#/components/schemas/ReturnVendorAuthorizationPurchaseOrder"
+          },
+          "return_status": {
+            "type": "string"
+          },
+          "rva_date": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "ReturnVendorAuthorizationPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnVendorAuthorizationPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size the API applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can be set on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": "string",
+            "description": "The cursor of the previous page."
+          },
+          "links": {
+            "$ref": "#/components/schemas/ReturnVendorAuthorizationPaginationLinks"
+          }
+        }
+      },
+      "ReturnVendorAuthorizationList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReturnVendorAuthorization"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/ReturnVendorAuthorizationPagination"
+          },
+          "url": {
+            "type": "string"
           }
         }
       },

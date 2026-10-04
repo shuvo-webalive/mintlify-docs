@@ -1,0 +1,639 @@
+{
+  "family": "return_vendor_authorizations",
+  "tag": "Return vendor authorizations",
+  "slug": "return-vendor-authorizations",
+  "icon": "truck-ramp-box",
+  "base": "/return_vendor_authorizations",
+  "overview_description": "Create, read, update and delete return vendor authorizations, the returns of purchased stock to a supplier.",
+  "intro": "A return vendor authorization records stock you send back to a supplier against lines of a purchase order. These endpoints create, list, read, update and delete returns and remove their notes and files. There are 7 endpoints, and all seven SDKs call every one.",
+  "warning": "**Only a draft return vendor authorization can be deleted, and the delete cannot be undone.** Any other status returns `400` `stock_committed`.",
+  "notes": [
+    "**Every write body is wrapped in `return_vendor_authorization`.**",
+    "**The create names a purchase order and its lines.** Each line takes `purchase_order_line` and `rva_qty`; `create_as_draft: true` saves a draft.",
+    "**The reads and the update accept the `rva_` id or the code.** The delete takes the `rva_` id only; a code returns `404`.",
+    "**No endpoint lists or creates a return's notes.** The note deletes need ids you already hold.",
+    "**Listings page by cursor.** Records are under `data`; pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`."
+  ],
+  "endpoints": [
+    {
+      "key": "create_return_vendor_authorization",
+      "method": "POST",
+      "path": "/return_vendor_authorizations",
+      "slug": "create-a-return-vendor-authorization",
+      "title": "Create a return vendor authorization",
+      "summary": "Creates a return to a supplier for purchase order lines and returns it under `return_vendor_authorization`.",
+      "description": "Creates a return vendor authorization for lines of a purchase order, wrapped in `return_vendor_authorization`. Name the purchase order by its `id`, and each line by its `purchase_order_line` id with the `rva_qty` to return. Send `create_as_draft: true` to save it as a draft.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "return_vendor_authorization": {
+              "type": "object",
+              "properties": {
+                "purchase_order": {
+                  "type": "string",
+                  "description": "The purchase order's `id`."
+                },
+                "create_as_draft": {
+                  "type": "boolean",
+                  "description": "`true` saves the return as a draft."
+                },
+                "lines": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "purchase_order_line": {
+                        "type": "string",
+                        "description": "The purchase order line's `id`, from the purchase order's lines list."
+                      },
+                      "rva_qty": {
+                        "type": "number",
+                        "description": "How many units to return."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "return_vendor_authorization"
+          ]
+        },
+        "example": {
+          "return_vendor_authorization": {
+            "purchase_order": "PO-0001",
+            "create_as_draft": true,
+            "lines": [
+              {
+                "purchase_order_line": "line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c",
+                "rva_qty": 1
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new return vendor authorization, under `return_vendor_authorization`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReturnVendorAuthorizationResponse"
+          }
+        },
+        "500": {
+          "description": "The server can fail with `500` on this call."
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "return_vendor_authorization": {
+            "purchase_order": "PO-0001",
+            "create_as_draft": true,
+            "lines": [
+              {
+                "purchase_order_line": "line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c",
+                "rva_qty": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_return_vendor_authorization",
+      "method": "DELETE",
+      "path": "/return_vendor_authorizations/{rva_id}",
+      "slug": "delete-a-draft-return-vendor-authorization",
+      "title": "Delete a draft return vendor authorization",
+      "summary": "Deletes a draft return vendor authorization. Nothing comes back.",
+      "description": "Deletes the return vendor authorization, addressed by its `rva_` id. Only a draft can be deleted. The call returns `204` with no body, and reading it afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "rva_id",
+          "in": "path",
+          "required": true,
+          "description": "The return vendor authorization's `rva_` id. A code returns `404`.",
+          "schema": {
+            "type": "string",
+            "example": "rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The return vendor authorization is deleted."
+        },
+        "400": {
+          "description": "`stock_committed`: the return is not a draft."
+        },
+        "404": {
+          "description": "No return vendor authorization has that `rva_` id. A code also returns `404` here."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rva_id": "rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d"
+        }
+      }
+    },
+    {
+      "key": "update_return_vendor_authorization",
+      "method": "PATCH",
+      "path": "/return_vendor_authorizations/{rva_id}",
+      "slug": "update-a-return-vendor-authorization",
+      "title": "Update a return vendor authorization",
+      "summary": "Changes the date, note or custom attributes of a return vendor authorization and returns it under `return_vendor_authorization`.",
+      "description": "Updates the header of the return vendor authorization, wrapped in `return_vendor_authorization`: `rva_date`, `note` and `custom_attributes`. Address it by its `rva_` id or its code.",
+      "parameters": [
+        {
+          "name": "rva_id",
+          "in": "path",
+          "required": true,
+          "description": "The return vendor authorization's `rva_` id, or its code.",
+          "schema": {
+            "type": "string",
+            "example": "rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "return_vendor_authorization": {
+              "type": "object",
+              "properties": {
+                "rva_date": {
+                  "type": "string"
+                },
+                "note": {
+                  "type": "string"
+                },
+                "custom_attributes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "return_vendor_authorization"
+          ]
+        },
+        "example": {
+          "return_vendor_authorization": {
+            "note": "Two cartons arrived damaged."
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated return vendor authorization, under `return_vendor_authorization`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReturnVendorAuthorizationResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "rva_id": "rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d"
+        },
+        "body": {
+          "return_vendor_authorization": {
+            "note": "Two cartons arrived damaged."
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_return_vendor_authorization_note",
+      "method": "DELETE",
+      "path": "/return_vendor_authorizations/{rva_id}/notes/{note_id}",
+      "slug": "delete-a-return-vendor-authorization-note",
+      "title": "Delete a return vendor authorization note",
+      "summary": "Deletes one note from a return vendor authorization. Nothing comes back.",
+      "description": "Deletes the note, addressed by the return's `rva_` id and the note's `id`. No endpoint lists or creates these notes, so you need the note's `id` already. The call returns `204` with no body.",
+      "parameters": [
+        {
+          "name": "rva_id",
+          "in": "path",
+          "required": true,
+          "description": "The return vendor authorization's `rva_` id.",
+          "schema": {
+            "type": "string",
+            "example": "rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The note is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rva_id": "rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d",
+          "note_id": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+        }
+      }
+    },
+    {
+      "key": "delete_return_vendor_authorization_note_file",
+      "method": "DELETE",
+      "path": "/return_vendor_authorizations/{rva_id}/notes/{note_id}/files/{file_id}",
+      "slug": "delete-a-return-vendor-authorization-note-file",
+      "title": "Delete a return vendor authorization note file",
+      "summary": "Removes one attachment from a return vendor authorization note. Nothing comes back.",
+      "description": "Deletes one file from the note. No endpoint lists these notes, so you need the note's `id` and the file's `id` already. The call returns `204` with no body.",
+      "parameters": [
+        {
+          "name": "rva_id",
+          "in": "path",
+          "required": true,
+          "description": "The return vendor authorization's `rva_` id.",
+          "schema": {
+            "type": "string",
+            "example": "rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+          }
+        },
+        {
+          "name": "file_id",
+          "in": "path",
+          "required": true,
+          "description": "The attachment's `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The file is removed from the note."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rva_id": "rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d",
+          "note_id": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a",
+          "file_id": "6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e"
+        }
+      }
+    },
+    {
+      "key": "get_return_vendor_authorizations",
+      "method": "GET",
+      "path": "/return_vendor_authorizations",
+      "slug": "list-return-vendor-authorizations",
+      "title": "List return vendor authorizations",
+      "summary": "Returns one page of return vendor authorizations.",
+      "description": "Lists the returns to suppliers, one page at a time, under `data`. Pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter the list as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of return vendor authorizations.",
+          "schema": {
+            "$ref": "#/components/schemas/ReturnVendorAuthorizationList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_return_vendor_authorization",
+      "method": "GET",
+      "path": "/return_vendor_authorizations/{rva_id}",
+      "slug": "retrieve-a-return-vendor-authorization",
+      "title": "Retrieve a return vendor authorization",
+      "summary": "Returns one return vendor authorization with its lines under `return_vendor_authorization`.",
+      "description": "Returns the return vendor authorization with its supplier, purchase order, status, `lines` and `receive_rvas` under `return_vendor_authorization`. Address it by its `rva_` id or its code; both return the same record.",
+      "parameters": [
+        {
+          "name": "rva_id",
+          "in": "path",
+          "required": true,
+          "description": "The return vendor authorization's `rva_` id, or its code.",
+          "schema": {
+            "type": "string",
+            "example": "rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The return vendor authorization, under `return_vendor_authorization`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReturnVendorAuthorizationResponse"
+          }
+        },
+        "404": {
+          "description": "No return vendor authorization has that id, for example after it is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "rva_id": "rva_9a8b7c6d5e4f4a3b2c1d0e9f8a7b6c5d"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "ReturnVendorAuthorizationView": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/ReturnVendorAuthorizationAccount"
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/ReturnVendorAuthorizationCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "item_count": {
+          "type": "integer"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {},
+        "note": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "purchase_order": {
+          "$ref": "#/components/schemas/ReturnVendorAuthorizationPurchaseOrder"
+        },
+        "return_status": {
+          "type": "string"
+        },
+        "rva_date": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "lines": {
+          "type": "array",
+          "items": {}
+        },
+        "receive_rvas": {
+          "type": "array",
+          "items": {}
+        }
+      }
+    },
+    "ReturnVendorAuthorizationAccount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ReturnVendorAuthorizationCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ReturnVendorAuthorizationPurchaseOrder": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ReturnVendorAuthorizationResponse": {
+      "type": "object",
+      "properties": {
+        "return_vendor_authorization": {
+          "$ref": "#/components/schemas/ReturnVendorAuthorizationView"
+        }
+      }
+    },
+    "ReturnVendorAuthorization": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/ReturnVendorAuthorizationAccount"
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/ReturnVendorAuthorizationCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "item_count": {
+          "type": "integer"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {},
+        "note": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "purchase_order": {
+          "$ref": "#/components/schemas/ReturnVendorAuthorizationPurchaseOrder"
+        },
+        "return_status": {
+          "type": "string"
+        },
+        "rva_date": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "ReturnVendorAuthorizationPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "ReturnVendorAuthorizationPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size the API applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can be set on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": "string",
+          "description": "The cursor of the previous page."
+        },
+        "links": {
+          "$ref": "#/components/schemas/ReturnVendorAuthorizationPaginationLinks"
+        }
+      }
+    },
+    "ReturnVendorAuthorizationList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ReturnVendorAuthorization"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ReturnVendorAuthorizationPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
