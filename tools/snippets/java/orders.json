@@ -1,0 +1,246 @@
+{
+  "sdk": "java",
+  "module": "orders",
+  "endpoints": {
+    "get_orders": {
+      "function": "orders().getOrders",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderList;\nimport java.util.Map;\n\nApiResponse<OrderList> response = client.orders().getOrders(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "create_order": {
+      "function": "orders().createOrder",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderRead;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse<OrderRead> response = client.orders().createOrder(\n        Map.of(\n                \"order\", Map.of(\n                        \"account_id\", \"W13ZGY\",\n                        \"name\", \"Acme Pty Ltd monthly order\",\n                        \"lines\", List.of(Map.of(\"item_id\", \"ITEM-0001\", \"item_order_quantity\", 1)))));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order": {
+      "function": "orders().getOrder",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderRead;\n\nApiResponse<OrderRead> response = client.orders().getOrder(\"ORD-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "delete_order": {
+      "function": "orders().deleteOrder",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\n\nApiResponse<Dto> response = client.orders().deleteOrder(\"ORD-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "activate_order": {
+      "function": "orders().activateOrder",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse<Dto> response = client.orders().activateOrder(\n        \"ORD-0001\",\n        Map.of(\"order\", Map.of(\"effective_date\", \"2026-10-01\")));\nSystem.out.println(response.getMap());\n"
+    },
+    "create_order_activate_draft": {
+      "function": "orders().createOrderActivateDraft",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderRead;\nimport java.util.Map;\n\nApiResponse<OrderRead> response = client.orders().createOrderActivateDraft(\n        \"ORD-0002\",\n        Map.of(\"order\", Map.of(\"effective_date\", \"2026-10-01\", \"note\", \"Approved by Acme Pty Ltd\")));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_billing_preferences": {
+      "function": "orders().getOrderBillingPreferences",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderBillingPreferences;\n\nApiResponse<OrderBillingPreferences> response = client.orders().getOrderBillingPreferences(\"ORD-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "update_order_billing_preferences": {
+      "function": "orders().updateOrderBillingPreferences",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderRead;\nimport java.util.Map;\n\nApiResponse<OrderRead> response = client.orders().updateOrderBillingPreferences(\n        \"ORD-0001\",\n        Map.of(\"order\", Map.of(\"billing_preferences\", Map.of(\"invoice_mode\", \"MANUAL\"))));\nSystem.out.println(response.getMap());\n"
+    },
+    "replace_order_billing_preferences": {
+      "function": "orders().replaceOrderBillingPreferences",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderRead;\nimport java.util.Map;\n\nApiResponse<OrderRead> response = client.orders().replaceOrderBillingPreferences(\n        \"ORD-0001\",\n        Map.of(\"order\", Map.of(\"billing_preferences\", Map.of(\"invoice_mode\", \"AUTOMATIC\"))));\nSystem.out.println(response.getMap());\n"
+    },
+    "cancel_order": {
+      "function": "orders().cancelOrder",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderRead;\nimport java.util.Map;\n\nApiResponse<OrderRead> response = client.orders().cancelOrder(\n        \"ORD-0001\",\n        Map.of(\"order\", Map.of(\"effective_date\", \"2026-10-01\")));\nSystem.out.println(response.getMap());\n"
+    },
+    "change_order": {
+      "function": "orders().changeOrder",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderRead;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse<OrderRead> response = client.orders().changeOrder(\n        \"ORD-0001\",\n        Map.of(\n                \"order\", Map.of(\n                        \"effective_date\", \"2026-10-01\",\n                        \"lines\", List.of(\n                                Map.of(\n                                        \"op\", \"add\",\n                                        \"item_id\", \"ITEM-0001\",\n                                        \"item_order_quantity\", 1)))));\nSystem.out.println(response.getMap());\n"
+    },
+    "create_order_convert_to_order": {
+      "function": "orders().createOrderConvertToOrder",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderRead;\nimport java.util.Map;\n\nApiResponse<OrderRead> response = client.orders().createOrderConvertToOrder(\"ORD-0002\", Map.of());\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_custom_objects": {
+      "function": "orders().getOrderCustomObjects",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.AccountOrders;\nimport java.util.Map;\n\nApiResponse<AccountOrders> response = client.orders().getOrderCustomObjects(\n        \"ORD-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_custom_objects_instances": {
+      "function": "orders().getOrderCustomObjectsInstances",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.AccountOrders;\nimport java.util.Map;\n\nApiResponse<AccountOrders> response = client.orders().getOrderCustomObjectsInstances(\n        \"ORD-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "create_order_discard_draft": {
+      "function": "orders().createOrderDiscardDraft",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderDiscardDraft;\nimport java.util.Map;\n\nApiResponse<OrderDiscardDraft> response = client.orders().createOrderDiscardDraft(\n        \"ORD-0002\",\n        Map.of(\"order\", Map.of(\"note\", \"Quote no longer needed\")));\nSystem.out.println(response.getMap());\n"
+    },
+    "create_order_extend_trial": {
+      "function": "orders().createOrderExtendTrial",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderExtendTrial;\nimport java.util.Map;\n\nApiResponse<OrderExtendTrial> response = client.orders().createOrderExtendTrial(\n        \"ORD-0001\",\n        Map.of(\"order\", Map.of(\"trial_start_date\", \"2026-10-04\", \"trial_end_date\", \"2026-10-11\")));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_information": {
+      "function": "orders().getOrderInformation",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderInformation;\n\nApiResponse<OrderInformation> response = client.orders().getOrderInformation(\"ORD-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "update_order_information": {
+      "function": "orders().updateOrderInformation",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderRead;\nimport java.util.Map;\n\nApiResponse<OrderRead> response = client.orders().updateOrderInformation(\n        \"ORD-0001\",\n        Map.of(\"order\", Map.of(\"description\", \"Monthly service for Acme Pty Ltd\")));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_item_fulfillments": {
+      "function": "orders().getOrderItemFulfillments",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.AccountOrders;\nimport java.util.Map;\n\nApiResponse<AccountOrders> response = client.orders().getOrderItemFulfillments(\n        \"ORD-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_lines": {
+      "function": "orders().getOrderLines",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderRead;\n\nApiResponse<OrderRead> response = client.orders().getOrderLines(\"ORD-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_notes": {
+      "function": "orders().getOrderNotes",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderNoteList;\nimport java.util.Map;\n\nApiResponse<OrderNoteList> response = client.orders().getOrderNotes(\n        \"ORD-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "create_order_note": {
+      "function": "orders().createOrderNote",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.RequestOptions;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderNoteView;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nApiResponse<OrderNoteView> response = client.orders().createOrderNote(\n        \"ORD-0001\",\n        \"<p>Customer asked for a call back.</p>\",\n        Map.of(\"file\", Path.of(\"call-notes.txt\")),\n        RequestOptions.none());\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_payment_methods": {
+      "function": "orders().getOrderPaymentMethods",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderPaymentMethods;\n\nApiResponse<OrderPaymentMethods> response = client.orders().getOrderPaymentMethods(\"ORD-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_pdf": {
+      "function": "orders().getOrderPdf",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderPdf;\n\nApiResponse<OrderPdf> response = client.orders().getOrderPdf(\"ORD-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "reactivate_order": {
+      "function": "orders().reactivateOrder",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderRead;\nimport java.util.Map;\n\nApiResponse<OrderRead> response = client.orders().reactivateOrder(\n        \"ORD-0001\",\n        Map.of(\"order\", Map.of(\"effective_date\", \"2026-10-01\")));\nSystem.out.println(response.getMap());\n"
+    },
+    "create_order_relinquish": {
+      "function": "orders().createOrderRelinquish",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderRead;\nimport java.util.Map;\n\nApiResponse<OrderRead> response = client.orders().createOrderRelinquish(\n        \"ORD-0001\",\n        Map.of(\"order\", Map.of(\"effective_date\", \"2026-10-01\")));\nSystem.out.println(response.getMap());\n"
+    },
+    "update_order_line": {
+      "function": "orders().updateOrderLine",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderRead;\nimport java.util.Map;\n\nApiResponse<OrderRead> response = client.orders().updateOrderLine(\n        \"ORD-0001\",\n        \"6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c\",\n        Map.of(\"order\", Map.of(\"line\", Map.of(\"item_description\", \"Monthly support, 10 hours\"))));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_line": {
+      "function": "orders().getOrderLine",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderLine;\n\nApiResponse<OrderLine> response = client.orders().getOrderLine(\"ORD-0001\", \"6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c\");\nSystem.out.println(response.getMap());\n"
+    },
+    "delete_order_note": {
+      "function": "orders().deleteOrderNote",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\n\nApiResponse<Dto> response = client.orders().deleteOrderNote(\"ORD-0001\", \"nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_note": {
+      "function": "orders().getOrderNote",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderNoteView;\n\nApiResponse<OrderNoteView> response = client.orders().getOrderNote(\"ORD-0001\", \"nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f\");\nSystem.out.println(response.getMap());\n"
+    },
+    "update_order_note": {
+      "function": "orders().updateOrderNote",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.RequestOptions;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderNoteView;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nApiResponse<OrderNoteView> response = client.orders().updateOrderNote(\n        \"ORD-0001\",\n        \"nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f\",\n        \"<p>Customer called back.</p>\",\n        Map.of(\"file\", Path.of(\"call-notes.txt\")),\n        RequestOptions.none());\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_payment_method": {
+      "function": "orders().getOrderPaymentMethod",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderPaymentMethod;\n\nApiResponse<OrderPaymentMethod> response = client.orders().getOrderPaymentMethod(\"ORD-0001\", \"acme-cash-01\");\nSystem.out.println(response.getMap());\n"
+    },
+    "update_order_line_billing_preferences": {
+      "function": "orders().updateOrderLineBillingPreferences",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderRead;\nimport java.util.Map;\n\nApiResponse<OrderRead> response = client.orders().updateOrderLineBillingPreferences(\n        \"ORD-0001\",\n        \"6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c\",\n        Map.of(\n                \"order\", Map.of(\n                        \"line\", Map.of(\n                                \"item_properties\", Map.of(\n                                        \"charging_start_date\", \"SUBSCRIPTION_START_DATE\")))));\nSystem.out.println(response.getMap());\n"
+    },
+    "replace_order_line_billing_preferences": {
+      "function": "orders().replaceOrderLineBillingPreferences",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderRead;\nimport java.util.Map;\n\nApiResponse<OrderRead> response = client.orders().replaceOrderLineBillingPreferences(\n        \"ORD-0001\",\n        \"6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c\",\n        Map.of(\n                \"order\", Map.of(\n                        \"line\", Map.of(\n                                \"billing_preferences\", Map.of(\n                                        \"charging_start_date\", \"SUBSCRIPTION_START_DATE\")))));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_note_files": {
+      "function": "orders().getOrderNoteFiles",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderNoteFileList;\nimport java.util.Map;\n\nApiResponse<OrderNoteFileList> response = client.orders().getOrderNoteFiles(\n        \"ORD-0001\",\n        \"nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_note_file": {
+      "function": "orders().getOrderNoteFile",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderNoteFile;\n\nApiResponse<OrderNoteFile> response = client.orders().getOrderNoteFile(\n        \"ORD-0001\",\n        \"nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f\",\n        \"b7c8d9e0-f1a2-4b3c-8d4e-5f6a7b8c9d0e\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_orders_notes": {
+      "function": "orders().getOrdersNotes",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderNoteList;\nimport java.util.Map;\n\nApiResponse<OrderNoteList> response = client.orders().getOrdersNotes(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "preview_order": {
+      "function": "orders().previewOrder",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse<Dto> response = client.orders().previewOrder(\n        Map.of(\n                \"order\", Map.of(\n                        \"account_id\", \"W13ZGY\",\n                        \"name\", \"Acme Pty Ltd monthly order\",\n                        \"lines\", List.of(Map.of(\"item_id\", \"ITEM-0001\", \"item_order_quantity\", 1)))));\nSystem.out.println(response.getMap());\n"
+    },
+    "create_order_express": {
+      "function": "orders().createOrderExpress",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse<Dto> response = client.orders().createOrderExpress(\n        Map.of(\n                \"account\", Map.of(\n                        \"id\", \"W13ZGY\",\n                        \"order\", Map.of(\n                                \"price_tax_inclusive\", false,\n                                \"properties\", Map.of(\n                                        \"fulfillment_mode\", \"MANUAL\",\n                                        \"fulfillment_term\", \"IMMEDIATELY\"),\n                                \"lines\", List.of(\n                                        Map.of(\n                                                \"item_id\", \"ITEM-0001\",\n                                                \"item_order_quantity\", 2,\n                                                \"item_price_snapshot\", Map.of(\n                                                        \"pricing_rule\", Map.of(\"price\", 1.5)),\n                                                \"tax_exempt_when_sold\", true))))));\nSystem.out.println(response.getMap());\n"
+    },
+    "accept_order": {
+      "function": "orders().acceptOrder",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\n\nApiResponse<Dto> response = client.orders().acceptOrder(\"ORD-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "activate_order_invoice_from_dormant": {
+      "function": "orders().activateOrderInvoiceFromDormant",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse<Dto> response = client.orders().activateOrderInvoiceFromDormant(\n        \"ORD-0001\",\n        \"4d5e6f70-8192-4a3b-bc4d-5e6f708192a3\",\n        Map.of(\"activate\", Map.of(\"due_date\", \"2026-10-31\", \"amount\", \"100.00\")));\nSystem.out.println(response.getMap());\n"
+    },
+    "preview_order_change": {
+      "function": "orders().previewOrderChange",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderRead;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse<OrderRead> response = client.orders().previewOrderChange(\n        \"ORD-0001\",\n        Map.of(\n                \"order\", Map.of(\n                        \"effective_date\", \"2026-10-01\",\n                        \"lines\", List.of(\n                                Map.of(\n                                        \"op\", \"add\",\n                                        \"item_id\", \"ITEM-0001\",\n                                        \"item_order_quantity\", 1)))));\nSystem.out.println(response.getMap());\n"
+    },
+    "change_order_status": {
+      "function": "orders().changeOrderStatus",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse<Dto> response = client.orders().changeOrderStatus(\n        \"ORD-0001\",\n        Map.of(\"order\", Map.of(\"workflow_status\", \"Approved\")));\nSystem.out.println(response.getMap());\n"
+    },
+    "adjust_order_contract": {
+      "function": "orders().adjustOrderContract",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse<Dto> response = client.orders().adjustOrderContract(\n        \"ORD-0001\",\n        Map.of(\n                \"effective_date\", \"2026-10-01\",\n                \"lines\", List.of(\n                        Map.of(\n                                \"charge_item_uuid\", \"0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d\",\n                                \"package_name\", \"Premium\"))));\nSystem.out.println(response.getMap());\n"
+    },
+    "preview_order_contract_adjustment": {
+      "function": "orders().previewOrderContractAdjustment",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse<Dto> response = client.orders().previewOrderContractAdjustment(\n        \"ORD-0001\",\n        Map.of(\n                \"effective_date\", \"2026-10-01\",\n                \"lines\", List.of(\n                        Map.of(\n                                \"charge_item_uuid\", \"0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d\",\n                                \"package_name\", \"Premium\"))));\nSystem.out.println(response.getMap());\n"
+    },
+    "downgrade_order": {
+      "function": "orders().downgradeOrder",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse<Dto> response = client.orders().downgradeOrder(\n        \"ORD-0001\",\n        Map.of(\n                \"effective_date\", \"2026-10-01\",\n                \"lines\", List.of(\n                        Map.of(\n                                \"charge_item_uuid\", \"0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d\",\n                                \"package_name\", \"Premium\"))));\nSystem.out.println(response.getMap());\n"
+    },
+    "preview_order_downgrade": {
+      "function": "orders().previewOrderDowngrade",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse<Dto> response = client.orders().previewOrderDowngrade(\n        \"ORD-0001\",\n        Map.of(\n                \"effective_date\", \"2026-10-01\",\n                \"lines\", List.of(\n                        Map.of(\n                                \"charge_item_uuid\", \"0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d\",\n                                \"package_name\", \"Premium\"))));\nSystem.out.println(response.getMap());\n"
+    },
+    "upgrade_order": {
+      "function": "orders().upgradeOrder",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse<Dto> response = client.orders().upgradeOrder(\n        \"ORD-0001\",\n        Map.of(\n                \"effective_date\", \"2026-10-01\",\n                \"lines\", List.of(\n                        Map.of(\n                                \"charge_item_uuid\", \"0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d\",\n                                \"package_name\", \"Premium\"))));\nSystem.out.println(response.getMap());\n"
+    },
+    "preview_order_upgrade": {
+      "function": "orders().previewOrderUpgrade",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse<Dto> response = client.orders().previewOrderUpgrade(\n        \"ORD-0001\",\n        Map.of(\n                \"effective_date\", \"2026-10-01\",\n                \"lines\", List.of(\n                        Map.of(\n                                \"charge_item_uuid\", \"0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d\",\n                                \"package_name\", \"Premium\"))));\nSystem.out.println(response.getMap());\n"
+    },
+    "terminate_order_trial": {
+      "function": "orders().terminateOrderTrial",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\n\nApiResponse<Dto> response = client.orders().terminateOrderTrial(\"ORD-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "delete_order_note_file": {
+      "function": "orders().deleteOrderNoteFile",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\n\nApiResponse<Dto> response = client.orders().deleteOrderNoteFile(\n        \"ORD-0001\",\n        \"nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f\",\n        \"b7c8d9e0-f1a2-4b3c-8d4e-5f6a7b8c9d0e\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_custom_object": {
+      "function": "orders().getOrderCustomObject",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderCustomObject;\n\nApiResponse<OrderCustomObject> response = client.orders().getOrderCustomObject(\n        \"ORD-0001\",\n        \"co_4f1c9a2e7b3d4e6f8a0b1c2d3e4f5a6b\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_custom_object_instance": {
+      "function": "orders().getOrderCustomObjectInstance",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\n\nApiResponse<Dto> response = client.orders().getOrderCustomObjectInstance(\n        \"ORD-0001\",\n        \"co_4f1c9a2e7b3d4e6f8a0b1c2d3e4f5a6b\",\n        \"coi_9a8b7c6d5e4f40312a1b2c3d4e5f6a7b\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_custom_objects_instance": {
+      "function": "orders().getOrderCustomObjectsInstance",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderCustomObject;\n\nApiResponse<OrderCustomObject> response = client.orders().getOrderCustomObjectsInstance(\n        \"ORD-0001\",\n        \"co_4f1c9a2e7b3d4e6f8a0b1c2d3e4f5a6b\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_custom_objects_instance_instance": {
+      "function": "orders().getOrderCustomObjectsInstanceInstance",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\n\nApiResponse<Dto> response = client.orders().getOrderCustomObjectsInstanceInstance(\n        \"ORD-0001\",\n        \"co_4f1c9a2e7b3d4e6f8a0b1c2d3e4f5a6b\",\n        \"coi_9a8b7c6d5e4f40312a1b2c3d4e5f6a7b\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_item_fulfillment": {
+      "function": "orders().getOrderItemFulfillment",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderItemFulfillment;\n\nApiResponse<OrderItemFulfillment> response = client.orders().getOrderItemFulfillment(\"ORD-0001\", \"IF-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_kpis": {
+      "function": "orders().getOrderKpis",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderKpis;\n\nApiResponse<OrderKpis> response = client.orders().getOrderKpis(\"ORD-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_payment": {
+      "function": "orders().getOrderPayment",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderPayment;\n\nApiResponse<OrderPayment> response = client.orders().getOrderPayment(\"ORD-0001\", \"PAY-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_quote_partial_invoices": {
+      "function": "orders().getOrderQuotePartialInvoices",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.orders.orders_dto.OrdersDto.OrderQuotePartialInvoices;\n\nApiResponse<OrderQuotePartialInvoices> response = client.orders().getOrderQuotePartialInvoices(\"ORD-0002\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_shipping_pdf": {
+      "function": "orders().getOrderShippingPdf",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\n\nApiResponse<Dto> response = client.orders().getOrderShippingPdf(\"ORD-0001\", \"8e9f0a1b-2c3d-4e5f-a6b7-c8d9e0f1a2b3\");\nSystem.out.println(response.getMap());\n"
+    }
+  }
+}

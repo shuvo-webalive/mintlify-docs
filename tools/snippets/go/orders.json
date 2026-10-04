@@ -1,0 +1,246 @@
+{
+ "sdk": "go",
+ "module": "orders",
+ "endpoints": {
+  "get_orders": {
+   "function": "Orders.GetOrders",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrders(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "create_order": {
+   "function": "Orders.CreateOrder",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().CreateOrder(context.Background(), map[string]any{\n\t\"order\": map[string]any{\n\t\t\"account_id\": \"W13ZGY\",\n\t\t\"name\":       \"Acme Pty Ltd monthly order\",\n\t\t\"lines\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"item_id\":             \"ITEM-0001\",\n\t\t\t\t\"item_order_quantity\": 1,\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order": {
+   "function": "Orders.GetOrder",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrder(context.Background(), \"ORD-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "delete_order": {
+   "function": "Orders.DeleteOrder",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().DeleteOrder(context.Background(), \"ORD-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "activate_order": {
+   "function": "Orders.ActivateOrder",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().ActivateOrder(context.Background(), \"ORD-0001\", map[string]any{\n\t\"order\": map[string]any{\"effective_date\": \"2026-10-01\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "create_order_activate_draft": {
+   "function": "Orders.CreateOrderActivateDraft",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().CreateOrderActivateDraft(context.Background(), \"ORD-0002\", map[string]any{\n\t\"order\": map[string]any{\n\t\t\"effective_date\": \"2026-10-01\",\n\t\t\"note\":           \"Approved by Acme Pty Ltd\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_billing_preferences": {
+   "function": "Orders.GetOrderBillingPreferences",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderBillingPreferences(context.Background(), \"ORD-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "update_order_billing_preferences": {
+   "function": "Orders.UpdateOrderBillingPreferences",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().UpdateOrderBillingPreferences(context.Background(), \"ORD-0001\", map[string]any{\n\t\"order\": map[string]any{\n\t\t\"billing_preferences\": map[string]any{\"invoice_mode\": \"MANUAL\"},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "replace_order_billing_preferences": {
+   "function": "Orders.ReplaceOrderBillingPreferences",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().ReplaceOrderBillingPreferences(context.Background(), \"ORD-0001\", map[string]any{\n\t\"order\": map[string]any{\n\t\t\"billing_preferences\": map[string]any{\"invoice_mode\": \"AUTOMATIC\"},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "cancel_order": {
+   "function": "Orders.CancelOrder",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().CancelOrder(context.Background(), \"ORD-0001\", map[string]any{\n\t\"order\": map[string]any{\"effective_date\": \"2026-10-01\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "change_order": {
+   "function": "Orders.ChangeOrder",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().ChangeOrder(context.Background(), \"ORD-0001\", map[string]any{\n\t\"order\": map[string]any{\n\t\t\"effective_date\": \"2026-10-01\",\n\t\t\"lines\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"op\":                  \"add\",\n\t\t\t\t\"item_id\":             \"ITEM-0001\",\n\t\t\t\t\"item_order_quantity\": 1,\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "create_order_convert_to_order": {
+   "function": "Orders.CreateOrderConvertToOrder",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().CreateOrderConvertToOrder(context.Background(), \"ORD-0002\", map[string]any{}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_custom_objects": {
+   "function": "Orders.GetOrderCustomObjects",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderCustomObjects(context.Background(), \"ORD-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_custom_objects_instances": {
+   "function": "Orders.GetOrderCustomObjectsInstances",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderCustomObjectsInstances(context.Background(), \"ORD-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "create_order_discard_draft": {
+   "function": "Orders.CreateOrderDiscardDraft",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().CreateOrderDiscardDraft(context.Background(), \"ORD-0002\", map[string]any{\n\t\"order\": map[string]any{\"note\": \"Quote no longer needed\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "create_order_extend_trial": {
+   "function": "Orders.CreateOrderExtendTrial",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().CreateOrderExtendTrial(context.Background(), \"ORD-0001\", map[string]any{\n\t\"order\": map[string]any{\n\t\t\"trial_start_date\": \"2026-10-04\",\n\t\t\"trial_end_date\":   \"2026-10-11\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_information": {
+   "function": "Orders.GetOrderInformation",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderInformation(context.Background(), \"ORD-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "update_order_information": {
+   "function": "Orders.UpdateOrderInformation",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().UpdateOrderInformation(context.Background(), \"ORD-0001\", map[string]any{\n\t\"order\": map[string]any{\n\t\t\"description\": \"Monthly service for Acme Pty Ltd\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_item_fulfillments": {
+   "function": "Orders.GetOrderItemFulfillments",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderItemFulfillments(context.Background(), \"ORD-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_lines": {
+   "function": "Orders.GetOrderLines",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderLines(context.Background(), \"ORD-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_notes": {
+   "function": "Orders.GetOrderNotes",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderNotes(context.Background(), \"ORD-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "create_order_note": {
+   "function": "Orders.CreateOrderNote",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n)\n\nfile, err := os.ReadFile(\"call-notes.txt\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.Orders().CreateOrderNote(context.Background(), \"ORD-0001\", \"<p>Customer asked for a call back.</p>\", map[string]any{\"file\": []any{\"call-notes.txt\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_payment_methods": {
+   "function": "Orders.GetOrderPaymentMethods",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderPaymentMethods(context.Background(), \"ORD-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_pdf": {
+   "function": "Orders.GetOrderPDF",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderPDF(context.Background(), \"ORD-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "reactivate_order": {
+   "function": "Orders.ReactivateOrder",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().ReactivateOrder(context.Background(), \"ORD-0001\", map[string]any{\n\t\"order\": map[string]any{\"effective_date\": \"2026-10-01\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "create_order_relinquish": {
+   "function": "Orders.CreateOrderRelinquish",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().CreateOrderRelinquish(context.Background(), \"ORD-0001\", map[string]any{\n\t\"order\": map[string]any{\"effective_date\": \"2026-10-01\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "update_order_line": {
+   "function": "Orders.UpdateOrderLine",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().UpdateOrderLine(context.Background(), \"ORD-0001\", \"6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c\", map[string]any{\n\t\"order\": map[string]any{\n\t\t\"line\": map[string]any{\n\t\t\t\"item_description\": \"Monthly support, 10 hours\",\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_line": {
+   "function": "Orders.GetOrderLine",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderLine(context.Background(), \"ORD-0001\", \"6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "delete_order_note": {
+   "function": "Orders.DeleteOrderNote",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().DeleteOrderNote(context.Background(), \"ORD-0001\", \"nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_note": {
+   "function": "Orders.GetOrderNote",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderNote(context.Background(), \"ORD-0001\", \"nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "update_order_note": {
+   "function": "Orders.UpdateOrderNote",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n)\n\nfile, err := os.ReadFile(\"call-notes.txt\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.Orders().UpdateOrderNote(context.Background(), \"ORD-0001\", \"nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f\", \"<p>Customer called back.</p>\", map[string]any{\"file\": []any{\"call-notes.txt\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_payment_method": {
+   "function": "Orders.GetOrderPaymentMethod",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderPaymentMethod(context.Background(), \"ORD-0001\", \"acme-cash-01\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "update_order_line_billing_preferences": {
+   "function": "Orders.UpdateOrderLineBillingPreferences",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().UpdateOrderLineBillingPreferences(context.Background(), \"ORD-0001\", \"6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c\", map[string]any{\n\t\"order\": map[string]any{\n\t\t\"line\": map[string]any{\n\t\t\t\"item_properties\": map[string]any{\n\t\t\t\t\"charging_start_date\": \"SUBSCRIPTION_START_DATE\",\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "replace_order_line_billing_preferences": {
+   "function": "Orders.ReplaceOrderLineBillingPreferences",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().ReplaceOrderLineBillingPreferences(context.Background(), \"ORD-0001\", \"6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c\", map[string]any{\n\t\"order\": map[string]any{\n\t\t\"line\": map[string]any{\n\t\t\t\"billing_preferences\": map[string]any{\n\t\t\t\t\"charging_start_date\": \"SUBSCRIPTION_START_DATE\",\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_note_files": {
+   "function": "Orders.GetOrderNoteFiles",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderNoteFiles(context.Background(), \"ORD-0001\", \"nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_note_file": {
+   "function": "Orders.GetOrderNoteFile",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderNoteFile(context.Background(), \"ORD-0001\", \"nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f\", \"b7c8d9e0-f1a2-4b3c-8d4e-5f6a7b8c9d0e\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_orders_notes": {
+   "function": "Orders.GetOrdersNotes",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrdersNotes(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "preview_order": {
+   "function": "Orders.PreviewOrder",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().PreviewOrder(context.Background(), map[string]any{\n\t\"order\": map[string]any{\n\t\t\"account_id\": \"W13ZGY\",\n\t\t\"name\":       \"Acme Pty Ltd monthly order\",\n\t\t\"lines\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"item_id\":             \"ITEM-0001\",\n\t\t\t\t\"item_order_quantity\": 1,\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "create_order_express": {
+   "function": "Orders.CreateOrderExpress",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().CreateOrderExpress(context.Background(), map[string]any{\n\t\"account\": map[string]any{\n\t\t\"id\": \"W13ZGY\",\n\t\t\"order\": map[string]any{\n\t\t\t\"price_tax_inclusive\": false,\n\t\t\t\"properties\": map[string]any{\n\t\t\t\t\"fulfillment_mode\": \"MANUAL\",\n\t\t\t\t\"fulfillment_term\": \"IMMEDIATELY\",\n\t\t\t},\n\t\t\t\"lines\": []any{\n\t\t\t\tmap[string]any{\n\t\t\t\t\t\"item_id\":             \"ITEM-0001\",\n\t\t\t\t\t\"item_order_quantity\": 2,\n\t\t\t\t\t\"item_price_snapshot\": map[string]any{\n\t\t\t\t\t\t\"pricing_rule\": map[string]any{\"price\": 1.5},\n\t\t\t\t\t},\n\t\t\t\t\t\"tax_exempt_when_sold\": true,\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "accept_order": {
+   "function": "Orders.AcceptOrder",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().AcceptOrder(context.Background(), \"ORD-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "activate_order_invoice_from_dormant": {
+   "function": "Orders.ActivateOrderInvoiceFromDormant",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().ActivateOrderInvoiceFromDormant(context.Background(), \"ORD-0001\", \"4d5e6f70-8192-4a3b-bc4d-5e6f708192a3\", map[string]any{\n\t\"activate\": map[string]any{\"due_date\": \"2026-10-31\", \"amount\": \"100.00\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "preview_order_change": {
+   "function": "Orders.PreviewOrderChange",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().PreviewOrderChange(context.Background(), \"ORD-0001\", map[string]any{\n\t\"order\": map[string]any{\n\t\t\"effective_date\": \"2026-10-01\",\n\t\t\"lines\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"op\":                  \"add\",\n\t\t\t\t\"item_id\":             \"ITEM-0001\",\n\t\t\t\t\"item_order_quantity\": 1,\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "change_order_status": {
+   "function": "Orders.ChangeOrderStatus",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().ChangeOrderStatus(context.Background(), \"ORD-0001\", map[string]any{\n\t\"order\": map[string]any{\"workflow_status\": \"Approved\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "adjust_order_contract": {
+   "function": "Orders.AdjustOrderContract",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().AdjustOrderContract(context.Background(), \"ORD-0001\", map[string]any{\n\t\"effective_date\": \"2026-10-01\",\n\t\"lines\": []any{\n\t\tmap[string]any{\n\t\t\t\"charge_item_uuid\": \"0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d\",\n\t\t\t\"package_name\":     \"Premium\",\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "preview_order_contract_adjustment": {
+   "function": "Orders.PreviewOrderContractAdjustment",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().PreviewOrderContractAdjustment(context.Background(), \"ORD-0001\", map[string]any{\n\t\"effective_date\": \"2026-10-01\",\n\t\"lines\": []any{\n\t\tmap[string]any{\n\t\t\t\"charge_item_uuid\": \"0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d\",\n\t\t\t\"package_name\":     \"Premium\",\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "downgrade_order": {
+   "function": "Orders.DowngradeOrder",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().DowngradeOrder(context.Background(), \"ORD-0001\", map[string]any{\n\t\"effective_date\": \"2026-10-01\",\n\t\"lines\": []any{\n\t\tmap[string]any{\n\t\t\t\"charge_item_uuid\": \"0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d\",\n\t\t\t\"package_name\":     \"Premium\",\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "preview_order_downgrade": {
+   "function": "Orders.PreviewOrderDowngrade",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().PreviewOrderDowngrade(context.Background(), \"ORD-0001\", map[string]any{\n\t\"effective_date\": \"2026-10-01\",\n\t\"lines\": []any{\n\t\tmap[string]any{\n\t\t\t\"charge_item_uuid\": \"0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d\",\n\t\t\t\"package_name\":     \"Premium\",\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "upgrade_order": {
+   "function": "Orders.UpgradeOrder",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().UpgradeOrder(context.Background(), \"ORD-0001\", map[string]any{\n\t\"effective_date\": \"2026-10-01\",\n\t\"lines\": []any{\n\t\tmap[string]any{\n\t\t\t\"charge_item_uuid\": \"0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d\",\n\t\t\t\"package_name\":     \"Premium\",\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "preview_order_upgrade": {
+   "function": "Orders.PreviewOrderUpgrade",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().PreviewOrderUpgrade(context.Background(), \"ORD-0001\", map[string]any{\n\t\"effective_date\": \"2026-10-01\",\n\t\"lines\": []any{\n\t\tmap[string]any{\n\t\t\t\"charge_item_uuid\": \"0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d\",\n\t\t\t\"package_name\":     \"Premium\",\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "terminate_order_trial": {
+   "function": "Orders.TerminateOrderTrial",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().TerminateOrderTrial(context.Background(), \"ORD-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "delete_order_note_file": {
+   "function": "Orders.DeleteOrderNoteFile",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().DeleteOrderNoteFile(context.Background(), \"ORD-0001\", \"nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f\", \"b7c8d9e0-f1a2-4b3c-8d4e-5f6a7b8c9d0e\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_custom_object": {
+   "function": "Orders.GetOrderCustomObject",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderCustomObject(context.Background(), \"ORD-0001\", \"co_4f1c9a2e7b3d4e6f8a0b1c2d3e4f5a6b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_custom_object_instance": {
+   "function": "Orders.GetOrderCustomObjectInstance",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderCustomObjectInstance(context.Background(), \"ORD-0001\", \"co_4f1c9a2e7b3d4e6f8a0b1c2d3e4f5a6b\", \"coi_9a8b7c6d5e4f40312a1b2c3d4e5f6a7b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_custom_objects_instance": {
+   "function": "Orders.GetOrderCustomObjectsInstance",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderCustomObjectsInstance(context.Background(), \"ORD-0001\", \"co_4f1c9a2e7b3d4e6f8a0b1c2d3e4f5a6b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_custom_objects_instance_instance": {
+   "function": "Orders.GetOrderCustomObjectsInstanceInstance",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderCustomObjectsInstanceInstance(context.Background(), \"ORD-0001\", \"co_4f1c9a2e7b3d4e6f8a0b1c2d3e4f5a6b\", \"coi_9a8b7c6d5e4f40312a1b2c3d4e5f6a7b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_item_fulfillment": {
+   "function": "Orders.GetOrderItemFulfillment",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderItemFulfillment(context.Background(), \"ORD-0001\", \"IF-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_kpis": {
+   "function": "Orders.GetOrderKPIs",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderKPIs(context.Background(), \"ORD-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_payment": {
+   "function": "Orders.GetOrderPayment",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderPayment(context.Background(), \"ORD-0001\", \"PAY-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_quote_partial_invoices": {
+   "function": "Orders.GetOrderQuotePartialInvoices",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderQuotePartialInvoices(context.Background(), \"ORD-0002\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_order_shipping_pdf": {
+   "function": "Orders.GetOrderShippingPDF",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.Orders().GetOrderShippingPDF(context.Background(), \"ORD-0001\", \"8e9f0a1b-2c3d-4e5f-a6b7-c8d9e0f1a2b3\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  }
+ }
+}
