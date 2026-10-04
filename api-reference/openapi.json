@@ -236,6 +236,9 @@
     },
     {
       "name": "Invoice terms"
+    },
+    {
+      "name": "Days of the month"
     }
   ],
   "paths": {
@@ -73307,6 +73310,176 @@
           }
         }
       }
+    },
+    "/settings/day_of_month": {
+      "get": {
+        "tags": [
+          "Days of the month"
+        ],
+        "summary": "List days of the month",
+        "operationId": "day_of_month_get_settings_days_of_month",
+        "description": "Lists the days of the month a date can be aligned to. Each record carries its `day` number. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` of the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of days of the month, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DayOfMonthList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/day_of_month?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.day_of_month.get_settings_days_of_month({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.dayOfMonth.getSettingsDaysOfMonth({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->dayOfMonth->getSettingsDaysOfMonth(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.day_of_month.day_of_month_dto.DayOfMonthDto.SettingsDayOfMonthList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsDayOfMonthList> response = client.dayOfMonth().getSettingsDaysOfMonth(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.DayOfMonth.GetSettingsDaysOfMonthAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.dayOfMonth.getSettingsDaysOfMonth(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.DayOfMonth().GetSettingsDaysOfMonth(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/settings/day_of_month/{day_of_month_id}": {
+      "get": {
+        "tags": [
+          "Days of the month"
+        ],
+        "summary": "Retrieve a day of the month",
+        "operationId": "day_of_month_get_settings_day_of_month",
+        "description": "Reads the day of the month with this `dom_` `id`. The `id` is the one the listing returns.",
+        "parameters": [
+          {
+            "name": "day_of_month_id",
+            "in": "path",
+            "required": true,
+            "description": "The day of the month's `dom_` `id`, as the listing returns it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The day of the month, under `day_of_month`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DayOfMonthResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/day_of_month/dom_343f24b51d7d780a09fc6d133aa7d9ae\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.day_of_month.get_settings_day_of_month(\n    \"dom_343f24b51d7d780a09fc6d133aa7d9ae\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.dayOfMonth.getSettingsDayOfMonth('dom_343f24b51d7d780a09fc6d133aa7d9ae');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->dayOfMonth->getSettingsDayOfMonth('dom_343f24b51d7d780a09fc6d133aa7d9ae');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.day_of_month.day_of_month_dto.DayOfMonthDto.SettingsDayOfMonth;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsDayOfMonth> response = client.dayOfMonth().getSettingsDayOfMonth(\n        \"dom_343f24b51d7d780a09fc6d133aa7d9ae\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.DayOfMonth.GetSettingsDayOfMonthAsync(\"dom_343f24b51d7d780a09fc6d133aa7d9ae\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.dayOfMonth.getSettingsDayOfMonth(\n  'dom_343f24b51d7d780a09fc6d133aa7d9ae',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.DayOfMonth().GetSettingsDayOfMonth(context.Background(), \"dom_343f24b51d7d780a09fc6d133aa7d9ae\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -112507,6 +112680,109 @@
         "properties": {
           "invoice_term": {
             "$ref": "#/components/schemas/InvoiceTerm"
+          }
+        }
+      },
+      "DayOfMonthList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DayOfMonth"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/DayOfMonthPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "DayOfMonth": {
+        "type": "object",
+        "properties": {
+          "created_by": {
+            "description": "Null in every record read so far, so its type is not known."
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "day": {
+            "type": "integer"
+          },
+          "description": {
+            "description": "Null in every record read so far, so its type is not known."
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "description": "Null in every record read so far, so its type is not known."
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "DayOfMonthPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass this back as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/DayOfMonthPaginationLinks"
+          }
+        }
+      },
+      "DayOfMonthPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "DayOfMonthResponse": {
+        "type": "object",
+        "properties": {
+          "day_of_month": {
+            "$ref": "#/components/schemas/DayOfMonth"
           }
         }
       },
