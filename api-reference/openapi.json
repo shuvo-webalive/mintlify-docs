@@ -72792,7 +72792,7 @@
         ],
         "summary": "List pricing periods",
         "operationId": "pricing_periods_get_settings_pricing_periods",
-        "description": "Lists the pricing periods on the instance. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results. Each record's `time_period` reads null here, whatever the record holds.",
+        "description": "Lists the pricing periods on the instance. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results. `time_period` is null in this response, even when the pricing period has a time period.",
         "parameters": [
           {
             "name": "limit",
@@ -72989,7 +72989,7 @@
         ],
         "summary": "Retrieve a pricing period",
         "operationId": "pricing_periods_get_settings_pricing_period",
-        "description": "Reads the pricing period with this `id`. The `id` is the one a listing or a create returns. Its `time_period` reads null here, whatever the record holds.",
+        "description": "Reads the pricing period with this `id`. `time_period` is null in this response, even when the pricing period has a time period.",
         "parameters": [
           {
             "name": "pricing_period_id",
@@ -123603,7 +123603,7 @@
         "type": "object",
         "properties": {
           "created_by": {
-            "description": "Null in every record read so far, so its type is not known."
+            "description": "Can be null."
           },
           "created_on": {
             "type": "string"
@@ -123621,7 +123621,7 @@
             "type": "string"
           },
           "last_updated_by": {
-            "description": "Null in every record read so far, so its type is not known."
+            "description": "Can be null."
           },
           "last_updated_on": {
             "type": "string"
@@ -123636,7 +123636,15 @@
             "type": "string"
           },
           "time_period": {
-            "$ref": "#/components/schemas/PricingPeriodTimePeriod"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PricingPeriodTimePeriod"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null in listings and single reads; only the create response fills it."
           }
         }
       },

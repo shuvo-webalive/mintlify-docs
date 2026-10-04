@@ -11,7 +11,7 @@
     "**Listings and single reads return `time_period` as null.** This happens whatever the record holds; the create response does carry the time period.",
     "**A create links the time period by its `tp_` id.** Send it as `time_period`, with `name` and `display_name`, under `pricing_period`.",
     "**`status` takes `active` or `inactive`.** Send it in an update to enable or disable a pricing period.",
-    "**Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true.",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.",
     "**A delete returns `204` with no body.** Reading the pricing period afterwards returns `404`."
   ],
   "endpoints": [
@@ -22,7 +22,7 @@
       "slug": "list-pricing-periods",
       "title": "List pricing periods",
       "summary": "Returns a page of pricing periods under `data`, with paging details under `pagination`.",
-      "description": "Lists the pricing periods on the instance. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results. Each record's `time_period` reads null here, whatever the record holds.",
+      "description": "Lists the pricing periods on the instance. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results. `time_period` is null in this response, even when the pricing period has a time period.",
       "parameters": [
         {
           "name": "limit",
@@ -141,7 +141,7 @@
       "slug": "retrieve-a-pricing-period",
       "title": "Retrieve a pricing period",
       "summary": "Returns one pricing period by its `id`, under `pricing_period`.",
-      "description": "Reads the pricing period with this `id`. The `id` is the one a listing or a create returns. Its `time_period` reads null here, whatever the record holds.",
+      "description": "Reads the pricing period with this `id`. `time_period` is null in this response, even when the pricing period has a time period.",
       "parameters": [
         {
           "name": "pricing_period_id",
@@ -304,7 +304,7 @@
       "type": "object",
       "properties": {
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -322,7 +322,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
@@ -337,7 +337,15 @@
           "type": "string"
         },
         "time_period": {
-          "$ref": "#/components/schemas/PricingPeriodTimePeriod"
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/PricingPeriodTimePeriod"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Null in listings and single reads; only the create response fills it."
         }
       }
     },
