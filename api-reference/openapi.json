@@ -260,6 +260,9 @@
     },
     {
       "name": "Custom components"
+    },
+    {
+      "name": "Custom features"
     }
   ],
   "paths": {
@@ -80142,6 +80145,655 @@
           }
         }
       }
+    },
+    "/custom_feature": {
+      "get": {
+        "tags": [
+          "Custom features"
+        ],
+        "summary": "List custom features",
+        "operationId": "custom_features_get_custom_features",
+        "description": "Lists the active custom features with each one's name, where it is used, its relation and its forms. Records are under `data` and paging details under `pagination`. Fields filter as `filter_<field>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` from the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "A field to sort by, such as `created_on`, or `-created_on` for newest first.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of active custom features, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomFeatureList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/custom_feature?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.custom_features.get_custom_features({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.customFeatures.getCustomFeatures({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->customFeatures->getCustomFeatures(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.custom_features.custom_features_dto.CustomFeaturesDto.CustomFeatureList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<CustomFeatureList> response = client.customFeatures().getCustomFeatures(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CustomFeatures.GetCustomFeaturesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customFeatures.getCustomFeatures(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CustomFeatures().GetCustomFeatures(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Custom features"
+        ],
+        "summary": "Create a custom feature",
+        "operationId": "custom_features_create_custom_feature",
+        "description": "Defines a new custom feature. Send its fields under `component`: a `name`, and optionally `display_name`, `description`, `use_in` such as `account` and `relation` such as `ONE_TO_MANY`. The new feature comes back with its `cmp_` id.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new custom feature, under `custom_feature`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomFeatureResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/custom_feature\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"component\": {\n      \"name\": \"service_contract\",\n      \"display_name\": \"Service contract\",\n      \"use_in\": \"account\",\n      \"relation\": \"ONE_TO_MANY\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.custom_features.create_custom_feature(\n    {\n        \"component\": {\n            \"name\": \"service_contract\",\n            \"display_name\": \"Service contract\",\n            \"use_in\": \"account\",\n            \"relation\": \"ONE_TO_MANY\",\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.customFeatures.createCustomFeature({\n    component: {name: 'service_contract', display_name: 'Service contract', use_in: 'account', relation: 'ONE_TO_MANY'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->customFeatures->createCustomFeature([\n    'component' => [\n        'name' => 'service_contract',\n        'display_name' => 'Service contract',\n        'use_in' => 'account',\n        'relation' => 'ONE_TO_MANY',\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.custom_features.custom_features_dto.CustomFeaturesDto.CustomFeature;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<CustomFeature> response = client.customFeatures().createCustomFeature(\n        Map.of(\n                \"component\", Map.of(\n                        \"name\", \"service_contract\",\n                        \"display_name\", \"Service contract\",\n                        \"use_in\", \"account\",\n                        \"relation\", \"ONE_TO_MANY\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CustomFeatures.CreateCustomFeatureAsync(new Dictionary<string, object?>\n{\n    [\"component\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"service_contract\",\n        [\"display_name\"] = \"Service contract\",\n        [\"use_in\"] = \"account\",\n        [\"relation\"] = \"ONE_TO_MANY\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customFeatures.createCustomFeature({\n  'component': {\n    'name': 'service_contract',\n    'display_name': 'Service contract',\n    'use_in': 'account',\n    'relation': 'ONE_TO_MANY',\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CustomFeatures().CreateCustomFeature(context.Background(), map[string]any{\n\t\"component\": map[string]any{\n\t\t\"name\":         \"service_contract\",\n\t\t\"display_name\": \"Service contract\",\n\t\t\"use_in\":       \"account\",\n\t\t\"relation\":     \"ONE_TO_MANY\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "component": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The feature's name, an identifier such as `service_contract`."
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "use_in": {
+                        "type": "string",
+                        "description": "Where the feature is used, such as `account`."
+                      },
+                      "relation": {
+                        "type": "string",
+                        "description": "How records relate to the feature, such as `ONE_TO_MANY`."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "component"
+                ]
+              },
+              "example": {
+                "component": {
+                  "name": "service_contract",
+                  "display_name": "Service contract",
+                  "use_in": "account",
+                  "relation": "ONE_TO_MANY"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/custom_feature/{custom_feature_id}": {
+      "get": {
+        "tags": [
+          "Custom features"
+        ],
+        "summary": "Retrieve a custom feature",
+        "operationId": "custom_features_get_custom_feature_by_id",
+        "description": "Reads a single custom feature by its `cmp_` id, with its forms, custom objects and child components.",
+        "parameters": [
+          {
+            "name": "custom_feature_id",
+            "in": "path",
+            "required": true,
+            "description": "The custom feature's `id`, which starts with `cmp_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The custom feature, under `custom_feature`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomFeatureResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No custom feature has that `id`, or it is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/custom_feature/cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.custom_features.get_custom_feature_by_id(\n    \"cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.customFeatures.getCustomFeatureById('cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->customFeatures->getCustomFeatureById('cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.custom_features.custom_features_dto.CustomFeaturesDto.CustomFeature;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<CustomFeature> response = client.customFeatures().getCustomFeatureById(\n        \"cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CustomFeatures.GetCustomFeatureByIdAsync(\"cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customFeatures.getCustomFeatureById(\n  'cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CustomFeatures().GetCustomFeatureByID(context.Background(), \"cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Custom features"
+        ],
+        "summary": "Delete a custom feature",
+        "operationId": "custom_features_delete_custom_feature_by_id",
+        "description": "Removes the custom feature with this `cmp_` id. A successful call returns 204 with an empty body, and reading the feature afterwards returns 404.",
+        "parameters": [
+          {
+            "name": "custom_feature_id",
+            "in": "path",
+            "required": true,
+            "description": "The custom feature's `id`, which starts with `cmp_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The custom feature is deleted. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/custom_feature/cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.custom_features.delete_custom_feature_by_id(\n    \"cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.customFeatures.deleteCustomFeatureById('cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->customFeatures->deleteCustomFeatureById(\n    'cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.customFeatures().deleteCustomFeatureById(\"cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CustomFeatures.DeleteCustomFeatureByIdAsync(\"cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customFeatures.deleteCustomFeatureById(\n  'cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CustomFeatures().DeleteCustomFeatureByID(context.Background(), \"cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Custom features"
+        ],
+        "summary": "Update a custom feature",
+        "operationId": "custom_features_update_custom_feature_by_id",
+        "description": "Send the fields to change under `component`, such as `display_name` and `description`. The updated feature comes back under `custom_feature`.",
+        "parameters": [
+          {
+            "name": "custom_feature_id",
+            "in": "path",
+            "required": true,
+            "description": "The custom feature's `id`, which starts with `cmp_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated custom feature, under `custom_feature`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomFeatureResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/custom_feature/cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"component\": {\n      \"display_name\": \"Service contract (updated)\",\n      \"description\": \"Support contracts held by Acme Pty Ltd\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.custom_features.update_custom_feature_by_id(\n    \"cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\",\n    {\n        \"component\": {\n            \"display_name\": \"Service contract (updated)\",\n            \"description\": \"Support contracts held by Acme Pty Ltd\",\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.customFeatures.updateCustomFeatureById('cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d', {\n    component: {display_name: 'Service contract (updated)', description: 'Support contracts held by Acme Pty Ltd'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->customFeatures->updateCustomFeatureById(\n    'cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d',\n    [\n        'component' => [\n            'display_name' => 'Service contract (updated)',\n            'description' => 'Support contracts held by Acme Pty Ltd',\n        ],\n    ],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.custom_features.custom_features_dto.CustomFeaturesDto.CustomFeature;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<CustomFeature> response = client.customFeatures().updateCustomFeatureById(\n        \"cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\",\n        Map.of(\n                \"component\", Map.of(\n                        \"display_name\", \"Service contract (updated)\",\n                        \"description\", \"Support contracts held by Acme Pty Ltd\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CustomFeatures.UpdateCustomFeatureByIdAsync(\n    \"cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\",\n    new Dictionary<string, object?>\n    {\n        [\"component\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Service contract (updated)\",\n            [\"description\"] = \"Support contracts held by Acme Pty Ltd\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customFeatures.updateCustomFeatureById(\n  'cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d',\n  {\n    'component': {\n      'display_name': 'Service contract (updated)',\n      'description': 'Support contracts held by Acme Pty Ltd',\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CustomFeatures().UpdateCustomFeatureByID(context.Background(), \"cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\", map[string]any{\n\t\"component\": map[string]any{\n\t\t\"display_name\": \"Service contract (updated)\",\n\t\t\"description\":  \"Support contracts held by Acme Pty Ltd\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "component": {
+                    "type": "object",
+                    "properties": {
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "component"
+                ]
+              },
+              "example": {
+                "component": {
+                  "display_name": "Service contract (updated)",
+                  "description": "Support contracts held by Acme Pty Ltd"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Custom features"
+        ],
+        "summary": "Set a custom feature's form layout and attributes",
+        "operationId": "custom_features_create_custom_feature_by_id",
+        "description": "Customizes the form of an existing feature. Send `configuration` with `settings.form_layout`, such as `TWO_COLS`, and the entries of `column_1` and `column_2`: each entry is an `ATTRIBUTE`, named by a custom attribute's `name`, or a `LABEL`. The feature comes back under `custom_feature`.",
+        "parameters": [
+          {
+            "name": "custom_feature_id",
+            "in": "path",
+            "required": true,
+            "description": "The custom feature's `id`, which starts with `cmp_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The custom feature with its new form, under `custom_feature`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomFeatureResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/custom_feature/cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"configuration\": {\n      \"settings\": {\n        \"form_layout\": \"TWO_COLS\"\n      },\n      \"column_1\": {\n        \"attributes\": [\n          {\n            \"type\": \"ATTRIBUTE\",\n            \"name\": \"contract_tier\",\n            \"required\": \"false\",\n            \"show_in_list_view\": \"true\"\n          }\n        ]\n      },\n      \"column_2\": {\n        \"attributes\": [\n          {\n            \"type\": \"LABEL\",\n            \"name\": \"Contract details\"\n          }\n        ]\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.custom_features.create_custom_feature_by_id(\n    \"cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\",\n    {\n        \"configuration\": {\n            \"settings\": {\"form_layout\": \"TWO_COLS\"},\n            \"column_1\": {\n                \"attributes\": [\n                    {\n                        \"type\": \"ATTRIBUTE\",\n                        \"name\": \"contract_tier\",\n                        \"required\": \"false\",\n                        \"show_in_list_view\": \"true\",\n                    }\n                ]\n            },\n            \"column_2\": {\"attributes\": [{\"type\": \"LABEL\", \"name\": \"Contract details\"}]},\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.customFeatures.createCustomFeatureById('cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d', {\n    configuration: {\n        settings: {form_layout: 'TWO_COLS'},\n        column_1: {\n            attributes: [{type: 'ATTRIBUTE', name: 'contract_tier', required: 'false', show_in_list_view: 'true'}],\n        },\n        column_2: {attributes: [{type: 'LABEL', name: 'Contract details'}]},\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->customFeatures->createCustomFeatureById(\n    'cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d',\n    [\n        'configuration' => [\n            'settings' => ['form_layout' => 'TWO_COLS'],\n            'column_1' => [\n                'attributes' => [\n                    [\n                        'type' => 'ATTRIBUTE',\n                        'name' => 'contract_tier',\n                        'required' => 'false',\n                        'show_in_list_view' => 'true',\n                    ],\n                ],\n            ],\n            'column_2' => ['attributes' => [['type' => 'LABEL', 'name' => 'Contract details']]],\n        ],\n    ],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.custom_features.custom_features_dto.CustomFeaturesDto.CustomFeature;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<CustomFeature> response = client.customFeatures().createCustomFeatureById(\n        \"cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\",\n        Map.of(\n                \"configuration\", Map.of(\n                        \"settings\", Map.of(\"form_layout\", \"TWO_COLS\"),\n                        \"column_1\", Map.of(\n                                \"attributes\", List.of(\n                                        Map.of(\n                                                \"type\", \"ATTRIBUTE\",\n                                                \"name\", \"contract_tier\",\n                                                \"required\", \"false\",\n                                                \"show_in_list_view\", \"true\"))),\n                        \"column_2\", Map.of(\n                                \"attributes\", List.of(\n                                        Map.of(\"type\", \"LABEL\", \"name\", \"Contract details\"))))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CustomFeatures.CreateCustomFeatureByIdAsync(\n    \"cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\",\n    new Dictionary<string, object?>\n    {\n        [\"configuration\"] = new Dictionary<string, object?>\n        {\n            [\"settings\"] = new Dictionary<string, object?>\n            {\n                [\"form_layout\"] = \"TWO_COLS\",\n            },\n            [\"column_1\"] = new Dictionary<string, object?>\n            {\n                [\"attributes\"] = new List<object?>\n                {\n                    new Dictionary<string, object?>\n                    {\n                        [\"type\"] = \"ATTRIBUTE\",\n                        [\"name\"] = \"contract_tier\",\n                        [\"required\"] = \"false\",\n                        [\"show_in_list_view\"] = \"true\",\n                    },\n                },\n            },\n            [\"column_2\"] = new Dictionary<string, object?>\n            {\n                [\"attributes\"] = new List<object?>\n                {\n                    new Dictionary<string, object?>\n                    {\n                        [\"type\"] = \"LABEL\",\n                        [\"name\"] = \"Contract details\",\n                    },\n                },\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customFeatures.createCustomFeatureById(\n  'cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d',\n  {\n    'configuration': {\n      'settings': {'form_layout': 'TWO_COLS'},\n      'column_1': {\n        'attributes': [\n          {\n            'type': 'ATTRIBUTE',\n            'name': 'contract_tier',\n            'required': 'false',\n            'show_in_list_view': 'true',\n          },\n        ],\n      },\n      'column_2': {\n        'attributes': [\n          {'type': 'LABEL', 'name': 'Contract details'},\n        ],\n      },\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CustomFeatures().CreateCustomFeatureByID(context.Background(), \"cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d\", map[string]any{\n\t\"configuration\": map[string]any{\n\t\t\"settings\": map[string]any{\"form_layout\": \"TWO_COLS\"},\n\t\t\"column_1\": map[string]any{\n\t\t\t\"attributes\": []any{\n\t\t\t\tmap[string]any{\n\t\t\t\t\t\"type\":              \"ATTRIBUTE\",\n\t\t\t\t\t\"name\":              \"contract_tier\",\n\t\t\t\t\t\"required\":          \"false\",\n\t\t\t\t\t\"show_in_list_view\": \"true\",\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t\t\"column_2\": map[string]any{\n\t\t\t\"attributes\": []any{\n\t\t\t\tmap[string]any{\"type\": \"LABEL\", \"name\": \"Contract details\"},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "configuration": {
+                    "type": "object",
+                    "properties": {
+                      "settings": {
+                        "type": "object",
+                        "properties": {
+                          "form_layout": {
+                            "type": "string",
+                            "description": "The layout, such as `TWO_COLS`."
+                          }
+                        }
+                      },
+                      "column_1": {
+                        "type": "object",
+                        "properties": {
+                          "attributes": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "description": "`ATTRIBUTE` for a custom attribute, or `LABEL` for a label."
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "description": "The custom attribute's `name`, or the label text."
+                                },
+                                "required": {
+                                  "type": "string"
+                                },
+                                "show_in_list_view": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "name"
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      "column_2": {
+                        "type": "object",
+                        "properties": {
+                          "attributes": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "description": "`ATTRIBUTE` for a custom attribute, or `LABEL` for a label."
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "description": "The custom attribute's `name`, or the label text."
+                                },
+                                "required": {
+                                  "type": "string"
+                                },
+                                "show_in_list_view": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "name"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "configuration"
+                ]
+              },
+              "example": {
+                "configuration": {
+                  "settings": {
+                    "form_layout": "TWO_COLS"
+                  },
+                  "column_1": {
+                    "attributes": [
+                      {
+                        "type": "ATTRIBUTE",
+                        "name": "contract_tier",
+                        "required": "false",
+                        "show_in_list_view": "true"
+                      }
+                    ]
+                  },
+                  "column_2": {
+                    "attributes": [
+                      {
+                        "type": "LABEL",
+                        "name": "Contract details"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -121268,6 +121920,246 @@
         }
       },
       "ComponentPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "prev": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "CustomFeature": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "use_in": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "relation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "custom_component": {},
+          "custom_objects": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "custom_forms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomFeatureForm"
+            }
+          },
+          "child_custom_components": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "activity_logs": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "created_by": {},
+          "last_updated_by": {},
+          "version": {
+            "type": "integer"
+          },
+          "href": {
+            "type": "string",
+            "description": "Names the plural `/custom_features` path, which is not served; call the singular `/custom_feature` path."
+          }
+        }
+      },
+      "CustomFeatureForm": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/CustomFeatureFormConfiguration"
+          }
+        }
+      },
+      "CustomFeatureFormConfiguration": {
+        "type": "object",
+        "properties": {
+          "settings": {
+            "$ref": "#/components/schemas/CustomFeatureFormSettings"
+          },
+          "column_1": {
+            "$ref": "#/components/schemas/CustomFeatureFormColumn1"
+          },
+          "column_2": {
+            "$ref": "#/components/schemas/CustomFeatureFormColumn2"
+          }
+        }
+      },
+      "CustomFeatureFormSettings": {
+        "type": "object",
+        "properties": {
+          "custom_form": {
+            "type": "string"
+          },
+          "form_layout": {
+            "type": "string"
+          }
+        }
+      },
+      "CustomFeatureFormColumn1": {
+        "type": "object",
+        "properties": {
+          "attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomFeatureFormColumn1Attribute"
+            }
+          }
+        }
+      },
+      "CustomFeatureFormColumn2": {
+        "type": "object",
+        "properties": {
+          "attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomFeatureFormColumn2Attribute"
+            }
+          }
+        }
+      },
+      "CustomFeatureFormColumn1Attribute": {
+        "type": "object",
+        "properties": {
+          "data_type": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "show_in_list_view": {
+            "type": "boolean"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "CustomFeatureFormColumn2Attribute": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "CustomFeatureResponse": {
+        "type": "object",
+        "properties": {
+          "custom_feature": {
+            "$ref": "#/components/schemas/CustomFeature"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "CustomFeatureList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomFeature"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/CustomFeaturePagination"
+          }
+        }
+      },
+      "CustomFeaturePagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can be stale on the last page."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "prev_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "links": {
+            "$ref": "#/components/schemas/CustomFeaturePaginationLinks"
+          }
+        }
+      },
+      "CustomFeaturePaginationLinks": {
         "type": "object",
         "properties": {
           "next": {

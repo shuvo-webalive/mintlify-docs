@@ -1,0 +1,33 @@
+---
+title: "Custom features"
+sidebarTitle: "Overview"
+description: "List, create, read, update and delete custom features, and set the form layout and attributes of a feature."
+---
+
+A custom feature is a component you define, such as a service contract attached to accounts, with its own form of custom attributes. This area has 6 endpoints to list, create, read, update and delete features and to set a feature's form layout, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List custom features](/api-reference/custom-features/list-custom-features) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/custom_feature` | Returns one page of the active custom features. |
+| [Retrieve a custom feature](/api-reference/custom-features/retrieve-a-custom-feature) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/custom_feature/{custom_feature_id}` | Returns one custom feature, under `custom_feature`. |
+| [Create a custom feature](/api-reference/custom-features/create-a-custom-feature) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/custom_feature` | Creates a custom feature and returns it, under `custom_feature`. |
+| [Delete a custom feature](/api-reference/custom-features/delete-a-custom-feature) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/custom_feature/{custom_feature_id}` | Deletes a custom feature and returns no body. |
+| [Update a custom feature](/api-reference/custom-features/update-a-custom-feature) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/custom_feature/{custom_feature_id}` | Changes a custom feature's fields and returns the updated feature. |
+| [Set a custom feature's form layout and attributes](/api-reference/custom-features/set-a-custom-features-form-layout-and-attributes) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/custom_feature/{custom_feature_id}` | Sets the form layout of a custom feature and the attributes in each column, and returns the feature. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **The path is singular.** Call `/custom_feature`; the `href`, `url` and `links.next` values in responses name `/custom_features`, which returns 405.
+- **Writes send their fields under `component`.** The create and update bodies wrap the fields in `component`, and the feature comes back under `custom_feature`.
+- **A custom feature id starts with `cmp_`.** It is the same id the custom components area uses for a component definition.
+- **The listing returns active features only, paged by cursor.** Pass `limit`, then the `next_cursor` from `pagination` as `cursor` while `has_more` is true.
+- **The form layout call takes `configuration` with no other wrapper.** It sets `settings.form_layout` and the attributes in `column_1` and `column_2`.
+- **A deleted feature returns 404.** The delete itself returns 204 with no body.
