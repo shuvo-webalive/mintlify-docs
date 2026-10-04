@@ -101,6 +101,9 @@
     },
     {
       "name": "Fulfillment terms"
+    },
+    {
+      "name": "Item fulfillments"
     }
   ],
   "paths": {
@@ -33009,6 +33012,814 @@
           }
         }
       }
+    },
+    "/item_fulfillments": {
+      "get": {
+        "tags": [
+          "Item fulfillments"
+        ],
+        "summary": "List item fulfillments",
+        "operationId": "item_fulfillments_get_item_fulfillments",
+        "description": "Returns fulfillments under `data`, each with its account, invoice, `fulfillment_status`, `tracking_number` and `fulfillments` lines. Set the page size with `limit` and fetch the next page with `cursor`. Other fields filter as `filter_<field>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of item fulfillments, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemFulfillmentList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/item_fulfillments?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.item_fulfillments.get_item_fulfillments({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.itemFulfillments.getItemFulfillments({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->itemFulfillments->getItemFulfillments(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.item_fulfillments.item_fulfillments_dto.ItemFulfillmentsDto.ItemFulfillmentList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ItemFulfillmentList> response = client.itemFulfillments().getItemFulfillments(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ItemFulfillments.GetItemFulfillmentsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.itemFulfillments.getItemFulfillments(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ItemFulfillments().GetItemFulfillments(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Item fulfillments"
+        ],
+        "summary": "Create an item fulfillment",
+        "operationId": "item_fulfillments_create_item_fulfillment",
+        "description": "Send the fulfillment under `item_fulfillment`: the `invoice_id`, and `fulfillments` listing each invoice line by its id in `invoice_line` with the `fulfillment_quantity` sent. The new fulfillment comes back under `item_fulfillment` with `fulfillment_status` `shipped`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new fulfillment, under `item_fulfillment`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemFulfillments"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/item_fulfillments\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"item_fulfillment\": {\n      \"invoice_id\": \"INV-0001\",\n      \"fulfillments\": [\n        {\n          \"invoice_line\": \"8e7d6c5b-4a39-4281-9706-f5e4d3c2b1a0\",\n          \"fulfillment_quantity\": 1\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.item_fulfillments.create_item_fulfillment(\n    {\n        \"item_fulfillment\": {\n            \"invoice_id\": \"INV-0001\",\n            \"fulfillments\": [\n                {\n                    \"invoice_line\": \"8e7d6c5b-4a39-4281-9706-f5e4d3c2b1a0\",\n                    \"fulfillment_quantity\": 1,\n                }\n            ],\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.itemFulfillments.createItemFulfillment({\n    item_fulfillment: {\n        invoice_id: 'INV-0001',\n        fulfillments: [{invoice_line: '8e7d6c5b-4a39-4281-9706-f5e4d3c2b1a0', fulfillment_quantity: 1}],\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->itemFulfillments->createItemFulfillment([\n    'item_fulfillment' => [\n        'invoice_id' => 'INV-0001',\n        'fulfillments' => [\n            ['invoice_line' => '8e7d6c5b-4a39-4281-9706-f5e4d3c2b1a0', 'fulfillment_quantity' => 1],\n        ],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.item_fulfillments.item_fulfillments_dto.ItemFulfillmentsDto;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ItemFulfillmentsDto.ItemFulfillments> response = client.itemFulfillments().createItemFulfillment(\n        Map.of(\n                \"item_fulfillment\", Map.of(\n                        \"invoice_id\", \"INV-0001\",\n                        \"fulfillments\", List.of(\n                                Map.of(\n                                        \"invoice_line\", \"8e7d6c5b-4a39-4281-9706-f5e4d3c2b1a0\",\n                                        \"fulfillment_quantity\", 1)))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ItemFulfillments.CreateItemFulfillmentAsync(new Dictionary<string, object?>\n{\n    [\"item_fulfillment\"] = new Dictionary<string, object?>\n    {\n        [\"invoice_id\"] = \"INV-0001\",\n        [\"fulfillments\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"invoice_line\"] = \"8e7d6c5b-4a39-4281-9706-f5e4d3c2b1a0\",\n                [\"fulfillment_quantity\"] = 1,\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.itemFulfillments.createItemFulfillment({\n  'item_fulfillment': {\n    'invoice_id': 'INV-0001',\n    'fulfillments': [\n      {\n        'invoice_line': '8e7d6c5b-4a39-4281-9706-f5e4d3c2b1a0',\n        'fulfillment_quantity': 1,\n      },\n    ],\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ItemFulfillments().CreateItemFulfillment(context.Background(), map[string]any{\n\t\"item_fulfillment\": map[string]any{\n\t\t\"invoice_id\": \"INV-0001\",\n\t\t\"fulfillments\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"invoice_line\":         \"8e7d6c5b-4a39-4281-9706-f5e4d3c2b1a0\",\n\t\t\t\t\"fulfillment_quantity\": 1,\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "item_fulfillment": {
+                    "type": "object",
+                    "properties": {
+                      "invoice_id": {
+                        "type": "string",
+                        "description": "The sale invoice's `id`."
+                      },
+                      "fulfillments": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "invoice_line": {
+                              "type": "string",
+                              "description": "The invoice line's `id`."
+                            },
+                            "fulfillment_quantity": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "invoice_line",
+                            "fulfillment_quantity"
+                          ]
+                        }
+                      }
+                    },
+                    "required": [
+                      "invoice_id",
+                      "fulfillments"
+                    ]
+                  }
+                },
+                "required": [
+                  "item_fulfillment"
+                ]
+              },
+              "example": {
+                "item_fulfillment": {
+                  "invoice_id": "INV-0001",
+                  "fulfillments": [
+                    {
+                      "invoice_line": "8e7d6c5b-4a39-4281-9706-f5e4d3c2b1a0",
+                      "fulfillment_quantity": 1
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/item_fulfillments/{fulfillment_id}": {
+      "get": {
+        "tags": [
+          "Item fulfillments"
+        ],
+        "summary": "Retrieve an item fulfillment",
+        "operationId": "item_fulfillments_get_item_fulfillment",
+        "description": "Returns the fulfillment under `item_fulfillment`, with its account, invoice, status, `tracking_number`, `version` and `fulfillments` lines.",
+        "parameters": [
+          {
+            "name": "fulfillment_id",
+            "in": "path",
+            "required": true,
+            "description": "The fulfillment's `id`, which starts with `ifm_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The fulfillment, under `item_fulfillment`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemFulfillmentReadResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/item_fulfillments/ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.item_fulfillments.get_item_fulfillment(\n    \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.itemFulfillments.getItemFulfillment('ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->itemFulfillments->getItemFulfillment('ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.item_fulfillments.item_fulfillments_dto.ItemFulfillmentsDto.ItemFulfillmentRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ItemFulfillmentRead> response = client.itemFulfillments().getItemFulfillment(\n        \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ItemFulfillments.GetItemFulfillmentAsync(\"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.itemFulfillments.getItemFulfillment(\n  'ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ItemFulfillments().GetItemFulfillment(context.Background(), \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Item fulfillments"
+        ],
+        "summary": "Update an item fulfillment",
+        "operationId": "item_fulfillments_update_item_fulfillment",
+        "description": "Send the changes under `item_fulfillment`, such as a new `tracking_number`. The response gives the fulfillment's `id`, `code`, `status` and new `version` under `item_fulfillment`.",
+        "parameters": [
+          {
+            "name": "fulfillment_id",
+            "in": "path",
+            "required": true,
+            "description": "The fulfillment's `id`, which starts with `ifm_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The short fulfillment record, under `item_fulfillment`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemFulfillmentUpdated"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/item_fulfillments/ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"item_fulfillment\": {\n      \"tracking_number\": \"TRK-0001\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.item_fulfillments.update_item_fulfillment(\n    \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\",\n    {\"item_fulfillment\": {\"tracking_number\": \"TRK-0001\"}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.itemFulfillments.updateItemFulfillment('ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9', {\n    item_fulfillment: {tracking_number: 'TRK-0001'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->itemFulfillments->updateItemFulfillment(\n    'ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9',\n    ['item_fulfillment' => ['tracking_number' => 'TRK-0001']],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.item_fulfillments.item_fulfillments_dto.ItemFulfillmentsDto.ItemFulfillmentUpdated;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ItemFulfillmentUpdated> response = client.itemFulfillments().updateItemFulfillment(\n        \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\",\n        Map.of(\"item_fulfillment\", Map.of(\"tracking_number\", \"TRK-0001\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ItemFulfillments.UpdateItemFulfillmentAsync(\n    \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\",\n    new Dictionary<string, object?>\n    {\n        [\"item_fulfillment\"] = new Dictionary<string, object?>\n        {\n            [\"tracking_number\"] = \"TRK-0001\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.itemFulfillments.updateItemFulfillment(\n  'ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9',\n  {\n    'item_fulfillment': {'tracking_number': 'TRK-0001'},\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ItemFulfillments().UpdateItemFulfillment(context.Background(), \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\", map[string]any{\n\t\"item_fulfillment\": map[string]any{\"tracking_number\": \"TRK-0001\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "item_fulfillment": {
+                    "type": "object",
+                    "properties": {
+                      "tracking_number": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "item_fulfillment"
+                ]
+              },
+              "example": {
+                "item_fulfillment": {
+                  "tracking_number": "TRK-0001"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Item fulfillments"
+        ],
+        "summary": "Delete an item fulfillment",
+        "operationId": "item_fulfillments_delete_item_fulfillment",
+        "description": "Deletes the fulfillment with that `ifm_` id. Once any of its stock has been sent the delete is refused.",
+        "parameters": [
+          {
+            "name": "fulfillment_id",
+            "in": "path",
+            "required": true,
+            "description": "The fulfillment's `id`, which starts with `ifm_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The fulfillment is deleted. No body."
+          },
+          "400": {
+            "description": "Some of the fulfillment's stock has been sent (`stock_committed`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/item_fulfillments/ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.item_fulfillments.delete_item_fulfillment(\n    \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.itemFulfillments.deleteItemFulfillment('ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->itemFulfillments->deleteItemFulfillment(\n    'ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.itemFulfillments().deleteItemFulfillment(\"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ItemFulfillments.DeleteItemFulfillmentAsync(\"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.itemFulfillments.deleteItemFulfillment(\n  'ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ItemFulfillments().DeleteItemFulfillment(context.Background(), \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/item_fulfillments/{fulfillment_id}/notes": {
+      "post": {
+        "tags": [
+          "Item fulfillments"
+        ],
+        "summary": "Create an item fulfillment note",
+        "operationId": "item_fulfillments_create_item_fulfillment_note",
+        "description": "Send a multipart form with the text in the `note` field and any files as extra parts. The note is stored on the fulfillment's sale invoice, and the response gives its `id` under `note`.",
+        "parameters": [
+          {
+            "name": "fulfillment_id",
+            "in": "path",
+            "required": true,
+            "description": "The fulfillment's `id`, which starts with `ifm_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The new note's `id` and links, under `note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemFulfillmentNotesResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/item_fulfillments/ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9/notes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -F \"file=@delivery-photo.jpg\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.item_fulfillments.create_item_fulfillment_note(\n    \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\",\n    \"<p>Left with reception.</p>\",\n    files={\"file\": open(\"delivery-photo.jpg\", \"rb\")},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {readFileSync} from 'node:fs';\nimport {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.itemFulfillments.createItemFulfillmentNote(\n    'ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9',\n    '<p>Left with reception.</p>',\n    {files: {file: ['delivery-photo.jpg', readFileSync('delivery-photo.jpg')]}},\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->itemFulfillments->createItemFulfillmentNote(\n    'ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9',\n    '<p>Left with reception.</p>',\n    ['file' => ['delivery-photo.jpg', fopen('delivery-photo.jpg', 'r')]],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.client.RequestOptions;\nimport com.exsited.sdk.resources.item_fulfillments.item_fulfillments_dto.ItemFulfillmentsDto.ItemFulfillmentNotes;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ItemFulfillmentNotes> response = client.itemFulfillments().createItemFulfillmentNote(\n        \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\",\n        \"<p>Left with reception.</p>\",\n        Map.of(\"file\", Path.of(\"delivery-photo.jpg\")),\n        RequestOptions.none());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ItemFulfillments.CreateItemFulfillmentNoteAsync(\n    \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\",\n    \"<p>Left with reception.</p>\",\n    new Dictionary<string, object?> { [\"file\"] = new object?[] { \"delivery-photo.jpg\", File.ReadAllBytes(\"delivery-photo.jpg\") } });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'dart:io';\n\nimport 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.itemFulfillments.createItemFulfillmentNote(\n  'ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9',\n  '<p>Left with reception.</p>',\n  files: {\n    'file': [\n      'delivery-photo.jpg',\n      File('delivery-photo.jpg').readAsBytesSync(),\n    ],\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nfile, err := os.ReadFile(\"delivery-photo.jpg\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.ItemFulfillments().CreateItemFulfillmentNote(context.Background(), \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\", \"<p>Left with reception.</p>\", map[string]any{\"file\": []any{\"delivery-photo.jpg\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "note": {
+                    "type": "string",
+                    "description": "The note's text."
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "A file to attach. Optional; send one part per file."
+                  }
+                },
+                "required": [
+                  "note"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Item fulfillments"
+        ],
+        "summary": "List an item fulfillment's notes",
+        "operationId": "item_fulfillments_get_item_fulfillment_notes",
+        "description": "Returns notes under `data`, each with its `content`, `attachments` and `watchers`. These are the notes of the fulfillment's sale invoice, which is where the create note endpoint puts them.",
+        "parameters": [
+          {
+            "name": "fulfillment_id",
+            "in": "path",
+            "required": true,
+            "description": "The fulfillment's `id`, which starts with `ifm_`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of notes, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemFulfillmentNoteList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/item_fulfillments/ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9/notes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.item_fulfillments.get_item_fulfillment_notes(\n    \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.itemFulfillments.getItemFulfillmentNotes('ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9', {\n    limit: 20,\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->itemFulfillments->getItemFulfillmentNotes(\n    'ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9',\n    ['limit' => 20],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.item_fulfillments.item_fulfillments_dto.ItemFulfillmentsDto.ItemFulfillmentNoteList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ItemFulfillmentNoteList> response = client.itemFulfillments().getItemFulfillmentNotes(\n        \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ItemFulfillments.GetItemFulfillmentNotesAsync(\n    \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.itemFulfillments.getItemFulfillmentNotes(\n  'ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ItemFulfillments().GetItemFulfillmentNotes(context.Background(), \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/item_fulfillments/{fulfillment_id}/notes/{note_id}": {
+      "delete": {
+        "tags": [
+          "Item fulfillments"
+        ],
+        "summary": "Delete an item fulfillment note",
+        "operationId": "item_fulfillments_delete_item_fulfillment_note",
+        "description": "Pass the fulfillment's `ifm_` id and the note's `note_` id. The delete looks for the note on the fulfillment, not on its sale invoice, where the create note endpoint stores notes.",
+        "parameters": [
+          {
+            "name": "fulfillment_id",
+            "in": "path",
+            "required": true,
+            "description": "The fulfillment's `id`, which starts with `ifm_`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, which starts with `note_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The note is deleted. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/item_fulfillments/ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9/notes/note_b1c2d3e4f5061728394a5b6c7d8e9f00\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.item_fulfillments.delete_item_fulfillment_note(\n    \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\", \"note_b1c2d3e4f5061728394a5b6c7d8e9f00\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.itemFulfillments.deleteItemFulfillmentNote(\n    'ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9',\n    'note_b1c2d3e4f5061728394a5b6c7d8e9f00',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->itemFulfillments->deleteItemFulfillmentNote(\n    'ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9',\n    'note_b1c2d3e4f5061728394a5b6c7d8e9f00',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.itemFulfillments().deleteItemFulfillmentNote(\n        \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\",\n        \"note_b1c2d3e4f5061728394a5b6c7d8e9f00\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ItemFulfillments.DeleteItemFulfillmentNoteAsync(\n    \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\",\n    \"note_b1c2d3e4f5061728394a5b6c7d8e9f00\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.itemFulfillments.deleteItemFulfillmentNote(\n  'ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9',\n  'note_b1c2d3e4f5061728394a5b6c7d8e9f00',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ItemFulfillments().DeleteItemFulfillmentNote(context.Background(), \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\", \"note_b1c2d3e4f5061728394a5b6c7d8e9f00\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Item fulfillments"
+        ],
+        "summary": "Retrieve an item fulfillment note",
+        "operationId": "item_fulfillments_get_item_fulfillment_note",
+        "description": "Returns the note with its `content`, `attachments` and `watchers`, nested as `item_fulfillment.note`.",
+        "parameters": [
+          {
+            "name": "fulfillment_id",
+            "in": "path",
+            "required": true,
+            "description": "The fulfillment's `id`, which starts with `ifm_`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, which starts with `note_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note, under `item_fulfillment.note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemFulfillmentNoteReadResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/item_fulfillments/ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9/notes/note_b1c2d3e4f5061728394a5b6c7d8e9f00\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.item_fulfillments.get_item_fulfillment_note(\n    \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\", \"note_b1c2d3e4f5061728394a5b6c7d8e9f00\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.itemFulfillments.getItemFulfillmentNote(\n    'ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9',\n    'note_b1c2d3e4f5061728394a5b6c7d8e9f00',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->itemFulfillments->getItemFulfillmentNote(\n    'ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9',\n    'note_b1c2d3e4f5061728394a5b6c7d8e9f00',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.item_fulfillments.item_fulfillments_dto.ItemFulfillmentsDto.ItemFulfillmentNoteRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ItemFulfillmentNoteRead> response = client.itemFulfillments().getItemFulfillmentNote(\n        \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\",\n        \"note_b1c2d3e4f5061728394a5b6c7d8e9f00\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ItemFulfillments.GetItemFulfillmentNoteAsync(\n    \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\",\n    \"note_b1c2d3e4f5061728394a5b6c7d8e9f00\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.itemFulfillments.getItemFulfillmentNote(\n  'ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9',\n  'note_b1c2d3e4f5061728394a5b6c7d8e9f00',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ItemFulfillments().GetItemFulfillmentNote(context.Background(), \"ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9\", \"note_b1c2d3e4f5061728394a5b6c7d8e9f00\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -48291,6 +49102,683 @@
         "properties": {
           "fulfillment_term": {
             "$ref": "#/components/schemas/FulfillmentTerm"
+          }
+        }
+      },
+      "ItemFulfillmentList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemFulfillment"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/ItemFulfillmentPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemFulfillment": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/ItemFulfillmentAccount"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/ItemFulfillmentCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "custom_attributes": {
+            "type": "object"
+          },
+          "date": {
+            "type": "string"
+          },
+          "delivery_status": {},
+          "fulfillment_completed": {
+            "type": "boolean"
+          },
+          "fulfillment_date": {
+            "type": "string"
+          },
+          "fulfillment_note": {
+            "type": "string"
+          },
+          "fulfillment_status": {
+            "type": "string"
+          },
+          "fulfillments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemFulfillmentRow"
+            }
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "The fulfillment's `id`, which starts with `ifm_`."
+          },
+          "invoice": {
+            "$ref": "#/components/schemas/ItemFulfillmentInvoice"
+          },
+          "invoice_id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/ItemFulfillmentLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "order": {},
+          "order_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "tracking_number": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "ItemFulfillmentAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemFulfillmentCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemFulfillmentRow": {
+        "type": "object",
+        "properties": {
+          "fulfillment_index": {
+            "type": "integer"
+          },
+          "fulfillment_qty": {
+            "type": "number"
+          },
+          "fulfillment_sent_qty": {
+            "type": "number"
+          },
+          "id": {
+            "type": "string"
+          },
+          "inventory_tracking": {},
+          "item": {
+            "$ref": "#/components/schemas/ItemFulfillmentRowItem"
+          },
+          "object": {
+            "type": "string"
+          },
+          "pending_return": {
+            "type": "number"
+          },
+          "returned": {
+            "type": "number"
+          },
+          "serving_status": {
+            "type": "string"
+          },
+          "uom": {
+            "type": "string"
+          },
+          "uom_precision": {
+            "type": "integer"
+          }
+        }
+      },
+      "ItemFulfillmentRowItem": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemFulfillmentInvoice": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemFulfillmentLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemFulfillmentPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size the API applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "next": {
+                "type": "string"
+              },
+              "prev": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "ItemFulfillments": {
+        "type": "object",
+        "properties": {
+          "activity_logs": {
+            "type": "array"
+          },
+          "item_fulfillment": {
+            "$ref": "#/components/schemas/ItemFulfillmentsItemFulfillment"
+          }
+        }
+      },
+      "ItemFulfillmentsItemFulfillment": {
+        "type": "object",
+        "properties": {
+          "activity_logs": {
+            "type": "array"
+          },
+          "code": {
+            "type": "string"
+          },
+          "fulfillment_date": {
+            "type": "string"
+          },
+          "fulfillment_note": {},
+          "fulfillment_status": {
+            "type": "string",
+            "description": "Such as `shipped`."
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "ItemFulfillmentRead": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/ItemFulfillmentReadAccount"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/ItemFulfillmentReadCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "custom_attributes": {
+            "type": "object"
+          },
+          "delivery_status": {},
+          "fulfillment_completed": {
+            "type": "boolean"
+          },
+          "fulfillment_date": {
+            "type": "string"
+          },
+          "fulfillment_note": {
+            "type": "string"
+          },
+          "fulfillment_status": {
+            "type": "string"
+          },
+          "fulfillments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemFulfillmentReadRow"
+            }
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "The fulfillment's `id`, which starts with `ifm_`."
+          },
+          "invoice": {
+            "$ref": "#/components/schemas/ItemFulfillmentReadInvoice"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/ItemFulfillmentReadLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "order": {},
+          "status": {
+            "type": "string"
+          },
+          "tracking_number": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "description": "Goes up with each change."
+          }
+        }
+      },
+      "ItemFulfillmentReadAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemFulfillmentReadCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemFulfillmentReadRow": {
+        "type": "object",
+        "properties": {
+          "fulfillment_index": {
+            "type": "integer"
+          },
+          "fulfillment_qty": {
+            "type": "number"
+          },
+          "fulfillment_sent_qty": {
+            "type": "number"
+          },
+          "id": {
+            "type": "string"
+          },
+          "inventory_tracking": {},
+          "item": {
+            "$ref": "#/components/schemas/ItemFulfillmentReadRowItem"
+          },
+          "object": {
+            "type": "string"
+          },
+          "pending_return": {
+            "type": "number"
+          },
+          "returned": {
+            "type": "number"
+          },
+          "serving_status": {
+            "type": "string"
+          },
+          "uom": {
+            "type": "string"
+          },
+          "uom_precision": {
+            "type": "integer"
+          }
+        }
+      },
+      "ItemFulfillmentReadRowItem": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemFulfillmentReadInvoice": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemFulfillmentReadLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemFulfillmentReadResponse": {
+        "type": "object",
+        "properties": {
+          "item_fulfillment": {
+            "$ref": "#/components/schemas/ItemFulfillmentRead"
+          }
+        }
+      },
+      "ItemFulfillmentUpdated": {
+        "type": "object",
+        "properties": {
+          "item_fulfillment": {
+            "$ref": "#/components/schemas/ItemFulfillmentUpdatedDetail"
+          },
+          "note": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemFulfillmentUpdatedDetail": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "ItemFulfillmentNotes": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "item_fulfillment": {
+            "$ref": "#/components/schemas/ItemFulfillmentNotesDetail"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemFulfillmentNotesDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemFulfillmentNotesResponse": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "$ref": "#/components/schemas/ItemFulfillmentNotes"
+          }
+        }
+      },
+      "ItemFulfillmentNoteList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemFulfillmentNote"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/ItemFulfillmentPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemFulfillmentNote": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemFulfillmentNoteAttachment"
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/ItemFulfillmentCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "group": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "item_fulfillment": {
+            "$ref": "#/components/schemas/ItemFulfillmentNotesDetail"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "user": {},
+          "version": {
+            "type": "integer"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemFulfillmentNoteWatcher"
+            }
+          }
+        }
+      },
+      "ItemFulfillmentNoteAttachment": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemFulfillmentNoteWatcher": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemFulfillmentNoteRead": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "$ref": "#/components/schemas/ItemFulfillmentNote"
+          }
+        }
+      },
+      "ItemFulfillmentNoteReadResponse": {
+        "type": "object",
+        "properties": {
+          "item_fulfillment": {
+            "$ref": "#/components/schemas/ItemFulfillmentNoteRead"
           }
         }
       },
