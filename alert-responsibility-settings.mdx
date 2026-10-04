@@ -1,0 +1,30 @@
+---
+title: "Alert responsibility settings"
+sidebarTitle: "Overview"
+description: "Create, read, update and delete alert responsibilities from the settings area."
+---
+
+Alert responsibility settings manage who is responsible for alerts, from the settings area. They are the same records the Alert responsibilities area serves. This area has 5 endpoints, and all seven Exsited SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List alert responsibility settings](/api-reference/alert-responsibility-settings/list-alert-responsibility-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/alert_responsibilities` | Lists the alert responsibilities from the settings area, one page at a time. |
+| [Create an alert responsibility setting](/api-reference/alert-responsibility-settings/create-an-alert-responsibility-setting) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/alert_responsibilities` | Creates an alert responsibility from the settings area. |
+| [Retrieve an alert responsibility setting](/api-reference/alert-responsibility-settings/retrieve-an-alert-responsibility-setting) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/alert_responsibilities/{alert_responsibility_id}` | Retrieves one alert responsibility from the settings area by its `ar_` id. |
+| [Delete an alert responsibility setting](/api-reference/alert-responsibility-settings/delete-an-alert-responsibility-setting) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/alert_responsibilities/{alert_responsibility_id}` | Deletes an alert responsibility from the settings area. Nothing comes back. |
+| [Update an alert responsibility setting](/api-reference/alert-responsibility-settings/update-an-alert-responsibility-setting) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/alert_responsibilities/{alert_responsibility_id}` | Changes an alert responsibility's fields or its status from the settings area. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **These are the same records as the Alert responsibilities area.** `/settings/alert_responsibilities` and `/alert_responsibility` serve the same alert responsibilities.
+- **Writes need the `MANAGE_ALERT_RESPONSIBILITY` permission.** Without it, a create, update or delete returns `403`.
+- **Alert responsibility ids start with `ar_`.** One record comes back under `alert_responsibility`, and `name` is required to create one.
+- **Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.
