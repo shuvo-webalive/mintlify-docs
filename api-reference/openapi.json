@@ -43874,7 +43874,7 @@
         ],
         "summary": "Amend a purchase invoice's lines",
         "operationId": "purchase_invoices_amend_purchase_invoice",
-        "description": "Changes the lines of the purchase invoice, wrapped in `purchase_invoice.lines`. Each entry has an `op`: `add` with an `item_id` and `item_quantity` adds a line, and `change` with the line's dashed `uuid` changes its quantity or price.",
+        "description": "Changes the lines of the purchase invoice, wrapped in `purchase_invoice.lines`. Each entry has an `op`: `add` with an `item_id` and `item_quantity` adds a line, and `change` with the line's `id` written as a UUID (drop the prefix before `_` and add dashes in the 8-4-4-4-12 pattern) changes its quantity or price.",
         "parameters": [
           {
             "name": "purchase_invoice_id",
@@ -43965,7 +43965,7 @@
                             },
                             "uuid": {
                               "type": "string",
-                              "description": "For `change`: the line's `uuid`, in dashed form."
+                              "description": "For `change`: the line's `id` written as a UUID: drop the prefix before `_` and add dashes in the 8-4-4-4-12 pattern."
                             },
                             "item_id": {
                               "type": "string",
@@ -44286,7 +44286,7 @@
         ],
         "summary": "List a purchase invoice's lines",
         "operationId": "purchase_invoices_get_purchase_invoice_lines",
-        "description": "Returns the purchase invoice's lines as `purchase_invoice.lines`, not as a paged `data` list. Use a line's `uuid` or `id` to read it on its own.",
+        "description": "Returns the purchase invoice's lines as `purchase_invoice.lines`, not as a paged `data` list. This read is not paged, and `limit`, `cursor` and `sort` are not documented to change it. Use a line's `id` to read it on its own.",
         "parameters": [
           {
             "name": "purchase_invoice_id",
@@ -45005,7 +45005,7 @@
         ],
         "summary": "Retrieve a purchase invoice line",
         "operationId": "purchase_invoices_get_purchase_invoice_line",
-        "description": "Returns a single line of the purchase invoice under `purchase_invoice.line`. Address the line by its `uuid` in dashed form, or by the `id` the lines list shows.",
+        "description": "Returns a single line of the purchase invoice under `purchase_invoice.line`. Address the line by the `id` the lines list shows, or by that `id` written as a UUID.",
         "parameters": [
           {
             "name": "purchase_invoice_id",
@@ -45020,7 +45020,7 @@
             "name": "purchase_invoice_line_uuid",
             "in": "path",
             "required": true,
-            "description": "The line's `uuid` in dashed form, or its `id` from the lines list.",
+            "description": "The line's `id` from the lines list, or that `id` written as a UUID: drop the prefix before `_` and add dashes in the 8-4-4-4-12 pattern, as in `3f2a9c1e-7b4d-4e8a-9c0b-1d2e3f4a5b6c`.",
             "schema": {
               "type": "string"
             }
@@ -45038,7 +45038,7 @@
             }
           },
           "404": {
-            "description": "The purchase invoice has no line with that `uuid`.",
+            "description": "The purchase invoice has no line with that `id`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -109919,207 +109919,13 @@
           }
         }
       },
-      "PurchaseInvoiceCreditNoteApplication": {
-        "type": "object",
-        "properties": {
-          "account": {
-            "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationDetail"
-          },
-          "alternate_due_date": {
-            "type": "string"
-          },
-          "alternate_issue_date": {
-            "type": "string"
-          },
-          "amount": {
-            "type": "string"
-          },
-          "created_by": {
-            "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationCreatedBy"
-          },
-          "created_on": {
-            "type": "string"
-          },
-          "currency": {
-            "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationCurrency"
-          },
-          "custom_form": {},
-          "due_date": {
-            "type": "string"
-          },
-          "href": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string"
-          },
-          "issue_date": {
-            "type": "string"
-          },
-          "last_updated_by": {
-            "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationLastUpdatedBy"
-          },
-          "last_updated_on": {
-            "type": "string"
-          },
-          "object": {
-            "type": "string"
-          },
-          "origin": {
-            "type": "string"
-          },
-          "payment_status": {
-            "type": "string"
-          },
-          "price_tax_inclusive": {
-            "type": "boolean"
-          },
-          "purchase_credit_note": {
-            "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationPurchaseCreditNote"
-          },
-          "purchase_order": {
-            "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationPurchaseOrder"
-          },
-          "purchase_payment": {
-            "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationPurchasePayment"
-          },
-          "remaining_balance": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "subtotal": {
-            "type": "string"
-          },
-          "tax": {
-            "type": "string"
-          },
-          "total": {
-            "type": "string"
-          },
-          "uuid": {
-            "type": "string"
-          },
-          "version": {
-            "type": "integer"
-          }
-        }
-      },
-      "PurchaseInvoiceCreditNoteApplicationDetail": {
-        "type": "object",
-        "properties": {
-          "href": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "object": {
-            "type": "string"
-          }
-        }
-      },
-      "PurchaseInvoiceCreditNoteApplicationCreatedBy": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "object": {
-            "type": "string"
-          }
-        }
-      },
-      "PurchaseInvoiceCreditNoteApplicationCurrency": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string"
-          },
-          "href": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "object": {
-            "type": "string"
-          }
-        }
-      },
-      "PurchaseInvoiceCreditNoteApplicationLastUpdatedBy": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "object": {
-            "type": "string"
-          }
-        }
-      },
-      "PurchaseInvoiceCreditNoteApplicationPurchaseCreditNote": {
-        "type": "object",
-        "properties": {
-          "href": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "object": {
-            "type": "string"
-          }
-        }
-      },
-      "PurchaseInvoiceCreditNoteApplicationPurchaseOrder": {
-        "type": "object",
-        "properties": {
-          "href": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string"
-          },
-          "object": {
-            "type": "string"
-          }
-        }
-      },
-      "PurchaseInvoiceCreditNoteApplicationPurchasePayment": {
-        "type": "object",
-        "properties": {
-          "href": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "object": {
-            "type": "string"
-          }
-        }
-      },
       "PurchaseInvoiceCreditNoteApplicationList": {
         "type": "object",
         "properties": {
           "data": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplication"
+              "$ref": "#/components/schemas/PurchaseInvoicePurchaseCreditNoteApplicationRead"
             }
           },
           "object": {

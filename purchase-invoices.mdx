@@ -4,7 +4,7 @@ sidebarTitle: "Overview"
 description: "Create, amend, cancel and read purchase invoices, their lines, notes, files, payments and credit note applications."
 ---
 
-A purchase invoice is a bill from a supplier. These endpoints create, amend, cancel and reactivate purchase invoices, read their lines, payments and credit note applications, and manage their notes and attached files. There are 22 endpoints, and all seven SDKs call every one.
+A purchase invoice is a bill from a supplier. These endpoints create, amend, cancel and reactivate purchase invoices, read their lines, payments and credit note applications, and manage their notes and attached files. This area has 22 endpoints, each available in all seven SDKs.
 
 <Warning>
   **Deleting a purchase invoice or one of its notes cannot be undone.** Cancel a purchase invoice instead if you may need it again.
@@ -45,9 +45,9 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 
 ## Things to know
 
-- **Every write body is wrapped in `purchase_invoice`.** The cancel and reactivate calls take an empty object.
+- **Every JSON write body is wrapped in `purchase_invoice`.** The cancel and reactivate calls take an empty object; the note create and update are multipart forms.
 - **A new purchase invoice is `active`.** Cancelling sets it to `inactive` and reactivating sets it back to `active`.
 - **The lines read is not a paged list.** It returns `purchase_invoice.lines`, and one line comes back as `purchase_invoice.line`.
-- **A line can be addressed by its dashed `uuid` or by its listed `id`.** An unknown `uuid` returns `404`.
+- **A line can be addressed by its `id` or by that `id` written as a UUID.** For the UUID form, drop the prefix before `_` and add dashes in the 8-4-4-4-12 pattern. An unknown line returns `404`.
 - **The credit note application read is not scoped to the invoice.** Any application can be read through any purchase invoice that exists.
 - **Listings page by cursor.** Records are under `data`; pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`.
