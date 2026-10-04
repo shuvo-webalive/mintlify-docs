@@ -5,14 +5,13 @@
   "icon": "user-group",
   "base": "/settings/account_groups",
   "overview_description": "List, create, read, update and delete the account groups you sort accounts into.",
-  "intro": "Account groups sort your accounts into sets, such as wholesale or retail customers. Here you list, create, read, update and delete them. This area has 5 endpoints, and all seven SDKs call every one.",
-  "warning": null,
+  "intro": "Account groups sort your accounts into sets, such as wholesale or retail customers. Here you list, create, read, update and delete them. This area has 5 endpoints, and every SDK supports all of them.",
+  "warning": "**Updating and deleting an account group currently fail.** `PATCH` and `DELETE /settings/account_groups/{account_group_id}` return `500`, even for a group just created, so a group you create cannot yet be changed or removed through the API.",
   "notes": [
-    "**A group is named by its `ag_` id.** List account groups returns each group's `id`.",
+    "**Each group's id starts with `ag_`.** List account groups returns each group's `id`.",
     "**`name` is required to create a group.** The new group comes back under `account_group`.",
     "**One group comes back under `account_group`; a listing comes back under `data`.** A listing also carries `pagination`; pass `pagination.next_cursor` as `cursor` while `has_more` is `true`.",
-    "**Only a group no account uses can be deleted.**",
-    "**Updating or deleting a group can fail with `500`.** It does so even for a group just created, so a group you create may not be removable through the API."
+    "**Only a group no account uses can be deleted.**"
   ],
   "endpoints": [
     {
@@ -22,7 +21,7 @@
       "slug": "list-account-groups",
       "title": "List account groups",
       "summary": "Lists your account groups, a page at a time.",
-      "description": "Returns the groups under `data`, with `pagination` for the next page. Other fields filter as `filter_<field>`.",
+      "description": "Returns the groups under `data`, with `pagination` for the next page. To filter, add `filter_<field>=<value>`.",
       "parameters": [
         {
           "name": "limit",
@@ -140,7 +139,7 @@
       "slug": "retrieve-an-account-group",
       "title": "Retrieve an account group",
       "summary": "Returns one account group, under `account_group`.",
-      "description": "Name the group by its `ag_` id.",
+      "description": "Pass the group's `ag_` id.",
       "parameters": [
         {
           "name": "account_group_id",
@@ -170,49 +169,13 @@
       }
     },
     {
-      "key": "delete_settings_account_group",
-      "method": "DELETE",
-      "path": "/settings/account_groups/{account_group_id}",
-      "slug": "delete-an-account-group",
-      "title": "Delete an account group",
-      "summary": "Deletes an account group that no account uses.",
-      "description": "Only a group no account uses can be deleted. A successful delete returns `204` with no content. This call can return `500`, even for a group just created.",
-      "parameters": [
-        {
-          "name": "account_group_id",
-          "in": "path",
-          "required": true,
-          "description": "The account group's `ag_` id.",
-          "schema": {
-            "type": "string",
-            "example": "ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b"
-          }
-        }
-      ],
-      "body": null,
-      "multipart": false,
-      "responses": {
-        "204": {
-          "description": "The group is deleted."
-        },
-        "500": {
-          "description": "The server could not delete the group."
-        }
-      },
-      "example_call": {
-        "path": {
-          "account_group_id": "ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b"
-        }
-      }
-    },
-    {
       "key": "update_settings_account_group",
       "method": "PATCH",
       "path": "/settings/account_groups/{account_group_id}",
       "slug": "update-an-account-group",
       "title": "Update an account group",
       "summary": "Changes an account group's fields or its status.",
-      "description": "Send only the fields to change. This call can return `500`, even for a group just created.",
+      "description": "Send only the fields to change, under `account_group`.",
       "parameters": [
         {
           "name": "account_group_id",
@@ -237,7 +200,7 @@
               "properties": {
                 "name": {
                   "type": "string",
-                  "description": "The group's name. Required to create a group."
+                  "description": "The group's new name."
                 },
                 "display_name": {
                   "type": "string"
@@ -264,7 +227,7 @@
           "description": "The group is updated."
         },
         "500": {
-          "description": "The server could not update the group."
+          "description": "Returned on every update, even for a group just created."
         }
       },
       "example_call": {
@@ -276,7 +239,45 @@
             "display_name": "Wholesale customers"
           }
         }
-      }
+      },
+      "warning": "**This call currently returns `500`.** It fails even for a group just created, so a group cannot yet be changed through the API."
+    },
+    {
+      "key": "delete_settings_account_group",
+      "method": "DELETE",
+      "path": "/settings/account_groups/{account_group_id}",
+      "slug": "delete-an-account-group",
+      "title": "Delete an account group",
+      "summary": "Deletes an account group that no account uses.",
+      "description": "Only a group no account uses can be deleted. A delete returns `204` with no content.",
+      "parameters": [
+        {
+          "name": "account_group_id",
+          "in": "path",
+          "required": true,
+          "description": "The account group's `ag_` id.",
+          "schema": {
+            "type": "string",
+            "example": "ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The group is deleted."
+        },
+        "500": {
+          "description": "Returned on every delete, even for a group just created."
+        }
+      },
+      "example_call": {
+        "path": {
+          "account_group_id": "ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b"
+        }
+      },
+      "warning": "**This call currently returns `500`.** It fails even for a group just created, so a group cannot yet be removed through the API."
     }
   ],
   "schemas": {
@@ -384,27 +385,6 @@
         },
         "links": {
           "$ref": "#/components/schemas/AccountGroupPaginationLinks"
-        },
-        "records": {
-          "type": "integer"
-        },
-        "offset": {
-          "type": "integer"
-        },
-        "next_page": {
-          "type": "string"
-        },
-        "previous_page": {
-          "type": "string"
-        },
-        "has_next": {
-          "type": "boolean"
-        },
-        "has_prev": {
-          "type": "boolean"
-        },
-        "per_page": {
-          "type": "integer"
         }
       }
     },

@@ -8190,7 +8190,7 @@
         ],
         "summary": "List account groups",
         "operationId": "account_groups_get_settings_account_groups",
-        "description": "Returns the groups under `data`, with `pagination` for the next page. Other fields filter as `filter_<field>`.",
+        "description": "Returns the groups under `data`, with `pagination` for the next page. To filter, add `filter_<field>=<value>`.",
         "parameters": [
           {
             "name": "limit",
@@ -8388,7 +8388,7 @@
         ],
         "summary": "Retrieve an account group",
         "operationId": "account_groups_get_settings_account_group",
-        "description": "Name the group by its `ag_` id.",
+        "description": "Pass the group's `ag_` id.",
         "parameters": [
           {
             "name": "account_group_id",
@@ -8455,89 +8455,13 @@
           }
         ]
       },
-      "delete": {
-        "tags": [
-          "Account groups"
-        ],
-        "summary": "Delete an account group",
-        "operationId": "account_groups_delete_settings_account_group",
-        "description": "Only a group no account uses can be deleted. A successful delete returns `204` with no content. This call can return `500`, even for a group just created.",
-        "parameters": [
-          {
-            "name": "account_group_id",
-            "in": "path",
-            "required": true,
-            "description": "The account group's `ag_` id.",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "The group is deleted."
-          },
-          "500": {
-            "description": "The server could not delete the group.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        },
-        "x-codeSamples": [
-          {
-            "lang": "bash",
-            "label": "cURL",
-            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/account_groups/ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
-          },
-          {
-            "lang": "python",
-            "label": "Python",
-            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.account_groups.delete_settings_account_group(\n    \"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\"\n)\nprint(response.data)\n"
-          },
-          {
-            "lang": "javascript",
-            "label": "JavaScript",
-            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.accountGroups.deleteSettingsAccountGroup('ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b');\nconsole.log(response.data);\n"
-          },
-          {
-            "lang": "php",
-            "label": "PHP",
-            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->accountGroups->deleteSettingsAccountGroup(\n    'ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b',\n);\nprint_r($response->data);\n"
-          },
-          {
-            "lang": "java",
-            "label": "Java",
-            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.accountGroups().deleteSettingsAccountGroup(\"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\");\nSystem.out.println(response.getMap());\n"
-          },
-          {
-            "lang": "csharp",
-            "label": ".NET",
-            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AccountGroups.DeleteSettingsAccountGroupAsync(\"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\");\n\nConsole.WriteLine(response.Json);\n"
-          },
-          {
-            "lang": "dart",
-            "label": "Dart",
-            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.accountGroups.deleteSettingsAccountGroup(\n  'ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b',\n);\nprint(response.map);\n"
-          },
-          {
-            "lang": "go",
-            "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AccountGroups().DeleteSettingsAccountGroup(context.Background(), \"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
-          }
-        ]
-      },
       "patch": {
         "tags": [
           "Account groups"
         ],
         "summary": "Update an account group",
         "operationId": "account_groups_update_settings_account_group",
-        "description": "Send only the fields to change. This call can return `500`, even for a group just created.",
+        "description": "Send only the fields to change, under `account_group`.",
         "parameters": [
           {
             "name": "account_group_id",
@@ -8554,7 +8478,7 @@
             "description": "The group is updated."
           },
           "500": {
-            "description": "The server could not update the group.",
+            "description": "Returned on every update, even for a group just created.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8621,7 +8545,7 @@
                     "properties": {
                       "name": {
                         "type": "string",
-                        "description": "The group's name. Required to create a group."
+                        "description": "The group's new name."
                       },
                       "display_name": {
                         "type": "string"
@@ -8644,6 +8568,82 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "Account groups"
+        ],
+        "summary": "Delete an account group",
+        "operationId": "account_groups_delete_settings_account_group",
+        "description": "Only a group no account uses can be deleted. A delete returns `204` with no content.",
+        "parameters": [
+          {
+            "name": "account_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The account group's `ag_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The group is deleted."
+          },
+          "500": {
+            "description": "Returned on every delete, even for a group just created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/account_groups/ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.account_groups.delete_settings_account_group(\n    \"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.accountGroups.deleteSettingsAccountGroup('ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->accountGroups->deleteSettingsAccountGroup(\n    'ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.accountGroups().deleteSettingsAccountGroup(\"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AccountGroups.DeleteSettingsAccountGroupAsync(\"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.accountGroups.deleteSettingsAccountGroup(\n  'ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AccountGroups().DeleteSettingsAccountGroup(context.Background(), \"ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
       }
     },
     "/communications/send_email": {
@@ -89498,27 +89498,6 @@
           },
           "links": {
             "$ref": "#/components/schemas/AccountGroupPaginationLinks"
-          },
-          "records": {
-            "type": "integer"
-          },
-          "offset": {
-            "type": "integer"
-          },
-          "next_page": {
-            "type": "string"
-          },
-          "previous_page": {
-            "type": "string"
-          },
-          "has_next": {
-            "type": "boolean"
-          },
-          "has_prev": {
-            "type": "boolean"
-          },
-          "per_page": {
-            "type": "integer"
           }
         }
       },
