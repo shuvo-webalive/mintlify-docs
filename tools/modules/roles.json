@@ -5,13 +5,12 @@
   "icon": "user-shield",
   "base": "/settings/roles",
   "overview_description": "List, read, create, update, enable, disable and delete the user roles on an Exsited instance.",
-  "intro": "Roles are the settings records that group user permissions, and each says whether it is a system role. You can list, read, create, update, enable or disable and delete roles. This area has 5 endpoints, and all seven SDKs call every one.",
-  "warning": "**A create or an update saves the role and then returns a `500`, so check the roles listing before you retry.**",
+  "intro": "Roles are the settings records for user roles, and each says whether it is a system role. You can list, read, create, update, enable or disable and delete roles. This area has 5 endpoints, and all seven SDKs call every one.",
+  "warning": "**Known issue: creating or updating a role currently returns `500` after the role is saved.** List the roles to check before you retry.",
   "notes": [
     "**Responses wrap a role in `role`.** A single read returns `{\"role\": {...}}`.",
-    "**`is_system_role` marks the built in roles.** A delete of a system role is refused.",
-    "**A create or an update reports an error after it saves.** The change is stored even though the status is `500`, so list the roles to find the record.",
-    "**Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true."
+    "**`is_system_role` marks the built-in roles.** A delete of a system role is refused.",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`."
   ],
   "endpoints": [
     {
@@ -76,8 +75,8 @@
       "path": "/settings/roles",
       "slug": "create-a-role",
       "title": "Create a role",
-      "summary": "Creates a role. The role is saved, but the call then returns a `500`.",
-      "description": "Send the new role under `role`. The role is saved, and the call then returns a `500` from a failed lookup after the save, so list the roles to find it before you retry.",
+      "summary": "Creates a role and returns it under `role`.",
+      "description": "Send the new role under `role`. The body fields are not documented yet; `name` is shown as an example. This call currently returns `500` even though the role is saved, so list the roles before you retry.",
       "parameters": [],
       "body": {
         "schema": {
@@ -103,7 +102,7 @@
           "description": "The role is created."
         },
         "500": {
-          "description": "The role is saved, and the lookup that follows the save fails."
+          "description": "Known issue: the role is saved but the call returns `500`."
         }
       },
       "example_call": {
@@ -113,7 +112,8 @@
             "name": "Support staff"
           }
         }
-      }
+      },
+      "warning": "**This call currently returns `500` after the role is saved.** List the roles before you retry."
     },
     {
       "key": "get_settings_role",
@@ -122,7 +122,7 @@
       "slug": "retrieve-a-role",
       "title": "Retrieve a role",
       "summary": "Returns one role by its `id`, under `role`.",
-      "description": "Reads the role with this `id`. The `id` is the one the listing returns.",
+      "description": "Reads the role with this `id`.",
       "parameters": [
         {
           "name": "role_id",
@@ -190,8 +190,8 @@
       "path": "/settings/roles/{role_id}",
       "slug": "update-a-role",
       "title": "Update a role",
-      "summary": "Changes a role, or enables or disables it. The change is saved, but the call then returns a `500`.",
-      "description": "Send the fields to change under `role`, or its `status` to enable or disable it. The change is saved, and the call then returns a `500` from a failed lookup after the save, so read the role again to see the result.",
+      "summary": "Changes a role, or enables or disables it.",
+      "description": "Send the fields to change under `role`, or its `status` to enable or disable it. The body fields are not documented yet; `display_name` is shown as an example. This call currently returns `500` even though the change is saved, so read the role again to see the result.",
       "parameters": [
         {
           "name": "role_id",
@@ -228,7 +228,7 @@
           "description": "The role is updated."
         },
         "500": {
-          "description": "The change is saved, and the lookup that follows the save fails."
+          "description": "Known issue: the role is saved but the call returns `500`."
         }
       },
       "example_call": {
@@ -240,7 +240,8 @@
             "display_name": "Support staff (AU)"
           }
         }
-      }
+      },
+      "warning": "**This call currently returns `500` after the change is saved.** Read the role again to see the result."
     }
   ],
   "schemas": {
@@ -268,13 +269,13 @@
       "type": "object",
       "properties": {
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
         },
         "description": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "display_name": {
           "type": "string"
@@ -289,7 +290,7 @@
           "type": "boolean"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
