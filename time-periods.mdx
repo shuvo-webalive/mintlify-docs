@@ -1,0 +1,34 @@
+---
+title: "Time periods"
+sidebarTitle: "Overview"
+description: "Manage time periods in Exsited: list, create, retrieve, update, enable, disable and delete them."
+---
+
+Time periods define a length of time, such as one month, in your Exsited settings. You can list, create, retrieve, update and delete them, and enable or disable one through its `status`. This area has 5 endpoints, and all seven SDKs call every one.
+
+<Warning>
+  **Deleting a time period cannot be undone.** After a delete, reading the time period returns `404`.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List time periods](/api-reference/time-periods/list-time-periods) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/time_periods` | Lists the time periods set up in Exsited, one page at a time. |
+| [Create a time period](/api-reference/time-periods/create-a-time-period) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/time_periods` | Creates a time period, such as one month, and returns it under `time_period`. |
+| [Retrieve a time period](/api-reference/time-periods/retrieve-a-time-period) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/time_periods/{time_period_id}` | Retrieves one time period by its `tp_` id. |
+| [Delete a time period](/api-reference/time-periods/delete-a-time-period) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/time_periods/{time_period_id}` | Deletes a time period; the response has no body. |
+| [Update a time period](/api-reference/time-periods/update-a-time-period) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/time_periods/{time_period_id}` | Updates a time period's details, or enables or disables it. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Request bodies go under `time_period`.** Both the create and the update wrap their fields in a `time_period` object, and every single-record response returns it under `time_period`.
+- **`period` goes in upper case and comes back in lower case.** Send `MONTHLY`; the response shows `monthly`.
+- **Time period ids start with `tp_`.** Pass that `id` as `time_period_id`.
+- **`status` takes `active` or `inactive`.** Send it in an update to enable or disable a time period.

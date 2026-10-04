@@ -1,0 +1,402 @@
+{
+  "family": "time_periods",
+  "tag": "Time periods",
+  "slug": "time-periods",
+  "icon": "calendar",
+  "base": "/settings/time_periods",
+  "overview_description": "Manage time periods in Exsited: list, create, retrieve, update, enable, disable and delete them.",
+  "intro": "Time periods define a length of time, such as one month, in your Exsited settings. You can list, create, retrieve, update and delete them, and enable or disable one through its `status`. This area has 5 endpoints, and all seven SDKs call every one.",
+  "warning": "**Deleting a time period cannot be undone.** After a delete, reading the time period returns `404`.",
+  "notes": [
+    "**Request bodies go under `time_period`.** Both the create and the update wrap their fields in a `time_period` object, and every single-record response returns it under `time_period`.",
+    "**`period` goes in upper case and comes back in lower case.** Send `MONTHLY`; the response shows `monthly`.",
+    "**Time period ids start with `tp_`.** Pass that `id` as `time_period_id`.",
+    "**`status` takes `active` or `inactive`.** Send it in an update to enable or disable a time period."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_time_periods",
+      "method": "GET",
+      "path": "/settings/time_periods",
+      "slug": "list-time-periods",
+      "title": "List time periods",
+      "summary": "Lists the time periods set up in Exsited, one page at a time.",
+      "description": "Returns one page of time periods under `data`, with `pagination` for the next page. Each time period carries its `name`, `display_name`, `period` (such as `monthly`), `duration` and `status`. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by; prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of time periods.",
+          "schema": {
+            "$ref": "#/components/schemas/TimePeriodList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_time_period",
+      "method": "POST",
+      "path": "/settings/time_periods",
+      "slug": "create-a-time-period",
+      "title": "Create a time period",
+      "summary": "Creates a time period, such as one month, and returns it under `time_period`.",
+      "description": "Send the new time period under `time_period` with its `name`, `display_name`, `period` and `duration`. Send `period` in upper case, such as `MONTHLY`; the response returns it in lower case, such as `monthly`. The new time period comes back under `time_period` with its `tp_` id.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "time_period": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "period": {
+                  "type": "string",
+                  "description": "The unit of the period, in upper case, such as `MONTHLY`."
+                },
+                "duration": {
+                  "type": "integer",
+                  "description": "How many units of `period` the time period spans."
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "time_period"
+          ]
+        },
+        "example": {
+          "time_period": {
+            "name": "One month",
+            "display_name": "One month",
+            "period": "MONTHLY",
+            "duration": 1
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new time period, under `time_period`.",
+          "schema": {
+            "$ref": "#/components/schemas/TimePeriodResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "time_period": {
+            "name": "One month",
+            "display_name": "One month",
+            "period": "MONTHLY",
+            "duration": 1
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_time_period",
+      "method": "GET",
+      "path": "/settings/time_periods/{time_period_id}",
+      "slug": "retrieve-a-time-period",
+      "title": "Retrieve a time period",
+      "summary": "Retrieves one time period by its `tp_` id.",
+      "description": "Returns the time period under `time_period`.",
+      "parameters": [
+        {
+          "name": "time_period_id",
+          "in": "path",
+          "required": true,
+          "description": "The time period's `id`, which starts with `tp_`.",
+          "schema": {
+            "type": "string",
+            "example": "tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The time period, under `time_period`.",
+          "schema": {
+            "$ref": "#/components/schemas/TimePeriodResponse"
+          }
+        },
+        "404": {
+          "description": "No time period has that `id`, for example because it has been deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "time_period_id": "tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_time_period",
+      "method": "DELETE",
+      "path": "/settings/time_periods/{time_period_id}",
+      "slug": "delete-a-time-period",
+      "title": "Delete a time period",
+      "summary": "Deletes a time period; the response has no body.",
+      "description": "Deletes the time period with this `id`. A successful delete returns `204` with no body, and reading the time period afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "time_period_id",
+          "in": "path",
+          "required": true,
+          "description": "The time period's `id`, which starts with `tp_`.",
+          "schema": {
+            "type": "string",
+            "example": "tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The time period is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "time_period_id": "tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a"
+        }
+      }
+    },
+    {
+      "key": "update_settings_time_period",
+      "method": "PATCH",
+      "path": "/settings/time_periods/{time_period_id}",
+      "slug": "update-a-time-period",
+      "title": "Update a time period",
+      "summary": "Updates a time period's details, or enables or disables it.",
+      "description": "Send the fields to change under `time_period`, such as `display_name` or `description`. To enable or disable the time period, send `status` as `active` or `inactive`. The updated time period comes back under `time_period`.",
+      "parameters": [
+        {
+          "name": "time_period_id",
+          "in": "path",
+          "required": true,
+          "description": "The time period's `id`, which starts with `tp_`.",
+          "schema": {
+            "type": "string",
+            "example": "tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "time_period": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "active",
+                    "inactive"
+                  ]
+                }
+              }
+            }
+          },
+          "required": [
+            "time_period"
+          ]
+        },
+        "example": {
+          "time_period": {
+            "display_name": "One calendar month",
+            "description": "Used for monthly billing"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated time period, under `time_period`.",
+          "schema": {
+            "$ref": "#/components/schemas/TimePeriodResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "time_period_id": "tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a"
+        },
+        "body": {
+          "time_period": {
+            "display_name": "One calendar month",
+            "description": "Used for monthly billing"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "TimePeriod": {
+      "type": "object",
+      "properties": {
+        "created_by": {
+          "type": "null"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "type": "null"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "period": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "TimePeriodResponse": {
+      "type": "object",
+      "properties": {
+        "time_period": {
+          "$ref": "#/components/schemas/TimePeriod"
+        }
+      }
+    },
+    "TimePeriodList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/TimePeriod"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/TimePeriodPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "TimePeriodPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Rely on this rather than on `next_cursor`, which can still hold a value on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/TimePeriodPaginationLinks"
+        }
+      }
+    },
+    "TimePeriodPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -170,6 +170,9 @@
     },
     {
       "name": "Teams"
+    },
+    {
+      "name": "Time periods"
     }
   ],
   "paths": {
@@ -55508,6 +55511,475 @@
           }
         }
       }
+    },
+    "/settings/time_periods": {
+      "get": {
+        "tags": [
+          "Time periods"
+        ],
+        "summary": "List time periods",
+        "operationId": "time_periods_get_settings_time_periods",
+        "description": "Returns one page of time periods under `data`, with `pagination` for the next page. Each time period carries its `name`, `display_name`, `period` (such as `monthly`), `duration` and `status`. Any other field of the record filters the listing as `filter_<field>` or `filter_<field>_<operator>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` of the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by; prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of time periods.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimePeriodList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/time_periods?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.time_periods.get_settings_time_periods({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.timePeriods.getSettingsTimePeriods({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->timePeriods->getSettingsTimePeriods(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.time_periods.time_periods_dto.TimePeriodsDto.SettingsTimePeriodList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsTimePeriodList> response = client.timePeriods().getSettingsTimePeriods(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.TimePeriods.GetSettingsTimePeriodsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.timePeriods.getSettingsTimePeriods(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.TimePeriods().GetSettingsTimePeriods(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Time periods"
+        ],
+        "summary": "Create a time period",
+        "operationId": "time_periods_create_settings_time_period",
+        "description": "Send the new time period under `time_period` with its `name`, `display_name`, `period` and `duration`. Send `period` in upper case, such as `MONTHLY`; the response returns it in lower case, such as `monthly`. The new time period comes back under `time_period` with its `tp_` id.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new time period, under `time_period`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimePeriodResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/time_periods\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"time_period\": {\n      \"name\": \"One month\",\n      \"display_name\": \"One month\",\n      \"period\": \"MONTHLY\",\n      \"duration\": 1\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.time_periods.create_settings_time_period(\n    {\n        \"time_period\": {\n            \"name\": \"One month\",\n            \"display_name\": \"One month\",\n            \"period\": \"MONTHLY\",\n            \"duration\": 1,\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.timePeriods.createSettingsTimePeriod({\n    time_period: {name: 'One month', display_name: 'One month', period: 'MONTHLY', duration: 1},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->timePeriods->createSettingsTimePeriod([\n    'time_period' => [\n        'name' => 'One month',\n        'display_name' => 'One month',\n        'period' => 'MONTHLY',\n        'duration' => 1,\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.time_periods.time_periods_dto.TimePeriodsDto.SettingsTimePeriod;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsTimePeriod> response = client.timePeriods().createSettingsTimePeriod(\n        Map.of(\n                \"time_period\", Map.of(\n                        \"name\", \"One month\",\n                        \"display_name\", \"One month\",\n                        \"period\", \"MONTHLY\",\n                        \"duration\", 1)));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.TimePeriods.CreateSettingsTimePeriodAsync(new Dictionary<string, object?>\n{\n    [\"time_period\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"One month\",\n        [\"display_name\"] = \"One month\",\n        [\"period\"] = \"MONTHLY\",\n        [\"duration\"] = 1,\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.timePeriods.createSettingsTimePeriod({\n  'time_period': {\n    'name': 'One month',\n    'display_name': 'One month',\n    'period': 'MONTHLY',\n    'duration': 1,\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.TimePeriods().CreateSettingsTimePeriod(context.Background(), map[string]any{\n\t\"time_period\": map[string]any{\n\t\t\"name\":         \"One month\",\n\t\t\"display_name\": \"One month\",\n\t\t\"period\":       \"MONTHLY\",\n\t\t\"duration\":     1,\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "time_period": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "period": {
+                        "type": "string",
+                        "description": "The unit of the period, in upper case, such as `MONTHLY`."
+                      },
+                      "duration": {
+                        "type": "integer",
+                        "description": "How many units of `period` the time period spans."
+                      },
+                      "description": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "time_period"
+                ]
+              },
+              "example": {
+                "time_period": {
+                  "name": "One month",
+                  "display_name": "One month",
+                  "period": "MONTHLY",
+                  "duration": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/time_periods/{time_period_id}": {
+      "get": {
+        "tags": [
+          "Time periods"
+        ],
+        "summary": "Retrieve a time period",
+        "operationId": "time_periods_get_settings_time_period",
+        "description": "Returns the time period under `time_period`.",
+        "parameters": [
+          {
+            "name": "time_period_id",
+            "in": "path",
+            "required": true,
+            "description": "The time period's `id`, which starts with `tp_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The time period, under `time_period`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimePeriodResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No time period has that `id`, for example because it has been deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/time_periods/tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.time_periods.get_settings_time_period(\n    \"tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.timePeriods.getSettingsTimePeriod('tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->timePeriods->getSettingsTimePeriod('tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.time_periods.time_periods_dto.TimePeriodsDto.SettingsTimePeriod;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsTimePeriod> response = client.timePeriods().getSettingsTimePeriod(\n        \"tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.TimePeriods.GetSettingsTimePeriodAsync(\"tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.timePeriods.getSettingsTimePeriod(\n  'tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.TimePeriods().GetSettingsTimePeriod(context.Background(), \"tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Time periods"
+        ],
+        "summary": "Delete a time period",
+        "operationId": "time_periods_delete_settings_time_period",
+        "description": "Deletes the time period with this `id`. A successful delete returns `204` with no body, and reading the time period afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "time_period_id",
+            "in": "path",
+            "required": true,
+            "description": "The time period's `id`, which starts with `tp_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The time period is deleted. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/time_periods/tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.time_periods.delete_settings_time_period(\n    \"tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.timePeriods.deleteSettingsTimePeriod('tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->timePeriods->deleteSettingsTimePeriod('tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.timePeriods().deleteSettingsTimePeriod(\"tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.TimePeriods.DeleteSettingsTimePeriodAsync(\"tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.timePeriods.deleteSettingsTimePeriod(\n  'tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.TimePeriods().DeleteSettingsTimePeriod(context.Background(), \"tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Time periods"
+        ],
+        "summary": "Update a time period",
+        "operationId": "time_periods_update_settings_time_period",
+        "description": "Send the fields to change under `time_period`, such as `display_name` or `description`. To enable or disable the time period, send `status` as `active` or `inactive`. The updated time period comes back under `time_period`.",
+        "parameters": [
+          {
+            "name": "time_period_id",
+            "in": "path",
+            "required": true,
+            "description": "The time period's `id`, which starts with `tp_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated time period, under `time_period`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimePeriodResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/time_periods/tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"time_period\": {\n      \"display_name\": \"One calendar month\",\n      \"description\": \"Used for monthly billing\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.time_periods.update_settings_time_period(\n    \"tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a\",\n    {\n        \"time_period\": {\n            \"display_name\": \"One calendar month\",\n            \"description\": \"Used for monthly billing\",\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.timePeriods.updateSettingsTimePeriod('tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a', {\n    time_period: {display_name: 'One calendar month', description: 'Used for monthly billing'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->timePeriods->updateSettingsTimePeriod('tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a', [\n    'time_period' => [\n        'display_name' => 'One calendar month',\n        'description' => 'Used for monthly billing',\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.time_periods.time_periods_dto.TimePeriodsDto.SettingsTimePeriod;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsTimePeriod> response = client.timePeriods().updateSettingsTimePeriod(\n        \"tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a\",\n        Map.of(\n                \"time_period\", Map.of(\n                        \"display_name\", \"One calendar month\",\n                        \"description\", \"Used for monthly billing\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.TimePeriods.UpdateSettingsTimePeriodAsync(\n    \"tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a\",\n    new Dictionary<string, object?>\n    {\n        [\"time_period\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"One calendar month\",\n            [\"description\"] = \"Used for monthly billing\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.timePeriods.updateSettingsTimePeriod(\n  'tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a',\n  {\n    'time_period': {\n      'display_name': 'One calendar month',\n      'description': 'Used for monthly billing',\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.TimePeriods().UpdateSettingsTimePeriod(context.Background(), \"tp_5d2e8f1a9b3c4d7e8f0a1b2c3d4e5f6a\", map[string]any{\n\t\"time_period\": map[string]any{\n\t\t\"display_name\": \"One calendar month\",\n\t\t\"description\":  \"Used for monthly billing\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "time_period": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "active",
+                          "inactive"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "time_period"
+                ]
+              },
+              "example": {
+                "time_period": {
+                  "display_name": "One calendar month",
+                  "description": "Used for monthly billing"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -88285,6 +88757,112 @@
         }
       },
       "TeamPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "TimePeriod": {
+        "type": "object",
+        "properties": {
+          "created_by": {
+            "type": "null"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "integer"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "type": "null"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "period": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "TimePeriodResponse": {
+        "type": "object",
+        "properties": {
+          "time_period": {
+            "$ref": "#/components/schemas/TimePeriod"
+          }
+        }
+      },
+      "TimePeriodList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimePeriod"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/TimePeriodPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "TimePeriodPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Rely on this rather than on `next_cursor`, which can still hold a value on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/TimePeriodPaginationLinks"
+          }
+        }
+      },
+      "TimePeriodPaginationLinks": {
         "type": "object",
         "properties": {
           "next": {
