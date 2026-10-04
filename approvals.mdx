@@ -1,0 +1,34 @@
+---
+title: "Approvals"
+sidebarTitle: "Overview"
+description: "List account and sale order approvals, read one, and approve or reject a pending approval."
+---
+
+Approvals hold an action until someone signs it off. You can list account and sale order approvals, read one account approval, and approve or reject a pending one. This area has 5 endpoints, and all seven Exsited SDKs call every one.
+
+<Warning>
+  **Approving or rejecting takes effect at once.** An approve runs the held action, and both send notifications.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List account approvals](/api-reference/approvals/list-account-approvals) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/approvals/account` | Lists the account approvals, one page at a time. |
+| [List sale order approvals](/api-reference/approvals/list-sale-order-approvals) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/approvals/saleOrder` | Lists the sale order approvals, one page at a time. |
+| [Retrieve an account approval](/api-reference/approvals/retrieve-an-account-approval) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/approvals/account/{account_uuid}` | Retrieves one account approval. |
+| [Approve a pending approval](/api-reference/approvals/approve-a-pending-approval) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/approvals/approve` | Approves a pending approval and runs the action it holds. |
+| [Reject a pending approval](/api-reference/approvals/reject-a-pending-approval) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/approvals/reject` | Rejects a pending approval. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Approve and reject name the record in the body.** Send `{"approval": {"entity", "resource_id", "note"}}`; the same two routes serve all 16 entities.
+- **A decision takes effect at once.** Approving runs the held action, and both decisions send notifications.
+- **The sale order listing path is camel case.** It is `/approvals/saleOrder`, not `sale_order`.
+- **Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.
