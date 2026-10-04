@@ -4,7 +4,7 @@ sidebarTitle: "Overview"
 description: "List, read, create, update and delete zones, the named groups of countries that shipping rules apply to."
 ---
 
-A zone is a named group of countries. Shipping rules name zones in their configuration. These endpoints list, read, create, update and delete zones. This area has 5 endpoints, and all seven SDKs call every one.
+A zone is a named group of countries. Shipping rules name zones in their configuration. These endpoints list, read, create, update and delete zones. This area has 5 endpoints, each available in all seven SDKs.
 
 ## At a glance
 
@@ -14,7 +14,7 @@ A zone is a named group of countries. Shipping rules name zones in their configu
 | [Create a zone](/api-reference/zones/create-a-zone) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/settings/zones` | Creates a zone from a name and a list of countries, and returns it. |
 | [Retrieve a zone](/api-reference/zones/retrieve-a-zone) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/settings/zones/{zone_id}` | Returns one zone by its `id`. |
 | [Delete a zone](/api-reference/zones/delete-a-zone) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `/settings/zones/{zone_id}` | Deletes a zone. A successful call returns `204` with no body. |
-| [Update a zone](/api-reference/zones/update-a-zone) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `/settings/zones/{zone_id}` | Changes a zone's details and returns the zone. |
+| [Update a zone](/api-reference/zones/update-a-zone) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `/settings/zones/{zone_id}` | Sends changes to a zone and returns the zone. |
 
 ## Before you call
 
@@ -26,5 +26,5 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 
 - **A zone needs at least one country.** `country_list` takes country `id` values, the `country_` ids that `GET /settings/countries` returns.
 - **Writes are wrapped in `zone`, and one zone comes back under `zone`.** A new zone's `display_name` is set from its `name`.
-- **Zone ids are prefixed with `zn_`.** A shipping rule configuration names a zone by its dashed uuid instead, built from the 32 hex digits after `zn_`.
+- **Zone ids are prefixed with `zn_`.** A shipping rule configuration is meant to name a zone by its UUID with dashes instead, built from the 32 hex digits after `zn_`. That currently returns `500`; see [Set a shipping rule's configuration](/api-reference/shipping-rules/set-a-shipping-rules-configuration).
 - **The listing pages by cursor.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor` until `has_more` is `false`.
