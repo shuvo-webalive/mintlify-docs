@@ -35020,7 +35020,7 @@
         ],
         "summary": "Create a booking",
         "operationId": "bookings_create_booking",
-        "description": "Send the same body as creating an order, under `order`: the `account_id`, an optional `name` and the `lines`. Each line needs a labour and its booking times. The new booking comes back under `booking`.",
+        "description": "Send the same body as creating an order, under `order`: the `account_id`, an optional `name` and the `lines`. Each line needs a labour and its booking times. The new booking comes back under `booking`. The example shows only the order fields. Each line also needs its labour and booking times, whose field names are not documented, so the example is refused as it stands.",
         "parameters": [],
         "responses": {
           "201": {
@@ -35215,7 +35215,7 @@
         ],
         "summary": "Delete a booking",
         "operationId": "bookings_delete_booking",
-        "description": "Deletes the order with this `id`, whatever its type, so check the `id` before you call it. Reading the same `id` afterwards returns `404`.",
+        "description": "Deletes the order with this `id`, whatever its type, so check the `id` before you call it. Reading the same `id` afterwards returns `404`. It is not documented whether the order's invoices must be deleted first.",
         "parameters": [
           {
             "name": "booking_id",
@@ -35677,13 +35677,13 @@
         ],
         "summary": "Change a booking",
         "operationId": "bookings_change_booking",
-        "description": "Send `effective_date` and `lines` under `booking`, not `order`. Only a booking-type order is accepted. Change is the only transition this path offers.",
+        "description": "Send `effective_date` and `lines` under `booking`, not `order`. Only a booking-type order is accepted. The shape of each entry in `lines` is not documented, so the example sends only `effective_date`.",
         "parameters": [
           {
             "name": "booking_id",
             "in": "path",
             "required": true,
-            "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+            "description": "The booking's `id`. It must be a booking-type order; other orders are refused.",
             "schema": {
               "type": "string"
             }
@@ -35780,13 +35780,13 @@
         ],
         "summary": "Preview a booking change",
         "operationId": "bookings_preview_booking_change",
-        "description": "Takes the same body as Change a booking, under `booking`, and changes nothing. Only a booking-type order is accepted.",
+        "description": "Takes the same body as Change a booking, under `booking`, and changes nothing. Only a booking-type order is accepted. The shape of each entry in `lines` is not documented, so the example sends only `effective_date`.",
         "parameters": [
           {
             "name": "booking_id",
             "in": "path",
             "required": true,
-            "description": "The booking's `id`. Any order's `id` works here, whatever the order's type.",
+            "description": "The booking's `id`. It must be a booking-type order; other orders are refused.",
             "schema": {
               "type": "string"
             }
@@ -36338,7 +36338,7 @@
         ],
         "summary": "Update a booking line's billing preferences",
         "operationId": "bookings_update_booking_line_billing_preferences",
-        "description": "Send the settings under `order.line.item_properties`, not under `billing_preferences`, such as `charging_start_date`. The example targets a metered line. The whole booking comes back under `order`.",
+        "description": "Send the settings under `order.line.item_properties`, not under `billing_preferences`, such as `charging_start_date`. The example targets a metered line. The whole booking comes back under `order`. `SUBSCRIPTION_START_DATE` is a literal value, not a placeholder.",
         "parameters": [
           {
             "name": "booking_id",
@@ -36743,7 +36743,7 @@
         "tags": [
           "Bookings"
         ],
-        "summary": "List a booking's custom objects (instances path)",
+        "summary": "List a booking's custom objects (alternate path)",
         "operationId": "bookings_get_booking_custom_objects_instances",
         "description": "Another path to List a booking's custom objects: it returns the same body, one page under `data`. Other fields filter as `filter_<field>` for equality and `filter_<field>_<operator>` otherwise.",
         "parameters": [
@@ -36847,7 +36847,7 @@
         "tags": [
           "Bookings"
         ],
-        "summary": "Retrieve a booking custom object (instances path)",
+        "summary": "Retrieve a booking custom object (alternate path)",
         "operationId": "bookings_get_booking_custom_objects_instance",
         "description": "Another path to Retrieve a booking custom object: it returns the same body, under `custom_object`.",
         "parameters": [
@@ -36931,7 +36931,7 @@
         "tags": [
           "Bookings"
         ],
-        "summary": "Retrieve a booking custom object instance (instances path)",
+        "summary": "Retrieve a booking custom object instance (alternate path)",
         "operationId": "bookings_get_booking_custom_objects_instance_instance",
         "description": "Another path to Retrieve a booking custom object instance, returning the same body.",
         "parameters": [
@@ -37886,7 +37886,7 @@
         ],
         "summary": "Retrieve a booking shipping line PDF",
         "operationId": "bookings_get_booking_shipping_pdf",
-        "description": "Returns the generated shipping PDF of the line. Until the line has a generated shipping PDF, the call returns `404`.",
+        "description": "Returns the shipping PDF of the line. Whether the response is the file or JSON links (as Retrieve a booking's PDF links returns) is not documented. Until the line has a generated shipping PDF, the call returns `404`.",
         "parameters": [
           {
             "name": "booking_id",
@@ -101416,18 +101416,18 @@
           },
           "last_updated_by": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_updated_on": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "object": {
             "type": "string"
           },
           "origin": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "payment_applied": {
             "type": "array",
@@ -101457,7 +101457,7 @@
           },
           "gateway_response": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "method": {
             "type": "string"
@@ -101570,18 +101570,18 @@
           },
           "last_updated_by": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_updated_on": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "object": {
             "type": "string"
           },
           "origin": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "payment_applied": {
             "type": "array",
@@ -101611,7 +101611,7 @@
           },
           "gateway_response": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "method": {
             "type": "string"
@@ -101839,43 +101839,43 @@
         "properties": {
           "deleted_at": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "estimated_total": {
             "type": "string"
           },
           "last_cancelled_at": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_changed_at": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_invoice_issue_date": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_invoice_total": {
             "type": "string"
           },
           "last_reactivated_at": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "monthly_recurring_revenue": {
             "type": "string"
           },
           "next_invoice_issue_date": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "object": {
             "type": "string"
           },
           "start_date": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "total_collected": {
             "type": "string"
@@ -101914,7 +101914,7 @@
           },
           "delivery_status": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "fulfillment_completed": {
             "type": "boolean"
@@ -101924,7 +101924,7 @@
           },
           "fulfillment_note": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "fulfillment_status": {
             "type": "string"
@@ -101955,7 +101955,7 @@
           },
           "order": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "status": {
             "type": "string"
@@ -102010,7 +102010,7 @@
           },
           "inventory_tracking": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "item": {
             "$ref": "#/components/schemas/BookingItemFulfillmentFulfillmentItem"
@@ -102023,18 +102023,18 @@
           },
           "returned": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "serving_status": {
             "type": "string"
           },
           "uom": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "uom_precision": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           }
         }
       },
@@ -102147,7 +102147,7 @@
           },
           "customer_purchase_order_id": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "discount_amount": {
             "type": "number"
@@ -102163,22 +102163,22 @@
           },
           "invoice_note": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "issue_date": {
             "type": "string"
           },
           "last_payment": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_updated_by": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_updated_on": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "object": {
             "type": "string"
@@ -102188,7 +102188,7 @@
           },
           "origin": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "paid": {
             "type": "string"
@@ -102309,18 +102309,18 @@
         "properties": {
           "created_by": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "created_on": {
             "type": "string"
           },
           "custom_component": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "description": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "display_name": {
             "type": "string"
@@ -102336,7 +102336,7 @@
           },
           "last_updated_by": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_updated_on": {
             "type": "string"
@@ -102383,18 +102383,18 @@
         "properties": {
           "created_by": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "created_on": {
             "type": "string"
           },
           "custom_component": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "description": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "display_name": {
             "type": "string"
@@ -102407,7 +102407,7 @@
           },
           "last_updated_by": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_updated_on": {
             "type": "string"
@@ -102707,21 +102707,21 @@
         "properties": {
           "acceptance_date": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "acceptance_required": {
             "type": "boolean"
           },
           "acceptance_term": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "payment_required": {
             "type": "boolean"
           },
           "terms_and_conditions": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           }
         }
       },
@@ -102765,7 +102765,7 @@
           },
           "group": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "href": {
             "type": "string"
@@ -102784,7 +102784,7 @@
           },
           "user": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "version": {
             "type": "integer"
@@ -102861,7 +102861,7 @@
           },
           "activity_logs": {
             "type": "array",
-            "description": "Returned by the writes, not by the reads, and empty in every response read."
+            "description": "Returned by the writes, not by the reads, and empty."
           },
           "allow_contract": {
             "type": "boolean"
@@ -102883,7 +102883,7 @@
           },
           "created_by": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "created_on": {
             "type": "string"
@@ -102908,7 +102908,7 @@
           },
           "discount_profile": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "display_name": {
             "type": "string"
@@ -102924,7 +102924,7 @@
           },
           "last_updated_by": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_updated_on": {
             "type": "string"
@@ -102961,7 +102961,7 @@
           },
           "original_total": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "pre_order": {
             "type": "boolean"
@@ -102977,15 +102977,15 @@
           },
           "referral_account": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "sales_rep": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "shipping_address": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "shipping_cost": {
             "type": "number"
@@ -102995,7 +102995,7 @@
           },
           "shipping_profile": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "status": {
             "type": "string"
@@ -103283,43 +103283,43 @@
         "properties": {
           "deleted_at": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "estimated_total": {
             "type": "string"
           },
           "last_cancelled_at": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_changed_at": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_invoice_issue_date": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_invoice_total": {
             "type": "string"
           },
           "last_reactivated_at": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "monthly_recurring_revenue": {
             "type": "string"
           },
           "next_invoice_issue_date": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "object": {
             "type": "string"
           },
           "start_date": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "total_collected": {
             "type": "string"
@@ -103459,21 +103459,21 @@
         "properties": {
           "acceptance_date": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "acceptance_required": {
             "type": "boolean"
           },
           "acceptance_term": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "payment_required": {
             "type": "boolean"
           },
           "terms_and_conditions": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           }
         }
       },
@@ -103488,15 +103488,15 @@
           },
           "address_line_3": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "address_line_4": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "address_line_5": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "city": {
             "type": "string"
@@ -103584,7 +103584,7 @@
           },
           "created_by": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "created_on": {
             "type": "string"
@@ -103615,7 +103615,7 @@
           },
           "last_updated_by": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "last_updated_on": {
             "type": "string"
@@ -103984,21 +103984,21 @@
         "properties": {
           "acceptance_date": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "acceptance_required": {
             "type": "boolean"
           },
           "acceptance_term": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           },
           "payment_required": {
             "type": "boolean"
           },
           "terms_and_conditions": {
             "type": "null",
-            "description": "Null in every response read."
+            "description": "Returned as `null`."
           }
         }
       },
@@ -104074,22 +104074,6 @@
           },
           "links": {
             "$ref": "#/components/schemas/BookingPaginationLinks"
-          },
-          "records": {
-            "type": "integer",
-            "description": "Offset pages only: total matching records, not the page's length."
-          },
-          "offset": {
-            "type": "integer",
-            "description": "Offset pages only."
-          },
-          "next_page": {
-            "type": "string",
-            "description": "Offset pages only: the literal string `NULL` at the end of a listing, not JSON null."
-          },
-          "previous_page": {
-            "type": "string",
-            "description": "Offset pages only."
           }
         }
       },
