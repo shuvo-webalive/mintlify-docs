@@ -5,7 +5,7 @@
   "icon": "calendar-days",
   "base": "/rental_assets",
   "overview_description": "Manage rental assets, the profiles that price them and the hours they are available.",
-  "intro": "Rental assets are the things customers can hire, each priced and scheduled by a rental asset profile. These endpoints list, create, update, cancel, reactivate and delete assets and profiles, and read and set each asset's availability. The module has 14 endpoints, and all seven SDKs call every one.",
+  "intro": "Rental assets are the things customers can hire, each priced and scheduled by a rental asset profile. These endpoints list, create, update and delete assets and profiles, cancel and reactivate assets, and read and set each asset's availability. This area has 14 endpoints, each available in all seven SDKs.",
   "warning": null,
   "notes": [
     "**Single records come back under `rental_asset` or `rental_asset_profile`.** Listings put their records under `data`.",
@@ -79,7 +79,7 @@
       "slug": "update-rental-asset-availability",
       "title": "Update rental asset availability",
       "summary": "Sets the weekly or custom hours of one or more rental assets.",
-      "description": "Send a `rental_assets` list. Each entry names an asset by `id` and carries `rental_asset_availability` for weekly hours or `rental_asset_custom_availability` for custom hours. An entry with only the `id` is accepted. In the tested flow, the asset's `use_custom_availability` is set to `true` before custom hours are sent.",
+      "description": "Send a `rental_assets` list. Each entry names an asset by `id` and carries `rental_asset_availability` for weekly hours or `rental_asset_custom_availability` for custom hours. An entry with only the `id` is accepted. Set the asset's `use_custom_availability` to `true` (Update a rental asset) before sending custom hours; whether it is required is not documented.",
       "parameters": [],
       "body": {
         "schema": {
@@ -355,7 +355,7 @@
             "rental_asset_profile_sessions": [
               {
                 "name": "Spring season",
-                "start_date": "2026-10-05",
+                "start_date": "2026-11-02",
                 "end_date": "2026-12-30",
                 "rental_asset_profile_session_prices": [
                   {
@@ -399,7 +399,7 @@
             "rental_asset_profile_sessions": [
               {
                 "name": "Spring season",
-                "start_date": "2026-10-05",
+                "start_date": "2026-11-02",
                 "end_date": "2026-12-30",
                 "rental_asset_profile_session_prices": [
                   {
@@ -580,7 +580,7 @@
       "slug": "update-a-rental-asset-profile",
       "title": "Update a rental asset profile",
       "summary": "Changes a rental asset profile.",
-      "description": "Send the fields to change under `rental_asset_profile`, such as `display_name`. Read the profile afterwards to see the stored values.",
+      "description": "Send the fields to change under `rental_asset_profile`, such as `display_name`. Read the profile afterwards to see the stored values. The `200` status has not been confirmed.",
       "parameters": [
         {
           "name": "rental_asset_profile_id",
@@ -640,7 +640,8 @@
       "slug": "delete-a-rental-asset-profile",
       "title": "Delete a rental asset profile",
       "summary": "Deletes a rental asset profile.",
-      "description": "Deletes the profile. Reading it afterwards returns `404`.",
+      "description": "Deletes the profile; a later read returns `404`. It is not documented whether a profile that rental assets still use can be deleted.",
+      "warning": "**The `200` status of this call has not been confirmed.** Read the profile afterwards; a deleted profile returns `404`.",
       "parameters": [
         {
           "name": "rental_asset_profile_id",
@@ -811,7 +812,7 @@
       "slug": "cancel-a-rental-asset",
       "title": "Cancel a rental asset",
       "summary": "Cancels a rental asset, setting its `status` to `inactive`.",
-      "description": "Send an empty object as the body. The asset comes back under `rental_asset`, and its `status` reads `inactive`. Cancelling an asset that is already cancelled is refused with a `4xx` status.",
+      "description": "Send an empty object as the body. The asset comes back under `rental_asset`; a later read shows `status` `inactive`. Cancelling an asset that is already cancelled is refused with a `4xx` status.",
       "parameters": [
         {
           "name": "rental_asset_id",
@@ -854,7 +855,7 @@
       "slug": "reactivate-a-rental-asset",
       "title": "Reactivate a rental asset",
       "summary": "Reactivates a cancelled rental asset, setting its `status` to `active`.",
-      "description": "Send an empty object as the body. The asset comes back under `rental_asset`, and its `status` reads `active`.",
+      "description": "Send an empty object as the body. The asset comes back under `rental_asset`; a later read shows `status` `active`.",
       "parameters": [
         {
           "name": "rental_asset_id",
@@ -927,7 +928,7 @@
         },
         "max_booking_limit": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "name": {
           "type": "string"
@@ -952,7 +953,7 @@
         },
         "tax": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "version": {
           "type": "integer"
@@ -973,7 +974,7 @@
         },
         "image_name": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "name": {
           "type": "string"
@@ -1070,7 +1071,7 @@
         },
         "pricing_level": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "rental_asset_profile_session_price_hours": {
           "type": "array"
@@ -1183,11 +1184,11 @@
         },
         "image_name": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "item": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "last_updated_by": {
           "$ref": "#/components/schemas/RentalAssetLastUpdatedBy"
@@ -1378,7 +1379,7 @@
         },
         "max_booking_limit": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "name": {
           "type": "string"
@@ -1403,7 +1404,7 @@
         },
         "tax": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "version": {
           "type": "integer"
@@ -1424,7 +1425,7 @@
         },
         "image_name": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "name": {
           "type": "string"
@@ -1521,7 +1522,7 @@
         },
         "pricing_level": {
           "type": "null",
-          "description": "Null in every response read."
+          "description": "Returned as `null`."
         },
         "rental_asset_profile_session_price_hours": {
           "type": "array"
@@ -1775,22 +1776,6 @@
         },
         "links": {
           "$ref": "#/components/schemas/RentalAssetPaginationLinks"
-        },
-        "records": {
-          "type": "integer",
-          "description": "Offset pages only: total matching records, not the page's length."
-        },
-        "offset": {
-          "type": "integer",
-          "description": "Offset pages only."
-        },
-        "next_page": {
-          "type": "string",
-          "description": "Offset pages only: the literal string `NULL` at the end of a listing, not JSON null."
-        },
-        "previous_page": {
-          "type": "string",
-          "description": "Offset pages only."
         }
       }
     },
