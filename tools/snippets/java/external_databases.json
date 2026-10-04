@@ -1,0 +1,34 @@
+{
+  "sdk": "java",
+  "module": "external_databases",
+  "endpoints": {
+    "get_external_databases": {
+      "function": "externalDatabases().getExternalDatabases",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.external_databases.external_databases_dto.ExternalDatabasesDto;\n\nApiResponse<ExternalDatabasesDto.ExternalDatabases> response = client.externalDatabases().getExternalDatabases();\nSystem.out.println(response.getMap());\n"
+    },
+    "create_external_database": {
+      "function": "externalDatabases().createExternalDatabase",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.external_databases.external_databases_dto.ExternalDatabasesDto.ExternalDatabasesView;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse<ExternalDatabasesView> response = client.externalDatabases().createExternalDatabase(\n        Map.of(\n                \"external_database\", Map.of(\n                        \"name\", \"acmedb\",\n                        \"tables\", List.of(\n                                Map.of(\n                                        \"table_name\", \"contacts\",\n                                        \"fields\", List.of(\"company\"),\n                                        \"records\", List.of(\n                                                Map.of(\n                                                        \"record\", List.of(\n                                                                Map.of(\n                                                                        \"field\", \"company\",\n                                                                        \"value\", \"Acme Pty Ltd\")))))))));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_external_database": {
+      "function": "externalDatabases().getExternalDatabase",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.external_databases.external_databases_dto.ExternalDatabasesDto;\n\nApiResponse<ExternalDatabasesDto.ExternalDatabases> response = client.externalDatabases().getExternalDatabase(\"acmedb\");\nSystem.out.println(response.getMap());\n"
+    },
+    "create_external_database_insert_record": {
+      "function": "externalDatabases().createExternalDatabaseInsertRecord",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.external_databases.external_databases_dto.ExternalDatabasesDto.ExternalDatabaseInsertRecord;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse<ExternalDatabaseInsertRecord> response = client.externalDatabases().createExternalDatabaseInsertRecord(\n        \"acmedb\",\n        Map.of(\n                \"table_name\", \"contacts\",\n                \"records\", List.of(\n                        Map.of(\n                                \"record\", List.of(\n                                        Map.of(\"field\", \"company\", \"value\", \"Example Holdings\"))))));\nSystem.out.println(response.getMap());\n"
+    },
+    "create_external_database_search": {
+      "function": "externalDatabases().createExternalDatabaseSearch",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.external_databases.external_databases_dto.ExternalDatabasesDto.ExternalDatabaseSearch;\nimport java.util.Map;\n\nApiResponse<ExternalDatabaseSearch> response = client.externalDatabases().createExternalDatabaseSearch(\n        \"acmedb\",\n        Map.of(\"table_name\", \"contacts\"));\nSystem.out.println(response.getMap());\n"
+    },
+    "update_external_database_update_records": {
+      "function": "externalDatabases().updateExternalDatabaseUpdateRecords",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.external_databases.external_databases_dto.ExternalDatabasesDto.ExternalDatabaseUpdateRecordsUpdated;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse<ExternalDatabaseUpdateRecordsUpdated> response = client.externalDatabases().updateExternalDatabaseUpdateRecords(\n        \"acmedb\",\n        Map.of(\n                \"table_name\", \"contacts\",\n                \"update_fields\", List.of(\n                        Map.of(\"field_name\", \"company\", \"field_value\", \"Acme Group\")),\n                \"where_condition\", Map.of(\n                        \"field_name\", \"company\",\n                        \"operator\", \"=\",\n                        \"field_value\", \"Acme Pty Ltd\")));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_external_database_table": {
+      "function": "externalDatabases().getExternalDatabaseTable",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.external_databases.external_databases_dto.ExternalDatabasesDto;\n\nApiResponse<ExternalDatabasesDto.ExternalDatabases> response = client.externalDatabases().getExternalDatabaseTable(\n        \"acmedb\",\n        \"contacts\");\nSystem.out.println(response.getMap());\n"
+    }
+  }
+}

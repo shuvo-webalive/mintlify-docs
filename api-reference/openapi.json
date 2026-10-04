@@ -278,6 +278,9 @@
     },
     {
       "name": "Integration connections"
+    },
+    {
+      "name": "External databases"
     }
   ],
   "paths": {
@@ -82379,6 +82382,751 @@
           }
         ]
       }
+    },
+    "/external_databases": {
+      "get": {
+        "tags": [
+          "External databases"
+        ],
+        "summary": "List external databases",
+        "operationId": "external_databases_get_external_databases",
+        "description": "Records are under `data`, and each names a database by `name`. The `pagination` block uses `has_next`, `has_prev` and `per_page`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The external databases, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalDatabaseList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/external_databases\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.external_databases.get_external_databases()\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.externalDatabases.getExternalDatabases();\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->externalDatabases->getExternalDatabases();\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.external_databases.external_databases_dto.ExternalDatabasesDto;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ExternalDatabasesDto.ExternalDatabases> response = client.externalDatabases().getExternalDatabases();\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ExternalDatabases.GetExternalDatabasesAsync();\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.externalDatabases.getExternalDatabases();\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ExternalDatabases().GetExternalDatabases(context.Background(), nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "External databases"
+        ],
+        "summary": "Create an external database",
+        "operationId": "external_databases_create_external_database",
+        "description": "Send the database under `external_database`: a `name` and a `tables` array, where each table has a `table_name`, its `fields` (column names) and its first `records`. Set `replace` to `true` to recreate a database that already exists with the tables in the body. The response holds the `name`, a `message` and `activity_logs` under `external_database`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The database is created; its `name` and a `message`, under `external_database`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalDatabaseCreateResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/external_databases\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"external_database\": {\n      \"name\": \"acmedb\",\n      \"tables\": [\n        {\n          \"table_name\": \"contacts\",\n          \"fields\": [\n            \"company\"\n          ],\n          \"records\": [\n            {\n              \"record\": [\n                {\n                  \"field\": \"company\",\n                  \"value\": \"Acme Pty Ltd\"\n                }\n              ]\n            }\n          ]\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.external_databases.create_external_database(\n    {\n        \"external_database\": {\n            \"name\": \"acmedb\",\n            \"tables\": [\n                {\n                    \"table_name\": \"contacts\",\n                    \"fields\": [\"company\"],\n                    \"records\": [\n                        {\"record\": [{\"field\": \"company\", \"value\": \"Acme Pty Ltd\"}]}\n                    ],\n                }\n            ],\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.externalDatabases.createExternalDatabase({\n    external_database: {\n        name: 'acmedb',\n        tables: [\n            {\n                table_name: 'contacts',\n                fields: ['company'],\n                records: [{record: [{field: 'company', value: 'Acme Pty Ltd'}]}],\n            },\n        ],\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->externalDatabases->createExternalDatabase([\n    'external_database' => [\n        'name' => 'acmedb',\n        'tables' => [\n            [\n                'table_name' => 'contacts',\n                'fields' => ['company'],\n                'records' => [['record' => [['field' => 'company', 'value' => 'Acme Pty Ltd']]]],\n            ],\n        ],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.external_databases.external_databases_dto.ExternalDatabasesDto.ExternalDatabasesView;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ExternalDatabasesView> response = client.externalDatabases().createExternalDatabase(\n        Map.of(\n                \"external_database\", Map.of(\n                        \"name\", \"acmedb\",\n                        \"tables\", List.of(\n                                Map.of(\n                                        \"table_name\", \"contacts\",\n                                        \"fields\", List.of(\"company\"),\n                                        \"records\", List.of(\n                                                Map.of(\n                                                        \"record\", List.of(\n                                                                Map.of(\n                                                                        \"field\", \"company\",\n                                                                        \"value\", \"Acme Pty Ltd\")))))))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ExternalDatabases.CreateExternalDatabaseAsync(new Dictionary<string, object?>\n{\n    [\"external_database\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"acmedb\",\n        [\"tables\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"table_name\"] = \"contacts\",\n                [\"fields\"] = new List<object?>\n                {\n                    \"company\",\n                },\n                [\"records\"] = new List<object?>\n                {\n                    new Dictionary<string, object?>\n                    {\n                        [\"record\"] = new List<object?>\n                        {\n                            new Dictionary<string, object?>\n                            {\n                                [\"field\"] = \"company\",\n                                [\"value\"] = \"Acme Pty Ltd\",\n                            },\n                        },\n                    },\n                },\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.externalDatabases.createExternalDatabase({\n  'external_database': {\n    'name': 'acmedb',\n    'tables': [\n      {\n        'table_name': 'contacts',\n        'fields': ['company'],\n        'records': [\n          {\n            'record': [\n              {'field': 'company', 'value': 'Acme Pty Ltd'},\n            ],\n          },\n        ],\n      },\n    ],\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ExternalDatabases().CreateExternalDatabase(context.Background(), map[string]any{\n\t\"external_database\": map[string]any{\n\t\t\"name\": \"acmedb\",\n\t\t\"tables\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"table_name\": \"contacts\",\n\t\t\t\t\"fields\":     []any{\"company\"},\n\t\t\t\t\"records\": []any{\n\t\t\t\t\tmap[string]any{\n\t\t\t\t\t\t\"record\": []any{\n\t\t\t\t\t\t\tmap[string]any{\"field\": \"company\", \"value\": \"Acme Pty Ltd\"},\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "external_database": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The database name."
+                      },
+                      "tables": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "table_name": {
+                              "type": "string"
+                            },
+                            "fields": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              },
+                              "description": "The column names."
+                            },
+                            "records": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "record": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "field": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "description": "One `field` and `value` pair per column."
+                                  }
+                                }
+                              },
+                              "description": "The first rows of the table."
+                            }
+                          }
+                        }
+                      },
+                      "replace": {
+                        "type": "boolean",
+                        "description": "`true` recreates an existing database with the tables in this body."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "external_database"
+                ]
+              },
+              "example": {
+                "external_database": {
+                  "name": "acmedb",
+                  "tables": [
+                    {
+                      "table_name": "contacts",
+                      "fields": [
+                        "company"
+                      ],
+                      "records": [
+                        {
+                          "record": [
+                            {
+                              "field": "company",
+                              "value": "Acme Pty Ltd"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/external_databases/{db_name}": {
+      "get": {
+        "tags": [
+          "External databases"
+        ],
+        "summary": "Retrieve an external database",
+        "operationId": "external_databases_get_external_database",
+        "description": "Pass the database `name` as `db_name`. The response has the same shape as the listing, with the database's entries under `data`. An unknown name returns `404`.",
+        "parameters": [
+          {
+            "name": "db_name",
+            "in": "path",
+            "required": true,
+            "description": "The database's `name`, as given when it is created, such as `acmedb`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The database, as a list under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalDatabaseList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No external database has that name.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/external_databases/acmedb\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.external_databases.get_external_database(\"acmedb\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.externalDatabases.getExternalDatabase('acmedb');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->externalDatabases->getExternalDatabase('acmedb');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.external_databases.external_databases_dto.ExternalDatabasesDto;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ExternalDatabasesDto.ExternalDatabases> response = client.externalDatabases().getExternalDatabase(\"acmedb\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ExternalDatabases.GetExternalDatabaseAsync(\"acmedb\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.externalDatabases.getExternalDatabase('acmedb');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ExternalDatabases().GetExternalDatabase(context.Background(), \"acmedb\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/external_databases/{db_name}/insert_records": {
+      "post": {
+        "tags": [
+          "External databases"
+        ],
+        "summary": "Insert records into an external database table",
+        "operationId": "external_databases_create_external_database_insert_record",
+        "description": "Send the `table_name` and a `records` array at the top level of the body, with no wrapper key. Each record is a list of `field` and `value` pairs. The response holds `success`, a `message` and `inserted_data` under `external_database`.",
+        "parameters": [
+          {
+            "name": "db_name",
+            "in": "path",
+            "required": true,
+            "description": "The database's `name`, as given when it is created, such as `acmedb`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The rows are added; the result under `external_database`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalDatabaseInsertResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/external_databases/acmedb/insert_records\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"table_name\": \"contacts\",\n    \"records\": [\n      {\n        \"record\": [\n          {\n            \"field\": \"company\",\n            \"value\": \"Example Holdings\"\n          }\n        ]\n      }\n    ]\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.external_databases.create_external_database_insert_record(\n    \"acmedb\",\n    {\n        \"table_name\": \"contacts\",\n        \"records\": [{\"record\": [{\"field\": \"company\", \"value\": \"Example Holdings\"}]}],\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.externalDatabases.createExternalDatabaseInsertRecord('acmedb', {\n    table_name: 'contacts',\n    records: [{record: [{field: 'company', value: 'Example Holdings'}]}],\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->externalDatabases->createExternalDatabaseInsertRecord('acmedb', [\n    'table_name' => 'contacts',\n    'records' => [['record' => [['field' => 'company', 'value' => 'Example Holdings']]]],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.external_databases.external_databases_dto.ExternalDatabasesDto.ExternalDatabaseInsertRecord;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ExternalDatabaseInsertRecord> response = client.externalDatabases().createExternalDatabaseInsertRecord(\n        \"acmedb\",\n        Map.of(\n                \"table_name\", \"contacts\",\n                \"records\", List.of(\n                        Map.of(\n                                \"record\", List.of(\n                                        Map.of(\"field\", \"company\", \"value\", \"Example Holdings\"))))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ExternalDatabases.CreateExternalDatabaseInsertRecordAsync(\n    \"acmedb\",\n    new Dictionary<string, object?>\n    {\n        [\"table_name\"] = \"contacts\",\n        [\"records\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"record\"] = new List<object?>\n                {\n                    new Dictionary<string, object?>\n                    {\n                        [\"field\"] = \"company\",\n                        [\"value\"] = \"Example Holdings\",\n                    },\n                },\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.externalDatabases\n    .createExternalDatabaseInsertRecord('acmedb', {\n      'table_name': 'contacts',\n      'records': [\n        {\n          'record': [\n            {'field': 'company', 'value': 'Example Holdings'},\n          ],\n        },\n      ],\n    });\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ExternalDatabases().CreateExternalDatabaseInsertRecord(context.Background(), \"acmedb\", map[string]any{\n\t\"table_name\": \"contacts\",\n\t\"records\": []any{\n\t\tmap[string]any{\n\t\t\t\"record\": []any{\n\t\t\t\tmap[string]any{\n\t\t\t\t\t\"field\": \"company\",\n\t\t\t\t\t\"value\": \"Example Holdings\",\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "table_name": {
+                    "type": "string"
+                  },
+                  "records": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "record": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "field": {
+                                "type": "string"
+                              },
+                              "value": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "description": "One `field` and `value` pair per column."
+                        }
+                      }
+                    },
+                    "description": "The rows to add."
+                  }
+                }
+              },
+              "example": {
+                "table_name": "contacts",
+                "records": [
+                  {
+                    "record": [
+                      {
+                        "field": "company",
+                        "value": "Example Holdings"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/external_databases/{db_name}/search": {
+      "post": {
+        "tags": [
+          "External databases"
+        ],
+        "summary": "Search an external database table",
+        "operationId": "external_databases_create_external_database_search",
+        "description": "Send the `table_name` at the top level of the body. The response, under `external_database`, holds `count`, `limit`, `offset` and a `list` object keyed by table name, where each row maps column names to values.",
+        "parameters": [
+          {
+            "name": "db_name",
+            "in": "path",
+            "required": true,
+            "description": "The database's `name`, as given when it is created, such as `acmedb`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The matching rows, under `external_database.list`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalDatabaseSearchResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/external_databases/acmedb/search\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"table_name\": \"contacts\"\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.external_databases.create_external_database_search(\n    \"acmedb\", {\"table_name\": \"contacts\"}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.externalDatabases.createExternalDatabaseSearch('acmedb', {table_name: 'contacts'});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->externalDatabases->createExternalDatabaseSearch('acmedb', [\n    'table_name' => 'contacts',\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.external_databases.external_databases_dto.ExternalDatabasesDto.ExternalDatabaseSearch;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ExternalDatabaseSearch> response = client.externalDatabases().createExternalDatabaseSearch(\n        \"acmedb\",\n        Map.of(\"table_name\", \"contacts\"));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ExternalDatabases.CreateExternalDatabaseSearchAsync(\n    \"acmedb\",\n    new Dictionary<string, object?> { [\"table_name\"] = \"contacts\" });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.externalDatabases.createExternalDatabaseSearch(\n  'acmedb',\n  {'table_name': 'contacts'},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ExternalDatabases().CreateExternalDatabaseSearch(context.Background(), \"acmedb\", map[string]any{\"table_name\": \"contacts\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "table_name": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "table_name": "contacts"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/external_databases/{db_name}/update_records": {
+      "patch": {
+        "tags": [
+          "External databases"
+        ],
+        "summary": "Update records in an external database table",
+        "operationId": "external_databases_update_external_database_update_records",
+        "description": "Send the `table_name`, an `update_fields` array of `field_name` and `field_value` pairs, and a `where_condition` with a `field_name`, an `operator` such as `=` and a `field_value`, all at the top level of the body. The response holds a `message` under `external_database`.",
+        "parameters": [
+          {
+            "name": "db_name",
+            "in": "path",
+            "required": true,
+            "description": "The database's `name`, as given when it is created, such as `acmedb`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The rows are changed; a `message` under `external_database`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalDatabaseUpdateResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/external_databases/acmedb/update_records\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"table_name\": \"contacts\",\n    \"update_fields\": [\n      {\n        \"field_name\": \"company\",\n        \"field_value\": \"Acme Group\"\n      }\n    ],\n    \"where_condition\": {\n      \"field_name\": \"company\",\n      \"operator\": \"=\",\n      \"field_value\": \"Acme Pty Ltd\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.external_databases.update_external_database_update_records(\n    \"acmedb\",\n    {\n        \"table_name\": \"contacts\",\n        \"update_fields\": [{\"field_name\": \"company\", \"field_value\": \"Acme Group\"}],\n        \"where_condition\": {\n            \"field_name\": \"company\",\n            \"operator\": \"=\",\n            \"field_value\": \"Acme Pty Ltd\",\n        },\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.externalDatabases.updateExternalDatabaseUpdateRecords('acmedb', {\n    table_name: 'contacts',\n    update_fields: [{field_name: 'company', field_value: 'Acme Group'}],\n    where_condition: {field_name: 'company', operator: '=', field_value: 'Acme Pty Ltd'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->externalDatabases->updateExternalDatabaseUpdateRecords('acmedb', [\n    'table_name' => 'contacts',\n    'update_fields' => [['field_name' => 'company', 'field_value' => 'Acme Group']],\n    'where_condition' => [\n        'field_name' => 'company',\n        'operator' => '=',\n        'field_value' => 'Acme Pty Ltd',\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.external_databases.external_databases_dto.ExternalDatabasesDto.ExternalDatabaseUpdateRecordsUpdated;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ExternalDatabaseUpdateRecordsUpdated> response = client.externalDatabases().updateExternalDatabaseUpdateRecords(\n        \"acmedb\",\n        Map.of(\n                \"table_name\", \"contacts\",\n                \"update_fields\", List.of(\n                        Map.of(\"field_name\", \"company\", \"field_value\", \"Acme Group\")),\n                \"where_condition\", Map.of(\n                        \"field_name\", \"company\",\n                        \"operator\", \"=\",\n                        \"field_value\", \"Acme Pty Ltd\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ExternalDatabases.UpdateExternalDatabaseUpdateRecordsAsync(\n    \"acmedb\",\n    new Dictionary<string, object?>\n    {\n        [\"table_name\"] = \"contacts\",\n        [\"update_fields\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"field_name\"] = \"company\",\n                [\"field_value\"] = \"Acme Group\",\n            },\n        },\n        [\"where_condition\"] = new Dictionary<string, object?>\n        {\n            [\"field_name\"] = \"company\",\n            [\"operator\"] = \"=\",\n            [\"field_value\"] = \"Acme Pty Ltd\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.externalDatabases\n    .updateExternalDatabaseUpdateRecords('acmedb', {\n      'table_name': 'contacts',\n      'update_fields': [\n        {'field_name': 'company', 'field_value': 'Acme Group'},\n      ],\n      'where_condition': {\n        'field_name': 'company',\n        'operator': '=',\n        'field_value': 'Acme Pty Ltd',\n      },\n    });\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ExternalDatabases().UpdateExternalDatabaseUpdateRecords(context.Background(), \"acmedb\", map[string]any{\n\t\"table_name\": \"contacts\",\n\t\"update_fields\": []any{\n\t\tmap[string]any{\n\t\t\t\"field_name\":  \"company\",\n\t\t\t\"field_value\": \"Acme Group\",\n\t\t},\n\t},\n\t\"where_condition\": map[string]any{\n\t\t\"field_name\":  \"company\",\n\t\t\"operator\":    \"=\",\n\t\t\"field_value\": \"Acme Pty Ltd\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "table_name": {
+                    "type": "string"
+                  },
+                  "update_fields": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field_name": {
+                          "type": "string"
+                        },
+                        "field_value": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "description": "The new value for each column to change."
+                  },
+                  "where_condition": {
+                    "type": "object",
+                    "properties": {
+                      "field_name": {
+                        "type": "string"
+                      },
+                      "operator": {
+                        "type": "string",
+                        "example": "="
+                      },
+                      "field_value": {
+                        "type": "string"
+                      }
+                    },
+                    "description": "Which rows to change."
+                  }
+                }
+              },
+              "example": {
+                "table_name": "contacts",
+                "update_fields": [
+                  {
+                    "field_name": "company",
+                    "field_value": "Acme Group"
+                  }
+                ],
+                "where_condition": {
+                  "field_name": "company",
+                  "operator": "=",
+                  "field_value": "Acme Pty Ltd"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/external_databases/{db_name}/tables/{table_name}": {
+      "get": {
+        "tags": [
+          "External databases"
+        ],
+        "summary": "Retrieve the columns of an external database table",
+        "operationId": "external_databases_get_external_database_table",
+        "description": "Pass the database `name` as `db_name` and the table's `table_name`. The response has the same shape as the database listing, with the table's columns under `data`.",
+        "parameters": [
+          {
+            "name": "db_name",
+            "in": "path",
+            "required": true,
+            "description": "The database's `name`, as given when it is created, such as `acmedb`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "table_name",
+            "in": "path",
+            "required": true,
+            "description": "The table's `table_name`, such as `contacts`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The table's columns, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalDatabaseList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/external_databases/acmedb/tables/contacts\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.external_databases.get_external_database_table(\"acmedb\", \"contacts\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.externalDatabases.getExternalDatabaseTable('acmedb', 'contacts');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->externalDatabases->getExternalDatabaseTable('acmedb', 'contacts');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.external_databases.external_databases_dto.ExternalDatabasesDto;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ExternalDatabasesDto.ExternalDatabases> response = client.externalDatabases().getExternalDatabaseTable(\n        \"acmedb\",\n        \"contacts\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ExternalDatabases.GetExternalDatabaseTableAsync(\"acmedb\", \"contacts\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.externalDatabases.getExternalDatabaseTable(\n  'acmedb',\n  'contacts',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ExternalDatabases().GetExternalDatabaseTable(context.Background(), \"acmedb\", \"contacts\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -124130,6 +124878,172 @@
             "type": "string"
           },
           "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "ExternalDatabaseList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "The entries on this page. In the database listing, each has a `name`."
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/ExternalDatabasePagination"
+          }
+        }
+      },
+      "ExternalDatabasePagination": {
+        "type": "object",
+        "properties": {
+          "has_next": {
+            "type": "boolean"
+          },
+          "has_prev": {
+            "type": "boolean"
+          },
+          "per_page": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "prev_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "links": {
+            "$ref": "#/components/schemas/ExternalDatabasePaginationLinks"
+          }
+        }
+      },
+      "ExternalDatabasePaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "ExternalDatabaseCreateResponse": {
+        "type": "object",
+        "properties": {
+          "external_database": {
+            "$ref": "#/components/schemas/ExternalDatabaseCreated"
+          }
+        }
+      },
+      "ExternalDatabaseCreated": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "activity_logs": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "ExternalDatabaseInsertResponse": {
+        "type": "object",
+        "properties": {
+          "external_database": {
+            "$ref": "#/components/schemas/ExternalDatabaseInsertResult"
+          }
+        }
+      },
+      "ExternalDatabaseInsertResult": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "inserted_data": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "ExternalDatabaseSearchResponse": {
+        "type": "object",
+        "properties": {
+          "external_database": {
+            "$ref": "#/components/schemas/ExternalDatabaseSearchResult"
+          }
+        }
+      },
+      "ExternalDatabaseSearchResult": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of rows found."
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "list": {
+            "type": "object",
+            "description": "One array of rows per table name; each row maps column names to values.",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "ExternalDatabaseUpdateResponse": {
+        "type": "object",
+        "properties": {
+          "external_database": {
+            "$ref": "#/components/schemas/ExternalDatabaseUpdateResult"
+          }
+        }
+      },
+      "ExternalDatabaseUpdateResult": {
+        "type": "object",
+        "properties": {
+          "message": {
             "type": "string"
           }
         }

@@ -1,0 +1,34 @@
+{
+  "sdk": "dotnet",
+  "module": "external_databases",
+  "endpoints": {
+    "get_external_databases": {
+      "function": "ExternalDatabases.GetExternalDatabasesAsync",
+      "code": "var response = await client.ExternalDatabases.GetExternalDatabasesAsync();\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "create_external_database": {
+      "function": "ExternalDatabases.CreateExternalDatabaseAsync",
+      "code": "var response = await client.ExternalDatabases.CreateExternalDatabaseAsync(new Dictionary<string, object?>\n{\n    [\"external_database\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"acmedb\",\n        [\"tables\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"table_name\"] = \"contacts\",\n                [\"fields\"] = new List<object?>\n                {\n                    \"company\",\n                },\n                [\"records\"] = new List<object?>\n                {\n                    new Dictionary<string, object?>\n                    {\n                        [\"record\"] = new List<object?>\n                        {\n                            new Dictionary<string, object?>\n                            {\n                                [\"field\"] = \"company\",\n                                [\"value\"] = \"Acme Pty Ltd\",\n                            },\n                        },\n                    },\n                },\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_external_database": {
+      "function": "ExternalDatabases.GetExternalDatabaseAsync",
+      "code": "var response = await client.ExternalDatabases.GetExternalDatabaseAsync(\"acmedb\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "create_external_database_insert_record": {
+      "function": "ExternalDatabases.CreateExternalDatabaseInsertRecordAsync",
+      "code": "var response = await client.ExternalDatabases.CreateExternalDatabaseInsertRecordAsync(\n    \"acmedb\",\n    new Dictionary<string, object?>\n    {\n        [\"table_name\"] = \"contacts\",\n        [\"records\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"record\"] = new List<object?>\n                {\n                    new Dictionary<string, object?>\n                    {\n                        [\"field\"] = \"company\",\n                        [\"value\"] = \"Example Holdings\",\n                    },\n                },\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "create_external_database_search": {
+      "function": "ExternalDatabases.CreateExternalDatabaseSearchAsync",
+      "code": "var response = await client.ExternalDatabases.CreateExternalDatabaseSearchAsync(\n    \"acmedb\",\n    new Dictionary<string, object?> { [\"table_name\"] = \"contacts\" });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "update_external_database_update_records": {
+      "function": "ExternalDatabases.UpdateExternalDatabaseUpdateRecordsAsync",
+      "code": "var response = await client.ExternalDatabases.UpdateExternalDatabaseUpdateRecordsAsync(\n    \"acmedb\",\n    new Dictionary<string, object?>\n    {\n        [\"table_name\"] = \"contacts\",\n        [\"update_fields\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"field_name\"] = \"company\",\n                [\"field_value\"] = \"Acme Group\",\n            },\n        },\n        [\"where_condition\"] = new Dictionary<string, object?>\n        {\n            [\"field_name\"] = \"company\",\n            [\"operator\"] = \"=\",\n            [\"field_value\"] = \"Acme Pty Ltd\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_external_database_table": {
+      "function": "ExternalDatabases.GetExternalDatabaseTableAsync",
+      "code": "var response = await client.ExternalDatabases.GetExternalDatabaseTableAsync(\"acmedb\", \"contacts\");\n\nConsole.WriteLine(response.Json);\n"
+    }
+  }
+}

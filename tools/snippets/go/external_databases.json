@@ -1,0 +1,34 @@
+{
+ "sdk": "go",
+ "module": "external_databases",
+ "endpoints": {
+  "get_external_databases": {
+   "function": "ExternalDatabases.GetExternalDatabases",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.ExternalDatabases().GetExternalDatabases(context.Background(), nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "create_external_database": {
+   "function": "ExternalDatabases.CreateExternalDatabase",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.ExternalDatabases().CreateExternalDatabase(context.Background(), map[string]any{\n\t\"external_database\": map[string]any{\n\t\t\"name\": \"acmedb\",\n\t\t\"tables\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"table_name\": \"contacts\",\n\t\t\t\t\"fields\":     []any{\"company\"},\n\t\t\t\t\"records\": []any{\n\t\t\t\t\tmap[string]any{\n\t\t\t\t\t\t\"record\": []any{\n\t\t\t\t\t\t\tmap[string]any{\"field\": \"company\", \"value\": \"Acme Pty Ltd\"},\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_external_database": {
+   "function": "ExternalDatabases.GetExternalDatabase",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.ExternalDatabases().GetExternalDatabase(context.Background(), \"acmedb\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "create_external_database_insert_record": {
+   "function": "ExternalDatabases.CreateExternalDatabaseInsertRecord",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.ExternalDatabases().CreateExternalDatabaseInsertRecord(context.Background(), \"acmedb\", map[string]any{\n\t\"table_name\": \"contacts\",\n\t\"records\": []any{\n\t\tmap[string]any{\n\t\t\t\"record\": []any{\n\t\t\t\tmap[string]any{\n\t\t\t\t\t\"field\": \"company\",\n\t\t\t\t\t\"value\": \"Example Holdings\",\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "create_external_database_search": {
+   "function": "ExternalDatabases.CreateExternalDatabaseSearch",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.ExternalDatabases().CreateExternalDatabaseSearch(context.Background(), \"acmedb\", map[string]any{\"table_name\": \"contacts\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "update_external_database_update_records": {
+   "function": "ExternalDatabases.UpdateExternalDatabaseUpdateRecords",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.ExternalDatabases().UpdateExternalDatabaseUpdateRecords(context.Background(), \"acmedb\", map[string]any{\n\t\"table_name\": \"contacts\",\n\t\"update_fields\": []any{\n\t\tmap[string]any{\n\t\t\t\"field_name\":  \"company\",\n\t\t\t\"field_value\": \"Acme Group\",\n\t\t},\n\t},\n\t\"where_condition\": map[string]any{\n\t\t\"field_name\":  \"company\",\n\t\t\"operator\":    \"=\",\n\t\t\"field_value\": \"Acme Pty Ltd\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  },
+  "get_external_database_table": {
+   "function": "ExternalDatabases.GetExternalDatabaseTable",
+   "code": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n)\n\nresponse, err := client.ExternalDatabases().GetExternalDatabaseTable(context.Background(), \"acmedb\", \"contacts\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+  }
+ }
+}
