@@ -8768,7 +8768,7 @@
         ],
         "summary": "List communication profiles",
         "operationId": "communication_profiles_get_settings_communication_profiles",
-        "description": "Returns the profiles under `data`, with `pagination` for the next page. Other fields filter as `filter_<field>`.",
+        "description": "Returns the profiles under `data`, with `pagination` for the next page. To filter, add `filter_<field>=<value>`.",
         "parameters": [
           {
             "name": "limit",
@@ -8867,7 +8867,7 @@
             "description": "The new profile, under `communication_profile`."
           },
           "500": {
-            "description": "The server could not create the profile.",
+            "description": "Returned on every create. No profile is created.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8964,7 +8964,7 @@
         ],
         "summary": "Retrieve a communication profile",
         "operationId": "communication_profiles_get_settings_communication_profile",
-        "description": "Name the profile by its `cmp_` id.",
+        "description": "Pass the profile's `cmp_` id.",
         "parameters": [
           {
             "name": "communication_profile_id",
@@ -9038,72 +9038,6 @@
             "lang": "go",
             "label": "Go",
             "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CommunicationProfiles().GetSettingsCommunicationProfile(context.Background(), \"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "Communication profiles"
-        ],
-        "summary": "Delete a communication profile",
-        "operationId": "communication_profiles_delete_settings_communication_profile",
-        "description": "Marks the profile deleted and returns `204` with no content. The default profile cannot be deleted. Retrieving a deleted profile returns `404`.",
-        "parameters": [
-          {
-            "name": "communication_profile_id",
-            "in": "path",
-            "required": true,
-            "description": "The communication profile's `cmp_` id.",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "The profile is deleted."
-          }
-        },
-        "x-codeSamples": [
-          {
-            "lang": "bash",
-            "label": "cURL",
-            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/communication_profiles/cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
-          },
-          {
-            "lang": "python",
-            "label": "Python",
-            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.communication_profiles.delete_settings_communication_profile(\n    \"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\"\n)\nprint(response.data)\n"
-          },
-          {
-            "lang": "javascript",
-            "label": "JavaScript",
-            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.communicationProfiles.deleteSettingsCommunicationProfile(\n    'cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e',\n);\nconsole.log(response.data);\n"
-          },
-          {
-            "lang": "php",
-            "label": "PHP",
-            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->communicationProfiles->deleteSettingsCommunicationProfile(\n    'cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e',\n);\nprint_r($response->data);\n"
-          },
-          {
-            "lang": "java",
-            "label": "Java",
-            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.communicationProfiles().deleteSettingsCommunicationProfile(\n        \"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\");\nSystem.out.println(response.getMap());\n"
-          },
-          {
-            "lang": "csharp",
-            "label": ".NET",
-            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CommunicationProfiles.DeleteSettingsCommunicationProfileAsync(\"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\");\n\nConsole.WriteLine(response.Json);\n"
-          },
-          {
-            "lang": "dart",
-            "label": "Dart",
-            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.communicationProfiles\n    .deleteSettingsCommunicationProfile(\n      'cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e',\n    );\nprint(response.map);\n"
-          },
-          {
-            "lang": "go",
-            "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CommunicationProfiles().DeleteSettingsCommunicationProfile(context.Background(), \"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
           }
         ]
       },
@@ -9207,6 +9141,72 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "Communication profiles"
+        ],
+        "summary": "Delete a communication profile",
+        "operationId": "communication_profiles_delete_settings_communication_profile",
+        "description": "Marks the profile deleted and returns `204` with no content. The default profile cannot be deleted. Retrieving a deleted profile returns `404`.",
+        "parameters": [
+          {
+            "name": "communication_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The communication profile's `cmp_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The profile is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/communication_profiles/cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.communication_profiles.delete_settings_communication_profile(\n    \"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.communicationProfiles.deleteSettingsCommunicationProfile(\n    'cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->communicationProfiles->deleteSettingsCommunicationProfile(\n    'cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.communicationProfiles().deleteSettingsCommunicationProfile(\n        \"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CommunicationProfiles.DeleteSettingsCommunicationProfileAsync(\"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.communicationProfiles\n    .deleteSettingsCommunicationProfile(\n      'cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e',\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CommunicationProfiles().DeleteSettingsCommunicationProfile(context.Background(), \"cmp_7b2d9e4a1c6f4b8d9a3e5c1f2b4d6a8e\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
       }
     },
     "/orders": {
@@ -89596,27 +89596,6 @@
           },
           "links": {
             "$ref": "#/components/schemas/CommunicationProfilePaginationLinks"
-          },
-          "records": {
-            "type": "integer"
-          },
-          "offset": {
-            "type": "integer"
-          },
-          "next_page": {
-            "type": "string"
-          },
-          "previous_page": {
-            "type": "string"
-          },
-          "has_next": {
-            "type": "boolean"
-          },
-          "has_prev": {
-            "type": "boolean"
-          },
-          "per_page": {
-            "type": "integer"
           }
         }
       },
