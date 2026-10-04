@@ -10,7 +10,7 @@
   "notes": [
     "**Writes and reads return different shapes.** A create or an update returns a flat `period` and an integer `duration`, where a read nests them as `duration.period` and `duration.count`.",
     "**A create sends `period` and `duration`.** For example `\"period\": \"MONTHLY\"` and `\"duration\": 1`, with `name` and `display_name`, under `invoice_term`.",
-    "**Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true.",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.",
     "**A delete returns `204` with no body.** Reading the invoice term afterwards returns `404`."
   ],
   "endpoints": [
@@ -146,7 +146,7 @@
       "slug": "retrieve-an-invoice-term",
       "title": "Retrieve an invoice term",
       "summary": "Returns one invoice term by its `id`, under `invoice_term`.",
-      "description": "Reads the invoice term with this `id`. The `id` is the one a listing or a create returns. A read nests the period and count under `duration`.",
+      "description": "Reads the invoice term with this `id`. A read nests the period and count under `duration`.",
       "parameters": [
         {
           "name": "invoice_term_id",
@@ -382,7 +382,7 @@
       "type": "object",
       "properties": {
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -403,7 +403,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
