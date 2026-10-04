@@ -182,6 +182,9 @@
     },
     {
       "name": "Events"
+    },
+    {
+      "name": "Custom events"
     }
   ],
   "paths": {
@@ -57902,6 +57905,439 @@
           }
         }
       }
+    },
+    "/settings/custom_events": {
+      "get": {
+        "tags": [
+          "Custom events"
+        ],
+        "summary": "List custom events",
+        "operationId": "custom_events_get_settings_custom_events",
+        "description": "Returns a page of custom events under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of custom events.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsCustomEventList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/custom_events?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.custom_events.get_settings_custom_events({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.customEvents.getSettingsCustomEvents({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->customEvents->getSettingsCustomEvents(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.custom_events.custom_events_dto.CustomEventsDto.SettingsCustomEventList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsCustomEventList> response = client.customEvents().getSettingsCustomEvents(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CustomEvents.GetSettingsCustomEventsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customEvents.getSettingsCustomEvents(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CustomEvents().GetSettingsCustomEvents(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Custom events"
+        ],
+        "summary": "Create a custom event",
+        "operationId": "custom_events_create_settings_custom_event",
+        "description": "`name` and `base_event` are required; `base_event` is an `se_` id. Creating the event also adds a message for it to every communication profile.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new custom event."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/custom_events\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"custom_event\": {\n      \"name\": \"Order approved by finance\",\n      \"base_event\": \"se_1d3f5a7c9e2b4d6f8a0c2e4b6d8f0a2c\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.custom_events.create_settings_custom_event(\n    {\n        \"custom_event\": {\n            \"name\": \"Order approved by finance\",\n            \"base_event\": \"se_1d3f5a7c9e2b4d6f8a0c2e4b6d8f0a2c\",\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.customEvents.createSettingsCustomEvent({\n    custom_event: {name: 'Order approved by finance', base_event: 'se_1d3f5a7c9e2b4d6f8a0c2e4b6d8f0a2c'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->customEvents->createSettingsCustomEvent([\n    'custom_event' => [\n        'name' => 'Order approved by finance',\n        'base_event' => 'se_1d3f5a7c9e2b4d6f8a0c2e4b6d8f0a2c',\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.customEvents().createSettingsCustomEvent(\n        Map.of(\n                \"custom_event\", Map.of(\n                        \"name\", \"Order approved by finance\",\n                        \"base_event\", \"se_1d3f5a7c9e2b4d6f8a0c2e4b6d8f0a2c\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CustomEvents.CreateSettingsCustomEventAsync(new Dictionary<string, object?>\n{\n    [\"custom_event\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Order approved by finance\",\n        [\"base_event\"] = \"se_1d3f5a7c9e2b4d6f8a0c2e4b6d8f0a2c\",\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customEvents.createSettingsCustomEvent({\n  'custom_event': {\n    'name': 'Order approved by finance',\n    'base_event': 'se_1d3f5a7c9e2b4d6f8a0c2e4b6d8f0a2c',\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CustomEvents().CreateSettingsCustomEvent(context.Background(), map[string]any{\n\t\"custom_event\": map[string]any{\n\t\t\"name\":       \"Order approved by finance\",\n\t\t\"base_event\": \"se_1d3f5a7c9e2b4d6f8a0c2e4b6d8f0a2c\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "custom_event": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The custom event's name."
+                      },
+                      "base_event": {
+                        "type": "string",
+                        "description": "The `se_` id of the system event this event builds on."
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "base_event"
+                    ]
+                  }
+                },
+                "required": [
+                  "custom_event"
+                ]
+              },
+              "example": {
+                "custom_event": {
+                  "name": "Order approved by finance",
+                  "base_event": "se_1d3f5a7c9e2b4d6f8a0c2e4b6d8f0a2c"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/custom_events/{custom_event_id}": {
+      "get": {
+        "tags": [
+          "Custom events"
+        ],
+        "summary": "Retrieve a custom event",
+        "operationId": "custom_events_get_settings_custom_event",
+        "description": "Returns the custom event under `custom_event`.",
+        "parameters": [
+          {
+            "name": "custom_event_id",
+            "in": "path",
+            "required": true,
+            "description": "The custom event's `ce_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The custom event, under `custom_event`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsCustomEventResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/custom_events/ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.custom_events.get_settings_custom_event(\n    \"ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.customEvents.getSettingsCustomEvent('ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->customEvents->getSettingsCustomEvent('ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.custom_events.custom_events_dto.CustomEventsDto.SettingsCustomEvent;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsCustomEvent> response = client.customEvents().getSettingsCustomEvent(\n        \"ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CustomEvents.GetSettingsCustomEventAsync(\"ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customEvents.getSettingsCustomEvent(\n  'ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CustomEvents().GetSettingsCustomEvent(context.Background(), \"ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Custom events"
+        ],
+        "summary": "Delete a custom event",
+        "operationId": "custom_events_delete_settings_custom_event",
+        "description": "Returns `204` with no body. A custom event a workflow uses cannot be deleted. The messages its create added to the communication profiles stay behind.",
+        "parameters": [
+          {
+            "name": "custom_event_id",
+            "in": "path",
+            "required": true,
+            "description": "The custom event's `ce_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The custom event is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/custom_events/ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.custom_events.delete_settings_custom_event(\n    \"ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.customEvents.deleteSettingsCustomEvent('ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->customEvents->deleteSettingsCustomEvent('ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.customEvents().deleteSettingsCustomEvent(\"ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CustomEvents.DeleteSettingsCustomEventAsync(\"ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customEvents.deleteSettingsCustomEvent(\n  'ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CustomEvents().DeleteSettingsCustomEvent(context.Background(), \"ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Custom events"
+        ],
+        "summary": "Update a custom event",
+        "operationId": "custom_events_update_settings_custom_event",
+        "description": "Send the fields to change. The updated custom event comes back.",
+        "parameters": [
+          {
+            "name": "custom_event_id",
+            "in": "path",
+            "required": true,
+            "description": "The custom event's `ce_` id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated custom event."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/custom_events/ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"custom_event\": {\n      \"display_name\": \"Order approved by finance team\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.custom_events.update_settings_custom_event(\n    \"ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a\",\n    {\"custom_event\": {\"display_name\": \"Order approved by finance team\"}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.customEvents.updateSettingsCustomEvent('ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a', {\n    custom_event: {display_name: 'Order approved by finance team'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->customEvents->updateSettingsCustomEvent(\n    'ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a',\n    ['custom_event' => ['display_name' => 'Order approved by finance team']],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.customEvents().updateSettingsCustomEvent(\n        \"ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a\",\n        Map.of(\"custom_event\", Map.of(\"display_name\", \"Order approved by finance team\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CustomEvents.UpdateSettingsCustomEventAsync(\n    \"ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a\",\n    new Dictionary<string, object?>\n    {\n        [\"custom_event\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Order approved by finance team\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customEvents.updateSettingsCustomEvent(\n  'ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a',\n  {\n    'custom_event': {'display_name': 'Order approved by finance team'},\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CustomEvents().UpdateSettingsCustomEvent(context.Background(), \"ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a\", map[string]any{\n\t\"custom_event\": map[string]any{\n\t\t\"display_name\": \"Order approved by finance team\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "custom_event": {
+                    "type": "object",
+                    "properties": {
+                      "display_name": {
+                        "type": "string",
+                        "description": "The name shown for the event."
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "description": "The event's status."
+                      }
+                    },
+                    "description": "The fields to change."
+                  }
+                },
+                "required": [
+                  "custom_event"
+                ]
+              },
+              "example": {
+                "custom_event": {
+                  "display_name": "Order approved by finance team"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -91398,6 +91834,124 @@
         }
       },
       "EventPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "prev": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "SettingsCustomEvent": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "The custom event's `ce_` id."
+          },
+          "status": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "base_event": {
+            "type": "boolean"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "created_by": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "last_updated_by": {
+            "description": "No type is known: this field is null in every record read."
+          },
+          "href": {
+            "type": "string"
+          }
+        }
+      },
+      "SettingsCustomEventResponse": {
+        "type": "object",
+        "properties": {
+          "custom_event": {
+            "$ref": "#/components/schemas/SettingsCustomEvent"
+          }
+        }
+      },
+      "SettingsCustomEventList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "description": "Always `list`."
+          },
+          "url": {
+            "type": "string",
+            "description": "The path this page was read from."
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SettingsCustomEvent"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/SettingsCustomEventPagination"
+          }
+        }
+      },
+      "SettingsCustomEventPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied to this page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "links": {
+            "$ref": "#/components/schemas/SettingsCustomEventPaginationLinks"
+          }
+        }
+      },
+      "SettingsCustomEventPaginationLinks": {
         "type": "object",
         "properties": {
           "next": {

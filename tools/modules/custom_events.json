@@ -1,0 +1,388 @@
+{
+  "family": "custom_events",
+  "tag": "Custom events",
+  "slug": "custom-events",
+  "icon": "calendar-plus",
+  "base": "/settings/custom_events",
+  "overview_description": "Create, read, update and delete custom events built on the platform's system events.",
+  "intro": "Custom events are events you define on top of a system event, for workflows and messages to react to. You can list, create, read, update and delete them. This area has 5 endpoints, and all seven Exsited SDKs call every one.",
+  "warning": "**Creating a custom event adds a message to every communication profile, and deleting the event leaves those messages behind.**",
+  "notes": [
+    "**`name` and `base_event` are required to create a custom event.** `base_event` is an `se_` id, not the `evt_` id the system events listing shows, and no listed id is accepted.",
+    "**Custom event ids start with `ce_`.** One custom event comes back under `custom_event`.",
+    "**A custom event in use cannot be deleted.** Only an event no workflow uses can be removed.",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_custom_events",
+      "method": "GET",
+      "path": "/settings/custom_events",
+      "slug": "list-custom-events",
+      "title": "List custom events",
+      "summary": "Lists the custom events on your instance, one page at a time.",
+      "description": "Returns a page of custom events under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of custom events.",
+          "schema": {
+            "$ref": "#/components/schemas/SettingsCustomEventList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_custom_event",
+      "method": "POST",
+      "path": "/settings/custom_events",
+      "slug": "create-a-custom-event",
+      "title": "Create a custom event",
+      "summary": "Creates a custom event built on a system event.",
+      "description": "`name` and `base_event` are required; `base_event` is an `se_` id. Creating the event also adds a message for it to every communication profile.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "custom_event": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The custom event's name."
+                },
+                "base_event": {
+                  "type": "string",
+                  "description": "The `se_` id of the system event this event builds on."
+                }
+              },
+              "required": [
+                "name",
+                "base_event"
+              ]
+            }
+          },
+          "required": [
+            "custom_event"
+          ]
+        },
+        "example": {
+          "custom_event": {
+            "name": "Order approved by finance",
+            "base_event": "se_1d3f5a7c9e2b4d6f8a0c2e4b6d8f0a2c"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new custom event."
+        }
+      },
+      "example_call": {
+        "body": {
+          "custom_event": {
+            "name": "Order approved by finance",
+            "base_event": "se_1d3f5a7c9e2b4d6f8a0c2e4b6d8f0a2c"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_custom_event",
+      "method": "GET",
+      "path": "/settings/custom_events/{custom_event_id}",
+      "slug": "retrieve-a-custom-event",
+      "title": "Retrieve a custom event",
+      "summary": "Retrieves one custom event by its `ce_` id.",
+      "description": "Returns the custom event under `custom_event`.",
+      "parameters": [
+        {
+          "name": "custom_event_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom event's `ce_` id.",
+          "schema": {
+            "type": "string",
+            "example": "ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The custom event, under `custom_event`.",
+          "schema": {
+            "$ref": "#/components/schemas/SettingsCustomEventResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "custom_event_id": "ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_custom_event",
+      "method": "DELETE",
+      "path": "/settings/custom_events/{custom_event_id}",
+      "slug": "delete-a-custom-event",
+      "title": "Delete a custom event",
+      "summary": "Deletes a custom event that no workflow uses. Nothing comes back.",
+      "description": "Returns `204` with no body. A custom event a workflow uses cannot be deleted. The messages its create added to the communication profiles stay behind.",
+      "parameters": [
+        {
+          "name": "custom_event_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom event's `ce_` id.",
+          "schema": {
+            "type": "string",
+            "example": "ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The custom event is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "custom_event_id": "ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a"
+        }
+      }
+    },
+    {
+      "key": "update_settings_custom_event",
+      "method": "PATCH",
+      "path": "/settings/custom_events/{custom_event_id}",
+      "slug": "update-a-custom-event",
+      "title": "Update a custom event",
+      "summary": "Changes a custom event's fields or its status.",
+      "description": "Send the fields to change. The updated custom event comes back.",
+      "parameters": [
+        {
+          "name": "custom_event_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom event's `ce_` id.",
+          "schema": {
+            "type": "string",
+            "example": "ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "custom_event": {
+              "type": "object",
+              "properties": {
+                "display_name": {
+                  "type": "string",
+                  "description": "The name shown for the event."
+                },
+                "description": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "description": "The event's status."
+                }
+              },
+              "description": "The fields to change."
+            }
+          },
+          "required": [
+            "custom_event"
+          ]
+        },
+        "example": {
+          "custom_event": {
+            "display_name": "Order approved by finance team"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated custom event."
+        }
+      },
+      "example_call": {
+        "path": {
+          "custom_event_id": "ce_8b0d2f4a6c8e4b1d3f5a7c9e1b3d5f7a"
+        },
+        "body": {
+          "custom_event": {
+            "display_name": "Order approved by finance team"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "SettingsCustomEvent": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The custom event's `ce_` id."
+        },
+        "status": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "base_event": {
+          "type": "boolean"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "created_by": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "last_updated_by": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "SettingsCustomEventResponse": {
+      "type": "object",
+      "properties": {
+        "custom_event": {
+          "$ref": "#/components/schemas/SettingsCustomEvent"
+        }
+      }
+    },
+    "SettingsCustomEventList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "description": "Always `list`."
+        },
+        "url": {
+          "type": "string",
+          "description": "The path this page was read from."
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/SettingsCustomEvent"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/SettingsCustomEventPagination"
+        }
+      }
+    },
+    "SettingsCustomEventPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Pass as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "links": {
+          "$ref": "#/components/schemas/SettingsCustomEventPaginationLinks"
+        }
+      }
+    },
+    "SettingsCustomEventPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

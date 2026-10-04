@@ -1,0 +1,34 @@
+---
+title: "Custom events"
+sidebarTitle: "Overview"
+description: "Create, read, update and delete custom events built on the platform's system events."
+---
+
+Custom events are events you define on top of a system event, for workflows and messages to react to. You can list, create, read, update and delete them. This area has 5 endpoints, and all seven Exsited SDKs call every one.
+
+<Warning>
+  **Creating a custom event adds a message to every communication profile, and deleting the event leaves those messages behind.**
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List custom events](/api-reference/custom-events/list-custom-events) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/custom_events` | Lists the custom events on your instance, one page at a time. |
+| [Create a custom event](/api-reference/custom-events/create-a-custom-event) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/custom_events` | Creates a custom event built on a system event. |
+| [Retrieve a custom event](/api-reference/custom-events/retrieve-a-custom-event) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/custom_events/{custom_event_id}` | Retrieves one custom event by its `ce_` id. |
+| [Delete a custom event](/api-reference/custom-events/delete-a-custom-event) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/custom_events/{custom_event_id}` | Deletes a custom event that no workflow uses. Nothing comes back. |
+| [Update a custom event](/api-reference/custom-events/update-a-custom-event) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/custom_events/{custom_event_id}` | Changes a custom event's fields or its status. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **`name` and `base_event` are required to create a custom event.** `base_event` is an `se_` id, not the `evt_` id the system events listing shows, and no listed id is accepted.
+- **Custom event ids start with `ce_`.** One custom event comes back under `custom_event`.
+- **A custom event in use cannot be deleted.** Only an event no workflow uses can be removed.
+- **Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.
