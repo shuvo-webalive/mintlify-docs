@@ -1,0 +1,374 @@
+{
+  "family": "sales_reps",
+  "tag": "Sales reps",
+  "slug": "sales-reps",
+  "icon": "user-tie",
+  "base": "/settings/sales_reps",
+  "overview_description": "List, create, read, update and delete the sales reps set up in your Exsited organisation settings.",
+  "intro": "Sales reps are the people you can name as the sales rep on an account or order. This area lists, creates, reads, updates and deletes them under settings. It has 5 endpoints, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**Creating a sales rep fails on the current instance.** `POST /settings/sales_reps` returns `400` with `validation_error` and no field named for every valid body tried, so the update and delete calls have no new rep to work on.",
+    "**Bodies sit under `sales_rep`.** A new rep takes `first_name`, `last_name` and `email_address`.",
+    "**`status` is `active` or `inactive`.** Send it in an update to enable or disable a rep.",
+    "**A sales rep id starts with `sr_`.** Shipping rules use the same `sr_` prefix, so check which kind of record an id names.",
+    "**The listing pages by cursor.** Send `limit`, then pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_sales_reps",
+      "method": "GET",
+      "path": "/settings/sales_reps",
+      "slug": "list-sales-reps",
+      "title": "List sales reps",
+      "summary": "Lists the sales reps set up in your organisation, one page at a time.",
+      "description": "The records are under `data`, and `pagination` holds the cursor for the next page. Other fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` to sort in descending order.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of sales reps, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/SalesRepList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_sales_rep",
+      "method": "POST",
+      "path": "/settings/sales_reps",
+      "slug": "create-a-sales-rep",
+      "title": "Create a sales rep",
+      "summary": "Creates a sales rep from a first name, last name and email address.",
+      "description": "Send the new rep under `sales_rep`. On the current instance this call returns `400` with `validation_error` and no field named, for every valid body tried.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "sales_rep": {
+              "type": "object",
+              "properties": {
+                "first_name": {
+                  "type": "string"
+                },
+                "last_name": {
+                  "type": "string"
+                },
+                "email_address": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "sales_rep"
+          ]
+        },
+        "example": {
+          "sales_rep": {
+            "first_name": "Jane",
+            "last_name": "Citizen",
+            "email_address": "jane@example.com"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The sales rep is created."
+        },
+        "400": {
+          "description": "`validation_error` with no field named, returned for every valid body tried."
+        }
+      },
+      "example_call": {
+        "body": {
+          "sales_rep": {
+            "first_name": "Jane",
+            "last_name": "Citizen",
+            "email_address": "jane@example.com"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_sales_rep",
+      "method": "GET",
+      "path": "/settings/sales_reps/{sales_rep_id}",
+      "slug": "retrieve-a-sales-rep",
+      "title": "Retrieve a sales rep",
+      "summary": "Returns one sales rep, under `sales_rep`.",
+      "description": "Pass the rep's `id`, which starts with `sr_`. The response holds the rep's name, email address and `status`.",
+      "parameters": [
+        {
+          "name": "sales_rep_id",
+          "in": "path",
+          "required": true,
+          "description": "The sales rep's `id`, which starts with `sr_`.",
+          "schema": {
+            "type": "string",
+            "example": "sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The sales rep, under `sales_rep`.",
+          "schema": {
+            "$ref": "#/components/schemas/SalesRepResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "sales_rep_id": "sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c"
+        }
+      }
+    },
+    {
+      "key": "delete_settings_sales_rep",
+      "method": "DELETE",
+      "path": "/settings/sales_reps/{sales_rep_id}",
+      "slug": "delete-a-sales-rep",
+      "title": "Delete a sales rep",
+      "summary": "Deletes a sales rep and returns no content.",
+      "description": "Pass the rep's `id`. A successful delete returns `204` with an empty body.",
+      "parameters": [
+        {
+          "name": "sales_rep_id",
+          "in": "path",
+          "required": true,
+          "description": "The sales rep's `id`, which starts with `sr_`.",
+          "schema": {
+            "type": "string",
+            "example": "sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The sales rep is deleted. The body is empty."
+        }
+      },
+      "example_call": {
+        "path": {
+          "sales_rep_id": "sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c"
+        }
+      }
+    },
+    {
+      "key": "update_settings_sales_rep",
+      "method": "PATCH",
+      "path": "/settings/sales_reps/{sales_rep_id}",
+      "slug": "update-a-sales-rep",
+      "title": "Update a sales rep",
+      "summary": "Changes a sales rep's details, or enables or disables the rep.",
+      "description": "Send only the fields to change under `sales_rep`. Set `status` to `active` or `inactive` to enable or disable the rep.",
+      "parameters": [
+        {
+          "name": "sales_rep_id",
+          "in": "path",
+          "required": true,
+          "description": "The sales rep's `id`, which starts with `sr_`.",
+          "schema": {
+            "type": "string",
+            "example": "sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "sales_rep": {
+              "type": "object",
+              "properties": {
+                "first_name": {
+                  "type": "string"
+                },
+                "last_name": {
+                  "type": "string"
+                },
+                "email_address": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "description": "`active` or `inactive`."
+                }
+              }
+            }
+          },
+          "required": [
+            "sales_rep"
+          ]
+        },
+        "example": {
+          "sales_rep": {
+            "last_name": "Citizen-Smith"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The sales rep is updated."
+        }
+      },
+      "example_call": {
+        "path": {
+          "sales_rep_id": "sr_7c1e4b9a2d3f4e5a8b6c0d1e2f3a4b5c"
+        },
+        "body": {
+          "sales_rep": {
+            "last_name": "Citizen-Smith"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "SalesRepList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/SalesRep"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/SalesRepPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "SalesRep": {
+      "type": "object",
+      "properties": {
+        "created_by": {},
+        "created_on": {
+          "type": "string"
+        },
+        "email_address": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "SalesRepResponse": {
+      "type": "object",
+      "properties": {
+        "sales_rep": {
+          "$ref": "#/components/schemas/SalesRep"
+        }
+      }
+    },
+    "SalesRepPagination": {
+      "type": "object",
+      "description": "Cursor paging for the listing.",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size the API applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. `false` ends the listing even when `next_cursor` is present."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Send as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "type": "object",
+          "properties": {
+            "next": {
+              "type": "string"
+            },
+            "prev": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
