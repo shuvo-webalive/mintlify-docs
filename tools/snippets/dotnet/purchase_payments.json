@@ -1,0 +1,66 @@
+{
+  "sdk": "dotnet",
+  "module": "purchase_payments",
+  "endpoints": {
+    "get_purchase_payments": {
+      "function": "PurchasePayments.GetPurchasePaymentsAsync",
+      "code": "var response = await client.PurchasePayments.GetPurchasePaymentsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "create_purchase_payment": {
+      "function": "PurchasePayments.CreatePurchasePaymentAsync",
+      "code": "var response = await client.PurchasePayments.CreatePurchasePaymentAsync(new Dictionary<string, object?>\n{\n    [\"purchase_payment\"] = new Dictionary<string, object?>\n    {\n        [\"payment_method_applications\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"amount\"] = \"1.00\",\n                [\"payment_processor\"] = \"PROC-0001\",\n            },\n        },\n        [\"purchase_invoice_applications\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"purchase_invoice\"] = \"PI-0001\",\n                [\"amount\"] = \"1.00\",\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "delete_purchase_payment": {
+      "function": "PurchasePayments.DeletePurchasePaymentAsync",
+      "code": "var response = await client.PurchasePayments.DeletePurchasePaymentAsync(\"PP-0001\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_payment": {
+      "function": "PurchasePayments.GetPurchasePaymentAsync",
+      "code": "var response = await client.PurchasePayments.GetPurchasePaymentAsync(\"PP-0001\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "update_purchase_payment": {
+      "function": "PurchasePayments.UpdatePurchasePaymentAsync",
+      "code": "var response = await client.PurchasePayments.UpdatePurchasePaymentAsync(\n    \"PP-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"purchase_payment\"] = new Dictionary<string, object?>\n        {\n            [\"payment_note\"] = \"Paid by bank transfer.\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "create_purchase_invoice_purchase_payment": {
+      "function": "PurchasePayments.CreatePurchaseInvoicePurchasePaymentAsync",
+      "code": "var response = await client.PurchasePayments.CreatePurchaseInvoicePurchasePaymentAsync(\n    \"PI-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"purchase_payment\"] = new Dictionary<string, object?>\n        {\n            [\"payment_method_applications\"] = new List<object?>\n            {\n                new Dictionary<string, object?>\n                {\n                    [\"amount\"] = \"1.00\",\n                    [\"payment_processor\"] = \"PROC-0001\",\n                },\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_payment_notes": {
+      "function": "PurchasePayments.GetPurchasePaymentNotesAsync",
+      "code": "var response = await client.PurchasePayments.GetPurchasePaymentNotesAsync(\n    \"PP-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "create_purchase_payment_note": {
+      "function": "PurchasePayments.CreatePurchasePaymentNoteAsync",
+      "code": "var response = await client.PurchasePayments.CreatePurchasePaymentNoteAsync(\n    \"PP-0001\",\n    \"<p>Goods received in full.</p>\",\n    new Dictionary<string, object?> { [\"file\"] = new object?[] { \"delivery-note.pdf\", File.ReadAllBytes(\"delivery-note.pdf\") } });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_payment_note": {
+      "function": "PurchasePayments.GetPurchasePaymentNoteAsync",
+      "code": "var response = await client.PurchasePayments.GetPurchasePaymentNoteAsync(\n    \"PP-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "delete_purchase_payment_note": {
+      "function": "PurchasePayments.DeletePurchasePaymentNoteAsync",
+      "code": "var response = await client.PurchasePayments.DeletePurchasePaymentNoteAsync(\n    \"PP-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_payment_note_files": {
+      "function": "PurchasePayments.GetPurchasePaymentNoteFilesAsync",
+      "code": "var response = await client.PurchasePayments.GetPurchasePaymentNoteFilesAsync(\n    \"PP-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_payment_note_file": {
+      "function": "PurchasePayments.GetPurchasePaymentNoteFileAsync",
+      "code": "var response = await client.PurchasePayments.GetPurchasePaymentNoteFileAsync(\n    \"PP-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_payment_purchase_credit_notes": {
+      "function": "PurchasePayments.GetPurchasePaymentPurchaseCreditNotesAsync",
+      "code": "var response = await client.PurchasePayments.GetPurchasePaymentPurchaseCreditNotesAsync(\n    \"PP-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "update_purchase_payment_note": {
+      "function": "PurchasePayments.UpdatePurchasePaymentNoteAsync",
+      "code": "var response = await client.PurchasePayments.UpdatePurchasePaymentNoteAsync(\n    \"PP-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"<p>Goods received in full.</p>\",\n    new Dictionary<string, object?> { [\"file\"] = new object?[] { \"delivery-note.pdf\", File.ReadAllBytes(\"delivery-note.pdf\") } });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "delete_purchase_payment_note_file": {
+      "function": "PurchasePayments.DeletePurchasePaymentNoteFileAsync",
+      "code": "var response = await client.PurchasePayments.DeletePurchasePaymentNoteFileAsync(\n    \"PP-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\");\n\nConsole.WriteLine(response.Json);\n"
+    }
+  }
+}
