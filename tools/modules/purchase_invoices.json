@@ -1,0 +1,3667 @@
+{
+  "family": "purchase_invoices",
+  "tag": "Purchase invoices",
+  "slug": "purchase-invoices",
+  "icon": "file-invoice",
+  "base": "/purchase_invoices",
+  "overview_description": "Create, amend, cancel and read purchase invoices, their lines, notes, files, payments and credit note applications.",
+  "intro": "A purchase invoice is a bill from a supplier. These endpoints create, amend, cancel and reactivate purchase invoices, read their lines, payments and credit note applications, and manage their notes and attached files. There are 22 endpoints, and all seven SDKs call every one.",
+  "warning": "**Deleting a purchase invoice or one of its notes cannot be undone.** Cancel a purchase invoice instead if you may need it again.",
+  "notes": [
+    "**Every write body is wrapped in `purchase_invoice`.** The cancel and reactivate calls take an empty object.",
+    "**A new purchase invoice is `active`.** Cancelling sets it to `inactive` and reactivating sets it back to `active`.",
+    "**The lines read is not a paged list.** It returns `purchase_invoice.lines`, and one line comes back as `purchase_invoice.line`.",
+    "**A line can be addressed by its dashed `uuid` or by its listed `id`.** An unknown `uuid` returns `404`.",
+    "**The credit note application read is not scoped to the invoice.** Any application can be read through any purchase invoice that exists.",
+    "**Listings page by cursor.** Records are under `data`; pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_purchase_invoices",
+      "method": "GET",
+      "path": "/purchase_invoices",
+      "slug": "list-purchase-invoices",
+      "title": "List purchase invoices",
+      "summary": "Returns one page of purchase invoices.",
+      "description": "Lists the purchase invoices on the account, one page at a time, under `data`. Pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter the list as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of purchase invoices.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoiceList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_purchase_invoice",
+      "method": "POST",
+      "path": "/purchase_invoices",
+      "slug": "create-a-purchase-invoice",
+      "title": "Create a purchase invoice",
+      "summary": "Creates a purchase invoice for a supplier and returns it under `purchase_invoice`.",
+      "description": "Creates a purchase invoice from a supplier's `account_id` and its lines, wrapped in `purchase_invoice`. A line takes an existing item by `item_id`, or a new one by `item_name` with a price under `item_price_snapshot`. The new invoice is `active`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "purchase_invoice": {
+              "type": "object",
+              "properties": {
+                "account_id": {
+                  "type": "string",
+                  "description": "The supplier account's `id`."
+                },
+                "lines": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "item_name": {
+                        "type": "string",
+                        "description": "The name of an item that does not exist yet."
+                      },
+                      "item_quantity": {
+                        "type": "number"
+                      },
+                      "item_price_snapshot": {
+                        "type": "object",
+                        "properties": {
+                          "pricing_rule": {
+                            "type": "object",
+                            "properties": {
+                              "price": {
+                                "type": "number"
+                              }
+                            }
+                          }
+                        },
+                        "description": "The unit price for a new item, under `pricing_rule.price`."
+                      },
+                      "item_id": {
+                        "type": "string",
+                        "description": "The `id` of an existing item, instead of `item_name`."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "purchase_invoice"
+          ]
+        },
+        "example": {
+          "purchase_invoice": {
+            "account_id": "W13ZGY",
+            "lines": [
+              {
+                "item_name": "Copy paper A4",
+                "item_quantity": 1,
+                "item_price_snapshot": {
+                  "pricing_rule": {
+                    "price": 5
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new purchase invoice, under `purchase_invoice`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoiceResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "purchase_invoice": {
+            "account_id": "W13ZGY",
+            "lines": [
+              {
+                "item_name": "Copy paper A4",
+                "item_quantity": 1,
+                "item_price_snapshot": {
+                  "pricing_rule": {
+                    "price": 5
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "get_purchase_invoices_notes",
+      "method": "GET",
+      "path": "/purchase_invoices/notes",
+      "slug": "list-notes-across-purchase-invoices",
+      "title": "List notes across purchase invoices",
+      "summary": "Returns one page of notes from every purchase invoice.",
+      "description": "Lists the notes of all purchase invoices together, one page at a time, under `data`. Other fields filter the list as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of purchase invoice notes.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoicesNoteList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "delete_purchase_invoice",
+      "method": "DELETE",
+      "path": "/purchase_invoices/{purchase_invoice_id}",
+      "slug": "delete-a-purchase-invoice",
+      "title": "Delete a purchase invoice",
+      "summary": "Deletes a purchase invoice. Nothing comes back.",
+      "description": "Deletes the purchase invoice. The call returns `204` with no body, and reading the invoice afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase invoice's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The purchase invoice is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001"
+        }
+      }
+    },
+    {
+      "key": "get_purchase_invoice",
+      "method": "GET",
+      "path": "/purchase_invoices/{purchase_invoice_id}",
+      "slug": "retrieve-a-purchase-invoice",
+      "title": "Retrieve a purchase invoice",
+      "summary": "Returns one purchase invoice with its lines under `purchase_invoice`.",
+      "description": "Returns the purchase invoice with its supplier, lines, totals, payment status and KPIs under `purchase_invoice`.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase invoice's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The purchase invoice, under `purchase_invoice`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoiceResponse"
+          }
+        },
+        "404": {
+          "description": "No purchase invoice has that `id`, for example after it is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001"
+        }
+      }
+    },
+    {
+      "key": "amend_purchase_invoice",
+      "method": "POST",
+      "path": "/purchase_invoices/{purchase_invoice_id}/amend",
+      "slug": "amend-a-purchase-invoices-lines",
+      "title": "Amend a purchase invoice's lines",
+      "summary": "Adds or changes lines on a purchase invoice and returns it under `purchase_invoice`.",
+      "description": "Changes the lines of the purchase invoice, wrapped in `purchase_invoice.lines`. Each entry has an `op`: `add` with an `item_id` and `item_quantity` adds a line, and `change` with the line's dashed `uuid` changes its quantity or price.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase invoice's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "purchase_invoice": {
+              "type": "object",
+              "properties": {
+                "lines": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "op": {
+                        "type": "string",
+                        "description": "`add` to add a line, or `change` to change one.",
+                        "enum": [
+                          "add",
+                          "change"
+                        ]
+                      },
+                      "uuid": {
+                        "type": "string",
+                        "description": "For `change`: the line's `uuid`, in dashed form."
+                      },
+                      "item_id": {
+                        "type": "string",
+                        "description": "For `add`: the `id` of the item to add."
+                      },
+                      "item_quantity": {
+                        "type": "number"
+                      },
+                      "item_price_snapshot": {
+                        "type": "object",
+                        "properties": {
+                          "pricing_rule": {
+                            "type": "object",
+                            "properties": {
+                              "price": {
+                                "type": "number"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "op"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "purchase_invoice"
+          ]
+        },
+        "example": {
+          "purchase_invoice": {
+            "lines": [
+              {
+                "op": "add",
+                "item_id": "ITEM-0001",
+                "item_quantity": 1
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The amended purchase invoice, under `purchase_invoice`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoiceResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001"
+        },
+        "body": {
+          "purchase_invoice": {
+            "lines": [
+              {
+                "op": "add",
+                "item_id": "ITEM-0001",
+                "item_quantity": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "cancel_purchase_invoice",
+      "method": "POST",
+      "path": "/purchase_invoices/{purchase_invoice_id}/cancel",
+      "slug": "cancel-a-purchase-invoice",
+      "title": "Cancel a purchase invoice",
+      "summary": "Cancels a purchase invoice and returns it under `purchase_invoice`.",
+      "description": "Cancels the purchase invoice, which sets its status to `inactive`. Send an empty object as the body. Reactivate it with the reactivate call.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase invoice's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object"
+        },
+        "example": {}
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The cancelled purchase invoice, under `purchase_invoice`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCancelResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001"
+        },
+        "body": {}
+      }
+    },
+    {
+      "key": "get_purchase_invoice_information",
+      "method": "GET",
+      "path": "/purchase_invoices/{purchase_invoice_id}/information",
+      "slug": "retrieve-a-purchase-invoices-information",
+      "title": "Retrieve a purchase invoice's information",
+      "summary": "Returns the header information of one purchase invoice under `purchase_invoice`.",
+      "description": "Returns the purchase invoice's header fields, such as its dates, totals, status and supplier, under `purchase_invoice`, without its lines.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase invoice's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The purchase invoice's information, under `purchase_invoice`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoiceInformationResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001"
+        }
+      }
+    },
+    {
+      "key": "update_purchase_invoice_information",
+      "method": "PATCH",
+      "path": "/purchase_invoices/{purchase_invoice_id}/information",
+      "slug": "update-a-purchase-invoices-information",
+      "title": "Update a purchase invoice's information",
+      "summary": "Changes header fields of a purchase invoice and returns it under `purchase_invoice`.",
+      "description": "Updates header fields of the purchase invoice, such as `origin`, wrapped in `purchase_invoice`. The updated invoice comes back under `purchase_invoice`.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase invoice's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "purchase_invoice": {
+              "type": "object",
+              "properties": {
+                "origin": {
+                  "type": "string",
+                  "description": "Where the invoice came from."
+                }
+              }
+            }
+          },
+          "required": [
+            "purchase_invoice"
+          ]
+        },
+        "example": {
+          "purchase_invoice": {
+            "origin": "Supplier portal"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated purchase invoice, under `purchase_invoice`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoiceInformationUpdatedResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001"
+        },
+        "body": {
+          "purchase_invoice": {
+            "origin": "Supplier portal"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_purchase_invoice_lines",
+      "method": "GET",
+      "path": "/purchase_invoices/{purchase_invoice_id}/lines",
+      "slug": "list-a-purchase-invoices-lines",
+      "title": "List a purchase invoice's lines",
+      "summary": "Returns the lines of a purchase invoice under `purchase_invoice.lines`.",
+      "description": "Returns the purchase invoice's lines as `purchase_invoice.lines`, not as a paged `data` list. Use a line's `uuid` or `id` to read it on its own.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase invoice's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The invoice's lines, under `purchase_invoice.lines`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoiceLinesResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_purchase_invoice_notes",
+      "method": "GET",
+      "path": "/purchase_invoices/{purchase_invoice_id}/notes",
+      "slug": "list-a-purchase-invoices-notes",
+      "title": "List a purchase invoice's notes",
+      "summary": "Returns one page of the notes on a purchase invoice.",
+      "description": "Lists the notes on the purchase invoice under `data`.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase invoice's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of the invoice's notes.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_purchase_invoice_note",
+      "method": "POST",
+      "path": "/purchase_invoices/{purchase_invoice_id}/notes",
+      "slug": "create-a-purchase-invoice-note",
+      "title": "Create a purchase invoice note",
+      "summary": "Adds a note, with an optional file, to a purchase invoice and returns it under `note`.",
+      "description": "Adds a note to the purchase invoice. Send a multipart form with the text as the `note` field and, optionally, a file to attach. The new note comes back under `note`.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase invoice's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "note"
+          ],
+          "properties": {
+            "note": {
+              "type": "string",
+              "description": "The note text. HTML is accepted."
+            },
+            "file": {
+              "type": "string",
+              "format": "binary",
+              "description": "An optional file to attach to the note."
+            }
+          }
+        },
+        "example": {
+          "note": "<p>Goods received in full.</p>",
+          "file": "delivery-note.pdf"
+        }
+      },
+      "multipart": true,
+      "responses": {
+        "201": {
+          "description": "The new note, under `note`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteCreatedResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001"
+        },
+        "note": "<p>Goods received in full.</p>",
+        "file": "delivery-note.pdf"
+      }
+    },
+    {
+      "key": "get_purchase_invoice_purchase_credit_note_applications",
+      "method": "GET",
+      "path": "/purchase_invoices/{purchase_invoice_id}/purchase_credit_note_applications",
+      "slug": "list-a-purchase-invoices-credit-note-applications",
+      "title": "List a purchase invoice's credit note applications",
+      "summary": "Returns one page of the purchase credit notes spent on a purchase invoice.",
+      "description": "Lists the purchase credit note applications on the purchase invoice under `data`: each one shows the credit note spent, the payment that spent it and the amount.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase invoice's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of the invoice's credit note applications.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_purchase_invoice_purchase_payments",
+      "method": "GET",
+      "path": "/purchase_invoices/{purchase_invoice_id}/purchase_payments",
+      "slug": "list-a-purchase-invoices-purchase-payments",
+      "title": "List a purchase invoice's purchase payments",
+      "summary": "Returns one page of the purchase payments made against a purchase invoice.",
+      "description": "Lists the purchase payments applied to the purchase invoice under `data`.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase invoice's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of the invoice's purchase payments.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "reactivate_purchase_invoice",
+      "method": "POST",
+      "path": "/purchase_invoices/{purchase_invoice_id}/reactivate",
+      "slug": "reactivate-a-purchase-invoice",
+      "title": "Reactivate a purchase invoice",
+      "summary": "Reactivates a cancelled purchase invoice and returns it under `purchase_invoice`.",
+      "description": "Reactivates a cancelled purchase invoice, which sets its status back to `active`. Send an empty object as the body.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase invoice's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object"
+        },
+        "example": {}
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The reactivated purchase invoice, under `purchase_invoice`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoiceResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001"
+        },
+        "body": {}
+      }
+    },
+    {
+      "key": "get_purchase_invoice_line",
+      "method": "GET",
+      "path": "/purchase_invoices/{purchase_invoice_id}/lines/{purchase_invoice_line_uuid}",
+      "slug": "retrieve-a-purchase-invoice-line",
+      "title": "Retrieve a purchase invoice line",
+      "summary": "Returns one line of a purchase invoice under `purchase_invoice.line`.",
+      "description": "Returns a single line of the purchase invoice under `purchase_invoice.line`. Address the line by its `uuid` in dashed form, or by the `id` the lines list shows.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase invoice's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        },
+        {
+          "name": "purchase_invoice_line_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The line's `uuid` in dashed form, or its `id` from the lines list.",
+          "schema": {
+            "type": "string",
+            "example": "3f2a9c1e-7b4d-4e8a-9c0b-1d2e3f4a5b6c"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The line, under `purchase_invoice.line`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoiceLineResponse"
+          }
+        },
+        "404": {
+          "description": "The purchase invoice has no line with that `uuid`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001",
+          "purchase_invoice_line_uuid": "3f2a9c1e-7b4d-4e8a-9c0b-1d2e3f4a5b6c"
+        }
+      }
+    },
+    {
+      "key": "update_purchase_invoice_note",
+      "method": "PATCH",
+      "path": "/purchase_invoices/{purchase_invoice_id}/notes/{note_id}",
+      "slug": "update-a-purchase-invoice-note",
+      "title": "Update a purchase invoice note",
+      "summary": "Replaces the text of a purchase invoice note and returns it under `note`.",
+      "description": "Changes the note's text. Send a multipart form with the new text as the `note` field and, optionally, a file to attach. The updated note comes back under `note`.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase invoice's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, from the note create or the notes list.",
+          "schema": {
+            "type": "string",
+            "example": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "note"
+          ],
+          "properties": {
+            "note": {
+              "type": "string",
+              "description": "The new note text. HTML is accepted."
+            },
+            "file": {
+              "type": "string",
+              "format": "binary",
+              "description": "An optional file to attach to the note."
+            }
+          }
+        },
+        "example": {
+          "note": "<p>Goods received in full.</p>",
+          "file": "delivery-note.pdf"
+        }
+      },
+      "multipart": true,
+      "responses": {
+        "200": {
+          "description": "The updated note, under `note`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteUpdatedResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001",
+          "note_id": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+        },
+        "note": "<p>Goods received in full.</p>",
+        "file": "delivery-note.pdf"
+      }
+    },
+    {
+      "key": "get_purchase_invoice_note",
+      "method": "GET",
+      "path": "/purchase_invoices/{purchase_invoice_id}/notes/{note_id}",
+      "slug": "retrieve-a-purchase-invoice-note",
+      "title": "Retrieve a purchase invoice note",
+      "summary": "Returns one note of a purchase invoice under `note`.",
+      "description": "Returns the note with its content, attachments and watchers under `note`.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase invoice's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, from the note create or the notes list.",
+          "schema": {
+            "type": "string",
+            "example": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The note, under `note`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteResponse"
+          }
+        },
+        "404": {
+          "description": "The purchase invoice has no note with that `id`, for example after it is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001",
+          "note_id": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+        }
+      }
+    },
+    {
+      "key": "delete_purchase_invoice_note",
+      "method": "DELETE",
+      "path": "/purchase_invoices/{purchase_invoice_id}/notes/{note_id}",
+      "slug": "delete-a-purchase-invoice-note",
+      "title": "Delete a purchase invoice note",
+      "summary": "Deletes a note from a purchase invoice. Nothing comes back.",
+      "description": "Deletes the note. The call returns `204` with no body, and reading the note afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase invoice's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, from the note create or the notes list.",
+          "schema": {
+            "type": "string",
+            "example": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The note is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001",
+          "note_id": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+        }
+      }
+    },
+    {
+      "key": "get_purchase_invoice_note_files",
+      "method": "GET",
+      "path": "/purchase_invoices/{purchase_invoice_id}/notes/{note_id}/files",
+      "slug": "list-a-purchase-invoice-notes-files",
+      "title": "List a purchase invoice note's files",
+      "summary": "Returns the files attached to one purchase invoice note.",
+      "description": "Lists the files attached to the note under `data`, with each file's name, type, size and `uuid`.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase invoice's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, from the note create or the notes list.",
+          "schema": {
+            "type": "string",
+            "example": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The note's files.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteFileList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001",
+          "note_id": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_purchase_invoice_note_file",
+      "method": "GET",
+      "path": "/purchase_invoices/{purchase_invoice_id}/notes/{note_id}/files/{file_id}",
+      "slug": "retrieve-a-purchase-invoice-note-file",
+      "title": "Retrieve a purchase invoice note file",
+      "summary": "Returns the details of one file attached to a purchase invoice note, under `file`.",
+      "description": "Returns one attachment's name, content type, size, `uuid` and link under `file`. Address the file by its `uuid`.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase invoice's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, from the note create or the notes list.",
+          "schema": {
+            "type": "string",
+            "example": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a"
+          }
+        },
+        {
+          "name": "file_id",
+          "in": "path",
+          "required": true,
+          "description": "The attachment's `uuid`, from the note's `attachments`.",
+          "schema": {
+            "type": "string",
+            "example": "6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The file's details, under `file`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteFileResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001",
+          "note_id": "note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a",
+          "file_id": "6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e"
+        }
+      }
+    },
+    {
+      "key": "get_purchase_invoice_purchase_credit_note_application",
+      "method": "GET",
+      "path": "/purchase_invoices/{purchase_invoice_id}/purchase_credit_note_applications/{application_id}",
+      "slug": "retrieve-a-purchase-invoices-credit-note-application",
+      "title": "Retrieve a purchase invoice's credit note application",
+      "summary": "Returns one purchase credit note application under `purchase_credit_note_application`.",
+      "description": "Returns the application with the credit note, the payment and the amount under `purchase_credit_note_application`. The application is not checked against the invoice in the path: any application can be read through any purchase invoice that exists.",
+      "parameters": [
+        {
+          "name": "purchase_invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase invoice's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PI-0001"
+          }
+        },
+        {
+          "name": "application_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase credit note application's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "PCNA-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The application, under `purchase_credit_note_application`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_invoice_id": "PI-0001",
+          "application_id": "PCNA-0001"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "PurchaseInvoice": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/PurchaseInvoiceAccount"
+        },
+        "alternate_due_date": {
+          "type": "string"
+        },
+        "alternate_issue_date": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchaseInvoiceCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/PurchaseInvoiceCurrency"
+        },
+        "custom_form": {},
+        "due_date": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/PurchaseInvoiceLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "payment_status": {
+          "type": "string"
+        },
+        "price_tax_inclusive": {
+          "type": "boolean"
+        },
+        "purchase_order": {
+          "$ref": "#/components/schemas/PurchaseInvoicePurchaseOrder"
+        },
+        "status": {
+          "type": "string"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchaseInvoiceAccount": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoicePurchaseOrder": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoicePaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoicePagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size the API applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can be set on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": "string",
+          "description": "The cursor of the previous page."
+        },
+        "links": {
+          "$ref": "#/components/schemas/PurchaseInvoicePaginationLinks"
+        }
+      }
+    },
+    "PurchaseInvoiceList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoice"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/PurchaseInvoicePagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceRead": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/PurchaseInvoiceReadAccount"
+        },
+        "activity_logs": {
+          "type": "array",
+          "items": {}
+        },
+        "alternate_due_date": {
+          "type": "string"
+        },
+        "alternate_issue_date": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchaseInvoiceReadCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/PurchaseInvoiceReadCurrency"
+        },
+        "custom_attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoiceReadCustomAttribute"
+          }
+        },
+        "custom_form": {},
+        "due_date": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "kpis": {
+          "$ref": "#/components/schemas/PurchaseInvoiceReadKpis"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/PurchaseInvoiceReadLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoiceReadLine"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "payment_status": {
+          "type": "string"
+        },
+        "price_tax_inclusive": {
+          "type": "boolean"
+        },
+        "purchase_order": {
+          "$ref": "#/components/schemas/PurchaseInvoiceReadPurchaseOrder"
+        },
+        "status": {
+          "type": "string"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchaseInvoiceReadAccount": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceReadCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceReadCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceReadCustomAttribute": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceReadKpis": {
+      "type": "object",
+      "properties": {
+        "credit_applied": {
+          "type": "string"
+        },
+        "credit_issued": {
+          "type": "string"
+        },
+        "deleted_on": {},
+        "last_amended_on": {},
+        "last_cancelled_on": {},
+        "last_payment_date": {},
+        "last_reactivated_on": {},
+        "object": {
+          "type": "string"
+        },
+        "outstanding": {
+          "type": "string"
+        },
+        "overdue": {
+          "type": "string"
+        },
+        "payment_applied": {
+          "type": "string"
+        },
+        "voided_on": {}
+      }
+    },
+    "PurchaseInvoiceReadLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceReadLine": {
+      "type": "object",
+      "properties": {
+        "accounting_code": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "item": {
+          "$ref": "#/components/schemas/PurchaseInvoiceReadLineItem"
+        },
+        "object": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "integer"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        },
+        "uom": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "warehouse": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceReadLineItem": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceReadPurchaseOrder": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceResponse": {
+      "type": "object",
+      "properties": {
+        "purchase_invoice": {
+          "$ref": "#/components/schemas/PurchaseInvoiceRead"
+        }
+      }
+    },
+    "PurchaseInvoicesNote": {
+      "type": "object",
+      "properties": {
+        "attachments": {
+          "type": "array",
+          "items": {}
+        },
+        "content": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchaseInvoicesNoteCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "group": {},
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/PurchaseInvoicesNoteLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "user": {},
+        "version": {
+          "type": "integer"
+        },
+        "watchers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoicesNoteWatcher"
+          }
+        }
+      }
+    },
+    "PurchaseInvoicesNoteCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoicesNoteLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoicesNoteWatcher": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoicesNoteList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoicesNote"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/PurchaseInvoicePagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceCancelDetail": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/PurchaseInvoiceCancelDetailAccount"
+        },
+        "activity_logs": {
+          "type": "array",
+          "items": {}
+        },
+        "alternate_due_date": {
+          "type": "string"
+        },
+        "alternate_issue_date": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchaseInvoiceCancelDetailCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/PurchaseInvoiceCancelDetailCurrency"
+        },
+        "custom_attributes": {
+          "type": "array",
+          "items": {}
+        },
+        "custom_form": {},
+        "due_date": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "kpis": {
+          "$ref": "#/components/schemas/PurchaseInvoiceCancelDetailKpis"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/PurchaseInvoiceCancelDetailLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCancelDetailLine"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "payment_status": {
+          "type": "string"
+        },
+        "price_tax_inclusive": {
+          "type": "boolean"
+        },
+        "purchase_order": {},
+        "status": {
+          "type": "string"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchaseInvoiceCancelDetailAccount": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceCancelDetailCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceCancelDetailCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceCancelDetailKpis": {
+      "type": "object",
+      "properties": {
+        "credit_applied": {
+          "type": "string"
+        },
+        "credit_issued": {
+          "type": "string"
+        },
+        "deleted_on": {},
+        "last_amended_on": {},
+        "last_cancelled_on": {},
+        "last_payment_date": {},
+        "last_reactivated_on": {},
+        "object": {
+          "type": "string"
+        },
+        "outstanding": {
+          "type": "string"
+        },
+        "overdue": {
+          "type": "string"
+        },
+        "payment_applied": {
+          "type": "string"
+        },
+        "voided_on": {}
+      }
+    },
+    "PurchaseInvoiceCancelDetailLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceCancelDetailLine": {
+      "type": "object",
+      "properties": {
+        "accounting_code": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "item": {
+          "$ref": "#/components/schemas/PurchaseInvoiceCancelDetailLineItem"
+        },
+        "object": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "integer"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        },
+        "uom": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "warehouse": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceCancelDetailLineItem": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceCancelResponse": {
+      "type": "object",
+      "properties": {
+        "purchase_invoice": {
+          "$ref": "#/components/schemas/PurchaseInvoiceCancelDetail"
+        }
+      }
+    },
+    "PurchaseInvoiceInformationResponse": {
+      "type": "object",
+      "properties": {
+        "purchase_invoice": {
+          "$ref": "#/components/schemas/PurchaseInvoice"
+        }
+      }
+    },
+    "PurchaseInvoiceInformation": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/PurchaseInvoiceInformationAccount"
+        },
+        "activity_logs": {
+          "type": "array",
+          "items": {}
+        },
+        "alternate_due_date": {
+          "type": "string"
+        },
+        "alternate_issue_date": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchaseInvoiceInformationCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/PurchaseInvoiceInformationCurrency"
+        },
+        "custom_attributes": {
+          "type": "array",
+          "items": {}
+        },
+        "custom_form": {},
+        "due_date": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "invoice_note": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "kpis": {
+          "$ref": "#/components/schemas/PurchaseInvoiceInformationKpis"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/PurchaseInvoiceInformationLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoiceInformationLine"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "payment_status": {
+          "type": "string"
+        },
+        "price_tax_inclusive": {
+          "type": "boolean"
+        },
+        "purchase_order": {},
+        "status": {
+          "type": "string"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchaseInvoiceInformationAccount": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceInformationCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceInformationCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceInformationKpis": {
+      "type": "object",
+      "properties": {
+        "credit_applied": {
+          "type": "string"
+        },
+        "credit_issued": {
+          "type": "string"
+        },
+        "deleted_on": {},
+        "last_amended_on": {},
+        "last_cancelled_on": {},
+        "last_payment_date": {},
+        "last_reactivated_on": {},
+        "object": {
+          "type": "string"
+        },
+        "outstanding": {
+          "type": "string"
+        },
+        "overdue": {
+          "type": "string"
+        },
+        "payment_applied": {
+          "type": "string"
+        },
+        "voided_on": {}
+      }
+    },
+    "PurchaseInvoiceInformationLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceInformationLine": {
+      "type": "object",
+      "properties": {
+        "accounting_code": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "item": {
+          "$ref": "#/components/schemas/PurchaseInvoiceInformationLineItem"
+        },
+        "object": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "integer"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        },
+        "uom": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "warehouse": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceInformationLineItem": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceInformationUpdatedResponse": {
+      "type": "object",
+      "properties": {
+        "purchase_invoice": {
+          "$ref": "#/components/schemas/PurchaseInvoiceInformation"
+        }
+      }
+    },
+    "PurchaseInvoiceLines": {
+      "type": "object",
+      "properties": {
+        "lines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoiceLinesRow"
+          }
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceLinesRow": {
+      "type": "object",
+      "properties": {
+        "accounting_code": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "item": {
+          "$ref": "#/components/schemas/PurchaseInvoiceLinesRowItem"
+        },
+        "object": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "integer"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        },
+        "uom": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "warehouse": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceLinesRowItem": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceLinesResponse": {
+      "type": "object",
+      "properties": {
+        "purchase_invoice": {
+          "$ref": "#/components/schemas/PurchaseInvoiceLines"
+        }
+      }
+    },
+    "PurchaseInvoiceNote": {
+      "type": "object",
+      "properties": {
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteAttachment"
+          }
+        },
+        "content": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchaseInvoiceNoteCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "group": {},
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/PurchaseInvoiceNoteLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "purchase_invoice": {
+          "$ref": "#/components/schemas/PurchaseInvoiceNoteDetail"
+        },
+        "user": {},
+        "version": {
+          "type": "integer"
+        },
+        "watchers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteWatcher"
+          }
+        }
+      }
+    },
+    "PurchaseInvoiceNoteAttachment": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNoteCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNoteLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNoteDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNoteWatcher": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNoteList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNote"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/PurchaseInvoicePagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNotesNote": {
+      "type": "object",
+      "properties": {
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNotesNoteAttachment"
+          }
+        },
+        "content": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchaseInvoiceNotesNoteCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "group": {},
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {},
+        "object": {
+          "type": "string"
+        },
+        "purchase_invoice": {
+          "$ref": "#/components/schemas/PurchaseInvoiceNotesNoteDetail"
+        },
+        "user": {},
+        "version": {
+          "type": "integer"
+        },
+        "watchers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNotesNoteWatcher"
+          }
+        }
+      }
+    },
+    "PurchaseInvoiceNotesNoteAttachment": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNotesNoteCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNotesNoteDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNotesNoteWatcher": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNoteCreatedResponse": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "$ref": "#/components/schemas/PurchaseInvoiceNotesNote"
+        }
+      }
+    },
+    "PurchaseInvoiceCreditNoteApplication": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationDetail"
+        },
+        "alternate_due_date": {
+          "type": "string"
+        },
+        "alternate_issue_date": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationCurrency"
+        },
+        "custom_form": {},
+        "due_date": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "payment_status": {
+          "type": "string"
+        },
+        "price_tax_inclusive": {
+          "type": "boolean"
+        },
+        "purchase_credit_note": {
+          "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationPurchaseCreditNote"
+        },
+        "purchase_order": {
+          "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationPurchaseOrder"
+        },
+        "purchase_payment": {
+          "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationPurchasePayment"
+        },
+        "remaining_balance": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchaseInvoiceCreditNoteApplicationDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceCreditNoteApplicationCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceCreditNoteApplicationCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceCreditNoteApplicationLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceCreditNoteApplicationPurchaseCreditNote": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceCreditNoteApplicationPurchaseOrder": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceCreditNoteApplicationPurchasePayment": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceCreditNoteApplicationList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplication"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/PurchaseInvoicePagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoicePurchasePayment": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentAccount"
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "credit_note_applications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentCreditNoteApplication"
+          }
+        },
+        "credit_note_total": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentCurrency"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "paid_total": {
+          "type": "string"
+        },
+        "payment_date": {
+          "type": "string"
+        },
+        "payment_method_applications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentPaymentMethodApplication"
+          }
+        },
+        "payment_note": {
+          "type": "string"
+        },
+        "payment_reference": {},
+        "purchase_invoice_applications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentPurchaseInvoiceApplication"
+          }
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchaseInvoicePurchasePaymentAccount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoicePurchasePaymentCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoicePurchasePaymentCreditNoteApplication": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string"
+        },
+        "purchase_credit_note": {
+          "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentCreditNoteApplicationPurchaseCreditNote"
+        }
+      }
+    },
+    "PurchaseInvoicePurchasePaymentCreditNoteApplicationPurchaseCreditNote": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoicePurchasePaymentCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoicePurchasePaymentLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoicePurchasePaymentPaymentMethodApplication": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string"
+        },
+        "payment_method": {
+          "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentPaymentMethodApplicationDetail"
+        },
+        "payment_processor": {
+          "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentPaymentMethodApplicationPaymentProcessor"
+        },
+        "reference": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoicePurchasePaymentPaymentMethodApplicationDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoicePurchasePaymentPaymentMethodApplicationPaymentProcessor": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoicePurchasePaymentPurchaseInvoiceApplication": {
+      "type": "object",
+      "properties": {
+        "applied": {
+          "type": "string"
+        },
+        "due_date": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "outstanding": {
+          "type": "string"
+        },
+        "purchase_invoice": {
+          "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentPurchaseInvoiceApplicationDetail"
+        },
+        "total": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoicePurchasePaymentPurchaseInvoiceApplicationDetail": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoicePurchasePaymentList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoicePurchasePayment"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/PurchaseInvoicePagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceLine": {
+      "type": "object",
+      "properties": {
+        "line": {
+          "$ref": "#/components/schemas/PurchaseInvoiceLineDetail"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceLineDetail": {
+      "type": "object",
+      "properties": {
+        "accounting_code": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "item": {
+          "$ref": "#/components/schemas/PurchaseInvoiceLineDetailItem"
+        },
+        "object": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "integer"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        },
+        "uom": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "warehouse": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceLineDetailItem": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceLineResponse": {
+      "type": "object",
+      "properties": {
+        "purchase_invoice": {
+          "$ref": "#/components/schemas/PurchaseInvoiceLine"
+        }
+      }
+    },
+    "PurchaseInvoiceNoteUpdated": {
+      "type": "object",
+      "properties": {
+        "attachments": {
+          "type": "array",
+          "items": {}
+        },
+        "content": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchaseInvoiceNoteUpdatedCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "group": {},
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/PurchaseInvoiceNoteUpdatedLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "purchase_invoice": {
+          "$ref": "#/components/schemas/PurchaseInvoiceNoteUpdatedDetail"
+        },
+        "user": {},
+        "version": {
+          "type": "integer"
+        },
+        "watchers": {
+          "type": "array",
+          "items": {}
+        }
+      }
+    },
+    "PurchaseInvoiceNoteUpdatedCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNoteUpdatedLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNoteUpdatedDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNoteUpdatedResponse": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "$ref": "#/components/schemas/PurchaseInvoiceNoteUpdated"
+        }
+      }
+    },
+    "PurchaseInvoiceNoteReadDetail": {
+      "type": "object",
+      "properties": {
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteReadDetailAttachment"
+          }
+        },
+        "content": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchaseInvoiceNoteReadDetailCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "group": {},
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {},
+        "object": {
+          "type": "string"
+        },
+        "purchase_invoice": {
+          "$ref": "#/components/schemas/PurchaseInvoiceNoteReadDetailPurchaseInvoice"
+        },
+        "user": {},
+        "version": {
+          "type": "integer"
+        },
+        "watchers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteReadDetailWatcher"
+          }
+        }
+      }
+    },
+    "PurchaseInvoiceNoteReadDetailAttachment": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNoteReadDetailCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNoteReadDetailPurchaseInvoice": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNoteReadDetailWatcher": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNoteResponse": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "$ref": "#/components/schemas/PurchaseInvoiceNoteReadDetail"
+        }
+      }
+    },
+    "PurchaseInvoiceNoteReadData": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNoteFileList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteReadData"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/PurchaseInvoicePagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNoteFile": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceNoteFileResponse": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "$ref": "#/components/schemas/PurchaseInvoiceNoteFile"
+        }
+      }
+    },
+    "PurchaseInvoicePurchaseCreditNoteApplicationRead": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchaseInvoicePurchaseCreditNoteApplicationReadCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "purchase_credit_note": {
+          "$ref": "#/components/schemas/PurchaseInvoicePurchaseCreditNoteApplicationReadDetail"
+        },
+        "purchase_payment": {
+          "$ref": "#/components/schemas/PurchaseInvoicePurchaseCreditNoteApplicationReadPurchasePayment"
+        },
+        "remaining_balance": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchaseInvoicePurchaseCreditNoteApplicationReadCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoicePurchaseCreditNoteApplicationReadDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoicePurchaseCreditNoteApplicationReadPurchasePayment": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseInvoiceCreditNoteApplicationResponse": {
+      "type": "object",
+      "properties": {
+        "purchase_credit_note_application": {
+          "$ref": "#/components/schemas/PurchaseInvoicePurchaseCreditNoteApplicationRead"
+        }
+      }
+    }
+  }
+}
