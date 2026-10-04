@@ -1,0 +1,26 @@
+---
+title: "Quote orders"
+sidebarTitle: "Overview"
+description: "List the invoices raised from an Exsited quote order, page by page."
+---
+
+A quote is an order with `quote_order` set to `true`. This area reads the invoices raised from a quote; the quote itself is created, read and converted under Orders. It has 1 endpoint, and all seven SDKs call it.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List a quote's invoices](/api-reference/quote-orders/list-a-quotes-invoices) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/quote_orders/{quote_order_id}/invoices` | Lists the invoices raised from a quote, one page at a time. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Quotes live under `/orders`.** Create a quote with `quote_order: true`, then read, change or convert it with the order calls.
+- **Only a quote has this listing.** An order that is not a quote returns `404`.
+- **Read a converted quote.** A quote converted with `convert_to_order` has `quote_converted` set to `true` and is the one that carries invoices.
+- **The listing pages by cursor.** Send `limit`, then pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`.

@@ -1,0 +1,320 @@
+{
+  "family": "quote_orders",
+  "tag": "Quote orders",
+  "slug": "quote-orders",
+  "icon": "file-invoice-dollar",
+  "base": "/quote_orders",
+  "overview_description": "List the invoices raised from an Exsited quote order, page by page.",
+  "intro": "A quote is an order with `quote_order` set to `true`. This area reads the invoices raised from a quote; the quote itself is created, read and converted under Orders. It has 1 endpoint, and all seven SDKs call it.",
+  "warning": null,
+  "notes": [
+    "**Quotes live under `/orders`.** Create a quote with `quote_order: true`, then read, change or convert it with the order calls.",
+    "**Only a quote has this listing.** An order that is not a quote returns `404`.",
+    "**Read a converted quote.** A quote converted with `convert_to_order` has `quote_converted` set to `true` and is the one that carries invoices.",
+    "**The listing pages by cursor.** Send `limit`, then pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_quote_order_invoices",
+      "method": "GET",
+      "path": "/quote_orders/{quote_order_id}/invoices",
+      "slug": "list-a-quotes-invoices",
+      "title": "List a quote's invoices",
+      "summary": "Lists the invoices raised from a quote, one page at a time.",
+      "description": "Pass the quote's order `id`. The records are under `data`, and `pagination` holds the cursor for the next page. An order that is not a quote returns `404`.",
+      "parameters": [
+        {
+          "name": "quote_order_id",
+          "in": "path",
+          "required": true,
+          "description": "The quote's order `id`, as `GET /orders` lists it.",
+          "schema": {
+            "type": "string",
+            "example": "ORD-0002"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` to sort in descending order.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of the quote's invoices, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/QuoteOrderInvoiceList"
+          }
+        },
+        "404": {
+          "description": "The order is not a quote."
+        }
+      },
+      "example_call": {
+        "path": {
+          "quote_order_id": "ORD-0002"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "QuoteOrderInvoiceList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/QuoteOrderInvoice"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/QuoteOrderPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "QuoteOrderInvoice": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/QuoteOrderInvoiceAccount"
+        },
+        "alternate_billing_end_date": {
+          "type": "string"
+        },
+        "alternate_billing_start_date": {
+          "type": "string"
+        },
+        "alternate_due_date": {
+          "type": "string"
+        },
+        "alternate_issue_date": {
+          "type": "string"
+        },
+        "billing_end_date": {
+          "type": "string"
+        },
+        "billing_start_date": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/QuoteOrderInvoiceCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/QuoteOrderInvoiceCurrency"
+        },
+        "custom_form": {
+          "$ref": "#/components/schemas/QuoteOrderInvoiceCustomForm"
+        },
+        "customer_purchase_order_id": {},
+        "discount_amount": {
+          "type": "number"
+        },
+        "due": {
+          "type": "string"
+        },
+        "due_date": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "invoice_note": {},
+        "issue_date": {
+          "type": "string"
+        },
+        "last_payment": {},
+        "last_updated_by": {},
+        "last_updated_on": {},
+        "object": {
+          "type": "string"
+        },
+        "order": {
+          "$ref": "#/components/schemas/QuoteOrderInvoiceOrder"
+        },
+        "origin": {},
+        "paid": {
+          "type": "string"
+        },
+        "payment_status": {
+          "type": "string"
+        },
+        "price_tax_inclusive": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "string"
+        },
+        "tax_total": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "QuoteOrderInvoiceAccount": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "QuoteOrderInvoiceCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "QuoteOrderInvoiceCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "QuoteOrderInvoiceCustomForm": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "QuoteOrderInvoiceOrder": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "QuoteOrderPagination": {
+      "type": "object",
+      "description": "Cursor paging for the listing.",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size the API applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. `false` ends the listing even when `next_cursor` is present."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Send as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "type": "object",
+          "properties": {
+            "next": {
+              "type": "string"
+            },
+            "prev": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
