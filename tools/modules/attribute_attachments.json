@@ -9,9 +9,9 @@
   "warning": null,
   "notes": [
     "**The path is singular.** Call `/attribute_attachment/{file_uuid}`, not a plural form.",
-    "**The file comes back as base64 with no wrapper key.** The body is `{\"base64\": \"...\"}`, so decode the `base64` value to get the file's bytes.",
+    "**The file comes back as a JSON object with one key, `base64`.** The body is `{\"base64\": \"...\"}`, so decode the `base64` value to get the file's bytes.",
     "**Use the uuid the account's file attribute links to.** An account's file attribute points at this path; take the `file_uuid` from there.",
-    "**An unknown uuid returns 404.** The error code is `resource_not_found`."
+    "**An unknown uuid returns `404`.** The error code is `resource_not_found`."
   ],
   "endpoints": [
     {
@@ -38,7 +38,10 @@
       "multipart": false,
       "responses": {
         "200": {
-          "description": "The file's content, as `{\"base64\": \"...\"}`."
+          "description": "The file's content, as `{\"base64\": \"...\"}`.",
+          "schema": {
+            "$ref": "#/components/schemas/AttributeAttachment"
+          }
         },
         "404": {
           "description": "No file has that `uuid`. The error code is `resource_not_found`."
@@ -51,5 +54,15 @@
       }
     }
   ],
-  "schemas": {}
+  "schemas": {
+    "AttributeAttachment": {
+      "type": "object",
+      "properties": {
+        "base64": {
+          "type": "string",
+          "description": "The file's bytes, base64 encoded."
+        }
+      }
+    }
+  }
 }
