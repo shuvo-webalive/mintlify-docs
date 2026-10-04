@@ -1,9 +1,13 @@
 ---
 title: "Set a shipping rule's configuration"
-description: "Sets the zones, rate and tiers of a shipping rule and returns the rule."
+description: "Sets the zones and rate of a shipping rule and returns the rule."
 openapi: "POST /settings/shipping_rules/{shipping_rule_id}/configuration"
 ---
 
-Send the configuration under `configuration`: `zones` lists each zone by its dashed uuid in `zone`, and `rate` gives the rate's `name`, `method` such as `FLAT_RATE`, `handling_cost` and `shipping_cost`.
+Send the configuration under `configuration`: `zones` lists each zone by its UUID with dashes in `zone`, and `rate` gives the rate's `name`, `method` such as `FLAT_RATE`, `handling_cost` and `shipping_cost`.
+
+<Warning>
+  **Setting a rule's configuration currently fails.** A zone given by its `zn_` id or as its 32 hex digits alone is refused with `400` `zone not found`, and a zone given as its UUID with dashes returns `500`.
+</Warning>
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `host` to your Exsited API host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>
