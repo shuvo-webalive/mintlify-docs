@@ -26431,6 +26431,16 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "The call can fail with `500`. Read the item to check its `status`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         },
         "x-codeSamples": [
@@ -26503,6 +26513,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ItemResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The call can fail with `500`. Read the item to check its `status`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -27711,7 +27731,7 @@
         "tags": [
           "Items"
         ],
-        "summary": "Create an item's inventory section",
+        "summary": "Create an item's inventory settings",
         "operationId": "items_create_item_inventories",
         "description": "Send `inventories` inside `item`, with `enabled` and `warehouse_enabled`. An item takes one inventory section, and it must be a `STANDARD` item with sale or purchase turned on.",
         "parameters": [
@@ -27830,7 +27850,7 @@
         "tags": [
           "Items"
         ],
-        "summary": "Add stock to a warehouse",
+        "summary": "Add warehouse stock",
         "operationId": "items_add_item_inventory",
         "description": "List the warehouses inside `item.inventories.warehouses`, each by `name` with the `quantity` to add. A negative quantity removes stock.",
         "parameters": [
@@ -28154,7 +28174,7 @@
             "name": "item_id",
             "in": "path",
             "required": true,
-            "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+            "description": "The bundle item's `id`, such as `ITEM-0010`. Not its `uuid`.",
             "schema": {
               "type": "string"
             }
@@ -28176,42 +28196,42 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/items/ITEM-0001/bundle_details\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"item\": {\n      \"bundle_details\": [\n        {\n          \"id\": \"ITEM-0002\",\n          \"quantity\": 2\n        },\n        {\n          \"id\": \"ITEM-0003\",\n          \"quantity\": 1\n        }\n      ]\n    }\n  }'"
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/items/ITEM-0010/bundle_details\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"item\": {\n      \"bundle_details\": [\n        {\n          \"id\": \"ITEM-0002\",\n          \"quantity\": 2\n        },\n        {\n          \"id\": \"ITEM-0003\",\n          \"quantity\": 1\n        }\n      ]\n    }\n  }'"
           },
           {
             "lang": "python",
             "label": "Python",
-            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.items.update_item_bundle_details(\n    \"ITEM-0001\",\n    {\n        \"item\": {\n            \"bundle_details\": [\n                {\"id\": \"ITEM-0002\", \"quantity\": 2},\n                {\"id\": \"ITEM-0003\", \"quantity\": 1},\n            ]\n        }\n    },\n)\nprint(response.data)\n"
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.items.update_item_bundle_details(\n    \"ITEM-0010\",\n    {\n        \"item\": {\n            \"bundle_details\": [\n                {\"id\": \"ITEM-0002\", \"quantity\": 2},\n                {\"id\": \"ITEM-0003\", \"quantity\": 1},\n            ]\n        }\n    },\n)\nprint(response.data)\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.items.updateItemBundleDetails('ITEM-0001', {\n    item: {\n        bundle_details: [\n            {id: 'ITEM-0002', quantity: 2},\n            {id: 'ITEM-0003', quantity: 1},\n        ],\n    },\n});\nconsole.log(response.data);\n"
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.items.updateItemBundleDetails('ITEM-0010', {\n    item: {\n        bundle_details: [\n            {id: 'ITEM-0002', quantity: 2},\n            {id: 'ITEM-0003', quantity: 1},\n        ],\n    },\n});\nconsole.log(response.data);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->items->updateItemBundleDetails('ITEM-0001', [\n    'item' => [\n        'bundle_details' => [\n            ['id' => 'ITEM-0002', 'quantity' => 2],\n            ['id' => 'ITEM-0003', 'quantity' => 1],\n        ],\n    ],\n]);\nprint_r($response->data);\n"
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->items->updateItemBundleDetails('ITEM-0010', [\n    'item' => [\n        'bundle_details' => [\n            ['id' => 'ITEM-0002', 'quantity' => 2],\n            ['id' => 'ITEM-0003', 'quantity' => 1],\n        ],\n    ],\n]);\nprint_r($response->data);\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.items.items_dto.ItemsDto.Item;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Item> response = client.items().updateItemBundleDetails(\n        \"ITEM-0001\",\n        Map.of(\n                \"item\", Map.of(\n                        \"bundle_details\", List.of(\n                                Map.of(\"id\", \"ITEM-0002\", \"quantity\", 2),\n                                Map.of(\"id\", \"ITEM-0003\", \"quantity\", 1)))));\nSystem.out.println(response.getMap());\n"
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.items.items_dto.ItemsDto.Item;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Item> response = client.items().updateItemBundleDetails(\n        \"ITEM-0010\",\n        Map.of(\n                \"item\", Map.of(\n                        \"bundle_details\", List.of(\n                                Map.of(\"id\", \"ITEM-0002\", \"quantity\", 2),\n                                Map.of(\"id\", \"ITEM-0003\", \"quantity\", 1)))));\nSystem.out.println(response.getMap());\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Items.UpdateItemBundleDetailsAsync(\n    \"ITEM-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"item\"] = new Dictionary<string, object?>\n        {\n            [\"bundle_details\"] = new List<object?>\n            {\n                new Dictionary<string, object?>\n                {\n                    [\"id\"] = \"ITEM-0002\",\n                    [\"quantity\"] = 2,\n                },\n                new Dictionary<string, object?>\n                {\n                    [\"id\"] = \"ITEM-0003\",\n                    [\"quantity\"] = 1,\n                },\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Items.UpdateItemBundleDetailsAsync(\n    \"ITEM-0010\",\n    new Dictionary<string, object?>\n    {\n        [\"item\"] = new Dictionary<string, object?>\n        {\n            [\"bundle_details\"] = new List<object?>\n            {\n                new Dictionary<string, object?>\n                {\n                    [\"id\"] = \"ITEM-0002\",\n                    [\"quantity\"] = 2,\n                },\n                new Dictionary<string, object?>\n                {\n                    [\"id\"] = \"ITEM-0003\",\n                    [\"quantity\"] = 1,\n                },\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.items.updateItemBundleDetails('ITEM-0001', {\n  'item': {\n    'bundle_details': [\n      {'id': 'ITEM-0002', 'quantity': 2},\n      {'id': 'ITEM-0003', 'quantity': 1},\n    ],\n  },\n});\nprint(response.map);\n"
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.items.updateItemBundleDetails('ITEM-0010', {\n  'item': {\n    'bundle_details': [\n      {'id': 'ITEM-0002', 'quantity': 2},\n      {'id': 'ITEM-0003', 'quantity': 1},\n    ],\n  },\n});\nprint(response.map);\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Items().UpdateItemBundleDetails(context.Background(), \"ITEM-0001\", map[string]any{\n\t\"item\": map[string]any{\n\t\t\"bundle_details\": []any{\n\t\t\tmap[string]any{\"id\": \"ITEM-0002\", \"quantity\": 2},\n\t\t\tmap[string]any{\"id\": \"ITEM-0003\", \"quantity\": 1},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Items().UpdateItemBundleDetails(context.Background(), \"ITEM-0010\", map[string]any{\n\t\"item\": map[string]any{\n\t\t\"bundle_details\": []any{\n\t\t\tmap[string]any{\"id\": \"ITEM-0002\", \"quantity\": 2},\n\t\t\tmap[string]any{\"id\": \"ITEM-0003\", \"quantity\": 1},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
           }
         ],
         "requestBody": {
@@ -28285,7 +28305,7 @@
             "name": "item_id",
             "in": "path",
             "required": true,
-            "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+            "description": "The item's `id`, such as `ITEM-0030`. Not its `uuid`.",
             "schema": {
               "type": "string"
             }
@@ -28307,42 +28327,42 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/items/ITEM-0001/variations\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"item\": {\n      \"configure_variations\": [\n        {\n          \"name\": \"Colour\",\n          \"values\": [\n            \"Red\",\n            \"Blue\"\n          ]\n        }\n      ]\n    }\n  }'"
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/items/ITEM-0030/variations\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"item\": {\n      \"configure_variations\": [\n        {\n          \"name\": \"Colour\",\n          \"values\": [\n            \"Red\",\n            \"Blue\"\n          ]\n        }\n      ]\n    }\n  }'"
           },
           {
             "lang": "python",
             "label": "Python",
-            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.items.update_item_variations(\n    \"ITEM-0001\",\n    {\"item\": {\"configure_variations\": [{\"name\": \"Colour\", \"values\": [\"Red\", \"Blue\"]}]}},\n)\nprint(response.data)\n"
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.items.update_item_variations(\n    \"ITEM-0030\",\n    {\"item\": {\"configure_variations\": [{\"name\": \"Colour\", \"values\": [\"Red\", \"Blue\"]}]}},\n)\nprint(response.data)\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.items.updateItemVariations('ITEM-0001', {\n    item: {configure_variations: [{name: 'Colour', values: ['Red', 'Blue']}]},\n});\nconsole.log(response.data);\n"
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.items.updateItemVariations('ITEM-0030', {\n    item: {configure_variations: [{name: 'Colour', values: ['Red', 'Blue']}]},\n});\nconsole.log(response.data);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->items->updateItemVariations('ITEM-0001', [\n    'item' => ['configure_variations' => [['name' => 'Colour', 'values' => ['Red', 'Blue']]]],\n]);\nprint_r($response->data);\n"
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->items->updateItemVariations('ITEM-0030', [\n    'item' => ['configure_variations' => [['name' => 'Colour', 'values' => ['Red', 'Blue']]]],\n]);\nprint_r($response->data);\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.items.items_dto.ItemsDto.Item;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Item> response = client.items().updateItemVariations(\n        \"ITEM-0001\",\n        Map.of(\n                \"item\", Map.of(\n                        \"configure_variations\", List.of(\n                                Map.of(\"name\", \"Colour\", \"values\", List.of(\"Red\", \"Blue\"))))));\nSystem.out.println(response.getMap());\n"
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.items.items_dto.ItemsDto.Item;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Item> response = client.items().updateItemVariations(\n        \"ITEM-0030\",\n        Map.of(\n                \"item\", Map.of(\n                        \"configure_variations\", List.of(\n                                Map.of(\"name\", \"Colour\", \"values\", List.of(\"Red\", \"Blue\"))))));\nSystem.out.println(response.getMap());\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Items.UpdateItemVariationsAsync(\n    \"ITEM-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"item\"] = new Dictionary<string, object?>\n        {\n            [\"configure_variations\"] = new List<object?>\n            {\n                new Dictionary<string, object?>\n                {\n                    [\"name\"] = \"Colour\",\n                    [\"values\"] = new List<object?>\n                    {\n                        \"Red\",\n                        \"Blue\",\n                    },\n                },\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Items.UpdateItemVariationsAsync(\n    \"ITEM-0030\",\n    new Dictionary<string, object?>\n    {\n        [\"item\"] = new Dictionary<string, object?>\n        {\n            [\"configure_variations\"] = new List<object?>\n            {\n                new Dictionary<string, object?>\n                {\n                    [\"name\"] = \"Colour\",\n                    [\"values\"] = new List<object?>\n                    {\n                        \"Red\",\n                        \"Blue\",\n                    },\n                },\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.items.updateItemVariations('ITEM-0001', {\n  'item': {\n    'configure_variations': [\n      {\n        'name': 'Colour',\n        'values': ['Red', 'Blue'],\n      },\n    ],\n  },\n});\nprint(response.map);\n"
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.items.updateItemVariations('ITEM-0030', {\n  'item': {\n    'configure_variations': [\n      {\n        'name': 'Colour',\n        'values': ['Red', 'Blue'],\n      },\n    ],\n  },\n});\nprint(response.map);\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Items().UpdateItemVariations(context.Background(), \"ITEM-0001\", map[string]any{\n\t\"item\": map[string]any{\n\t\t\"configure_variations\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"name\":   \"Colour\",\n\t\t\t\t\"values\": []any{\"Red\", \"Blue\"},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Items().UpdateItemVariations(context.Background(), \"ITEM-0030\", map[string]any{\n\t\"item\": map[string]any{\n\t\t\"configure_variations\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"name\":   \"Colour\",\n\t\t\t\t\"values\": []any{\"Red\", \"Blue\"},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
           }
         ],
         "requestBody": {
@@ -28433,7 +28453,7 @@
             "name": "item_id",
             "in": "path",
             "required": true,
-            "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+            "description": "The family item's `id`, such as `ITEM-0020`. Not its `uuid`.",
             "schema": {
               "type": "string"
             }
@@ -28455,42 +28475,42 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/items/ITEM-0001/family_details\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/items/ITEM-0020/family_details\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
           },
           {
             "lang": "python",
             "label": "Python",
-            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.items.get_item_family_details(\"ITEM-0001\")\nprint(response.data)\n"
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.items.get_item_family_details(\"ITEM-0020\")\nprint(response.data)\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.items.getItemFamilyDetails('ITEM-0001');\nconsole.log(response.data);\n"
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.items.getItemFamilyDetails('ITEM-0020');\nconsole.log(response.data);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->items->getItemFamilyDetails('ITEM-0001');\nprint_r($response->data);\n"
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->items->getItemFamilyDetails('ITEM-0020');\nprint_r($response->data);\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.items.items_dto.ItemsDto.Item;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Item> response = client.items().getItemFamilyDetails(\"ITEM-0001\");\nSystem.out.println(response.getMap());\n"
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.items.items_dto.ItemsDto.Item;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Item> response = client.items().getItemFamilyDetails(\"ITEM-0020\");\nSystem.out.println(response.getMap());\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Items.GetItemFamilyDetailsAsync(\"ITEM-0001\");\n\nConsole.WriteLine(response.Json);\n"
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Items.GetItemFamilyDetailsAsync(\"ITEM-0020\");\n\nConsole.WriteLine(response.Json);\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.items.getItemFamilyDetails('ITEM-0001');\nprint(response.map);\n"
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.items.getItemFamilyDetails('ITEM-0020');\nprint(response.map);\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Items().GetItemFamilyDetails(context.Background(), \"ITEM-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Items().GetItemFamilyDetails(context.Background(), \"ITEM-0020\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
           }
         ]
       },
@@ -28506,7 +28526,7 @@
             "name": "item_id",
             "in": "path",
             "required": true,
-            "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+            "description": "The family item's `id`, such as `ITEM-0020`. Not its `uuid`.",
             "schema": {
               "type": "string"
             }
@@ -28528,42 +28548,42 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/items/ITEM-0001/family_details\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"item\": {\n      \"family_details\": {\n        \"add\": [\n          \"ITEM-0002\"\n        ]\n      }\n    }\n  }'"
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/items/ITEM-0020/family_details\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"item\": {\n      \"family_details\": {\n        \"add\": [\n          \"ITEM-0002\"\n        ]\n      }\n    }\n  }'"
           },
           {
             "lang": "python",
             "label": "Python",
-            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.items.create_item_family_details(\n    \"ITEM-0001\", {\"item\": {\"family_details\": {\"add\": [\"ITEM-0002\"]}}}\n)\nprint(response.data)\n"
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.items.create_item_family_details(\n    \"ITEM-0020\", {\"item\": {\"family_details\": {\"add\": [\"ITEM-0002\"]}}}\n)\nprint(response.data)\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.items.createItemFamilyDetails('ITEM-0001', {\n    item: {family_details: {add: ['ITEM-0002']}},\n});\nconsole.log(response.data);\n"
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.items.createItemFamilyDetails('ITEM-0020', {\n    item: {family_details: {add: ['ITEM-0002']}},\n});\nconsole.log(response.data);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->items->createItemFamilyDetail('ITEM-0001', [\n    'item' => ['family_details' => ['add' => ['ITEM-0002']]],\n]);\nprint_r($response->data);\n"
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->items->createItemFamilyDetail('ITEM-0020', [\n    'item' => ['family_details' => ['add' => ['ITEM-0002']]],\n]);\nprint_r($response->data);\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.items.items_dto.ItemsDto.Item;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Item> response = client.items().createItemFamilyDetails(\n        \"ITEM-0001\",\n        Map.of(\"item\", Map.of(\"family_details\", Map.of(\"add\", List.of(\"ITEM-0002\")))));\nSystem.out.println(response.getMap());\n"
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.items.items_dto.ItemsDto.Item;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Item> response = client.items().createItemFamilyDetails(\n        \"ITEM-0020\",\n        Map.of(\"item\", Map.of(\"family_details\", Map.of(\"add\", List.of(\"ITEM-0002\")))));\nSystem.out.println(response.getMap());\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Items.CreateItemFamilyDetailAsync(\n    \"ITEM-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"item\"] = new Dictionary<string, object?>\n        {\n            [\"family_details\"] = new Dictionary<string, object?>\n            {\n                [\"add\"] = new List<object?>\n                {\n                    \"ITEM-0002\",\n                },\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Items.CreateItemFamilyDetailAsync(\n    \"ITEM-0020\",\n    new Dictionary<string, object?>\n    {\n        [\"item\"] = new Dictionary<string, object?>\n        {\n            [\"family_details\"] = new Dictionary<string, object?>\n            {\n                [\"add\"] = new List<object?>\n                {\n                    \"ITEM-0002\",\n                },\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.items.createItemFamilyDetails('ITEM-0001', {\n  'item': {\n    'family_details': {\n      'add': ['ITEM-0002'],\n    },\n  },\n});\nprint(response.map);\n"
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.items.createItemFamilyDetails('ITEM-0020', {\n  'item': {\n    'family_details': {\n      'add': ['ITEM-0002'],\n    },\n  },\n});\nprint(response.map);\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Items().CreateItemFamilyDetails(context.Background(), \"ITEM-0001\", map[string]any{\n\t\"item\": map[string]any{\n\t\t\"family_details\": map[string]any{\n\t\t\t\"add\": []any{\"ITEM-0002\"},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Items().CreateItemFamilyDetails(context.Background(), \"ITEM-0020\", map[string]any{\n\t\"item\": map[string]any{\n\t\t\"family_details\": map[string]any{\n\t\t\t\"add\": []any{\"ITEM-0002\"},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
           }
         ],
         "requestBody": {
@@ -29820,7 +29840,7 @@
             "description": "The file is deleted. No body."
           },
           "404": {
-            "description": "The file could not be deleted. Every failure is reported with this status.",
+            "description": "The file could not be deleted. Every failure is reported with this status, and it is currently returned even for a listed file.",
             "content": {
               "application/json": {
                 "schema": {
@@ -29879,7 +29899,7 @@
         "tags": [
           "Items"
         ],
-        "summary": "Add stock to a warehouse (inventories path)",
+        "summary": "Add warehouse stock (inventories path)",
         "operationId": "items_add_item_inventories",
         "description": "Behaves the same as `POST /items/{item_id}/inventory/add`. List the warehouses inside `item.inventories.warehouses`, each by `name` with the `quantity` to add; a negative quantity removes stock.",
         "parameters": [
@@ -30017,7 +30037,7 @@
         "tags": [
           "Items"
         ],
-        "summary": "Create an item's inventory section (inventory path)",
+        "summary": "Create an item's inventory settings (inventory path)",
         "operationId": "items_create_item_inventory",
         "description": "Behaves the same as `POST /items/{item_id}/inventories`. Send `inventories` inside `item`, with `enabled` and `warehouse_enabled`.",
         "parameters": [

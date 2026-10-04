@@ -4,14 +4,14 @@
   "slug": "items",
   "icon": "box",
   "base": "/items",
-  "overview_description": "Create and update items, set their sale, purchase and inventory sections, add stock, and manage bundles, families, packages and notes.",
-  "intro": "Items are the products and services you sell and buy. These endpoints create, read, update and delete items, set their sale, purchase and inventory sections, add stock to warehouses, and manage bundles, families, variations, packages and notes. This area has 41 endpoints, and all seven SDKs call every one.",
-  "warning": "**Deleting an item removes it, and a later read returns `404`.** An item that an order references is refused with `409`, and retrying does not help.",
+  "overview_description": "List, read, create, update and delete items, set their sale, purchase and inventory sections, add stock, and manage bundles, families, packages and notes.",
+  "intro": "Items are the products and services you sell and buy. These endpoints create, read, update and delete items, set their sale, purchase and inventory sections, add stock to warehouses, and manage bundles, families, variations, packages and notes. This area has 41 endpoints, each available in all seven SDKs.",
+  "warning": "**An item that an order references cannot be deleted.** The delete returns `409`, and retrying does not help. Deactivating or reactivating an item can return `500`, and deleting a note file currently returns `404`.",
   "notes": [
-    "**Every item write is wrapped in `item`.** The one exception is the image upload, which sends `image_base64` at the top level of the body.",
+    "**Every item JSON write is wrapped in `item`.** Two writes are not: the image upload sends `image_base64` at the top level, and the note writes are multipart forms with a `note` field.",
     "**Address an item by its `id`, such as `ITEM-0001`.** Not by its `uuid`, and not by the integer `id` that the sale and purchase reads return.",
     "**`type` and `name` are the minimum to create an item.** Send `type` in upper case, such as `STANDARD`, `BUNDLE`, `FAMILY` or `VARIATION_BASED`; it comes back in lower case.",
-    "**The item listing pages by cursor.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor`; `has_more` tells you when to stop. Filter with `filter_<field>`; a bare `filter` expression is refused with `400`, and `order_by` and `direction` are ignored.",
+    "**The item listing pages by cursor and filters with `filter_<field>`.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor`; `has_more` tells you when to stop. Filter with `filter_<field>`; a bare `filter` expression is refused with `400`, and `order_by` and `direction` are ignored.",
     "**The sale, purchase and inventories reads return a short item.** Each carries `id`, `name` and its one section, and the sale and purchase reads give `id` as an integer.",
     "**Item notes are sent as a multipart form.** The text goes in the `note` field, and files are optional extra parts."
   ],
@@ -723,6 +723,7 @@
       "title": "Deactivate an item",
       "summary": "Sets an item's status to inactive and returns the item.",
       "description": "Takes no body. After the call the item's `status` reads `inactive`; reactivate it to set it back to `active`.",
+      "warning": "**This call can return `500`.** Read the item afterwards and check that its `status` is `inactive`.",
       "parameters": [
         {
           "name": "item_id",
@@ -743,6 +744,9 @@
           "schema": {
             "$ref": "#/components/schemas/ItemResponse"
           }
+        },
+        "500": {
+          "description": "The call can fail with `500`. Read the item to check its `status`."
         }
       },
       "example_call": {
@@ -759,6 +763,7 @@
       "title": "Reactivate an item",
       "summary": "Sets a deactivated item's status back to active and returns the item.",
       "description": "Takes no body. After the call the item's `status` reads `active`.",
+      "warning": "**This call can return `500`.** Read the item afterwards and check that its `status` is `active`.",
       "parameters": [
         {
           "name": "item_id",
@@ -779,6 +784,9 @@
           "schema": {
             "$ref": "#/components/schemas/ItemResponse"
           }
+        },
+        "500": {
+          "description": "The call can fail with `500`. Read the item to check its `status`."
         }
       },
       "example_call": {
@@ -1671,8 +1679,8 @@
       "key": "add_item_inventory",
       "method": "POST",
       "path": "/items/{item_id}/inventory/add",
-      "slug": "add-stock-to-a-warehouse",
-      "title": "Add stock to a warehouse",
+      "slug": "add-warehouse-stock",
+      "title": "Add warehouse stock",
       "summary": "Adds stock to one or more of an item's warehouses and returns the item.",
       "description": "List the warehouses inside `item.inventories.warehouses`, each by `name` with the `quantity` to add. A negative quantity removes stock.",
       "parameters": [
@@ -1778,7 +1786,7 @@
       "path": "/items/{item_id}/inventory_adjustments",
       "slug": "list-an-items-inventory-adjustments",
       "title": "List an item's inventory adjustments",
-      "summary": "Returns a page of the stock changes recorded for one item.",
+      "summary": "Returns a page of the stock changes made to one item.",
       "description": "Returns the item's inventory adjustments under `data`, one per stock change, paged by cursor. Every quantity in an adjustment is a string, so convert it before doing arithmetic.",
       "parameters": [
         {
@@ -1883,17 +1891,17 @@
       "path": "/items/{item_id}/bundle_details",
       "slug": "update-a-bundles-components",
       "title": "Update a bundle's components",
-      "summary": "Sets the component items of a bundle item and returns the item.",
+      "summary": "Sends a bundle item's component list and returns the item.",
       "description": "Send `bundle_details` inside `item` as a plain list, each entry with a component item's `id` and its `quantity`. This differs from the family details write, which takes an object.",
       "parameters": [
         {
           "name": "item_id",
           "in": "path",
           "required": true,
-          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "description": "The bundle item's `id`, such as `ITEM-0010`. Not its `uuid`.",
           "schema": {
             "type": "string",
-            "example": "ITEM-0001"
+            "example": "ITEM-0010"
           }
         }
       ],
@@ -1959,7 +1967,7 @@
       },
       "example_call": {
         "path": {
-          "item_id": "ITEM-0001"
+          "item_id": "ITEM-0010"
         },
         "body": {
           "item": {
@@ -1990,10 +1998,10 @@
           "name": "item_id",
           "in": "path",
           "required": true,
-          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "description": "The item's `id`, such as `ITEM-0030`. Not its `uuid`.",
           "schema": {
             "type": "string",
-            "example": "ITEM-0001"
+            "example": "ITEM-0030"
           }
         }
       ],
@@ -2076,7 +2084,7 @@
       },
       "example_call": {
         "path": {
-          "item_id": "ITEM-0001"
+          "item_id": "ITEM-0030"
         },
         "body": {
           "item": {
@@ -2106,10 +2114,10 @@
           "name": "item_id",
           "in": "path",
           "required": true,
-          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "description": "The family item's `id`, such as `ITEM-0020`. Not its `uuid`.",
           "schema": {
             "type": "string",
-            "example": "ITEM-0001"
+            "example": "ITEM-0020"
           }
         }
       ],
@@ -2125,7 +2133,7 @@
       },
       "example_call": {
         "path": {
-          "item_id": "ITEM-0001"
+          "item_id": "ITEM-0020"
         }
       }
     },
@@ -2142,10 +2150,10 @@
           "name": "item_id",
           "in": "path",
           "required": true,
-          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "description": "The family item's `id`, such as `ITEM-0020`. Not its `uuid`.",
           "schema": {
             "type": "string",
-            "example": "ITEM-0001"
+            "example": "ITEM-0020"
           }
         }
       ],
@@ -2206,7 +2214,7 @@
       },
       "example_call": {
         "path": {
-          "item_id": "ITEM-0001"
+          "item_id": "ITEM-0020"
         },
         "body": {
           "item": {
@@ -2846,8 +2854,8 @@
       "key": "create_item_inventories",
       "method": "POST",
       "path": "/items/{item_id}/inventories",
-      "slug": "create-an-items-inventory-section",
-      "title": "Create an item's inventory section",
+      "slug": "create-an-items-inventory-settings",
+      "title": "Create an item's inventory settings",
       "summary": "Adds an inventory section to an item and returns the whole item.",
       "description": "Send `inventories` inside `item`, with `enabled` and `warehouse_enabled`. An item takes one inventory section, and it must be a `STANDARD` item with sale or purchase turned on.",
       "parameters": [
@@ -2928,8 +2936,8 @@
       "key": "add_item_inventories",
       "method": "POST",
       "path": "/items/{item_id}/inventories/add",
-      "slug": "add-stock-to-a-warehouse-inventories-path",
-      "title": "Add stock to a warehouse (inventories path)",
+      "slug": "add-warehouse-stock-inventories-path",
+      "title": "Add warehouse stock (inventories path)",
       "summary": "Adds stock to an item's warehouses through the plural `inventories/add` path.",
       "description": "Behaves the same as `POST /items/{item_id}/inventory/add`. List the warehouses inside `item.inventories.warehouses`, each by `name` with the `quantity` to add; a negative quantity removes stock.",
       "parameters": [
@@ -3033,8 +3041,8 @@
       "key": "create_item_inventory",
       "method": "POST",
       "path": "/items/{item_id}/inventory",
-      "slug": "create-an-items-inventory-section-inventory-path",
-      "title": "Create an item's inventory section (inventory path)",
+      "slug": "create-an-items-inventory-settings-inventory-path",
+      "title": "Create an item's inventory settings (inventory path)",
       "summary": "Adds an inventory section to an item through the singular `inventory` path.",
       "description": "Behaves the same as `POST /items/{item_id}/inventories`. Send `inventories` inside `item`, with `enabled` and `warehouse_enabled`.",
       "parameters": [
@@ -3119,6 +3127,7 @@
       "title": "Delete a note file",
       "summary": "Deletes one file from an item note. A successful call returns `204` with no body.",
       "description": "Pass the file's `uuid` from the note's files listing. Any failure to delete the file is reported as `404`, whatever its cause.",
+      "warning": "**Deleting a note file currently fails.** This call currently returns `404` `attachment not found`, even for a file the note's files listing shows.",
       "parameters": [
         {
           "name": "item_id",
@@ -3158,7 +3167,7 @@
           "description": "The file is deleted. No body."
         },
         "404": {
-          "description": "The file could not be deleted. Every failure is reported with this status."
+          "description": "The file could not be deleted. Every failure is reported with this status, and it is currently returned even for a listed file."
         }
       },
       "example_call": {
