@@ -293,6 +293,9 @@
     },
     {
       "name": "Child organisations"
+    },
+    {
+      "name": "Webhooks"
     }
   ],
   "paths": {
@@ -84808,6 +84811,84 @@
             }
           }
         }
+      }
+    },
+    "/webhooks/{webhook_id}": {
+      "get": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "Retrieve a webhook delivery",
+        "operationId": "webhooks_get_webhook",
+        "description": "Pass the `whk_` id the delivery carries as `webhook_id`. No endpoint lists deliveries, so keep the id from each one. An unknown id returns `404` with the code `resource_not_found`.",
+        "parameters": [
+          {
+            "name": "webhook_id",
+            "in": "path",
+            "required": true,
+            "description": "The delivery's id: `whk_` followed by 32 characters.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The webhook delivery."
+          },
+          "404": {
+            "description": "No delivery has that id; the error code is `resource_not_found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/webhooks/whk_5f2c9a1e7b3d4c6f8a0e1b2d3c4f5a6b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.webhooks.get_webhook(\"whk_5f2c9a1e7b3d4c6f8a0e1b2d3c4f5a6b\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.webhooks.getWebhook('whk_5f2c9a1e7b3d4c6f8a0e1b2d3c4f5a6b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->webhooks->getWebhook('whk_5f2c9a1e7b3d4c6f8a0e1b2d3c4f5a6b');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.webhooks().getWebhook(\"whk_5f2c9a1e7b3d4c6f8a0e1b2d3c4f5a6b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Webhooks.GetWebhookAsync(\"whk_5f2c9a1e7b3d4c6f8a0e1b2d3c4f5a6b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.webhooks.getWebhook(\n  'whk_5f2c9a1e7b3d4c6f8a0e1b2d3c4f5a6b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Webhooks().GetWebhook(context.Background(), \"whk_5f2c9a1e7b3d4c6f8a0e1b2d3c4f5a6b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
       }
     }
   },
