@@ -34254,7 +34254,7 @@
         ],
         "summary": "List item receipts",
         "operationId": "item_receipts_get_item_receipts",
-        "description": "Returns receipts under `data`, each with its purchase order, `receipt_status`, `receipt_date`, `tracking_number` and `lines`. Set the page size with `limit` and fetch the next page with `cursor`. Other fields filter as `filter_<field>`.",
+        "description": "Returns receipts under `data`, each with its purchase order, `receipt_status`, `receipt_date`, `tracking_number` and `lines`. Set the page size with `limit` and fetch the next page with `cursor`. Filter with `filter_<field>`, or `filter_<field>_<operator>` for other comparisons.",
         "parameters": [
           {
             "name": "limit",
@@ -34273,6 +34273,16 @@
             "description": "The `next_cursor` from the previous page, to fetch the page after it.",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` to sort descending, as in `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
             }
           }
         ],
@@ -34346,6 +34356,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ItemReceiptsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Currently returned for a body like the example.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -34494,7 +34514,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ItemReceiptUpdatedResponse"
+                  "$ref": "#/components/schemas/ItemReceiptResponse"
                 }
               }
             }
@@ -34745,7 +34765,7 @@
         ],
         "summary": "List a purchase order's item receipts",
         "operationId": "item_receipts_get_purchase_order_item_receipts",
-        "description": "Returns the purchase order's receipts in `item_receipts`, with a `pagination` block, under `purchase_order`.",
+        "description": "Returns the item receipts of one purchase order. The response is expected under `purchase_order`, with the receipts in `item_receipts` and a `pagination` block; this shape has not been confirmed.",
         "parameters": [
           {
             "name": "purchase_order_id",

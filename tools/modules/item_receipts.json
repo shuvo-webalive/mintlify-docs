@@ -5,10 +5,10 @@
   "icon": "dolly",
   "base": "/item_receipts",
   "overview_description": "Record items received against a purchase order's lines, then list, read, update and delete item receipts.",
-  "intro": "An item receipt records items received against the lines of a purchase order. These endpoints create, list, read, update and delete receipts, list a purchase order's receipts, and delete a receipt's note. This area has 7 endpoints, and all seven SDKs call every one.",
+  "intro": "An item receipt records items received against the lines of a purchase order. These endpoints create, list, read, update and delete receipts, list a purchase order's receipts, and delete a receipt's note. This area has 7 endpoints, each available in all seven SDKs.",
   "warning": "**A completed item receipt cannot be deleted.** The delete is refused with `400` `stock_committed`.",
   "notes": [
-    "**Writes are wrapped in `item_receipt`.** A create names the `purchase_order`, a `receipt_status` such as `STARTED`, a `receipt_date`, and `lines`, each with a `purchase_order_line` id and a `receipt_quantity`.",
+    "**Writes are wrapped in `item_receipt`.** A create names the `purchase_order`, a `receipt_status` such as `STARTED`, a `receipt_date`, and `lines`, each with a `purchase_order_line` id and a `receipt_quantity`. Reads return `receipt_status` in lower case, such as `started`.",
     "**Receipt ids start with `ir_`, and note ids with `note_`.** Pass them in the paths as they are.",
     "**The update changes a receipt's details.** It takes fields such as `tracking_number`, `receipt_note` and `receipt_date`, and raises the receipt's `version`.",
     "**No endpoint lists or creates a receipt's notes.** Only the note delete exists here.",
@@ -22,7 +22,7 @@
       "slug": "list-item-receipts",
       "title": "List item receipts",
       "summary": "Returns a page of item receipts.",
-      "description": "Returns receipts under `data`, each with its purchase order, `receipt_status`, `receipt_date`, `tracking_number` and `lines`. Set the page size with `limit` and fetch the next page with `cursor`. Other fields filter as `filter_<field>`.",
+      "description": "Returns receipts under `data`, each with its purchase order, `receipt_status`, `receipt_date`, `tracking_number` and `lines`. Set the page size with `limit` and fetch the next page with `cursor`. Filter with `filter_<field>`, or `filter_<field>_<operator>` for other comparisons.",
       "parameters": [
         {
           "name": "limit",
@@ -41,6 +41,16 @@
           "description": "The `next_cursor` from the previous page, to fetch the page after it.",
           "schema": {
             "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` to sort descending, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
           }
         }
       ],
@@ -68,6 +78,7 @@
       "title": "Create an item receipt",
       "summary": "Records items received against a purchase order's lines and returns the receipt.",
       "description": "Send the receipt under `item_receipt`: the `purchase_order` id, a `receipt_status` such as `STARTED`, the `receipt_date`, and `lines` listing each purchase order line by its id with the `receipt_quantity` received.",
+      "warning": "**Creating an item receipt currently fails.** This call currently returns `400` for a body like the example, so no receipt can be created through the API yet. Its success status is documented as both `200` and `201`.",
       "parameters": [],
       "body": {
         "schema": {
@@ -145,6 +156,9 @@
           "schema": {
             "$ref": "#/components/schemas/ItemReceiptsResponse"
           }
+        },
+        "400": {
+          "description": "Currently returned for a body like the example."
         }
       },
       "example_call": {
@@ -218,7 +232,7 @@
         "200": {
           "description": "The updated receipt, under `item_receipt`.",
           "schema": {
-            "$ref": "#/components/schemas/ItemReceiptUpdatedResponse"
+            "$ref": "#/components/schemas/ItemReceiptResponse"
           }
         }
       },
@@ -278,8 +292,8 @@
       "path": "/purchase_orders/{purchase_order_id}/item_receipts",
       "slug": "list-a-purchase-orders-item-receipts",
       "title": "List a purchase order's item receipts",
-      "summary": "Returns the item receipts recorded against one purchase order.",
-      "description": "Returns the purchase order's receipts in `item_receipts`, with a `pagination` block, under `purchase_order`.",
+      "summary": "Returns the item receipts of one purchase order.",
+      "description": "Returns the item receipts of one purchase order. The response is expected under `purchase_order`, with the receipts in `item_receipts` and a `pagination` block; this shape has not been confirmed.",
       "parameters": [
         {
           "name": "purchase_order_id",
@@ -329,6 +343,7 @@
       "title": "Delete an item receipt",
       "summary": "Deletes an item receipt. A successful call returns `204` with no body.",
       "description": "Deletes the receipt with that `ir_` id; a later read of it returns `404`. A completed receipt cannot be deleted.",
+      "warning": "**This call has not been confirmed to work.** Creating an item receipt currently fails; see [Create an item receipt](/api-reference/item-receipts/create-an-item-receipt).",
       "parameters": [
         {
           "name": "item_receipt_id",
