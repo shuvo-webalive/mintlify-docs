@@ -1,0 +1,531 @@
+{
+  "family": "credit_note_applications",
+  "tag": "Credit note applications",
+  "slug": "credit-note-applications",
+  "icon": "money-check-dollar",
+  "base": "/credit_note_applications",
+  "overview_description": "Read the records of credit notes applied to invoices, across all invoices or for one invoice.",
+  "intro": "A credit note application records part of a credit note being spent against an invoice through a payment. This area has 3 read endpoints: list all applications, retrieve one, and list one invoice's applications. All seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**Applications are read only here.** One is created when a payment spends a credit note, by listing the credit note's `code` and an `amount` under `credit_applied`.",
+    "**Listings page by cursor.** Records are under `data`. Pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is `true`.",
+    "**`amount` and `remaining_balance` are numbers.** Unlike most money fields elsewhere, which are strings, these two come back as JSON numbers.",
+    "**A single application comes back under `credit_note_application`.** It names its `credit_note`, `payment` and `refund` as small references with `id`, `name` and `href`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_credit_note_applications",
+      "method": "GET",
+      "path": "/credit_note_applications",
+      "slug": "list-credit-note-applications",
+      "title": "List credit note applications",
+      "summary": "Returns one page of credit note applications across all invoices.",
+      "description": "Lists every credit note application, one page at a time, under `data`. Each record names its `credit_note`, the `payment` it made and the `amount` applied. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of credit note applications, under `data`, with `pagination`.",
+          "schema": {
+            "$ref": "#/components/schemas/CreditNoteApplicationList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_credit_note_application",
+      "method": "GET",
+      "path": "/credit_note_applications/{credit_note_application_id}",
+      "slug": "retrieve-a-credit-note-application",
+      "title": "Retrieve a credit note application",
+      "summary": "Returns one credit note application by its `id`.",
+      "description": "Fetches a single credit note application, with the credit note it drew on, the payment it made, the `amount` and the `remaining_balance`.",
+      "parameters": [
+        {
+          "name": "credit_note_application_id",
+          "in": "path",
+          "required": true,
+          "description": "The credit note application's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "CNA-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The credit note application, under `credit_note_application`.",
+          "schema": {
+            "$ref": "#/components/schemas/CreditNoteApplicationReadResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "credit_note_application_id": "CNA-0001"
+        }
+      }
+    },
+    {
+      "key": "get_invoice_credit_note_applications",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}/credit_note_applications",
+      "slug": "list-an-invoices-credit-note-applications",
+      "title": "List an invoice's credit note applications",
+      "summary": "Returns one page of the credit note applications made to one invoice.",
+      "description": "Lists the credit note applications made against the invoice, one page at a time, under `data`. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+      "parameters": [
+        {
+          "name": "invoice_id",
+          "in": "path",
+          "required": true,
+          "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "INV-0001"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of the invoice's credit note applications, under `data`, with `pagination`.",
+          "schema": {
+            "$ref": "#/components/schemas/CreditNoteApplicationInvoiceList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "invoice_id": "INV-0001"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "CreditNoteApplicationList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CreditNoteApplication"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/CreditNoteApplicationPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "CreditNoteApplication": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/CreditNoteApplicationCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "credit_note": {
+          "$ref": "#/components/schemas/CreditNoteApplicationDetail"
+        },
+        "credit_note_id": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "payment": {
+          "$ref": "#/components/schemas/CreditNoteApplicationPayment"
+        },
+        "payment_id": {
+          "type": "string"
+        },
+        "primaryId": {
+          "type": "integer"
+        },
+        "refund": {
+          "$ref": "#/components/schemas/CreditNoteApplicationRefund"
+        },
+        "refund_id": {
+          "type": "string"
+        },
+        "remaining_balance": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "CreditNoteApplicationCreatedBy": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "CreditNoteApplicationDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "CreditNoteApplicationPayment": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "CreditNoteApplicationRefund": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "CreditNoteApplicationPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can be stale on the last page."
+        },
+        "next_cursor": {
+          "type": "string"
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/CreditNoteApplicationPaginationLinks"
+        },
+        "records": {
+          "type": "integer",
+          "description": "The total number of matching records, not the length of this page."
+        },
+        "offset": {
+          "type": "integer"
+        },
+        "next_page": {
+          "type": "string",
+          "description": "On the last page this is the string `NULL`, not JSON null."
+        },
+        "previous_page": {
+          "type": "string"
+        },
+        "has_next": {
+          "type": "boolean"
+        },
+        "has_prev": {
+          "type": "boolean"
+        },
+        "per_page": {
+          "type": "integer"
+        }
+      }
+    },
+    "CreditNoteApplicationPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "CreditNoteApplicationRead": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/CreditNoteApplicationReadCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "credit_note": {
+          "$ref": "#/components/schemas/CreditNoteApplicationReadDetail"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "payment": {
+          "$ref": "#/components/schemas/CreditNoteApplicationReadPayment"
+        },
+        "primaryId": {
+          "type": "integer"
+        },
+        "refund": {
+          "$ref": "#/components/schemas/CreditNoteApplicationReadRefund"
+        },
+        "remaining_balance": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "CreditNoteApplicationReadCreatedBy": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "CreditNoteApplicationReadDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "CreditNoteApplicationReadPayment": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "CreditNoteApplicationReadRefund": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "CreditNoteApplicationReadResponse": {
+      "type": "object",
+      "properties": {
+        "credit_note_application": {
+          "$ref": "#/components/schemas/CreditNoteApplicationRead"
+        }
+      }
+    },
+    "CreditNoteApplicationInvoiceList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CreditNoteApplication"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/CreditNoteApplicationPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

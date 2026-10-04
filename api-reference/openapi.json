@@ -71,6 +71,9 @@
     },
     {
       "name": "Credit notes"
+    },
+    {
+      "name": "Credit note applications"
     }
   ],
   "paths": {
@@ -24550,6 +24553,280 @@
           }
         ]
       }
+    },
+    "/credit_note_applications": {
+      "get": {
+        "tags": [
+          "Credit note applications"
+        ],
+        "summary": "List credit note applications",
+        "operationId": "credit_note_applications_get_credit_note_applications",
+        "description": "Lists every credit note application, one page at a time, under `data`. Each record names its `credit_note`, the `payment` it made and the `amount` applied. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of credit note applications, under `data`, with `pagination`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditNoteApplicationList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/credit_note_applications?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.credit_note_applications.get_credit_note_applications({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.creditNoteApplications.getCreditNoteApplications({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->creditNoteApplications->getCreditNoteApplications(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.credit_note_applications.credit_note_applications_dto.CreditNoteApplicationsDto.CreditNoteApplicationList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<CreditNoteApplicationList> response = client.creditNoteApplications().getCreditNoteApplications(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CreditNoteApplications.GetCreditNoteApplicationsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.creditNoteApplications\n    .getCreditNoteApplications(queryParams: {'limit': 20});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CreditNoteApplications().GetCreditNoteApplications(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/credit_note_applications/{credit_note_application_id}": {
+      "get": {
+        "tags": [
+          "Credit note applications"
+        ],
+        "summary": "Retrieve a credit note application",
+        "operationId": "credit_note_applications_get_credit_note_application",
+        "description": "Fetches a single credit note application, with the credit note it drew on, the payment it made, the `amount` and the `remaining_balance`.",
+        "parameters": [
+          {
+            "name": "credit_note_application_id",
+            "in": "path",
+            "required": true,
+            "description": "The credit note application's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The credit note application, under `credit_note_application`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditNoteApplicationReadResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/credit_note_applications/CNA-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.credit_note_applications.get_credit_note_application(\"CNA-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.creditNoteApplications.getCreditNoteApplication('CNA-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->creditNoteApplications->getCreditNoteApplication('CNA-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.credit_note_applications.credit_note_applications_dto.CreditNoteApplicationsDto.CreditNoteApplicationRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<CreditNoteApplicationRead> response = client.creditNoteApplications().getCreditNoteApplication(\"CNA-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CreditNoteApplications.GetCreditNoteApplicationAsync(\"CNA-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.creditNoteApplications.getCreditNoteApplication(\n  'CNA-0001',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CreditNoteApplications().GetCreditNoteApplication(context.Background(), \"CNA-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/invoices/{invoice_id}/credit_note_applications": {
+      "get": {
+        "tags": [
+          "Credit note applications"
+        ],
+        "summary": "List an invoice's credit note applications",
+        "operationId": "credit_note_applications_get_invoice_credit_note_applications",
+        "description": "Lists the credit note applications made against the invoice, one page at a time, under `data`. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of the invoice's credit note applications, under `data`, with `pagination`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditNoteApplicationInvoiceList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/credit_note_applications?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.credit_note_applications.get_invoice_credit_note_applications(\n    \"INV-0001\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.creditNoteApplications.getInvoiceCreditNoteApplications('INV-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->creditNoteApplications->getInvoiceCreditNoteApplications('INV-0001', [\n    'limit' => 20,\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.credit_note_applications.credit_note_applications_dto.CreditNoteApplicationsDto.InvoiceCreditNoteApplications;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<InvoiceCreditNoteApplications> response = client.creditNoteApplications().getInvoiceCreditNoteApplications(\n        \"INV-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.CreditNoteApplications.GetInvoiceCreditNoteApplicationsAsync(\n    \"INV-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.creditNoteApplications\n    .getInvoiceCreditNoteApplications('INV-0001', queryParams: {'limit': 20});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.CreditNoteApplications().GetInvoiceCreditNoteApplications(context.Background(), \"INV-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -37420,6 +37697,357 @@
         "properties": {
           "note": {
             "$ref": "#/components/schemas/CreditNoteNote"
+          }
+        }
+      },
+      "CreditNoteApplicationList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreditNoteApplication"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/CreditNoteApplicationPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteApplication": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/CreditNoteApplicationCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "credit_note": {
+            "$ref": "#/components/schemas/CreditNoteApplicationDetail"
+          },
+          "credit_note_id": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "payment": {
+            "$ref": "#/components/schemas/CreditNoteApplicationPayment"
+          },
+          "payment_id": {
+            "type": "string"
+          },
+          "primaryId": {
+            "type": "integer"
+          },
+          "refund": {
+            "$ref": "#/components/schemas/CreditNoteApplicationRefund"
+          },
+          "refund_id": {
+            "type": "string"
+          },
+          "remaining_balance": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "CreditNoteApplicationCreatedBy": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteApplicationDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteApplicationPayment": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteApplicationRefund": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteApplicationPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can be stale on the last page."
+          },
+          "next_cursor": {
+            "type": "string"
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/CreditNoteApplicationPaginationLinks"
+          },
+          "records": {
+            "type": "integer",
+            "description": "The total number of matching records, not the length of this page."
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "next_page": {
+            "type": "string",
+            "description": "On the last page this is the string `NULL`, not JSON null."
+          },
+          "previous_page": {
+            "type": "string"
+          },
+          "has_next": {
+            "type": "boolean"
+          },
+          "has_prev": {
+            "type": "boolean"
+          },
+          "per_page": {
+            "type": "integer"
+          }
+        }
+      },
+      "CreditNoteApplicationPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteApplicationRead": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/CreditNoteApplicationReadCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "credit_note": {
+            "$ref": "#/components/schemas/CreditNoteApplicationReadDetail"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "payment": {
+            "$ref": "#/components/schemas/CreditNoteApplicationReadPayment"
+          },
+          "primaryId": {
+            "type": "integer"
+          },
+          "refund": {
+            "$ref": "#/components/schemas/CreditNoteApplicationReadRefund"
+          },
+          "remaining_balance": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "CreditNoteApplicationReadCreatedBy": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteApplicationReadDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteApplicationReadPayment": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteApplicationReadRefund": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditNoteApplicationReadResponse": {
+        "type": "object",
+        "properties": {
+          "credit_note_application": {
+            "$ref": "#/components/schemas/CreditNoteApplicationRead"
+          }
+        }
+      },
+      "CreditNoteApplicationInvoiceList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreditNoteApplication"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/CreditNoteApplicationPagination"
+          },
+          "url": {
+            "type": "string"
           }
         }
       },

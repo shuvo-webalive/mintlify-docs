@@ -1,0 +1,28 @@
+---
+title: "Credit note applications"
+sidebarTitle: "Overview"
+description: "Read the records of credit notes applied to invoices, across all invoices or for one invoice."
+---
+
+A credit note application records part of a credit note being spent against an invoice through a payment. This area has 3 read endpoints: list all applications, retrieve one, and list one invoice's applications. All seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List credit note applications](/api-reference/credit-note-applications/list-credit-note-applications) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/credit_note_applications` | Returns one page of credit note applications across all invoices. |
+| [Retrieve a credit note application](/api-reference/credit-note-applications/retrieve-a-credit-note-application) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/credit_note_applications/{credit_note_application_id}` | Returns one credit note application by its `id`. |
+| [List an invoice's credit note applications](/api-reference/credit-note-applications/list-an-invoices-credit-note-applications) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/invoices/{invoice_id}…/credit_note_applications` | Returns one page of the credit note applications made to one invoice. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Applications are read only here.** One is created when a payment spends a credit note, by listing the credit note's `code` and an `amount` under `credit_applied`.
+- **Listings page by cursor.** Records are under `data`. Pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is `true`.
+- **`amount` and `remaining_balance` are numbers.** Unlike most money fields elsewhere, which are strings, these two come back as JSON numbers.
+- **A single application comes back under `credit_note_application`.** It names its `credit_note`, `payment` and `refund` as small references with `id`, `name` and `href`.
