@@ -4,10 +4,10 @@ sidebarTitle: "Overview"
 description: "Manage tasks in Exsited: create, read, update and delete tasks, their checklist items, notes and note files."
 ---
 
-Tasks are units of work in Exsited, with a checklist, assignees, notes and attached files. You can create, list, retrieve, update and delete tasks, manage their checklist items, and add, read, change and remove notes and note files. This area has 18 endpoints, and all seven SDKs call every one.
+Tasks are units of work in Exsited, with a checklist, assignees, notes and attached files. You can create, list, retrieve, update and delete tasks, manage their checklist items, and add, read, change and remove notes and note files. This area has 18 endpoints, each available in all seven SDKs.
 
 <Warning>
-  **Deletes in this area cannot be undone.** Deleting a task, a checklist item, a note or a note file removes it; a deleted task then returns `404`.
+  **Adding a note to a task currently fails.** `POST /tasks/{task_id}/notes` returns `409`, so the calls that need an existing note (read, update and delete a note, and list, read and delete its files) have not been confirmed to work. Deletes in this area cannot be undone; a deleted task returns `404`.
 </Warning>
 
 ## At a glance
@@ -45,5 +45,5 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 - **The note routes take the task's `code`, not its `wt_` id.** A `wt_` id returns `404` on every `/notes` path; the task, checklist and update calls take the `wt_` id.
 - **Checklist bodies go under `checklist`.** Adding items sends an array of `{"name": ...}`; updating one item sends a single object. Most checklist calls return the whole task under `work_task`.
 - **`checklist` changes shape.** It is an array on the task and on the checklist list, and a single object when you retrieve one checklist item.
-- **Notes are multipart forms.** Send the text as the `note` field and an optional `file`; a file's details come from its `uuid` in the note's file list, not its contents.
+- **Notes are multipart forms.** Send the text as the `note` field and, optionally, a `file`. To read an attached file's details, use the `uuid` from the note's file list; the call returns the file's details, not its contents.
 - **A `COMPLETED` checklist item cannot be deleted.** The delete returns `409`.
