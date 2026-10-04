@@ -1,0 +1,35 @@
+---
+title: "Purchase refunds"
+sidebarTitle: "Overview"
+description: "Record refunds from suppliers against purchase credit notes, and read, update and delete purchase refunds."
+---
+
+A purchase refund records money a supplier pays back against a purchase credit note. These endpoints record a refund from a credit note and read, update and delete refunds. There are 5 endpoints, and all seven SDKs call every one.
+
+<Warning>
+  **Deleting a purchase refund cannot be undone.**
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List purchase refunds](/api-reference/purchase-refunds/list-purchase-refunds) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/purchase_refunds` | Returns one page of purchase refunds. |
+| [Retrieve a purchase refund](/api-reference/purchase-refunds/retrieve-a-purchase-refund) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/purchase_refunds/{purchase_refund_id}` | Returns one purchase refund under `purchase_refund`. |
+| [Create a purchase refund from a purchase credit note](/api-reference/purchase-refunds/create-a-purchase-refund-from-a-purchase-credit-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/purchase_credit_notes/{purchase_credit_note_id}…/purchase_refunds` | Records a refund from a supplier against a purchase credit note and returns it under `purchase_refund`. |
+| [Update a purchase refund](/api-reference/purchase-refunds/update-a-purchase-refund) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/purchase_refunds/{purchase_refund_id}` | Changes a refund's reference, note, date or custom attributes and returns it under `purchase_refund`. |
+| [Delete a purchase refund](/api-reference/purchase-refunds/delete-a-purchase-refund) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/purchase_refunds/{purchase_refund_id}` | Deletes a purchase refund. Nothing comes back. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **A purchase refund is created from a purchase credit note.** Post it to `/purchase_credit_notes/{purchase_credit_note_id}/purchase_refunds`.
+- **Every write body is wrapped in `purchase_refund`.**
+- **`payment_method` is the reference of one of the supplier's payment methods.**
+- **The update takes only `alternate_date`, `reference`, `note` and `custom_attributes`.** Any other key returns `400`, and the amount cannot change.
+- **The update and delete address a refund by its code.** They match nothing else.
