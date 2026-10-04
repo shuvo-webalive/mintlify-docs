@@ -1,0 +1,27 @@
+---
+title: "Reconciliations"
+sidebarTitle: "Overview"
+description: "List the payments and refunds included in a bank reconciliation."
+---
+
+A reconciliation matches payments and refunds against a bank statement. This area has 2 endpoints, which list the payments and the refunds in one reconciliation. All seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List a reconciliation's payments](/api-reference/reconciliations/list-a-reconciliations-payments) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/reconciliations/{reconciliation_id}/sale_payments` | Returns the payments included in a reconciliation. |
+| [List a reconciliation's refunds](/api-reference/reconciliations/list-a-reconciliations-refunds) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/reconciliations/{reconciliation_id}/sale_refunds` | Returns the refunds included in a reconciliation. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **There is no endpoint for the reconciliation itself.** Only the two lists of its payments and refunds are available.
+- **Name the reconciliation by its uuid or its numeric id.** Both forms are accepted in `{reconciliation_id}`.
+- **An unknown reconciliation returns `404`.** The error code is `resource_not_found`.
+- **Records are under `data`.** Both lists put their records under `data`.
