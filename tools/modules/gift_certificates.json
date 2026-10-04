@@ -5,10 +5,10 @@
   "icon": "gift",
   "base": "/gift_certificates",
   "overview_description": "Create, read, change and delete Exsited gift certificates, set balances, and allocate them to accounts.",
-  "intro": "A gift certificate holds a balance a customer can spend. This area creates, lists, reads, updates and deletes certificates, sets a new balance, allocates a certificate to an account or takes it back, and reads its allocations and transactions. It has 12 endpoints, and all seven SDKs call every one.",
+  "intro": "A gift certificate holds a balance a customer can spend. This area creates, lists, reads, updates and deletes certificates, sets a new balance, allocates a certificate to an account or takes it back, and reads its allocations and transactions. It has 12 endpoints, and every SDK supports all of them.",
   "warning": null,
   "notes": [
-    "**Bodies sit under `gift_certificate`.** A new certificate takes `amount` and `expiry_date`; amounts and balances are decimal strings such as `5.00`.",
+    "**Send bodies under `gift_certificate`.** A new certificate takes `amount` and `expiry_date`; amounts and balances are decimal strings such as `5.00`.",
     "**Change the balance with amend.** `POST /gift_certificates/{gc_id}/amend` takes only `new_balance`, and a balance below the amount already used returns `400`.",
     "**Name the account by `code` when allocating.** Send `{\"account\": {\"code\": \"W13ZGY\"}}`. The `id` form wants the account's `acc_` uuid and returns `404` for the `id` the accounts API gives you.",
     "**Allocate and deallocate return `200`.** Both return the certificate with its `allocations`; a deallocation changes the entry rather than removing it.",
@@ -23,7 +23,7 @@
       "slug": "list-gift-certificates",
       "title": "List gift certificates",
       "summary": "Lists gift certificates, one page at a time.",
-      "description": "The records are under `data`, and `pagination` holds the cursor for the next page. Other fields filter as `filter_<field>`.",
+      "description": "The records are under `data`, and `pagination` holds the cursor for the next page. To filter, add `filter_<field>=<value>`.",
       "parameters": [
         {
           "name": "limit",
@@ -78,7 +78,7 @@
       "slug": "create-a-gift-certificate",
       "title": "Create a gift certificate",
       "summary": "Creates a gift certificate with a starting amount and an expiry date and returns it under `gift_certificate`.",
-      "description": "Send `amount` and `expiry_date` under `gift_certificate`. The new certificate gets a `code`, its `remaining_balance` starts at `amount`, and its transactions start with one of type `initial`.",
+      "description": "Send `amount` and `expiry_date` under `gift_certificate`. The new certificate gets a `code`, and its transactions start with one of type `initial`.",
       "parameters": [],
       "body": {
         "schema": {
@@ -480,7 +480,7 @@
       "slug": "allocate-a-gift-certificate-to-an-account",
       "title": "Allocate a gift certificate to an account",
       "summary": "Allocates a gift certificate to an account and returns the certificate under `gift_certificate`.",
-      "description": "Name the account under `gift_certificate.account`, by `code` (the account's `id`, such as `W13ZGY`). The call returns `200`, not `201`, and the certificate's `allocations` gains an entry.",
+      "description": "Name the account in `gift_certificate.account.code`, using the account's `id` from the accounts API, such as `W13ZGY`. The call returns `200`, not `201`, and the certificate's `allocations` gains an entry.",
       "parameters": [
         {
           "name": "gc_id",
@@ -541,7 +541,7 @@
           }
         },
         "404": {
-          "description": "`account.id` was sent with the account's `id` rather than its `acc_` uuid. Send it as `account.code` instead."
+          "description": "`account.id` held the account's `id`, such as `W13ZGY`, instead of its `acc_` uuid. Send that value as `account.code` instead."
         }
       },
       "example_call": {

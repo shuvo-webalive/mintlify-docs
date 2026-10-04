@@ -4,7 +4,7 @@ sidebarTitle: "Overview"
 description: "Create, read, change and delete Exsited gift certificates, set balances, and allocate them to accounts."
 ---
 
-A gift certificate holds a balance a customer can spend. This area creates, lists, reads, updates and deletes certificates, sets a new balance, allocates a certificate to an account or takes it back, and reads its allocations and transactions. It has 12 endpoints, and all seven SDKs call every one.
+A gift certificate holds a balance a customer can spend. This area creates, lists, reads, updates and deletes certificates, sets a new balance, allocates a certificate to an account or takes it back, and reads its allocations and transactions. It has 12 endpoints, and every SDK supports all of them.
 
 ## At a glance
 
@@ -31,7 +31,7 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 
 ## Things to know
 
-- **Bodies sit under `gift_certificate`.** A new certificate takes `amount` and `expiry_date`; amounts and balances are decimal strings such as `5.00`.
+- **Send bodies under `gift_certificate`.** A new certificate takes `amount` and `expiry_date`; amounts and balances are decimal strings such as `5.00`.
 - **Change the balance with amend.** `POST /gift_certificates/{gc_id}/amend` takes only `new_balance`, and a balance below the amount already used returns `400`.
 - **Name the account by `code` when allocating.** Send `{"account": {"code": "W13ZGY"}}`. The `id` form wants the account's `acc_` uuid and returns `404` for the `id` the accounts API gives you.
 - **Allocate and deallocate return `200`.** Both return the certificate with its `allocations`; a deallocation changes the entry rather than removing it.
