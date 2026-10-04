@@ -47759,7 +47759,7 @@
             "name": "purchase_credit_note_id",
             "in": "path",
             "required": true,
-            "description": "The purchase credit note's `id`, such as `pcn_...`. The reads also accept its code.",
+            "description": "The purchase credit note's `id`, such as `pcn_...`. Its code also works here.",
             "schema": {
               "type": "string"
             }
@@ -47826,13 +47826,13 @@
         ],
         "summary": "Update a purchase credit note",
         "operationId": "purchase_credit_notes_update_purchase_credit_note",
-        "description": "Updates the purchase credit note, wrapped in `purchase_credit_note`, for example its `custom_attributes`. The updated credit note comes back under `purchase_credit_note`.",
+        "description": "Updates the purchase credit note, wrapped in `purchase_credit_note`, for example its `custom_attributes`. The updated credit note comes back under `purchase_credit_note`. An empty `custom_attributes` list, as in the example, removes all custom attributes.",
         "parameters": [
           {
             "name": "purchase_credit_note_id",
             "in": "path",
             "required": true,
-            "description": "The purchase credit note's `id`, such as `pcn_...`. The reads also accept its code.",
+            "description": "The purchase credit note's `id`, such as `pcn_...`.",
             "schema": {
               "type": "string"
             }
@@ -48148,7 +48148,7 @@
         "tags": [
           "Purchase credit notes"
         ],
-        "summary": "Create a purchase credit note note",
+        "summary": "Add a note to a purchase credit note",
         "operationId": "purchase_credit_notes_create_purchase_credit_note_note",
         "description": "Adds a note to the purchase credit note. Send a multipart form with the text as the `note` field and, optionally, a file to attach. Address the credit note by its `pcn_` id. It needs the permission to create purchase credit note notes.",
         "parameters": [
@@ -48191,42 +48191,42 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/purchase_credit_notes/pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b/notes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  --form-string 'note=<p>Goods received in full.</p>' \\\n  -F \"file=@delivery-note.pdf\""
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/purchase_credit_notes/pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b/notes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  --form-string 'note=<p>Credit agreed with supplier.</p>' \\\n  -F \"file=@delivery-note.pdf\""
           },
           {
             "lang": "python",
             "label": "Python",
-            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_credit_notes.create_purchase_credit_note_note(\n    \"pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b\",\n    \"<p>Goods received in full.</p>\",\n    files={\"file\": open(\"delivery-note.pdf\", \"rb\")},\n)\nprint(response.data)\n"
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_credit_notes.create_purchase_credit_note_note(\n    \"pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b\",\n    \"<p>Credit agreed with supplier.</p>\",\n    files={\"file\": open(\"delivery-note.pdf\", \"rb\")},\n)\nprint(response.data)\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {readFileSync} from 'node:fs';\nimport {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseCreditNotes.createPurchaseCreditNoteNote(\n    'pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b',\n    '<p>Goods received in full.</p>',\n    {files: {file: ['delivery-note.pdf', readFileSync('delivery-note.pdf')]}},\n);\nconsole.log(response.data);\n"
+            "source": "import {readFileSync} from 'node:fs';\nimport {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseCreditNotes.createPurchaseCreditNoteNote(\n    'pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b',\n    '<p>Credit agreed with supplier.</p>',\n    {files: {file: ['delivery-note.pdf', readFileSync('delivery-note.pdf')]}},\n);\nconsole.log(response.data);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseCreditNotes->createPurchaseCreditNoteNote(\n    'pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b',\n    '<p>Goods received in full.</p>',\n    ['file' => ['delivery-note.pdf', fopen('delivery-note.pdf', 'r')]],\n);\nprint_r($response->data);\n"
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseCreditNotes->createPurchaseCreditNoteNote(\n    'pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b',\n    '<p>Credit agreed with supplier.</p>',\n    ['file' => ['delivery-note.pdf', fopen('delivery-note.pdf', 'r')]],\n);\nprint_r($response->data);\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.client.RequestOptions;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.purchaseCreditNotes().createPurchaseCreditNoteNote(\n        \"pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b\",\n        \"<p>Goods received in full.</p>\",\n        Map.of(\"file\", Path.of(\"delivery-note.pdf\")),\n        RequestOptions.none());\nSystem.out.println(response.getMap());\n"
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.client.RequestOptions;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.purchaseCreditNotes().createPurchaseCreditNoteNote(\n        \"pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b\",\n        \"<p>Credit agreed with supplier.</p>\",\n        Map.of(\"file\", Path.of(\"delivery-note.pdf\")),\n        RequestOptions.none());\nSystem.out.println(response.getMap());\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseCreditNotes.CreatePurchaseCreditNoteNoteAsync(\n    \"pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b\",\n    \"<p>Goods received in full.</p>\",\n    new Dictionary<string, object?> { [\"file\"] = new object?[] { \"delivery-note.pdf\", File.ReadAllBytes(\"delivery-note.pdf\") } });\n\nConsole.WriteLine(response.Json);\n"
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseCreditNotes.CreatePurchaseCreditNoteNoteAsync(\n    \"pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b\",\n    \"<p>Credit agreed with supplier.</p>\",\n    new Dictionary<string, object?> { [\"file\"] = new object?[] { \"delivery-note.pdf\", File.ReadAllBytes(\"delivery-note.pdf\") } });\n\nConsole.WriteLine(response.Json);\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'dart:io';\n\nimport 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseCreditNotes\n    .createPurchaseCreditNoteNote(\n      'pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b',\n      '<p>Goods received in full.</p>',\n      files: {\n        'file': [\n          'delivery-note.pdf',\n          File('delivery-note.pdf').readAsBytesSync(),\n        ],\n      },\n    );\nprint(response.map);\n"
+            "source": "import 'dart:io';\n\nimport 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseCreditNotes\n    .createPurchaseCreditNoteNote(\n      'pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b',\n      '<p>Credit agreed with supplier.</p>',\n      files: {\n        'file': [\n          'delivery-note.pdf',\n          File('delivery-note.pdf').readAsBytesSync(),\n        ],\n      },\n    );\nprint(response.map);\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nfile, err := os.ReadFile(\"delivery-note.pdf\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.PurchaseCreditNotes().CreatePurchaseCreditNoteNote(context.Background(), \"pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b\", \"<p>Goods received in full.</p>\", map[string]any{\"file\": []any{\"delivery-note.pdf\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nfile, err := os.ReadFile(\"delivery-note.pdf\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.PurchaseCreditNotes().CreatePurchaseCreditNoteNote(context.Background(), \"pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b\", \"<p>Credit agreed with supplier.</p>\", map[string]any{\"file\": []any{\"delivery-note.pdf\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
           }
         ],
         "requestBody": {
@@ -48260,7 +48260,7 @@
         "tags": [
           "Purchase credit notes"
         ],
-        "summary": "Delete a purchase credit note note",
+        "summary": "Delete a note from a purchase credit note",
         "operationId": "purchase_credit_notes_delete_purchase_credit_note_note",
         "description": "Deletes the note, addressed by the credit note's `pcn_` id and the note's `note_` id. The call returns `204` with no body.",
         "parameters": [
