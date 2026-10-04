@@ -116,6 +116,9 @@
     },
     {
       "name": "Return merchandise authorisations"
+    },
+    {
+      "name": "Purchase orders"
     }
   ],
   "paths": {
@@ -40699,6 +40702,2241 @@
           }
         ]
       }
+    },
+    "/purchase_orders": {
+      "get": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "List purchase orders",
+        "operationId": "purchase_orders_get_purchase_orders",
+        "description": "Lists the purchase orders on the account, one page at a time. The records are under `data` and the paging details under `pagination`; pass `next_cursor` back as `cursor` to read the next page. Other fields filter the list as `filter_<field>` or `filter_<field>_<operator>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of purchase orders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrderList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_orders?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.get_purchase_orders({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.getPurchaseOrders({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->getPurchaseOrders(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto.PurchaseOrderList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrderList> response = client.purchaseOrders().getPurchaseOrders(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.GetPurchaseOrdersAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.getPurchaseOrders(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().GetPurchaseOrders(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "Create a purchase order",
+        "operationId": "purchase_orders_create_purchase_order",
+        "description": "Creates a purchase order from a supplier and its lines, wrapped in `purchase_order`. Name an existing supplier with `account_id`, or send `account` to create the supplier in the same call. A line takes an existing item by `item_id`, or a new one by `item_name` with a price under `item_price_snapshot`. The new order is `active`; send `\"draft\": true` to create a draft instead.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new purchase order, under `purchase_order`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrderCreatedResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/purchase_orders\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"purchase_order\": {\n      \"account\": {\n        \"name\": \"Acme Pty Ltd\",\n        \"type\": \"SUPPLIER\",\n        \"email_address\": \"jane@example.com\"\n      },\n      \"lines\": [\n        {\n          \"item_name\": \"Copy paper A4\",\n          \"item_quantity\": 1,\n          \"item_price_snapshot\": {\n            \"pricing_rule\": {\n              \"price\": 5\n            }\n          }\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.create_purchase_order(\n    {\n        \"purchase_order\": {\n            \"account\": {\n                \"name\": \"Acme Pty Ltd\",\n                \"type\": \"SUPPLIER\",\n                \"email_address\": \"jane@example.com\",\n            },\n            \"lines\": [\n                {\n                    \"item_name\": \"Copy paper A4\",\n                    \"item_quantity\": 1,\n                    \"item_price_snapshot\": {\"pricing_rule\": {\"price\": 5}},\n                }\n            ],\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.createPurchaseOrder({\n    purchase_order: {\n        account: {name: 'Acme Pty Ltd', type: 'SUPPLIER', email_address: 'jane@example.com'},\n        lines: [{item_name: 'Copy paper A4', item_quantity: 1, item_price_snapshot: {pricing_rule: {price: 5}}}],\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->createPurchaseOrder([\n    'purchase_order' => [\n        'account' => [\n            'name' => 'Acme Pty Ltd',\n            'type' => 'SUPPLIER',\n            'email_address' => 'jane@example.com',\n        ],\n        'lines' => [\n            [\n                'item_name' => 'Copy paper A4',\n                'item_quantity' => 1,\n                'item_price_snapshot' => ['pricing_rule' => ['price' => 5]],\n            ],\n        ],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrdersDto.PurchaseOrders> response = client.purchaseOrders().createPurchaseOrder(\n        Map.of(\n                \"purchase_order\", Map.of(\n                        \"account\", Map.of(\n                                \"name\", \"Acme Pty Ltd\",\n                                \"type\", \"SUPPLIER\",\n                                \"email_address\", \"jane@example.com\"),\n                        \"lines\", List.of(\n                                Map.of(\n                                        \"item_name\", \"Copy paper A4\",\n                                        \"item_quantity\", 1,\n                                        \"item_price_snapshot\", Map.of(\n                                                \"pricing_rule\", Map.of(\"price\", 5)))))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.CreatePurchaseOrderAsync(new Dictionary<string, object?>\n{\n    [\"purchase_order\"] = new Dictionary<string, object?>\n    {\n        [\"account\"] = new Dictionary<string, object?>\n        {\n            [\"name\"] = \"Acme Pty Ltd\",\n            [\"type\"] = \"SUPPLIER\",\n            [\"email_address\"] = \"jane@example.com\",\n        },\n        [\"lines\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"item_name\"] = \"Copy paper A4\",\n                [\"item_quantity\"] = 1,\n                [\"item_price_snapshot\"] = new Dictionary<string, object?>\n                {\n                    [\"pricing_rule\"] = new Dictionary<string, object?>\n                    {\n                        [\"price\"] = 5,\n                    },\n                },\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.createPurchaseOrder({\n  'purchase_order': {\n    'account': {\n      'name': 'Acme Pty Ltd',\n      'type': 'SUPPLIER',\n      'email_address': 'jane@example.com',\n    },\n    'lines': [\n      {\n        'item_name': 'Copy paper A4',\n        'item_quantity': 1,\n        'item_price_snapshot': {\n          'pricing_rule': {'price': 5},\n        },\n      },\n    ],\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().CreatePurchaseOrder(context.Background(), map[string]any{\n\t\"purchase_order\": map[string]any{\n\t\t\"account\": map[string]any{\n\t\t\t\"name\":          \"Acme Pty Ltd\",\n\t\t\t\"type\":          \"SUPPLIER\",\n\t\t\t\"email_address\": \"jane@example.com\",\n\t\t},\n\t\t\"lines\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"item_name\":     \"Copy paper A4\",\n\t\t\t\t\"item_quantity\": 1,\n\t\t\t\t\"item_price_snapshot\": map[string]any{\n\t\t\t\t\t\"pricing_rule\": map[string]any{\"price\": 5},\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "purchase_order": {
+                    "type": "object",
+                    "properties": {
+                      "account": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "description": "`SUPPLIER` for a supplier account."
+                          },
+                          "email_address": {
+                            "type": "string"
+                          }
+                        },
+                        "description": "A new supplier account to create with the order. Send `account_id` instead to use an existing one."
+                      },
+                      "account_id": {
+                        "type": "string",
+                        "description": "The `id` of an existing supplier account."
+                      },
+                      "draft": {
+                        "type": "boolean",
+                        "description": "`true` creates the purchase order with status `draft`."
+                      },
+                      "lines": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "item_name": {
+                              "type": "string",
+                              "description": "The name of an item that does not exist yet."
+                            },
+                            "item_quantity": {
+                              "type": "number"
+                            },
+                            "item_price_snapshot": {
+                              "type": "object",
+                              "properties": {
+                                "pricing_rule": {
+                                  "type": "object",
+                                  "properties": {
+                                    "price": {
+                                      "type": "number"
+                                    }
+                                  }
+                                }
+                              },
+                              "description": "The unit price for a new item, under `pricing_rule.price`."
+                            },
+                            "item_id": {
+                              "type": "string",
+                              "description": "The `id` of an existing item, instead of `item_name`."
+                            }
+                          }
+                        },
+                        "description": "The order lines."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "purchase_order"
+                ]
+              },
+              "example": {
+                "purchase_order": {
+                  "account": {
+                    "name": "Acme Pty Ltd",
+                    "type": "SUPPLIER",
+                    "email_address": "jane@example.com"
+                  },
+                  "lines": [
+                    {
+                      "item_name": "Copy paper A4",
+                      "item_quantity": 1,
+                      "item_price_snapshot": {
+                        "pricing_rule": {
+                          "price": 5
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/purchase_orders/notes": {
+      "get": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "List notes across purchase orders",
+        "operationId": "purchase_orders_get_purchase_orders_notes",
+        "description": "Lists the notes of all purchase orders together, one page at a time, under `data`. Use the per order notes list to see one purchase order's notes. Other fields filter the list as `filter_<field>` or `filter_<field>_<operator>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of purchase order notes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrdersNoteList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_orders/notes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.get_purchase_orders_notes({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.getPurchaseOrdersNotes({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->getPurchaseOrdersNotes(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto.PurchaseOrdersNoteList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrdersNoteList> response = client.purchaseOrders().getPurchaseOrdersNotes(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.GetPurchaseOrdersNotesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.getPurchaseOrdersNotes(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().GetPurchaseOrdersNotes(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_orders/{purchase_order_id}": {
+      "delete": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "Delete a purchase order",
+        "operationId": "purchase_orders_delete_purchase_order",
+        "description": "Deletes the purchase order. The call returns `204` with no body, and reading the purchase order afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The purchase order is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.delete_purchase_order(\"PO-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.deletePurchaseOrder('PO-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->deletePurchaseOrder('PO-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.purchaseOrders().deletePurchaseOrder(\"PO-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.DeletePurchaseOrderAsync(\"PO-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.deletePurchaseOrder('PO-0001');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().DeletePurchaseOrder(context.Background(), \"PO-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "Update a purchase order",
+        "operationId": "purchase_orders_update_purchase_order",
+        "description": "Updates fields of the purchase order, such as `purchase_order_note`, wrapped in `purchase_order`. The updated purchase order comes back under `purchase_order`. To add or change lines, use the change call.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated purchase order, under `purchase_order`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrderUpdatedResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"purchase_order\": {\n      \"purchase_order_note\": \"Deliver to the rear dock.\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.update_purchase_order(\n    \"PO-0001\", {\"purchase_order\": {\"purchase_order_note\": \"Deliver to the rear dock.\"}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.updatePurchaseOrder('PO-0001', {\n    purchase_order: {purchase_order_note: 'Deliver to the rear dock.'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->updatePurchaseOrder('PO-0001', [\n    'purchase_order' => ['purchase_order_note' => 'Deliver to the rear dock.'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto.PurchaseOrderUpdated;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrderUpdated> response = client.purchaseOrders().updatePurchaseOrder(\n        \"PO-0001\",\n        Map.of(\"purchase_order\", Map.of(\"purchase_order_note\", \"Deliver to the rear dock.\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.UpdatePurchaseOrderAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"purchase_order\"] = new Dictionary<string, object?>\n        {\n            [\"purchase_order_note\"] = \"Deliver to the rear dock.\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.updatePurchaseOrder('PO-0001', {\n  'purchase_order': {'purchase_order_note': 'Deliver to the rear dock.'},\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().UpdatePurchaseOrder(context.Background(), \"PO-0001\", map[string]any{\n\t\"purchase_order\": map[string]any{\n\t\t\"purchase_order_note\": \"Deliver to the rear dock.\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "purchase_order": {
+                    "type": "object",
+                    "properties": {
+                      "purchase_order_note": {
+                        "type": "string",
+                        "description": "A note printed on the purchase order."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "purchase_order"
+                ]
+              },
+              "example": {
+                "purchase_order": {
+                  "purchase_order_note": "Deliver to the rear dock."
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "Retrieve a purchase order",
+        "operationId": "purchase_orders_get_purchase_order",
+        "description": "Returns the purchase order with its supplier, totals, status and KPIs under `purchase_order`. Its lines are listed by the lines call.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The purchase order, under `purchase_order`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrderResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No purchase order has that `id`, for example after it is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.get_purchase_order(\"PO-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.getPurchaseOrder('PO-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->getPurchaseOrder('PO-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto.PurchaseOrderRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrderRead> response = client.purchaseOrders().getPurchaseOrder(\"PO-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.GetPurchaseOrderAsync(\"PO-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.getPurchaseOrder('PO-0001');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().GetPurchaseOrder(context.Background(), \"PO-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_orders/{purchase_order_id}/cancel": {
+      "post": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "Cancel a purchase order",
+        "operationId": "purchase_orders_cancel_purchase_order",
+        "description": "Cancels the purchase order, which sets its status to `inactive`. Send an empty object as the body. Reactivate it with the reactivate call.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The cancelled purchase order, under `purchase_order`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrderResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001/cancel\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{}'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.cancel_purchase_order(\"PO-0001\", {})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.cancelPurchaseOrder('PO-0001', {});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->cancelPurchaseOrder('PO-0001', '{}');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto.PurchaseOrderRead;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrderRead> response = client.purchaseOrders().cancelPurchaseOrder(\n        \"PO-0001\",\n        Map.of());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.CancelPurchaseOrderAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?>());\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.cancelPurchaseOrder(\n  'PO-0001',\n  {},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().CancelPurchaseOrder(context.Background(), \"PO-0001\", map[string]any{}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {}
+            }
+          }
+        }
+      }
+    },
+    "/purchase_orders/{purchase_order_id}/change": {
+      "post": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "Change a purchase order's lines",
+        "operationId": "purchase_orders_change_purchase_order",
+        "description": "Changes the lines of the purchase order, wrapped in `purchase_order.lines`. Each entry has an `op`: `add` with an `item_id` and `item_quantity` adds a line, and `change` with the line's dashed `uuid` changes its quantity or price.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The changed purchase order, under `purchase_order`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrderResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001/change\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"purchase_order\": {\n      \"lines\": [\n        {\n          \"op\": \"add\",\n          \"item_id\": \"ITEM-0001\",\n          \"item_quantity\": 1\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.change_purchase_order(\n    \"PO-0001\",\n    {\n        \"purchase_order\": {\n            \"lines\": [{\"op\": \"add\", \"item_id\": \"ITEM-0001\", \"item_quantity\": 1}]\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.changePurchaseOrder('PO-0001', {\n    purchase_order: {lines: [{op: 'add', item_id: 'ITEM-0001', item_quantity: 1}]},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->changePurchaseOrder('PO-0001', [\n    'purchase_order' => [\n        'lines' => [['op' => 'add', 'item_id' => 'ITEM-0001', 'item_quantity' => 1]],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto.PurchaseOrderRead;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrderRead> response = client.purchaseOrders().changePurchaseOrder(\n        \"PO-0001\",\n        Map.of(\n                \"purchase_order\", Map.of(\n                        \"lines\", List.of(\n                                Map.of(\"op\", \"add\", \"item_id\", \"ITEM-0001\", \"item_quantity\", 1)))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.ChangePurchaseOrderAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"purchase_order\"] = new Dictionary<string, object?>\n        {\n            [\"lines\"] = new List<object?>\n            {\n                new Dictionary<string, object?>\n                {\n                    [\"op\"] = \"add\",\n                    [\"item_id\"] = \"ITEM-0001\",\n                    [\"item_quantity\"] = 1,\n                },\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.changePurchaseOrder('PO-0001', {\n  'purchase_order': {\n    'lines': [\n      {'op': 'add', 'item_id': 'ITEM-0001', 'item_quantity': 1},\n    ],\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().ChangePurchaseOrder(context.Background(), \"PO-0001\", map[string]any{\n\t\"purchase_order\": map[string]any{\n\t\t\"lines\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"op\":            \"add\",\n\t\t\t\t\"item_id\":       \"ITEM-0001\",\n\t\t\t\t\"item_quantity\": 1,\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "purchase_order": {
+                    "type": "object",
+                    "properties": {
+                      "lines": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "op": {
+                              "type": "string",
+                              "description": "`add` to add a line, or `change` to change one.",
+                              "enum": [
+                                "add",
+                                "change"
+                              ]
+                            },
+                            "uuid": {
+                              "type": "string",
+                              "description": "For `change`: the line's `uuid`, in dashed form."
+                            },
+                            "item_id": {
+                              "type": "string",
+                              "description": "For `add`: the `id` of the item to add."
+                            },
+                            "item_quantity": {
+                              "type": "number"
+                            },
+                            "item_price_snapshot": {
+                              "type": "object",
+                              "properties": {
+                                "pricing_rule": {
+                                  "type": "object",
+                                  "properties": {
+                                    "price": {
+                                      "type": "number"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "required": [
+                            "op"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "purchase_order"
+                ]
+              },
+              "example": {
+                "purchase_order": {
+                  "lines": [
+                    {
+                      "op": "add",
+                      "item_id": "ITEM-0001",
+                      "item_quantity": 1
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/purchase_orders/{purchase_order_id}/information": {
+      "get": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "Retrieve a purchase order's information",
+        "operationId": "purchase_orders_get_purchase_order_information",
+        "description": "Returns the purchase order's header fields, such as its dates, totals, status and custom attributes, under `purchase_order`, without the supplier, currency and KPI blocks.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The purchase order's information, under `purchase_order`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrderInformationResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001/information\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.get_purchase_order_information(\"PO-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.getPurchaseOrderInformation('PO-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->getPurchaseOrderInformation('PO-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto.PurchaseOrderInformation;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrderInformation> response = client.purchaseOrders().getPurchaseOrderInformation(\"PO-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.GetPurchaseOrderInformationAsync(\"PO-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.getPurchaseOrderInformation(\n  'PO-0001',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().GetPurchaseOrderInformation(context.Background(), \"PO-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_orders/{purchase_order_id}/lines": {
+      "get": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "List a purchase order's lines",
+        "operationId": "purchase_orders_get_purchase_order_lines",
+        "description": "Lists the purchase order's lines under `data`, with the item, quantity, price and tax of each. Use a line's `id` to read it on its own.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of the purchase order's lines.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrderLineList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001/lines?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.get_purchase_order_lines(\"PO-0001\", {\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.getPurchaseOrderLines('PO-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->getPurchaseOrderLines('PO-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto.PurchaseOrderLineList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrderLineList> response = client.purchaseOrders().getPurchaseOrderLines(\n        \"PO-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.GetPurchaseOrderLinesAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.getPurchaseOrderLines(\n  'PO-0001',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().GetPurchaseOrderLines(context.Background(), \"PO-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_orders/{purchase_order_id}/notes": {
+      "get": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "List a purchase order's notes",
+        "operationId": "purchase_orders_get_purchase_order_notes",
+        "description": "Lists the notes on the purchase order under `data`. Address the purchase order by its `code`.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `code`. The note calls address a purchase order by its code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of the purchase order's notes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrderNoteList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001/notes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.get_purchase_order_notes(\"PO-0001\", {\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.getPurchaseOrderNotes('PO-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->getPurchaseOrderNotes('PO-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto.PurchaseOrderNotes;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrderNotes> response = client.purchaseOrders().getPurchaseOrderNotes(\n        \"PO-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.GetPurchaseOrderNotesAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.getPurchaseOrderNotes(\n  'PO-0001',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().GetPurchaseOrderNotes(context.Background(), \"PO-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "Create a purchase order note",
+        "operationId": "purchase_orders_create_purchase_order_note",
+        "description": "Adds a note to the purchase order. Send a multipart form with the text as the `note` field and, optionally, a file to attach. Address the purchase order by its `code`. The new note comes back under `note`.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `code`. The note calls address a purchase order by its code.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The new note, under `note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrderNoteCreatedResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001/notes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -F \"file=@delivery-note.pdf\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.create_purchase_order_note(\n    \"PO-0001\",\n    \"<p>Goods received in full.</p>\",\n    files={\"file\": open(\"delivery-note.pdf\", \"rb\")},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {readFileSync} from 'node:fs';\nimport {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.createPurchaseOrderNote('PO-0001', '<p>Goods received in full.</p>', {\n    files: {file: ['delivery-note.pdf', readFileSync('delivery-note.pdf')]},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->createPurchaseOrderNote(\n    'PO-0001',\n    '<p>Goods received in full.</p>',\n    ['file' => ['delivery-note.pdf', fopen('delivery-note.pdf', 'r')]],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.client.RequestOptions;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto.PurchaseOrderNotesView;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrderNotesView> response = client.purchaseOrders().createPurchaseOrderNote(\n        \"PO-0001\",\n        \"<p>Goods received in full.</p>\",\n        Map.of(\"file\", Path.of(\"delivery-note.pdf\")),\n        RequestOptions.none());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.CreatePurchaseOrderNoteAsync(\n    \"PO-0001\",\n    \"<p>Goods received in full.</p>\",\n    new Dictionary<string, object?> { [\"file\"] = new object?[] { \"delivery-note.pdf\", File.ReadAllBytes(\"delivery-note.pdf\") } });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'dart:io';\n\nimport 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.createPurchaseOrderNote(\n  'PO-0001',\n  '<p>Goods received in full.</p>',\n  files: {\n    'file': [\n      'delivery-note.pdf',\n      File('delivery-note.pdf').readAsBytesSync(),\n    ],\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nfile, err := os.ReadFile(\"delivery-note.pdf\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.PurchaseOrders().CreatePurchaseOrderNote(context.Background(), \"PO-0001\", \"<p>Goods received in full.</p>\", map[string]any{\"file\": []any{\"delivery-note.pdf\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "note"
+                ],
+                "properties": {
+                  "note": {
+                    "type": "string",
+                    "description": "The note text. HTML is accepted."
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "An optional file to attach to the note."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/purchase_orders/{purchase_order_id}/purchase_invoices": {
+      "post": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "Create a purchase invoice from a purchase order",
+        "operationId": "purchase_orders_create_purchase_order_purchase_invoice",
+        "description": "Creates a purchase invoice from the purchase order's lines. Send `{\"purchase_invoice\": {}}` as the body. The new invoice is `active` and appears in the purchase order's purchase invoices list.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The new purchase invoice, under `purchase_invoice`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrderPurchaseInvoiceResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001/purchase_invoices\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"purchase_invoice\": {}\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.create_purchase_order_purchase_invoice(\n    \"PO-0001\", {\"purchase_invoice\": {}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.createPurchaseOrderPurchaseInvoice('PO-0001', {purchase_invoice: {}});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->createPurchaseOrderPurchaseInvoice('PO-0001', [\n    'purchase_invoice' => (object) [],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto.PurchaseOrderPurchaseInvoices;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrderPurchaseInvoices> response = client.purchaseOrders().createPurchaseOrderPurchaseInvoice(\n        \"PO-0001\",\n        Map.of(\"purchase_invoice\", Map.of()));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.CreatePurchaseOrderPurchaseInvoiceAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"purchase_invoice\"] = new Dictionary<string, object?>(),\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders\n    .createPurchaseOrderPurchaseInvoice('PO-0001', {'purchase_invoice': {}});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().CreatePurchaseOrderPurchaseInvoice(context.Background(), \"PO-0001\", map[string]any{\"purchase_invoice\": map[string]any{}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "purchase_invoice": {
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "purchase_invoice"
+                ]
+              },
+              "example": {
+                "purchase_invoice": {}
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "List a purchase order's purchase invoices",
+        "operationId": "purchase_orders_get_purchase_order_purchase_invoices",
+        "description": "Lists the purchase invoices created from the purchase order, under `data`.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of the purchase order's purchase invoices.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrderPurchaseInvoiceList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001/purchase_invoices?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.get_purchase_order_purchase_invoices(\n    \"PO-0001\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.getPurchaseOrderPurchaseInvoices('PO-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->getPurchaseOrderPurchaseInvoices('PO-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto.PurchaseOrderPurchaseInvoiceList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrderPurchaseInvoiceList> response = client.purchaseOrders().getPurchaseOrderPurchaseInvoices(\n        \"PO-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.GetPurchaseOrderPurchaseInvoicesAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.getPurchaseOrderPurchaseInvoices(\n  'PO-0001',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().GetPurchaseOrderPurchaseInvoices(context.Background(), \"PO-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_orders/{purchase_order_id}/purchase_payments": {
+      "get": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "List a purchase order's purchase payments",
+        "operationId": "purchase_orders_get_purchase_order_purchase_payments",
+        "description": "Lists the purchase payments that pay the purchase order's invoices, under `data`.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of the purchase order's purchase payments.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrderPurchasePaymentList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001/purchase_payments?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.get_purchase_order_purchase_payments(\n    \"PO-0001\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.getPurchaseOrderPurchasePayments('PO-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->getPurchaseOrderPurchasePayments('PO-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto.PurchaseOrderPurchasePaymentList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrderPurchasePaymentList> response = client.purchaseOrders().getPurchaseOrderPurchasePayments(\n        \"PO-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.GetPurchaseOrderPurchasePaymentsAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.getPurchaseOrderPurchasePayments(\n  'PO-0001',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().GetPurchaseOrderPurchasePayments(context.Background(), \"PO-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_orders/{purchase_order_id}/reactivate": {
+      "post": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "Reactivate a purchase order",
+        "operationId": "purchase_orders_reactivate_purchase_order",
+        "description": "Reactivates a cancelled purchase order, which sets its status back to `active`. Send an empty object as the body.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The reactivated purchase order, under `purchase_order`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrderResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001/reactivate\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{}'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.reactivate_purchase_order(\"PO-0001\", {})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.reactivatePurchaseOrder('PO-0001', {});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->reactivatePurchaseOrder('PO-0001', '{}');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto.PurchaseOrderRead;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrderRead> response = client.purchaseOrders().reactivatePurchaseOrder(\n        \"PO-0001\",\n        Map.of());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.ReactivatePurchaseOrderAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?>());\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.reactivatePurchaseOrder(\n  'PO-0001',\n  {},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().ReactivatePurchaseOrder(context.Background(), \"PO-0001\", map[string]any{}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {}
+            }
+          }
+        }
+      }
+    },
+    "/purchase_orders/{purchase_order_id}/lines/{purchase_order_line_uuid}": {
+      "get": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "Retrieve a purchase order line",
+        "operationId": "purchase_orders_get_purchase_order_line",
+        "description": "Returns a single line of the purchase order, with its item, quantity, price and tax, under `purchase_order_line`.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "purchase_order_line_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The line's `id`, from the lines list.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The line, under `purchase_order_line`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrderLineResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001/lines/line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.get_purchase_order_line(\n    \"PO-0001\", \"line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.getPurchaseOrderLine('PO-0001', 'line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->getPurchaseOrderLine(\n    'PO-0001',\n    'line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto.PurchaseOrderLineRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrderLineRead> response = client.purchaseOrders().getPurchaseOrderLine(\n        \"PO-0001\",\n        \"line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.GetPurchaseOrderLineAsync(\n    \"PO-0001\",\n    \"line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.getPurchaseOrderLine(\n  'PO-0001',\n  'line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().GetPurchaseOrderLine(context.Background(), \"PO-0001\", \"line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_orders/{purchase_order_id}/notes/{purchase_order_note_id}": {
+      "delete": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "Delete a purchase order note",
+        "operationId": "purchase_orders_delete_purchase_order_note",
+        "description": "Deletes the note. Address the purchase order by its `code`. The call returns `204` with no body, and reading the note afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `code`. The note calls address a purchase order by its code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "purchase_order_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, from the note create or the notes list.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The note is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001/notes/note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.delete_purchase_order_note(\n    \"PO-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.deletePurchaseOrderNote(\n    'PO-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->deletePurchaseOrderNote(\n    'PO-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.purchaseOrders().deletePurchaseOrderNote(\n        \"PO-0001\",\n        \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.DeletePurchaseOrderNoteAsync(\n    \"PO-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.deletePurchaseOrderNote(\n  'PO-0001',\n  'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().DeletePurchaseOrderNote(context.Background(), \"PO-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "Retrieve a purchase order note",
+        "operationId": "purchase_orders_get_purchase_order_note",
+        "description": "Returns the note with its content, attachments and watchers under `note`. Address the purchase order by its `code`.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `code`. The note calls address a purchase order by its code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "purchase_order_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, from the note create or the notes list.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note, under `note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrderNoteResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The purchase order has no note with that `id`, for example after it is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001/notes/note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.get_purchase_order_note(\n    \"PO-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.getPurchaseOrderNote('PO-0001', 'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->getPurchaseOrderNote(\n    'PO-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto.PurchaseOrderNote;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrderNote> response = client.purchaseOrders().getPurchaseOrderNote(\n        \"PO-0001\",\n        \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.GetPurchaseOrderNoteAsync(\n    \"PO-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.getPurchaseOrderNote(\n  'PO-0001',\n  'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().GetPurchaseOrderNote(context.Background(), \"PO-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_orders/{purchase_order_id}/notes/{purchase_order_note_id}/files": {
+      "get": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "List a purchase order note's files",
+        "operationId": "purchase_orders_get_purchase_order_note_files",
+        "description": "Lists the files attached to the note under `data`, with each file's name, type, size and `uuid`. Address the purchase order by its `code`.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `code`. The note calls address a purchase order by its code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "purchase_order_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, from the note create or the notes list.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note's files.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrderNoteFileList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001/notes/note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a/files?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.get_purchase_order_note_files(\n    \"PO-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.getPurchaseOrderNoteFiles(\n    'PO-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    {limit: 20},\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->getPurchaseOrderNoteFiles(\n    'PO-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    ['limit' => 20],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto.PurchaseOrderNote;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrderNote> response = client.purchaseOrders().getPurchaseOrderNoteFiles(\n        \"PO-0001\",\n        \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.GetPurchaseOrderNoteFilesAsync(\n    \"PO-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.getPurchaseOrderNoteFiles(\n  'PO-0001',\n  'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().GetPurchaseOrderNoteFiles(context.Background(), \"PO-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_orders/{purchase_order_id}/notes/{purchase_order_note_id}/files/{purchase_order_file_id}": {
+      "get": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "Retrieve a purchase order note file",
+        "operationId": "purchase_orders_get_purchase_order_note_file",
+        "description": "Returns one attachment's name, content type, size, `uuid` and link under `file`. Address the purchase order by its `code` and the file by its `uuid`.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `code`. The note calls address a purchase order by its code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "purchase_order_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, from the note create or the notes list.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "purchase_order_file_id",
+            "in": "path",
+            "required": true,
+            "description": "The attachment's `uuid`, from the note's `attachments`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file's details, under `file`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrderNoteFileResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001/notes/note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a/files/6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.get_purchase_order_note_file(\n    \"PO-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\",\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.getPurchaseOrderNoteFile(\n    'PO-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    '6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->getPurchaseOrderNoteFile(\n    'PO-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    '6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto.PurchaseOrderNoteFile;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrderNoteFile> response = client.purchaseOrders().getPurchaseOrderNoteFile(\n        \"PO-0001\",\n        \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n        \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.GetPurchaseOrderNoteFileAsync(\n    \"PO-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.getPurchaseOrderNoteFile(\n  'PO-0001',\n  'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n  '6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().GetPurchaseOrderNoteFile(context.Background(), \"PO-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "Delete a purchase order note file",
+        "operationId": "purchase_orders_delete_purchase_order_note_file",
+        "description": "Deletes one file from the note. Address the purchase order by its `code` and the file by its `uuid`. The call returns `204` with no body.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `code`. The note calls address a purchase order by its code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "purchase_order_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, from the note create or the notes list.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "purchase_order_file_id",
+            "in": "path",
+            "required": true,
+            "description": "The attachment's `uuid`, from the note's `attachments`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The file is removed from the note."
+          },
+          "404": {
+            "description": "Attachment not found. This call can return `404` even for a file the note's file list shows.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001/notes/note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a/files/6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.delete_purchase_order_note_file(\n    \"PO-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\",\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.deletePurchaseOrderNoteFile(\n    'PO-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    '6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->deletePurchaseOrderNoteFile(\n    'PO-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    '6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.purchaseOrders().deletePurchaseOrderNoteFile(\n        \"PO-0001\",\n        \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n        \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.DeletePurchaseOrderNoteFileAsync(\n    \"PO-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.deletePurchaseOrderNoteFile(\n  'PO-0001',\n  'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n  '6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().DeletePurchaseOrderNoteFile(context.Background(), \"PO-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_orders/{purchase_order_id}/kpis": {
+      "get": {
+        "tags": [
+          "Purchase orders"
+        ],
+        "summary": "Retrieve a purchase order's KPIs",
+        "operationId": "purchase_orders_get_purchase_order_kpis",
+        "description": "Returns the purchase order's KPIs, such as `total_purchase_invoice`, `total_outstanding` and `total_overdue`, under `purchase_order_kpis`. The same figures come with the purchase order as `kpis`.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The KPIs, under `purchase_order_kpis`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseOrderKpisResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001/kpis\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_orders.get_purchase_order_kpis(\"PO-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseOrders.getPurchaseOrderKpis('PO-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseOrders->getPurchaseOrderKpis('PO-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_orders.purchase_orders_dto.PurchaseOrdersDto.PurchaseOrderKpis;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrderKpis> response = client.purchaseOrders().getPurchaseOrderKpis(\"PO-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseOrders.GetPurchaseOrderKpisAsync(\"PO-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseOrders.getPurchaseOrderKpis('PO-0001');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseOrders().GetPurchaseOrderKPIs(context.Background(), \"PO-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -61547,6 +63785,2874 @@
         "properties": {
           "receive_rma": {
             "$ref": "#/components/schemas/ReturnMerchandiseAuthorisationReceiptDetail"
+          }
+        }
+      },
+      "PurchaseOrder": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PurchaseOrderAccount"
+          },
+          "bill_total": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseOrderCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/PurchaseOrderCurrency"
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {}
+          },
+          "custom_form": {
+            "$ref": "#/components/schemas/PurchaseOrderCustomForm"
+          },
+          "due_date": {
+            "type": "string"
+          },
+          "due_total": {
+            "type": "string"
+          },
+          "expected_completion_date": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_price_tax_inclusive": {
+            "type": "boolean"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchaseOrderLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "operational_status": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "paid_amount": {
+            "type": "string"
+          },
+          "purchase_order_note": {
+            "type": "string"
+          },
+          "sale_order": {},
+          "status": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "supplier_invoice_id": {
+            "type": "string"
+          },
+          "tax_total": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "warehouse": {}
+        }
+      },
+      "PurchaseOrderAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderCustomForm": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size the API applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can be set on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": "string",
+            "description": "The cursor of the previous page."
+          },
+          "links": {
+            "$ref": "#/components/schemas/PurchaseOrderPaginationLinks"
+          }
+        }
+      },
+      "PurchaseOrderList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrder"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PurchaseOrderPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrders": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PurchaseOrdersAccount"
+          },
+          "account_id": {
+            "type": "string"
+          },
+          "activity_logs": {
+            "type": "array",
+            "items": {}
+          },
+          "bill_total": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseOrdersCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/PurchaseOrdersCurrency"
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {}
+          },
+          "custom_form": {
+            "$ref": "#/components/schemas/PurchaseOrdersCustomForm"
+          },
+          "custom_objects": {
+            "type": "array",
+            "items": {}
+          },
+          "due_date": {
+            "type": "string"
+          },
+          "due_total": {
+            "type": "string"
+          },
+          "expected_completion_date": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_price_tax_inclusive": {},
+          "issue_date": {
+            "type": "string"
+          },
+          "kpis": {
+            "$ref": "#/components/schemas/PurchaseOrdersKpis"
+          },
+          "last_updated_by": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "lines": {
+            "type": "array",
+            "items": {}
+          },
+          "object": {
+            "type": "string"
+          },
+          "operational_status": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "paid_amount": {
+            "type": "string"
+          },
+          "price_tax_inclusive": {
+            "type": "string"
+          },
+          "purchase_order_note": {
+            "type": "string"
+          },
+          "sale_order": {},
+          "status": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "supplier_invoice_id": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "string"
+          },
+          "tax_total": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "warehouse": {}
+        }
+      },
+      "PurchaseOrdersAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrdersCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrdersCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrdersCustomForm": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrdersKpis": {
+        "type": "object",
+        "properties": {
+          "estimated_total": {
+            "type": "string"
+          },
+          "issue_date": {},
+          "last_cancelled_on": {},
+          "last_changed_on": {},
+          "last_deleted_on": {},
+          "last_invoice_issue_date": {},
+          "last_invoice_total": {
+            "type": "string"
+          },
+          "last_reactivated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "total_expense": {
+            "type": "string"
+          },
+          "total_outstanding": {
+            "type": "string"
+          },
+          "total_overdue": {
+            "type": "string"
+          },
+          "total_purchase_invoice": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchaseOrderCreatedResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_order": {
+            "$ref": "#/components/schemas/PurchaseOrders"
+          }
+        }
+      },
+      "PurchaseOrdersNote": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {}
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseOrdersNoteCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "group": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "user": {},
+          "version": {
+            "type": "integer"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrdersNoteWatcher"
+            }
+          }
+        }
+      },
+      "PurchaseOrdersNoteCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrdersNoteWatcher": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrdersNoteList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrdersNote"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PurchaseOrderPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderUpdated": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PurchaseOrderUpdatedAccount"
+          },
+          "account_id": {
+            "type": "string"
+          },
+          "activity_logs": {
+            "type": "array",
+            "items": {}
+          },
+          "bill_total": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseOrderUpdatedCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/PurchaseOrderUpdatedCurrency"
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {}
+          },
+          "custom_form": {
+            "$ref": "#/components/schemas/PurchaseOrderUpdatedCustomForm"
+          },
+          "custom_objects": {
+            "type": "array",
+            "items": {}
+          },
+          "due_date": {
+            "type": "string"
+          },
+          "due_total": {
+            "type": "string"
+          },
+          "expected_completion_date": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_price_tax_inclusive": {},
+          "issue_date": {
+            "type": "string"
+          },
+          "kpis": {
+            "$ref": "#/components/schemas/PurchaseOrderUpdatedKpis"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchaseOrderUpdatedLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "lines": {
+            "type": "array",
+            "items": {}
+          },
+          "object": {
+            "type": "string"
+          },
+          "operational_status": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "paid_amount": {
+            "type": "string"
+          },
+          "price_tax_inclusive": {
+            "type": "string"
+          },
+          "purchase_order_note": {
+            "type": "string"
+          },
+          "sale_order": {},
+          "sale_order_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "supplier_invoice_id": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "string"
+          },
+          "tax_total": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "warehouse": {}
+        }
+      },
+      "PurchaseOrderUpdatedAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderUpdatedCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderUpdatedCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderUpdatedCustomForm": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderUpdatedKpis": {
+        "type": "object",
+        "properties": {
+          "estimated_total": {
+            "type": "string"
+          },
+          "issue_date": {},
+          "last_cancelled_on": {},
+          "last_changed_on": {},
+          "last_deleted_on": {},
+          "last_invoice_issue_date": {},
+          "last_invoice_total": {
+            "type": "string"
+          },
+          "last_reactivated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "total_expense": {
+            "type": "string"
+          },
+          "total_outstanding": {
+            "type": "string"
+          },
+          "total_overdue": {
+            "type": "string"
+          },
+          "total_purchase_invoice": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchaseOrderUpdatedLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderUpdatedResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_order": {
+            "$ref": "#/components/schemas/PurchaseOrderUpdated"
+          }
+        }
+      },
+      "PurchaseOrderRead": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PurchaseOrderReadAccount"
+          },
+          "activity_logs": {
+            "type": "array",
+            "items": {}
+          },
+          "bill_total": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseOrderReadCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/PurchaseOrderReadCurrency"
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrderReadCustomAttribute"
+            }
+          },
+          "custom_form": {
+            "$ref": "#/components/schemas/PurchaseOrderReadCustomForm"
+          },
+          "due_date": {
+            "type": "string"
+          },
+          "due_total": {
+            "type": "string"
+          },
+          "expected_completion_date": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_price_tax_inclusive": {
+            "type": "boolean"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "kpis": {
+            "$ref": "#/components/schemas/PurchaseOrderReadKpis"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchaseOrderReadLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "operational_status": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "paid_amount": {
+            "type": "string"
+          },
+          "purchase_order_note": {
+            "type": "string"
+          },
+          "sale_order": {},
+          "status": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "supplier_invoice_id": {
+            "type": "string"
+          },
+          "tax_total": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "warehouse": {}
+        }
+      },
+      "PurchaseOrderReadAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderReadCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderReadCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderReadCustomAttribute": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderReadCustomForm": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderReadKpis": {
+        "type": "object",
+        "properties": {
+          "estimated_total": {
+            "type": "string"
+          },
+          "issue_date": {},
+          "last_cancelled_on": {},
+          "last_changed_on": {},
+          "last_deleted_on": {},
+          "last_invoice_issue_date": {},
+          "last_invoice_total": {
+            "type": "string"
+          },
+          "last_reactivated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "total_expense": {
+            "type": "string"
+          },
+          "total_outstanding": {
+            "type": "string"
+          },
+          "total_overdue": {
+            "type": "string"
+          },
+          "total_purchase_invoice": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchaseOrderReadLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_order": {
+            "$ref": "#/components/schemas/PurchaseOrderRead"
+          }
+        }
+      },
+      "PurchaseOrderInformation": {
+        "type": "object",
+        "properties": {
+          "bill_total": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseOrderInformationCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrderInformationCustomAttribute"
+            }
+          },
+          "custom_form": {
+            "$ref": "#/components/schemas/PurchaseOrderInformationCustomForm"
+          },
+          "due_date": {
+            "type": "string"
+          },
+          "due_total": {
+            "type": "string"
+          },
+          "expected_completion_date": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_price_tax_inclusive": {
+            "type": "boolean"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchaseOrderInformationLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "operational_status": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "paid_amount": {
+            "type": "string"
+          },
+          "purchase_order_note": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "supplier_invoice_id": {
+            "type": "string"
+          },
+          "tax_total": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchaseOrderInformationCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderInformationCustomAttribute": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderInformationCustomForm": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderInformationLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderInformationResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_order": {
+            "$ref": "#/components/schemas/PurchaseOrderInformation"
+          }
+        }
+      },
+      "PurchaseOrderLine": {
+        "type": "object",
+        "properties": {
+          "created_on": {
+            "type": "string"
+          },
+          "flat_discount": {
+            "type": "number"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_price_tax_inclusive": {
+            "type": "boolean"
+          },
+          "is_tax_exempt": {
+            "type": "boolean"
+          },
+          "item": {
+            "$ref": "#/components/schemas/PurchaseOrderLineItem"
+          },
+          "item_accounting_code": {
+            "$ref": "#/components/schemas/PurchaseOrderLineItemAccountingCode"
+          },
+          "item_discount_amount": {
+            "type": "number"
+          },
+          "item_expected_completion_date": {
+            "type": "string"
+          },
+          "item_invoice_note": {},
+          "item_price_snapshot": {
+            "$ref": "#/components/schemas/PurchaseOrderLineItemPriceSnapshot"
+          },
+          "item_price_tax": {
+            "$ref": "#/components/schemas/PurchaseOrderLineItemPriceTax"
+          },
+          "item_price_tax_exempt": {
+            "type": "boolean"
+          },
+          "item_purchase_accounting_code": {
+            "$ref": "#/components/schemas/PurchaseOrderLineItemPurchaseAccountingCode"
+          },
+          "item_purchase_tax_configuration": {
+            "$ref": "#/components/schemas/PurchaseOrderLineItemPurchaseTaxConfiguration"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "purchase_line_note": {},
+          "quantity": {
+            "type": "integer"
+          },
+          "sort_index": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "tax": {
+            "$ref": "#/components/schemas/PurchaseOrderLineTax"
+          },
+          "tax_total": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "uom": {
+            "$ref": "#/components/schemas/PurchaseOrderLineUom"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "warehouse": {
+            "$ref": "#/components/schemas/PurchaseOrderLineWarehouse"
+          }
+        }
+      },
+      "PurchaseOrderLineItem": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderLineItemAccountingCode": {
+        "type": "object",
+        "properties": {
+          "cost_of_goods_sold": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderLineItemPriceSnapshot": {
+        "type": "object",
+        "properties": {
+          "pricing_rule": {
+            "$ref": "#/components/schemas/PurchaseOrderLineItemPriceSnapshotPricingRule"
+          }
+        }
+      },
+      "PurchaseOrderLineItemPriceSnapshotPricingRule": {
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "number"
+          },
+          "price_type": {
+            "type": "string"
+          },
+          "pricing_version": {
+            "type": "string"
+          },
+          "uom": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderLineItemPriceTax": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "rate": {
+            "type": "number"
+          }
+        }
+      },
+      "PurchaseOrderLineItemPurchaseAccountingCode": {
+        "type": "object",
+        "properties": {
+          "cost_of_goods_sold": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderLineItemPurchaseTaxConfiguration": {
+        "type": "object",
+        "properties": {
+          "purchase_price_is_tax_inclusive": {
+            "type": "boolean"
+          },
+          "tax_code": {
+            "$ref": "#/components/schemas/PurchaseOrderLineItemPurchaseTaxConfigurationTaxCode"
+          },
+          "tax_exempt_when_purchase": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PurchaseOrderLineItemPurchaseTaxConfigurationTaxCode": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "rate": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderLineTax": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderLineUom": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderLineWarehouse": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderLineList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrderLine"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PurchaseOrderPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderNotesData": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrderNotesDataAttachment"
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseOrderNotesDataCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "group": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "purchase_order": {
+            "$ref": "#/components/schemas/PurchaseOrderNotesDataDetail"
+          },
+          "user": {},
+          "version": {
+            "type": "integer"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrderNotesDataWatcher"
+            }
+          }
+        }
+      },
+      "PurchaseOrderNotesDataAttachment": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderNotesDataCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderNotesDataDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderNotesDataWatcher": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderNoteList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrderNotesData"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PurchaseOrderPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderNotesView": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrderNotesViewAttachment"
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseOrderNotesViewCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "group": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "purchase_order": {
+            "$ref": "#/components/schemas/PurchaseOrderNotesViewDetail"
+          },
+          "user": {},
+          "version": {
+            "type": "integer"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrderNotesViewWatcher"
+            }
+          }
+        }
+      },
+      "PurchaseOrderNotesViewAttachment": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderNotesViewCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderNotesViewDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderNotesViewWatcher": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderNoteCreatedResponse": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "$ref": "#/components/schemas/PurchaseOrderNotesView"
+          }
+        }
+      },
+      "PurchaseOrderPurchaseInvoices": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchaseInvoicesAccount"
+          },
+          "activity_logs": {
+            "type": "array",
+            "items": {}
+          },
+          "alternate_due_date": {
+            "type": "string"
+          },
+          "alternate_issue_date": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchaseInvoicesCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchaseInvoicesCurrency"
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {}
+          },
+          "custom_form": {},
+          "due_date": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "kpis": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchaseInvoicesKpis"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrderPurchaseInvoicesLine"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "origin": {},
+          "payment_status": {
+            "type": "string"
+          },
+          "price_tax_inclusive": {
+            "type": "boolean"
+          },
+          "purchase_order": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchaseInvoicesDetail"
+          },
+          "status": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchaseOrderPurchaseInvoicesAccount": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchaseInvoicesCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchaseInvoicesCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchaseInvoicesKpis": {
+        "type": "object",
+        "properties": {
+          "credit_applied": {
+            "type": "string"
+          },
+          "credit_issued": {
+            "type": "string"
+          },
+          "deleted_on": {},
+          "last_amended_on": {},
+          "last_cancelled_on": {},
+          "last_payment_date": {},
+          "last_reactivated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "outstanding": {
+            "type": "string"
+          },
+          "overdue": {
+            "type": "string"
+          },
+          "payment_applied": {
+            "type": "string"
+          },
+          "voided_on": {}
+        }
+      },
+      "PurchaseOrderPurchaseInvoicesLine": {
+        "type": "object",
+        "properties": {
+          "accounting_code": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "item": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchaseInvoicesLineItem"
+          },
+          "object": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "uom": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "warehouse": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchaseInvoicesLineItem": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchaseInvoicesDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchaseInvoiceResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_invoice": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchaseInvoices"
+          }
+        }
+      },
+      "PurchaseOrderPurchaseInvoice": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchaseInvoiceAccount"
+          },
+          "alternate_due_date": {
+            "type": "string"
+          },
+          "alternate_issue_date": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchaseInvoiceCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchaseInvoiceCurrency"
+          },
+          "custom_form": {},
+          "due_date": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchaseInvoiceLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "payment_status": {
+            "type": "string"
+          },
+          "price_tax_inclusive": {
+            "type": "boolean"
+          },
+          "purchase_order": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchaseInvoiceDetail"
+          },
+          "status": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchaseOrderPurchaseInvoiceAccount": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchaseInvoiceCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchaseInvoiceCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchaseInvoiceLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchaseInvoiceDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchaseInvoiceList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrderPurchaseInvoice"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PurchaseOrderPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchasePayment": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchasePaymentAccount"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchasePaymentCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "credit_note_applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrderPurchasePaymentCreditNoteApplication"
+            }
+          },
+          "credit_note_total": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchasePaymentCurrency"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchasePaymentLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "paid_total": {
+            "type": "string"
+          },
+          "payment_date": {
+            "type": "string"
+          },
+          "payment_method_applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrderPurchasePaymentPaymentMethodApplication"
+            }
+          },
+          "payment_note": {
+            "type": "string"
+          },
+          "payment_reference": {},
+          "purchase_invoice_applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrderPurchasePaymentPurchaseInvoiceApplication"
+            }
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchaseOrderPurchasePaymentAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchasePaymentCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchasePaymentCreditNoteApplication": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "purchase_credit_note": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchasePaymentCreditNoteApplicationPurchaseCreditNote"
+          }
+        }
+      },
+      "PurchaseOrderPurchasePaymentCreditNoteApplicationPurchaseCreditNote": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchasePaymentCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchasePaymentLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchasePaymentPaymentMethodApplication": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "payment_method": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchasePaymentPaymentMethodApplicationDetail"
+          },
+          "payment_processor": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchasePaymentPaymentMethodApplicationPaymentProcessor"
+          },
+          "reference": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchasePaymentPaymentMethodApplicationDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchasePaymentPaymentMethodApplicationPaymentProcessor": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchasePaymentPurchaseInvoiceApplication": {
+        "type": "object",
+        "properties": {
+          "applied": {
+            "type": "string"
+          },
+          "due_date": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "outstanding": {
+            "type": "string"
+          },
+          "purchase_invoice": {
+            "$ref": "#/components/schemas/PurchaseOrderPurchasePaymentPurchaseInvoiceApplicationDetail"
+          },
+          "total": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchasePaymentPurchaseInvoiceApplicationDetail": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderPurchasePaymentList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrderPurchasePayment"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PurchaseOrderPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderLineReadDetail": {
+        "type": "object",
+        "properties": {
+          "created_on": {
+            "type": "string"
+          },
+          "flat_discount": {
+            "type": "number"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_price_tax_inclusive": {
+            "type": "boolean"
+          },
+          "is_tax_exempt": {
+            "type": "boolean"
+          },
+          "item": {
+            "$ref": "#/components/schemas/PurchaseOrderLineReadDetailItem"
+          },
+          "item_accounting_code": {
+            "$ref": "#/components/schemas/PurchaseOrderLineReadDetailItemAccountingCode"
+          },
+          "item_discount_amount": {
+            "type": "number"
+          },
+          "item_expected_completion_date": {
+            "type": "string"
+          },
+          "item_invoice_note": {},
+          "item_price_snapshot": {
+            "$ref": "#/components/schemas/PurchaseOrderLineReadDetailItemPriceSnapshot"
+          },
+          "item_price_tax": {
+            "$ref": "#/components/schemas/PurchaseOrderLineReadDetailItemPriceTax"
+          },
+          "item_price_tax_exempt": {
+            "type": "boolean"
+          },
+          "item_purchase_accounting_code": {
+            "$ref": "#/components/schemas/PurchaseOrderLineReadDetailItemPurchaseAccountingCode"
+          },
+          "item_purchase_tax_configuration": {
+            "$ref": "#/components/schemas/PurchaseOrderLineReadDetailItemPurchaseTaxConfiguration"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "purchase_line_note": {},
+          "quantity": {
+            "type": "integer"
+          },
+          "sort_index": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "tax": {
+            "$ref": "#/components/schemas/PurchaseOrderLineReadDetailTax"
+          },
+          "tax_total": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "uom": {
+            "$ref": "#/components/schemas/PurchaseOrderLineReadDetailUom"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "warehouse": {
+            "$ref": "#/components/schemas/PurchaseOrderLineReadDetailWarehouse"
+          }
+        }
+      },
+      "PurchaseOrderLineReadDetailItem": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderLineReadDetailItemAccountingCode": {
+        "type": "object",
+        "properties": {
+          "cost_of_goods_sold": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderLineReadDetailItemPriceSnapshot": {
+        "type": "object",
+        "properties": {
+          "pricing_rule": {
+            "$ref": "#/components/schemas/PurchaseOrderLineReadDetailItemPriceSnapshotPricingRule"
+          }
+        }
+      },
+      "PurchaseOrderLineReadDetailItemPriceSnapshotPricingRule": {
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "number"
+          },
+          "price_type": {
+            "type": "string"
+          },
+          "pricing_version": {
+            "type": "string"
+          },
+          "uom": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderLineReadDetailItemPriceTax": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "rate": {
+            "type": "number"
+          }
+        }
+      },
+      "PurchaseOrderLineReadDetailItemPurchaseAccountingCode": {
+        "type": "object",
+        "properties": {
+          "cost_of_goods_sold": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderLineReadDetailItemPurchaseTaxConfiguration": {
+        "type": "object",
+        "properties": {
+          "purchase_price_is_tax_inclusive": {
+            "type": "boolean"
+          },
+          "tax_code": {
+            "$ref": "#/components/schemas/PurchaseOrderLineReadDetailItemPurchaseTaxConfigurationTaxCode"
+          },
+          "tax_exempt_when_purchase": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PurchaseOrderLineReadDetailItemPurchaseTaxConfigurationTaxCode": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "rate": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderLineReadDetailTax": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderLineReadDetailUom": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderLineReadDetailWarehouse": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderLineResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_order_line": {
+            "$ref": "#/components/schemas/PurchaseOrderLineReadDetail"
+          }
+        }
+      },
+      "PurchaseOrderNoteDetail": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrderNoteDetailAttachment"
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseOrderNoteDetailCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "group": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "purchase_order": {
+            "$ref": "#/components/schemas/PurchaseOrderNoteDetailPurchaseOrder"
+          },
+          "user": {},
+          "version": {
+            "type": "integer"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrderNoteDetailWatcher"
+            }
+          }
+        }
+      },
+      "PurchaseOrderNoteDetailAttachment": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderNoteDetailCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderNoteDetailPurchaseOrder": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderNoteDetailWatcher": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderNoteResponse": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "$ref": "#/components/schemas/PurchaseOrderNoteDetail"
+          }
+        }
+      },
+      "PurchaseOrderNoteData": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderNoteFileList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrderNoteData"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PurchaseOrderPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderNoteFile": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseOrderNoteFileResponse": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "$ref": "#/components/schemas/PurchaseOrderNoteFile"
+          }
+        }
+      },
+      "PurchaseOrderKpis": {
+        "type": "object",
+        "properties": {
+          "estimated_total": {
+            "type": "string"
+          },
+          "issue_date": {},
+          "last_cancelled_on": {},
+          "last_changed_on": {},
+          "last_deleted_on": {},
+          "last_invoice_issue_date": {},
+          "last_invoice_total": {
+            "type": "string"
+          },
+          "last_reactivated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "total_expense": {
+            "type": "string"
+          },
+          "total_outstanding": {
+            "type": "string"
+          },
+          "total_overdue": {
+            "type": "string"
+          },
+          "total_purchase_invoice": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchaseOrderKpisResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_order_kpis": {
+            "$ref": "#/components/schemas/PurchaseOrderKpis"
           }
         }
       },

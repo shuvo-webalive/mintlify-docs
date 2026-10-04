@@ -1,0 +1,98 @@
+{
+  "sdk": "dotnet",
+  "module": "purchase_orders",
+  "endpoints": {
+    "get_purchase_orders": {
+      "function": "PurchaseOrders.GetPurchaseOrdersAsync",
+      "code": "var response = await client.PurchaseOrders.GetPurchaseOrdersAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "create_purchase_order": {
+      "function": "PurchaseOrders.CreatePurchaseOrderAsync",
+      "code": "var response = await client.PurchaseOrders.CreatePurchaseOrderAsync(new Dictionary<string, object?>\n{\n    [\"purchase_order\"] = new Dictionary<string, object?>\n    {\n        [\"account\"] = new Dictionary<string, object?>\n        {\n            [\"name\"] = \"Acme Pty Ltd\",\n            [\"type\"] = \"SUPPLIER\",\n            [\"email_address\"] = \"jane@example.com\",\n        },\n        [\"lines\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"item_name\"] = \"Copy paper A4\",\n                [\"item_quantity\"] = 1,\n                [\"item_price_snapshot\"] = new Dictionary<string, object?>\n                {\n                    [\"pricing_rule\"] = new Dictionary<string, object?>\n                    {\n                        [\"price\"] = 5,\n                    },\n                },\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_orders_notes": {
+      "function": "PurchaseOrders.GetPurchaseOrdersNotesAsync",
+      "code": "var response = await client.PurchaseOrders.GetPurchaseOrdersNotesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "delete_purchase_order": {
+      "function": "PurchaseOrders.DeletePurchaseOrderAsync",
+      "code": "var response = await client.PurchaseOrders.DeletePurchaseOrderAsync(\"PO-0001\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "update_purchase_order": {
+      "function": "PurchaseOrders.UpdatePurchaseOrderAsync",
+      "code": "var response = await client.PurchaseOrders.UpdatePurchaseOrderAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"purchase_order\"] = new Dictionary<string, object?>\n        {\n            [\"purchase_order_note\"] = \"Deliver to the rear dock.\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_order": {
+      "function": "PurchaseOrders.GetPurchaseOrderAsync",
+      "code": "var response = await client.PurchaseOrders.GetPurchaseOrderAsync(\"PO-0001\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "cancel_purchase_order": {
+      "function": "PurchaseOrders.CancelPurchaseOrderAsync",
+      "code": "var response = await client.PurchaseOrders.CancelPurchaseOrderAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?>());\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "change_purchase_order": {
+      "function": "PurchaseOrders.ChangePurchaseOrderAsync",
+      "code": "var response = await client.PurchaseOrders.ChangePurchaseOrderAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"purchase_order\"] = new Dictionary<string, object?>\n        {\n            [\"lines\"] = new List<object?>\n            {\n                new Dictionary<string, object?>\n                {\n                    [\"op\"] = \"add\",\n                    [\"item_id\"] = \"ITEM-0001\",\n                    [\"item_quantity\"] = 1,\n                },\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_order_information": {
+      "function": "PurchaseOrders.GetPurchaseOrderInformationAsync",
+      "code": "var response = await client.PurchaseOrders.GetPurchaseOrderInformationAsync(\"PO-0001\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_order_lines": {
+      "function": "PurchaseOrders.GetPurchaseOrderLinesAsync",
+      "code": "var response = await client.PurchaseOrders.GetPurchaseOrderLinesAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_order_notes": {
+      "function": "PurchaseOrders.GetPurchaseOrderNotesAsync",
+      "code": "var response = await client.PurchaseOrders.GetPurchaseOrderNotesAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "create_purchase_order_note": {
+      "function": "PurchaseOrders.CreatePurchaseOrderNoteAsync",
+      "code": "var response = await client.PurchaseOrders.CreatePurchaseOrderNoteAsync(\n    \"PO-0001\",\n    \"<p>Goods received in full.</p>\",\n    new Dictionary<string, object?> { [\"file\"] = new object?[] { \"delivery-note.pdf\", File.ReadAllBytes(\"delivery-note.pdf\") } });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "create_purchase_order_purchase_invoice": {
+      "function": "PurchaseOrders.CreatePurchaseOrderPurchaseInvoiceAsync",
+      "code": "var response = await client.PurchaseOrders.CreatePurchaseOrderPurchaseInvoiceAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"purchase_invoice\"] = new Dictionary<string, object?>(),\n    });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_order_purchase_invoices": {
+      "function": "PurchaseOrders.GetPurchaseOrderPurchaseInvoicesAsync",
+      "code": "var response = await client.PurchaseOrders.GetPurchaseOrderPurchaseInvoicesAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_order_purchase_payments": {
+      "function": "PurchaseOrders.GetPurchaseOrderPurchasePaymentsAsync",
+      "code": "var response = await client.PurchaseOrders.GetPurchaseOrderPurchasePaymentsAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "reactivate_purchase_order": {
+      "function": "PurchaseOrders.ReactivatePurchaseOrderAsync",
+      "code": "var response = await client.PurchaseOrders.ReactivatePurchaseOrderAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?>());\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_order_line": {
+      "function": "PurchaseOrders.GetPurchaseOrderLineAsync",
+      "code": "var response = await client.PurchaseOrders.GetPurchaseOrderLineAsync(\n    \"PO-0001\",\n    \"line_3f2a9c1e7b4d4e8a9c0b1d2e3f4a5b6c\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "delete_purchase_order_note": {
+      "function": "PurchaseOrders.DeletePurchaseOrderNoteAsync",
+      "code": "var response = await client.PurchaseOrders.DeletePurchaseOrderNoteAsync(\n    \"PO-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_order_note": {
+      "function": "PurchaseOrders.GetPurchaseOrderNoteAsync",
+      "code": "var response = await client.PurchaseOrders.GetPurchaseOrderNoteAsync(\n    \"PO-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_order_note_files": {
+      "function": "PurchaseOrders.GetPurchaseOrderNoteFilesAsync",
+      "code": "var response = await client.PurchaseOrders.GetPurchaseOrderNoteFilesAsync(\n    \"PO-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_order_note_file": {
+      "function": "PurchaseOrders.GetPurchaseOrderNoteFileAsync",
+      "code": "var response = await client.PurchaseOrders.GetPurchaseOrderNoteFileAsync(\n    \"PO-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_order_kpis": {
+      "function": "PurchaseOrders.GetPurchaseOrderKpisAsync",
+      "code": "var response = await client.PurchaseOrders.GetPurchaseOrderKpisAsync(\"PO-0001\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "delete_purchase_order_note_file": {
+      "function": "PurchaseOrders.DeletePurchaseOrderNoteFileAsync",
+      "code": "var response = await client.PurchaseOrders.DeletePurchaseOrderNoteFileAsync(\n    \"PO-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\");\n\nConsole.WriteLine(response.Json);\n"
+    }
+  }
+}

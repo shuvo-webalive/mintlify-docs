@@ -1,0 +1,54 @@
+---
+title: "Purchase orders"
+sidebarTitle: "Overview"
+description: "Create, change, cancel and read purchase orders, their lines, notes, files, KPIs and the invoices and payments raised from them."
+---
+
+A purchase order records what you are buying from a supplier. These endpoints create, update, change, cancel and reactivate purchase orders, read their lines, KPIs, purchase invoices and payments, and manage their notes and attached files. There are 23 endpoints, and all seven SDKs call every one.
+
+<Warning>
+  **Deleting a purchase order, a note or a note file cannot be undone.** Cancel a purchase order instead if you may need it again.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List purchase orders](/api-reference/purchase-orders/list-purchase-orders) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/purchase_orders` | Returns one page of purchase orders. |
+| [Create a purchase order](/api-reference/purchase-orders/create-a-purchase-order) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/purchase_orders` | Creates a purchase order for a supplier and returns it under `purchase_order`. |
+| [List notes across purchase orders](/api-reference/purchase-orders/list-notes-across-purchase-orders) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/purchase_orders/notes` | Returns one page of notes from every purchase order. |
+| [Delete a purchase order](/api-reference/purchase-orders/delete-a-purchase-order) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/purchase_orders/{purchase_order_id}` | Deletes a purchase order. Nothing comes back. |
+| [Update a purchase order](/api-reference/purchase-orders/update-a-purchase-order) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/purchase_orders/{purchase_order_id}` | Changes header fields of a purchase order and returns it under `purchase_order`. |
+| [Retrieve a purchase order](/api-reference/purchase-orders/retrieve-a-purchase-order) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/purchase_orders/{purchase_order_id}` | Returns one purchase order under `purchase_order`. |
+| [Cancel a purchase order](/api-reference/purchase-orders/cancel-a-purchase-order) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/purchase_orders/{purchase_order_id}/cancel` | Cancels a purchase order and returns it under `purchase_order`. |
+| [Change a purchase order's lines](/api-reference/purchase-orders/change-a-purchase-orders-lines) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/purchase_orders/{purchase_order_id}/change` | Adds or changes lines on a purchase order and returns it under `purchase_order`. |
+| [Retrieve a purchase order's information](/api-reference/purchase-orders/retrieve-a-purchase-orders-information) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/purchase_orders/{purchase_order_id}/information` | Returns the header information of one purchase order under `purchase_order`. |
+| [List a purchase order's lines](/api-reference/purchase-orders/list-a-purchase-orders-lines) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/purchase_orders/{purchase_order_id}/lines` | Returns one page of the lines of a purchase order. |
+| [List a purchase order's notes](/api-reference/purchase-orders/list-a-purchase-orders-notes) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/purchase_orders/{purchase_order_id}/notes` | Returns one page of the notes on a purchase order. |
+| [Create a purchase order note](/api-reference/purchase-orders/create-a-purchase-order-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/purchase_orders/{purchase_order_id}/notes` | Adds a note, with an optional file, to a purchase order and returns it under `note`. |
+| [Create a purchase invoice from a purchase order](/api-reference/purchase-orders/create-a-purchase-invoice-from-a-purchase-order) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/purchase_orders/{purchase_order_id}/purchase_invoices` | Raises a purchase invoice for a purchase order and returns it under `purchase_invoice`. |
+| [List a purchase order's purchase invoices](/api-reference/purchase-orders/list-a-purchase-orders-purchase-invoices) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/purchase_orders/{purchase_order_id}/purchase_invoices` | Returns one page of the purchase invoices raised from a purchase order. |
+| [List a purchase order's purchase payments](/api-reference/purchase-orders/list-a-purchase-orders-purchase-payments) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/purchase_orders/{purchase_order_id}/purchase_payments` | Returns one page of the purchase payments made against a purchase order's invoices. |
+| [Reactivate a purchase order](/api-reference/purchase-orders/reactivate-a-purchase-order) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/purchase_orders/{purchase_order_id}/reactivate` | Reactivates a cancelled purchase order and returns it under `purchase_order`. |
+| [Retrieve a purchase order line](/api-reference/purchase-orders/retrieve-a-purchase-order-line) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/purchase_orders/{purchase_order_id}/lines/{purchase_order_line_uuid}` | Returns one line of a purchase order under `purchase_order_line`. |
+| [Delete a purchase order note](/api-reference/purchase-orders/delete-a-purchase-order-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/purchase_orders/{purchase_order_id}/notes/{purchase_order_note_id}` | Deletes a note from a purchase order. Nothing comes back. |
+| [Retrieve a purchase order note](/api-reference/purchase-orders/retrieve-a-purchase-order-note) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/purchase_orders/{purchase_order_id}/notes/{purchase_order_note_id}` | Returns one note of a purchase order under `note`. |
+| [List a purchase order note's files](/api-reference/purchase-orders/list-a-purchase-order-notes-files) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/purchase_orders/{purchase_order_id}/notes/{purchase_order_note_id}/files` | Returns the files attached to one purchase order note. |
+| [Retrieve a purchase order note file](/api-reference/purchase-orders/retrieve-a-purchase-order-note-file) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/purchase_orders/{purchase_order_id}/notes/{purchase_order_note_id}/files/{purchase_order_file_id}` | Returns the details of one file attached to a purchase order note, under `file`. |
+| [Retrieve a purchase order's KPIs](/api-reference/purchase-orders/retrieve-a-purchase-orders-kpis) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/purchase_orders/{purchase_order_id}/kpis` | Returns the KPI figures of one purchase order under `purchase_order_kpis`. |
+| [Delete a purchase order note file](/api-reference/purchase-orders/delete-a-purchase-order-note-file) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/purchase_orders/{purchase_order_id}/notes/{purchase_order_note_id}/files/{purchase_order_file_id}` | Removes one attachment from a purchase order note. Nothing comes back. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Every write body is wrapped in `purchase_order`.** The one exception is the purchase invoice create, which is wrapped in `purchase_invoice`; the cancel and reactivate calls take an empty object.
+- **The note calls take the purchase order's `code`, not its `id`.** That covers listing, creating, reading and deleting notes and their files.
+- **A new purchase order is `active`.** Send `"draft": true` in the create body to save it as a draft instead.
+- **Cancelling sets the status to `inactive`.** Reactivating sets it back to `active`.
+- **Listings page by cursor.** Records are under `data`; pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`.
+- **Notes are created as a multipart form.** The text goes in the `note` field, and a file is optional.
