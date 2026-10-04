@@ -281,6 +281,9 @@
     },
     {
       "name": "External databases"
+    },
+    {
+      "name": "Reports"
     }
   ],
   "paths": {
@@ -83127,6 +83130,762 @@
           }
         ]
       }
+    },
+    "/reports/accounts/account_overview": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Retrieve the account overview report",
+        "operationId": "reports_get_reports_accounts_account_overview",
+        "description": "The report is under `report.accounts.account_overview`, one entry per `date` with `new`, `cancelled`, `reactivated`, `deleted` and `net_gain`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+        "parameters": [
+          {
+            "name": "date_range",
+            "in": "query",
+            "required": false,
+            "description": "The reporting period. `custom` uses `from` and `to`; an unrecognised value returns `400`. Without it, a default period applies.",
+            "schema": {
+              "type": "string",
+              "example": "custom"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "description": "The first day of a `custom` period, as `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-09-01"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "description": "The last day of a `custom` period, as `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-09-07"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The account overview report, under `report`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportAccountOverviewResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`date_range` is not a recognised value.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/reports/accounts/account_overview?date_range=custom&from=2026-09-01&to=2026-09-07\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.reports.get_reports_accounts_account_overview(\n    {\"date_range\": \"custom\", \"from\": \"2026-09-01\", \"to\": \"2026-09-07\"}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.reports.getReportsAccountsAccountOverview({\n    date_range: 'custom',\n    from: '2026-09-01',\n    to: '2026-09-07',\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->reports->getReportsAccountsAccountOverview([\n    'date_range' => 'custom',\n    'from' => '2026-09-01',\n    'to' => '2026-09-07',\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.reports.reports_dto.ReportsDto.ReportsAccountsAccountOverview;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReportsAccountsAccountOverview> response = client.reports().getReportsAccountsAccountOverview(\n        Map.of(\"date_range\", \"custom\", \"from\", \"2026-09-01\", \"to\", \"2026-09-07\"));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Reports.GetReportsAccountsAccountOverviewAsync(new Dictionary<string, object?>\n{\n    [\"date_range\"] = \"custom\",\n    [\"from\"] = \"2026-09-01\",\n    [\"to\"] = \"2026-09-07\",\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.reports.getReportsAccountsAccountOverview(\n  queryParams: {\n    'date_range': 'custom',\n    'from': '2026-09-01',\n    'to': '2026-09-07',\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Reports().GetReportsAccountsAccountOverview(context.Background(), map[string]any{\n\t\"date_range\": \"custom\",\n\t\"from\":       \"2026-09-01\",\n\t\"to\":         \"2026-09-07\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/reports/invoices/invoice_overview": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Retrieve the invoice overview report",
+        "operationId": "reports_get_reports_invoices_invoice_overview",
+        "description": "The report is under `report.invoices.invoice_overview`. Each entry has a `date`, an `invoice_total`, and an `amount` and `count` for `new`, `cancelled`, `reactivated`, `voided`, `amended` and `net_gain`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+        "parameters": [
+          {
+            "name": "date_range",
+            "in": "query",
+            "required": false,
+            "description": "The reporting period. `custom` uses `from` and `to`; an unrecognised value returns `400`. Without it, a default period applies.",
+            "schema": {
+              "type": "string",
+              "example": "custom"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "description": "The first day of a `custom` period, as `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-09-01"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "description": "The last day of a `custom` period, as `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-09-07"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The invoice overview report, under `report`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportInvoiceOverviewResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`date_range` is not a recognised value.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/reports/invoices/invoice_overview?date_range=custom&from=2026-09-01&to=2026-09-07\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.reports.get_reports_invoices_invoice_overview(\n    {\"date_range\": \"custom\", \"from\": \"2026-09-01\", \"to\": \"2026-09-07\"}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.reports.getReportsInvoicesInvoiceOverview({\n    date_range: 'custom',\n    from: '2026-09-01',\n    to: '2026-09-07',\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->reports->getReportsInvoicesInvoiceOverview([\n    'date_range' => 'custom',\n    'from' => '2026-09-01',\n    'to' => '2026-09-07',\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.reports.reports_dto.ReportsDto.ReportsInvoicesInvoiceOverview;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReportsInvoicesInvoiceOverview> response = client.reports().getReportsInvoicesInvoiceOverview(\n        Map.of(\"date_range\", \"custom\", \"from\", \"2026-09-01\", \"to\", \"2026-09-07\"));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Reports.GetReportsInvoicesInvoiceOverviewAsync(new Dictionary<string, object?>\n{\n    [\"date_range\"] = \"custom\",\n    [\"from\"] = \"2026-09-01\",\n    [\"to\"] = \"2026-09-07\",\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.reports.getReportsInvoicesInvoiceOverview(\n  queryParams: {\n    'date_range': 'custom',\n    'from': '2026-09-01',\n    'to': '2026-09-07',\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Reports().GetReportsInvoicesInvoiceOverview(context.Background(), map[string]any{\n\t\"date_range\": \"custom\",\n\t\"from\":       \"2026-09-01\",\n\t\"to\":         \"2026-09-07\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/reports/orders/order_overview": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Retrieve the order overview report",
+        "operationId": "reports_get_reports_orders_order_overview",
+        "description": "The report is under `report.orders.order_overview`. Each entry has a `date`, an `order_total`, and an `amount` and `count` for `new`, `cancelled`, `reactivated`, `changed`, `deleted` and `net_gain`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+        "parameters": [
+          {
+            "name": "date_range",
+            "in": "query",
+            "required": false,
+            "description": "The reporting period. `custom` uses `from` and `to`; an unrecognised value returns `400`. Without it, a default period applies.",
+            "schema": {
+              "type": "string",
+              "example": "custom"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "description": "The first day of a `custom` period, as `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-09-01"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "description": "The last day of a `custom` period, as `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-09-07"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The order overview report, under `report`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportOrderOverviewResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`date_range` is not a recognised value.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/reports/orders/order_overview?date_range=custom&from=2026-09-01&to=2026-09-07\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.reports.get_reports_orders_order_overview(\n    {\"date_range\": \"custom\", \"from\": \"2026-09-01\", \"to\": \"2026-09-07\"}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.reports.getReportsOrdersOrderOverview({\n    date_range: 'custom',\n    from: '2026-09-01',\n    to: '2026-09-07',\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->reports->getReportsOrdersOrderOverview([\n    'date_range' => 'custom',\n    'from' => '2026-09-01',\n    'to' => '2026-09-07',\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.reports.reports_dto.ReportsDto.ReportsOrdersOrderOverview;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReportsOrdersOrderOverview> response = client.reports().getReportsOrdersOrderOverview(\n        Map.of(\"date_range\", \"custom\", \"from\", \"2026-09-01\", \"to\", \"2026-09-07\"));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Reports.GetReportsOrdersOrderOverviewAsync(new Dictionary<string, object?>\n{\n    [\"date_range\"] = \"custom\",\n    [\"from\"] = \"2026-09-01\",\n    [\"to\"] = \"2026-09-07\",\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.reports.getReportsOrdersOrderOverview(\n  queryParams: {\n    'date_range': 'custom',\n    'from': '2026-09-01',\n    'to': '2026-09-07',\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Reports().GetReportsOrdersOrderOverview(context.Background(), map[string]any{\n\t\"date_range\": \"custom\",\n\t\"from\":       \"2026-09-01\",\n\t\"to\":         \"2026-09-07\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/reports/purchase_invoices/purchase_invoice_overview": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Retrieve the purchase invoice overview report",
+        "operationId": "reports_get_reports_purchase_invoices_purchase_invoice_overview",
+        "description": "The report is under `report.purchase_invoices.purchase_invoice_overview`. Each entry has a `date`, a `purchase_invoice_total`, and an `amount` and `count` for `new`, `cancelled`, `reactivated`, `voided`, `amended` and `net_gain`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+        "parameters": [
+          {
+            "name": "date_range",
+            "in": "query",
+            "required": false,
+            "description": "The reporting period. `custom` uses `from` and `to`; an unrecognised value returns `400`. Without it, a default period applies.",
+            "schema": {
+              "type": "string",
+              "example": "custom"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "description": "The first day of a `custom` period, as `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-09-01"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "description": "The last day of a `custom` period, as `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-09-07"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The purchase invoice overview report, under `report`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportPurchaseInvoiceOverviewResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`date_range` is not a recognised value.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/reports/purchase_invoices/purchase_invoice_overview?date_range=custom&from=2026-09-01&to=2026-09-07\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.reports.get_reports_purchase_invoices_purchase_invoice_overview(\n    {\"date_range\": \"custom\", \"from\": \"2026-09-01\", \"to\": \"2026-09-07\"}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.reports.getReportsPurchaseInvoicesPurchaseInvoiceOverview({\n    date_range: 'custom',\n    from: '2026-09-01',\n    to: '2026-09-07',\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->reports->getReportsPurchaseInvoicesPurchaseInvoiceOverview([\n    'date_range' => 'custom',\n    'from' => '2026-09-01',\n    'to' => '2026-09-07',\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.reports.reports_dto.ReportsDto.ReportsPurchaseInvoicesPurchaseInvoiceOverview;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReportsPurchaseInvoicesPurchaseInvoiceOverview> response = client.reports().getReportsPurchaseInvoicesPurchaseInvoiceOverview(\n        Map.of(\"date_range\", \"custom\", \"from\", \"2026-09-01\", \"to\", \"2026-09-07\"));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Reports.GetReportsPurchaseInvoicesPurchaseInvoiceOverviewAsync(new Dictionary<string, object?>\n{\n    [\"date_range\"] = \"custom\",\n    [\"from\"] = \"2026-09-01\",\n    [\"to\"] = \"2026-09-07\",\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.reports\n    .getReportsPurchaseInvoicesPurchaseInvoiceOverview(\n      queryParams: {\n        'date_range': 'custom',\n        'from': '2026-09-01',\n        'to': '2026-09-07',\n      },\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Reports().GetReportsPurchaseInvoicesPurchaseInvoiceOverview(context.Background(), map[string]any{\n\t\"date_range\": \"custom\",\n\t\"from\":       \"2026-09-01\",\n\t\"to\":         \"2026-09-07\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/reports/purchase_orders/purchase_order_overview": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Retrieve the purchase order overview report",
+        "operationId": "reports_get_reports_purchase_orders_purchase_order_overview",
+        "description": "The report is under `report.purchase_orders.purchase_order_overview`. Each entry has a `date`, a `purchase_order_total`, and an `amount` and `count` for `new`, `cancelled`, `reactivated`, `changed`, `deleted` and `net_purchases`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+        "parameters": [
+          {
+            "name": "date_range",
+            "in": "query",
+            "required": false,
+            "description": "The reporting period. `custom` uses `from` and `to`; an unrecognised value returns `400`. Without it, a default period applies.",
+            "schema": {
+              "type": "string",
+              "example": "custom"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "description": "The first day of a `custom` period, as `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-09-01"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "description": "The last day of a `custom` period, as `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-09-07"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The purchase order overview report, under `report`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportPurchaseOrderOverviewResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`date_range` is not a recognised value.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/reports/purchase_orders/purchase_order_overview?date_range=custom&from=2026-09-01&to=2026-09-07\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.reports.get_reports_purchase_orders_purchase_order_overview(\n    {\"date_range\": \"custom\", \"from\": \"2026-09-01\", \"to\": \"2026-09-07\"}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.reports.getReportsPurchaseOrdersPurchaseOrderOverview({\n    date_range: 'custom',\n    from: '2026-09-01',\n    to: '2026-09-07',\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->reports->getReportsPurchaseOrdersPurchaseOrderOverview([\n    'date_range' => 'custom',\n    'from' => '2026-09-01',\n    'to' => '2026-09-07',\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.reports.reports_dto.ReportsDto.ReportsPurchaseOrdersPurchaseOrderOverview;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReportsPurchaseOrdersPurchaseOrderOverview> response = client.reports().getReportsPurchaseOrdersPurchaseOrderOverview(\n        Map.of(\"date_range\", \"custom\", \"from\", \"2026-09-01\", \"to\", \"2026-09-07\"));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Reports.GetReportsPurchaseOrdersPurchaseOrderOverviewAsync(new Dictionary<string, object?>\n{\n    [\"date_range\"] = \"custom\",\n    [\"from\"] = \"2026-09-01\",\n    [\"to\"] = \"2026-09-07\",\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.reports\n    .getReportsPurchaseOrdersPurchaseOrderOverview(\n      queryParams: {\n        'date_range': 'custom',\n        'from': '2026-09-01',\n        'to': '2026-09-07',\n      },\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Reports().GetReportsPurchaseOrdersPurchaseOrderOverview(context.Background(), map[string]any{\n\t\"date_range\": \"custom\",\n\t\"from\":       \"2026-09-01\",\n\t\"to\":         \"2026-09-07\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/reports/purchase_transactions/purchase_payment_and_refund_overview": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Retrieve the purchase payment and refund overview report",
+        "operationId": "reports_get_reports_purchase_transactions_purchase_payment_and_refund_overview",
+        "description": "The report is under `report.purchase_payment_and_refund_overview`, with a `purchase_payments` list and a `purchase_refunds` list. Each entry has a `date` and an `amount` and `count` for `new` and `deleted`; a purchase payment entry also has `purchase_payment_applied`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+        "parameters": [
+          {
+            "name": "date_range",
+            "in": "query",
+            "required": false,
+            "description": "The reporting period. `custom` uses `from` and `to`; an unrecognised value returns `400`. Without it, a default period applies.",
+            "schema": {
+              "type": "string",
+              "example": "custom"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "description": "The first day of a `custom` period, as `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-09-01"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "description": "The last day of a `custom` period, as `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-09-07"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The purchase payment and refund overview report, under `report`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportPurchasePaymentAndRefundOverviewResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`date_range` is not a recognised value.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/reports/purchase_transactions/purchase_payment_and_refund_overview?date_range=custom&from=2026-09-01&to=2026-09-07\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.reports.get_reports_purchase_transactions_purchase_payment_and_refund_overview(\n    {\"date_range\": \"custom\", \"from\": \"2026-09-01\", \"to\": \"2026-09-07\"}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.reports.getReportsPurchaseTransactionsPurchasePaymentAndRefundOverview({\n    date_range: 'custom',\n    from: '2026-09-01',\n    to: '2026-09-07',\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->reports->getReportsPurchaseTransactionsPurchasePaymentAndRefundOverview([\n    'date_range' => 'custom',\n    'from' => '2026-09-01',\n    'to' => '2026-09-07',\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.reports.reports_dto.ReportsDto.ReportsPurchaseTransactionsPurchasePaymentAndRefundOverview;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReportsPurchaseTransactionsPurchasePaymentAndRefundOverview> response = client.reports().getReportsPurchaseTransactionsPurchasePaymentAndRefundOverview(\n        Map.of(\"date_range\", \"custom\", \"from\", \"2026-09-01\", \"to\", \"2026-09-07\"));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Reports.GetReportsPurchaseTransactionsPurchasePaymentAndRefundOverviewAsync(new Dictionary<string, object?>\n{\n    [\"date_range\"] = \"custom\",\n    [\"from\"] = \"2026-09-01\",\n    [\"to\"] = \"2026-09-07\",\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.reports\n    .getReportsPurchaseTransactionsPurchasePaymentAndRefundOverview(\n      queryParams: {\n        'date_range': 'custom',\n        'from': '2026-09-01',\n        'to': '2026-09-07',\n      },\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Reports().GetReportsPurchaseTransactionsPurchasePaymentAndRefundOverview(context.Background(), map[string]any{\n\t\"date_range\": \"custom\",\n\t\"from\":       \"2026-09-01\",\n\t\"to\":         \"2026-09-07\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/reports/transactions/payment_and_refund_overview": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Retrieve the payment and refund overview report",
+        "operationId": "reports_get_reports_transactions_payment_and_refund_overview",
+        "description": "The report is under `report.payment_and_refund_overview`, with a `payments` list and a `refunds` list. Each entry has a `date` and an `amount` and `count` for `new` and `deleted`; a payment entry also has `payment_applied`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+        "parameters": [
+          {
+            "name": "date_range",
+            "in": "query",
+            "required": false,
+            "description": "The reporting period. `custom` uses `from` and `to`; an unrecognised value returns `400`. Without it, a default period applies.",
+            "schema": {
+              "type": "string",
+              "example": "custom"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "description": "The first day of a `custom` period, as `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-09-01"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "description": "The last day of a `custom` period, as `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-09-07"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The payment and refund overview report, under `report`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportPaymentAndRefundOverviewResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`date_range` is not a recognised value.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/reports/transactions/payment_and_refund_overview?date_range=custom&from=2026-09-01&to=2026-09-07\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.reports.get_reports_transactions_payment_and_refund_overview(\n    {\"date_range\": \"custom\", \"from\": \"2026-09-01\", \"to\": \"2026-09-07\"}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.reports.getReportsTransactionsPaymentAndRefundOverview({\n    date_range: 'custom',\n    from: '2026-09-01',\n    to: '2026-09-07',\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->reports->getReportsTransactionsPaymentAndRefundOverview([\n    'date_range' => 'custom',\n    'from' => '2026-09-01',\n    'to' => '2026-09-07',\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.reports.reports_dto.ReportsDto.ReportsTransactionsPaymentAndRefundOverview;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ReportsTransactionsPaymentAndRefundOverview> response = client.reports().getReportsTransactionsPaymentAndRefundOverview(\n        Map.of(\"date_range\", \"custom\", \"from\", \"2026-09-01\", \"to\", \"2026-09-07\"));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Reports.GetReportsTransactionsPaymentAndRefundOverviewAsync(new Dictionary<string, object?>\n{\n    [\"date_range\"] = \"custom\",\n    [\"from\"] = \"2026-09-01\",\n    [\"to\"] = \"2026-09-07\",\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.reports\n    .getReportsTransactionsPaymentAndRefundOverview(\n      queryParams: {\n        'date_range': 'custom',\n        'from': '2026-09-01',\n        'to': '2026-09-07',\n      },\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Reports().GetReportsTransactionsPaymentAndRefundOverview(context.Background(), map[string]any{\n\t\"date_range\": \"custom\",\n\t\"from\":       \"2026-09-01\",\n\t\"to\":         \"2026-09-07\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -125045,6 +125804,378 @@
         "properties": {
           "message": {
             "type": "string"
+          }
+        }
+      },
+      "ReportAmountCount": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "count": {
+            "type": "string"
+          }
+        },
+        "description": "An amount and a count, both as strings."
+      },
+      "ReportAccountOverviewResponse": {
+        "type": "object",
+        "properties": {
+          "report": {
+            "type": "object",
+            "properties": {
+              "accounts": {
+                "type": "object",
+                "properties": {
+                  "account_overview": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ReportAccountOverviewEntry"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ReportAccountOverviewEntry": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "new": {
+            "type": "string"
+          },
+          "cancelled": {
+            "type": "string"
+          },
+          "reactivated": {
+            "type": "string"
+          },
+          "deleted": {
+            "type": "string"
+          },
+          "net_gain": {
+            "type": "string"
+          }
+        }
+      },
+      "ReportInvoiceOverviewResponse": {
+        "type": "object",
+        "properties": {
+          "report": {
+            "type": "object",
+            "properties": {
+              "invoices": {
+                "type": "object",
+                "properties": {
+                  "invoice_overview": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ReportInvoiceOverviewEntry"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ReportInvoiceOverviewEntry": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "invoice_total": {
+            "type": "string"
+          },
+          "new": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "cancelled": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "reactivated": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "voided": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "amended": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "net_gain": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          }
+        }
+      },
+      "ReportOrderOverviewResponse": {
+        "type": "object",
+        "properties": {
+          "report": {
+            "type": "object",
+            "properties": {
+              "orders": {
+                "type": "object",
+                "properties": {
+                  "order_overview": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ReportOrderOverviewEntry"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ReportOrderOverviewEntry": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "order_total": {
+            "type": "string"
+          },
+          "new": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "cancelled": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "reactivated": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "changed": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "deleted": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "net_gain": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          }
+        }
+      },
+      "ReportPurchaseInvoiceOverviewResponse": {
+        "type": "object",
+        "properties": {
+          "report": {
+            "type": "object",
+            "properties": {
+              "purchase_invoices": {
+                "type": "object",
+                "properties": {
+                  "purchase_invoice_overview": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ReportPurchaseInvoiceOverviewEntry"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ReportPurchaseInvoiceOverviewEntry": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "purchase_invoice_total": {
+            "type": "string"
+          },
+          "new": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "cancelled": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "reactivated": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "voided": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "amended": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "net_gain": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          }
+        }
+      },
+      "ReportPurchaseOrderOverviewResponse": {
+        "type": "object",
+        "properties": {
+          "report": {
+            "type": "object",
+            "properties": {
+              "purchase_orders": {
+                "type": "object",
+                "properties": {
+                  "purchase_order_overview": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ReportPurchaseOrderOverviewEntry"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ReportPurchaseOrderOverviewEntry": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "purchase_order_total": {
+            "type": "string"
+          },
+          "new": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "cancelled": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "reactivated": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "changed": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "deleted": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "net_purchases": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          }
+        }
+      },
+      "ReportPurchasePaymentAndRefundOverviewResponse": {
+        "type": "object",
+        "properties": {
+          "report": {
+            "type": "object",
+            "properties": {
+              "purchase_payment_and_refund_overview": {
+                "type": "object",
+                "properties": {
+                  "purchase_payments": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ReportPurchasePaymentEntry"
+                    }
+                  },
+                  "purchase_refunds": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ReportPurchaseRefundEntry"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ReportPurchasePaymentEntry": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "purchase_payment_applied": {
+            "type": "string"
+          },
+          "new": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "deleted": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          }
+        }
+      },
+      "ReportPurchaseRefundEntry": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "new": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "deleted": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          }
+        }
+      },
+      "ReportPaymentAndRefundOverviewResponse": {
+        "type": "object",
+        "properties": {
+          "report": {
+            "type": "object",
+            "properties": {
+              "payment_and_refund_overview": {
+                "type": "object",
+                "properties": {
+                  "payments": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ReportPaymentEntry"
+                    }
+                  },
+                  "refunds": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ReportRefundEntry"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ReportPaymentEntry": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "payment_applied": {
+            "type": "string"
+          },
+          "new": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "deleted": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          }
+        }
+      },
+      "ReportRefundEntry": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "new": {
+            "$ref": "#/components/schemas/ReportAmountCount"
+          },
+          "deleted": {
+            "$ref": "#/components/schemas/ReportAmountCount"
           }
         }
       },

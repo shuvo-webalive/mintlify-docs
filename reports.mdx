@@ -1,0 +1,33 @@
+---
+title: "Reports"
+sidebarTitle: "Overview"
+description: "Read overview reports for accounts, invoices, orders, purchases, payments and refunds over a date range."
+---
+
+Reports return overview figures as a list of dated entries over a period: accounts, invoices, orders, purchase invoices, purchase orders, payments and refunds, and purchase payments and refunds. Each report is a single read with a date range. This area has 7 endpoints, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Retrieve the account overview report](/api-reference/reports/retrieve-the-account-overview-report) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/reports/accounts/account_overview` | Returns new, cancelled, reactivated and deleted account counts, with the net gain, for each dated entry in a period. |
+| [Retrieve the invoice overview report](/api-reference/reports/retrieve-the-invoice-overview-report) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/reports/invoices/invoice_overview` | Returns invoice totals and the amount and count of new, cancelled, reactivated, voided and amended invoices for each dated entry in a period. |
+| [Retrieve the order overview report](/api-reference/reports/retrieve-the-order-overview-report) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/reports/orders/order_overview` | Returns order totals and the amount and count of new, cancelled, reactivated, changed and deleted orders for each dated entry in a period. |
+| [Retrieve the purchase invoice overview report](/api-reference/reports/retrieve-the-purchase-invoice-overview-report) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/reports/purchase_invoices/purchase_invoice_overview` | Returns purchase invoice totals and the amount and count of new, cancelled, reactivated, voided and amended purchase invoices for each dated entry in a period. |
+| [Retrieve the purchase order overview report](/api-reference/reports/retrieve-the-purchase-order-overview-report) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/reports/purchase_orders/purchase_order_overview` | Returns purchase order totals and the amount and count of new, cancelled, reactivated, changed and deleted purchase orders for each dated entry in a period. |
+| [Retrieve the purchase payment and refund overview report](/api-reference/reports/retrieve-the-purchase-payment-and-refund-overview-report) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/reports/purchase_transactions/purchase_payment_and_refund_overview` | Returns the purchase payments and purchase refunds made and deleted for each dated entry in a period. |
+| [Retrieve the payment and refund overview report](/api-reference/reports/retrieve-the-payment-and-refund-overview-report) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/reports/transactions/payment_and_refund_overview` | Returns the payments and refunds made and deleted for each dated entry in a period. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Every report comes back under `report`.** Inside it, one key names the report, such as `accounts` holding an `account_overview` list.
+- **Choose the period with `date_range`.** Send `date_range=custom` with `from` and `to` dates as `YYYY-MM-DD`; an unrecognised `date_range` returns `400`.
+- **A report has a default period.** Called with no parameters, it gives 7 dated entries, the same count as a seven day `custom` range.
+- **Amounts and counts are strings.** Fields such as `amount`, `count`, `net_gain` and `invoice_total` are JSON strings, not numbers.
+- **A report can take up to 90 seconds.** Set a client timeout above the default 30 seconds, such as 120.
