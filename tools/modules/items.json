@@ -1,0 +1,4618 @@
+{
+  "family": "items",
+  "tag": "Items",
+  "slug": "items",
+  "icon": "box",
+  "base": "/items",
+  "overview_description": "Create and update items, set their sale, purchase and inventory sections, add stock, and manage bundles, families, packages and notes.",
+  "intro": "Items are the products and services you sell and buy. These endpoints create, read, update and delete items, set their sale, purchase and inventory sections, add stock to warehouses, and manage bundles, families, variations, packages and notes. This area has 41 endpoints, and all seven SDKs call every one.",
+  "warning": "**Deleting an item removes it, and a later read returns `404`.** An item that an order references is refused with `409`, and retrying does not help.",
+  "notes": [
+    "**Every item write is wrapped in `item`.** The one exception is the image upload, which sends `image_base64` at the top level of the body.",
+    "**Address an item by its `id`, such as `ITEM-0001`.** Not by its `uuid`, and not by the integer `id` that the sale and purchase reads return.",
+    "**`type` and `name` are the minimum to create an item.** Send `type` in upper case, such as `STANDARD`, `BUNDLE`, `FAMILY` or `VARIATION_BASED`; it comes back in lower case.",
+    "**The item listing pages by cursor.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor`; `has_more` tells you when to stop. Filter with `filter_<field>`; a bare `filter` expression is refused with `400`, and `order_by` and `direction` are ignored.",
+    "**The sale, purchase and inventories reads return a short item.** Each carries `id`, `name` and its one section, and the sale and purchase reads give `id` as an integer.",
+    "**Item notes are sent as a multipart form.** The text goes in the `note` field, and files are optional extra parts."
+  ],
+  "endpoints": [
+    {
+      "key": "get_items",
+      "method": "GET",
+      "path": "/items",
+      "slug": "list-items",
+      "title": "List items",
+      "summary": "Returns a page of items with their core fields and capability flags.",
+      "description": "Returns items one page at a time under `data`, with `pagination` holding `has_more` and `next_cursor`. Set the page size with `limit` and fetch the next page with `cursor`. Filter with `filter_<field>` or `filter_<field>_<operator>`: an unknown field is refused with `400`, and a value the field cannot match returns an empty `data`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` to sort descending, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        },
+        {
+          "name": "filter_id",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `id` equals this value. Also takes `_neq`, `_contains` and `_not_contains`.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_uuid",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `uuid` equals this value. Also takes `_neq`.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_name",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `name` equals this value. Also takes `_neq`, `_contains` and `_not_contains`.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_display_name",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `display_name` equals this value. Also takes `_neq`, `_contains` and `_not_contains`.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_description",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `description` equals this value. Also takes `_neq`, `_contains` and `_not_contains`.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_status",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `status` equals this value. Also takes `_neq`.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_type",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `type` equals this value. Also takes `_neq`.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_origin",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `origin` equals this value. Also takes `_neq`, `_contains` and `_not_contains`.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_invoice_note",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `invoice_note` equals this value. Also takes `_neq`, `_contains` and `_not_contains`.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_image_uri",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `image_uri` equals this value. Also takes `_neq`, `_contains` and `_not_contains`.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_base_uom",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `base_uom` equals this value. Also takes `_neq`.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_group",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `group` equals this value. Also takes `_neq`.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_manager",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `manager` equals this value. Also takes `_neq`.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_custom_form",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `custom_form` equals this value. Also takes `_neq`.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_created_by",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `created_by` equals this value. Also takes `_neq`.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_last_updated_by",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `last_updated_by` equals this value. Also takes `_neq`.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_version",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `version` equals this value. Also takes `_neq`.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_item_number",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `item_number` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_upc_code",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `upc_code` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_sale_enabled",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `sale_enabled` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_sales_accounting_code_revenue",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `sales_accounting_code_revenue` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_sales_billing_mode",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `sales_billing_mode` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_sales_charge_type",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `sales_charge_type` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_sales_currency",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `sales_currency` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_sales_fulfillment_mode",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `sales_fulfillment_mode` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_sales_payment_mode",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `sales_payment_mode` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_sales_pricing_method",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `sales_pricing_method` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_sales_tax_inclusive_based_on",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `sales_tax_inclusive_based_on` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_purchase_enabled",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `purchase_enabled` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_purchase_currency",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `purchase_currency` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_purchase_order_note",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `purchase_order_note` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_purchase_profile",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `purchase_profile` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_purchase_receive_mode",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `purchase_receive_mode` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_inventory_enabled",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `inventory_enabled` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_inventory_quantity_available",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `inventory_quantity_available` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_inventory_quantity_on_hand",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `inventory_quantity_on_hand` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_inventory_qty_avl_on_sale_determination",
+          "in": "query",
+          "required": false,
+          "description": "Only items whose `inventory_qty_avl_on_sale_determination` in the sale, purchase or inventory section equals this value.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of items, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemList"
+          }
+        },
+        "400": {
+          "description": "A bare `filter` expression, or a `filter_<field>` name that is not a filterable field."
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_item",
+      "method": "GET",
+      "path": "/items/{item_id}",
+      "slug": "retrieve-an-item",
+      "title": "Retrieve an item",
+      "summary": "Returns one item by its `id`, with its sale, purchase and inventory sections.",
+      "description": "Returns the item under `item`. The sale, purchase and inventories sections come inline, along with the item's bundle, family, package and variation lists.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        },
+        "404": {
+          "description": "No item has that `id`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        }
+      }
+    },
+    {
+      "key": "get_item_information",
+      "method": "GET",
+      "path": "/items/{item_id}/information",
+      "slug": "retrieve-an-items-information",
+      "title": "Retrieve an item's information",
+      "summary": "Returns an item's core information, without its sale, purchase or inventory sections.",
+      "description": "Returns the item under `item` with its name, type, status, codes, currencies and other core fields. The sale, purchase and inventory sections are left out; read them with their own endpoints.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The item's core information, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        }
+      }
+    },
+    {
+      "key": "create_item",
+      "method": "POST",
+      "path": "/items",
+      "slug": "create-an-item",
+      "title": "Create an item",
+      "summary": "Creates an item and returns it under `item`.",
+      "description": "Send the item under `item`. `type` and `name` are the minimum. A bundle lists its components in `bundle_details`, each with an `id` and a `quantity`; a variation parent sends `is_parent: true`, and a child sends `is_child: true` with the parent's `parent_item_id`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "`STANDARD`, `BUNDLE`, `FAMILY` or `VARIATION_BASED`."
+                },
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "origin": {
+                  "type": "string"
+                },
+                "invoice_note": {
+                  "type": "string"
+                },
+                "manager": {
+                  "type": "string"
+                },
+                "custom_form": {
+                  "type": "string"
+                },
+                "group": {
+                  "type": "string",
+                  "description": "An existing item group. An unknown group is refused with `400`."
+                },
+                "is_parent": {
+                  "type": "boolean",
+                  "description": "Set `true` for a variation parent. Reads back as `parent`."
+                },
+                "is_child": {
+                  "type": "boolean",
+                  "description": "Set `true` for a variation child. Reads back as `child`."
+                },
+                "parent_item_id": {
+                  "type": "string",
+                  "description": "The parent item's `id`, for a variation child."
+                },
+                "currencies": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The currency code, such as `AUD`."
+                      },
+                      "used_for_sale": {
+                        "type": "boolean"
+                      },
+                      "default_for_sale": {
+                        "type": "boolean"
+                      },
+                      "used_for_purchase": {
+                        "type": "boolean"
+                      },
+                      "default_for_purchase": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                },
+                "uoms": {
+                  "type": "array"
+                },
+                "sale": {
+                  "type": "object",
+                  "description": "The sale section, as the sale create takes it."
+                },
+                "purchase": {
+                  "type": "object",
+                  "description": "The purchase section, as the purchase create takes it."
+                },
+                "inventories": {
+                  "type": "object",
+                  "description": "The inventory section."
+                },
+                "bundle_details": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "A component item's `id`."
+                      },
+                      "quantity": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              },
+              "required": [
+                "type",
+                "name"
+              ]
+            }
+          },
+          "required": [
+            "item"
+          ]
+        },
+        "example": {
+          "item": {
+            "type": "STANDARD",
+            "name": "Acme Widget"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        },
+        "400": {
+          "description": "The `group` names no existing item group."
+        }
+      },
+      "example_call": {
+        "body": {
+          "item": {
+            "type": "STANDARD",
+            "name": "Acme Widget"
+          }
+        }
+      }
+    },
+    {
+      "key": "update_item_information",
+      "method": "PATCH",
+      "path": "/items/{item_id}/information",
+      "slug": "update-an-items-information",
+      "title": "Update an item's information",
+      "summary": "Changes an item's core information and returns the item.",
+      "description": "Send only the fields that change, under `item`. Fields you leave out keep their values.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "origin": {
+                  "type": "string"
+                },
+                "invoice_note": {
+                  "type": "string"
+                },
+                "manager": {
+                  "type": "string"
+                },
+                "custom_form": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "item"
+          ]
+        },
+        "example": {
+          "item": {
+            "description": "Stainless steel widget",
+            "display_name": "Acme Widget"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        },
+        "body": {
+          "item": {
+            "description": "Stainless steel widget",
+            "display_name": "Acme Widget"
+          }
+        }
+      }
+    },
+    {
+      "key": "deactivate_item",
+      "method": "POST",
+      "path": "/items/{item_id}/deactivate",
+      "slug": "deactivate-an-item",
+      "title": "Deactivate an item",
+      "summary": "Sets an item's status to inactive and returns the item.",
+      "description": "Takes no body. After the call the item's `status` reads `inactive`; reactivate it to set it back to `active`.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        }
+      }
+    },
+    {
+      "key": "reactivate_item",
+      "method": "POST",
+      "path": "/items/{item_id}/reactivate",
+      "slug": "reactivate-an-item",
+      "title": "Reactivate an item",
+      "summary": "Sets a deactivated item's status back to active and returns the item.",
+      "description": "Takes no body. After the call the item's `status` reads `active`.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        }
+      }
+    },
+    {
+      "key": "delete_item",
+      "method": "DELETE",
+      "path": "/items/{item_id}",
+      "slug": "delete-an-item",
+      "title": "Delete an item",
+      "summary": "Deletes an item. A successful call returns `204` with no body.",
+      "description": "Deletes the item with that `id`; a later read returns `404`. An item that an order references cannot be deleted.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The item is deleted. No body."
+        },
+        "409": {
+          "description": "An order references the item. Retrying does not help."
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        }
+      }
+    },
+    {
+      "key": "upload_item_image",
+      "method": "POST",
+      "path": "/items/{item_id}/image",
+      "slug": "upload-an-items-image",
+      "title": "Upload an item's image",
+      "summary": "Sets an item's image from base64 text and returns the item.",
+      "description": "Send the image as base64 text in `image_base64`, at the top level of a JSON body with no `item` wrapper. This is not a multipart upload. Afterwards the item's `image_url` holds the image's address.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "image_base64": {
+              "type": "string",
+              "description": "The image file, base64 encoded."
+            }
+          },
+          "required": [
+            "image_base64"
+          ]
+        },
+        "example": {
+          "image_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        },
+        "body": {
+          "image_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+        }
+      }
+    },
+    {
+      "key": "get_item_sale",
+      "method": "GET",
+      "path": "/items/{item_id}/sale",
+      "slug": "retrieve-an-items-sale-settings",
+      "title": "Retrieve an item's sale settings",
+      "summary": "Returns an item's sale section in a short item with `id`, `name` and `sale`.",
+      "description": "Returns `{id, name, sale}` under `item`. Here `id` is an integer, not the item's `id` code, so keep using the code in paths.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The short item with its sale section, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemSaleViewResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        }
+      }
+    },
+    {
+      "key": "create_item_sale",
+      "method": "POST",
+      "path": "/items/{item_id}/sale",
+      "slug": "create-an-items-sale-settings",
+      "title": "Create an item's sale settings",
+      "summary": "Adds a sale section to an item and returns the item.",
+      "description": "Send the `sale` section, and the `currencies` it sells in, inside `item`. An item takes one sale section: a second create is refused with `409` `already_exists`; change it with the update instead.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "object",
+              "properties": {
+                "currencies": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The currency code, such as `AUD`."
+                      },
+                      "used_for_sale": {
+                        "type": "boolean"
+                      },
+                      "default_for_sale": {
+                        "type": "boolean"
+                      },
+                      "used_for_purchase": {
+                        "type": "boolean"
+                      },
+                      "default_for_purchase": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                },
+                "sale": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "default_sale_price": {
+                      "type": "number"
+                    },
+                    "default_sale_currency": {
+                      "type": "string"
+                    },
+                    "pricing_method": {
+                      "type": "string",
+                      "description": "Such as `STANDARD`."
+                    },
+                    "charge": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "description": "Such as `ONE_OFF`."
+                        }
+                      }
+                    },
+                    "pricing": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "description": "Such as `PER_UNIT_PRICING`."
+                        },
+                        "pricing_module": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "price": {
+                                "type": "number"
+                              },
+                              "currency": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "required": [
+                "sale"
+              ]
+            }
+          },
+          "required": [
+            "item"
+          ]
+        },
+        "example": {
+          "item": {
+            "currencies": [
+              {
+                "name": "AUD",
+                "default_for_sale": true,
+                "used_for_sale": true
+              }
+            ],
+            "sale": {
+              "enabled": true,
+              "default_sale_price": 1,
+              "default_sale_currency": "AUD",
+              "pricing_method": "STANDARD",
+              "charge": {
+                "type": "ONE_OFF"
+              },
+              "pricing": {
+                "type": "PER_UNIT_PRICING"
+              }
+            }
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        },
+        "409": {
+          "description": "The item already has a sale section (`already_exists`)."
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        },
+        "body": {
+          "item": {
+            "currencies": [
+              {
+                "name": "AUD",
+                "default_for_sale": true,
+                "used_for_sale": true
+              }
+            ],
+            "sale": {
+              "enabled": true,
+              "default_sale_price": 1,
+              "default_sale_currency": "AUD",
+              "pricing_method": "STANDARD",
+              "charge": {
+                "type": "ONE_OFF"
+              },
+              "pricing": {
+                "type": "PER_UNIT_PRICING"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "key": "update_item_sale",
+      "method": "PATCH",
+      "path": "/items/{item_id}/sale",
+      "slug": "update-an-items-sale-settings",
+      "title": "Update an item's sale settings",
+      "summary": "Changes part of an item's sale section and returns the item.",
+      "description": "Send only the sale fields that change, inside `item.sale`. Fields you leave out keep their values.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "object",
+              "properties": {
+                "currencies": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The currency code, such as `AUD`."
+                      },
+                      "used_for_sale": {
+                        "type": "boolean"
+                      },
+                      "default_for_sale": {
+                        "type": "boolean"
+                      },
+                      "used_for_purchase": {
+                        "type": "boolean"
+                      },
+                      "default_for_purchase": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                },
+                "sale": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "default_sale_price": {
+                      "type": "number"
+                    },
+                    "default_sale_currency": {
+                      "type": "string"
+                    },
+                    "pricing_method": {
+                      "type": "string",
+                      "description": "Such as `STANDARD`."
+                    },
+                    "charge": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "description": "Such as `ONE_OFF`."
+                        }
+                      }
+                    },
+                    "pricing": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "description": "Such as `PER_UNIT_PRICING`."
+                        },
+                        "pricing_module": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "price": {
+                                "type": "number"
+                              },
+                              "currency": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "required": [
+                "sale"
+              ]
+            }
+          },
+          "required": [
+            "item"
+          ]
+        },
+        "example": {
+          "item": {
+            "sale": {
+              "default_sale_price": 2
+            }
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        },
+        "body": {
+          "item": {
+            "sale": {
+              "default_sale_price": 2
+            }
+          }
+        }
+      }
+    },
+    {
+      "key": "get_item_purchase",
+      "method": "GET",
+      "path": "/items/{item_id}/purchase",
+      "slug": "retrieve-an-items-purchase-settings",
+      "title": "Retrieve an item's purchase settings",
+      "summary": "Returns an item's purchase section in a short item with `id`, `name` and `purchase`.",
+      "description": "Returns `{id, name, purchase}` under `item`. Here `id` is an integer, not the item's `id` code.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The short item with its purchase section, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemPurchaseViewResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        }
+      }
+    },
+    {
+      "key": "create_item_purchase",
+      "method": "POST",
+      "path": "/items/{item_id}/purchase",
+      "slug": "create-an-items-purchase-settings",
+      "title": "Create an item's purchase settings",
+      "summary": "Adds a purchase section to an item and returns the item.",
+      "description": "Send the `purchase` section, and the `currencies` it buys in, inside `item`.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "object",
+              "properties": {
+                "currencies": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The currency code, such as `AUD`."
+                      },
+                      "used_for_sale": {
+                        "type": "boolean"
+                      },
+                      "default_for_sale": {
+                        "type": "boolean"
+                      },
+                      "used_for_purchase": {
+                        "type": "boolean"
+                      },
+                      "default_for_purchase": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                },
+                "purchase": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "supplier_management_enabled": {
+                      "type": "boolean"
+                    },
+                    "default_purchase_price": {
+                      "type": "number"
+                    },
+                    "default_purchase_currency": {
+                      "type": "string"
+                    },
+                    "pricing": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "description": "Such as `PER_UNIT_PRICING`."
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "required": [
+                "purchase"
+              ]
+            }
+          },
+          "required": [
+            "item"
+          ]
+        },
+        "example": {
+          "item": {
+            "currencies": [
+              {
+                "name": "AUD",
+                "default_for_purchase": true,
+                "used_for_purchase": true
+              }
+            ],
+            "purchase": {
+              "enabled": true,
+              "default_purchase_price": 1,
+              "default_purchase_currency": "AUD",
+              "pricing": {
+                "type": "PER_UNIT_PRICING"
+              }
+            }
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        },
+        "body": {
+          "item": {
+            "currencies": [
+              {
+                "name": "AUD",
+                "default_for_purchase": true,
+                "used_for_purchase": true
+              }
+            ],
+            "purchase": {
+              "enabled": true,
+              "default_purchase_price": 1,
+              "default_purchase_currency": "AUD",
+              "pricing": {
+                "type": "PER_UNIT_PRICING"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "key": "update_item_purchase",
+      "method": "PATCH",
+      "path": "/items/{item_id}/purchase",
+      "slug": "update-an-items-purchase-settings",
+      "title": "Update an item's purchase settings",
+      "summary": "Changes part of an item's purchase section and returns the item.",
+      "description": "Send only the purchase fields that change, inside `item.purchase`.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "object",
+              "properties": {
+                "currencies": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The currency code, such as `AUD`."
+                      },
+                      "used_for_sale": {
+                        "type": "boolean"
+                      },
+                      "default_for_sale": {
+                        "type": "boolean"
+                      },
+                      "used_for_purchase": {
+                        "type": "boolean"
+                      },
+                      "default_for_purchase": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                },
+                "purchase": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "supplier_management_enabled": {
+                      "type": "boolean"
+                    },
+                    "default_purchase_price": {
+                      "type": "number"
+                    },
+                    "default_purchase_currency": {
+                      "type": "string"
+                    },
+                    "pricing": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "description": "Such as `PER_UNIT_PRICING`."
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "required": [
+                "purchase"
+              ]
+            }
+          },
+          "required": [
+            "item"
+          ]
+        },
+        "example": {
+          "item": {
+            "purchase": {
+              "default_purchase_price": 2
+            }
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        },
+        "body": {
+          "item": {
+            "purchase": {
+              "default_purchase_price": 2
+            }
+          }
+        }
+      }
+    },
+    {
+      "key": "get_item_inventories",
+      "method": "GET",
+      "path": "/items/{item_id}/inventories",
+      "slug": "retrieve-an-items-inventory-settings-and-stock",
+      "title": "Retrieve an item's inventory settings and stock",
+      "summary": "Returns an item's inventory section and its stock per warehouse.",
+      "description": "Returns `{id, name, inventories}` under `item`, where `id` is the item's `id` code. `inventories.warehouses` lists each warehouse with its quantities on hand, available, on order and promised.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The short item with its inventory section, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemInventoriesViewResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        }
+      }
+    },
+    {
+      "key": "update_item_inventories",
+      "method": "PATCH",
+      "path": "/items/{item_id}/inventories",
+      "slug": "update-an-items-inventory-settings",
+      "title": "Update an item's inventory settings",
+      "summary": "Changes an item's inventory section and returns the item.",
+      "description": "Send the changes inside `item.inventories`. Turn inventory on with `enabled: true`. Warehouse management is written `warehouse_enabled`, with the `warehouses` the item is kept in and a `default_warehouse`, each by name.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "object",
+              "properties": {
+                "inventories": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "warehouse_enabled": {
+                      "type": "boolean"
+                    },
+                    "warehouses": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "The warehouse's name."
+                          }
+                        }
+                      }
+                    },
+                    "default_warehouse": {
+                      "type": "string",
+                      "description": "The default warehouse's name."
+                    }
+                  }
+                }
+              },
+              "required": [
+                "inventories"
+              ]
+            }
+          },
+          "required": [
+            "item"
+          ]
+        },
+        "example": {
+          "item": {
+            "inventories": {
+              "warehouse_enabled": true,
+              "warehouses": [
+                {
+                  "name": "Main Warehouse"
+                }
+              ],
+              "default_warehouse": "Main Warehouse"
+            }
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        },
+        "body": {
+          "item": {
+            "inventories": {
+              "warehouse_enabled": true,
+              "warehouses": [
+                {
+                  "name": "Main Warehouse"
+                }
+              ],
+              "default_warehouse": "Main Warehouse"
+            }
+          }
+        }
+      }
+    },
+    {
+      "key": "add_item_inventory",
+      "method": "POST",
+      "path": "/items/{item_id}/inventory/add",
+      "slug": "add-stock-to-a-warehouse",
+      "title": "Add stock to a warehouse",
+      "summary": "Adds stock to one or more of an item's warehouses and returns the item.",
+      "description": "List the warehouses inside `item.inventories.warehouses`, each by `name` with the `quantity` to add. A negative quantity removes stock.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "object",
+              "properties": {
+                "inventories": {
+                  "type": "object",
+                  "properties": {
+                    "warehouses": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "The warehouse's name."
+                          },
+                          "quantity": {
+                            "type": "number",
+                            "description": "How much stock to add. A negative number removes stock."
+                          }
+                        },
+                        "required": [
+                          "name",
+                          "quantity"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "warehouses"
+                  ]
+                }
+              },
+              "required": [
+                "inventories"
+              ]
+            }
+          },
+          "required": [
+            "item"
+          ]
+        },
+        "example": {
+          "item": {
+            "inventories": {
+              "warehouses": [
+                {
+                  "name": "Main Warehouse",
+                  "quantity": 1
+                }
+              ]
+            }
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        },
+        "body": {
+          "item": {
+            "inventories": {
+              "warehouses": [
+                {
+                  "name": "Main Warehouse",
+                  "quantity": 1
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "key": "get_item_inventory_adjustments",
+      "method": "GET",
+      "path": "/items/{item_id}/inventory_adjustments",
+      "slug": "list-an-items-inventory-adjustments",
+      "title": "List an item's inventory adjustments",
+      "summary": "Returns a page of the stock changes recorded for one item.",
+      "description": "Returns the item's inventory adjustments under `data`, one per stock change, paged by cursor. Every quantity in an adjustment is a string, so convert it before doing arithmetic.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of inventory adjustments, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemInventoryAdjustmentList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_item_warehouse_inventories",
+      "method": "GET",
+      "path": "/items/{item_id}/warehouses/{warehouse_name}/inventories",
+      "slug": "retrieve-an-items-stock-in-one-warehouse",
+      "title": "Retrieve an item's stock in one warehouse",
+      "summary": "Returns an item's inventory section for one warehouse, named in the path.",
+      "description": "Returns `{id, name, inventories}` under `item`, with `inventories.warehouses` holding only the warehouse named in the path. The warehouse is given by its name, not an id.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        },
+        {
+          "name": "warehouse_name",
+          "in": "path",
+          "required": true,
+          "description": "The warehouse's name, not an id.",
+          "schema": {
+            "type": "string",
+            "example": "Main Warehouse"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The short item with the one warehouse's stock, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemInventoriesViewResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001",
+          "warehouse_name": "Main Warehouse"
+        }
+      }
+    },
+    {
+      "key": "update_item_bundle_details",
+      "method": "PATCH",
+      "path": "/items/{item_id}/bundle_details",
+      "slug": "update-a-bundles-components",
+      "title": "Update a bundle's components",
+      "summary": "Sets the component items of a bundle item and returns the item.",
+      "description": "Send `bundle_details` inside `item` as a plain list, each entry with a component item's `id` and its `quantity`. This differs from the family details write, which takes an object.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "object",
+              "properties": {
+                "bundle_details": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "A component item's `id`."
+                      },
+                      "quantity": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "quantity"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "bundle_details"
+              ]
+            }
+          },
+          "required": [
+            "item"
+          ]
+        },
+        "example": {
+          "item": {
+            "bundle_details": [
+              {
+                "id": "ITEM-0002",
+                "quantity": 2
+              },
+              {
+                "id": "ITEM-0003",
+                "quantity": 1
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The bundle item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        },
+        "body": {
+          "item": {
+            "bundle_details": [
+              {
+                "id": "ITEM-0002",
+                "quantity": 2
+              },
+              {
+                "id": "ITEM-0003",
+                "quantity": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "update_item_variations",
+      "method": "PATCH",
+      "path": "/items/{item_id}/variations",
+      "slug": "configure-an-items-variations",
+      "title": "Configure an item's variations",
+      "summary": "Sets the variation options of a parent item, or the options a child item uses.",
+      "description": "A variation parent sends `configure_variations`: each entry names a variation and the `values` it offers. A child sends its `parent_item_id` and `use_variations`, naming the values it takes. Both go inside `item`.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "object",
+              "properties": {
+                "configure_variations": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "values": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "description": "For a parent: the variations it offers."
+                },
+                "use_variations": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "values": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "description": "For a child: the values it takes."
+                },
+                "parent_item_id": {
+                  "type": "string",
+                  "description": "For a child: the parent item's `id`."
+                }
+              }
+            }
+          },
+          "required": [
+            "item"
+          ]
+        },
+        "example": {
+          "item": {
+            "configure_variations": [
+              {
+                "name": "Colour",
+                "values": [
+                  "Red",
+                  "Blue"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        },
+        "body": {
+          "item": {
+            "configure_variations": [
+              {
+                "name": "Colour",
+                "values": [
+                  "Red",
+                  "Blue"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "get_item_family_details",
+      "method": "GET",
+      "path": "/items/{item_id}/family_details",
+      "slug": "list-an-item-familys-members",
+      "title": "List an item family's members",
+      "summary": "Returns the member items of a family item.",
+      "description": "Returns `{id, name, family_details}` under `item`, where each `family_details` entry gives a member's `item_id` and `item_name`.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The family item with its members, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        }
+      }
+    },
+    {
+      "key": "create_item_family_details",
+      "method": "POST",
+      "path": "/items/{item_id}/family_details",
+      "slug": "add-or-remove-family-members",
+      "title": "Add or remove family members",
+      "summary": "Adds member items to a family item, or removes them, and returns the item.",
+      "description": "Send `family_details` inside `item` as an object: `add` lists the item ids to add, and `remove` lists the item ids to take out.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "object",
+              "properties": {
+                "family_details": {
+                  "type": "object",
+                  "properties": {
+                    "add": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Item ids to add to the family."
+                    },
+                    "remove": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Item ids to remove from the family."
+                    }
+                  }
+                }
+              },
+              "required": [
+                "family_details"
+              ]
+            }
+          },
+          "required": [
+            "item"
+          ]
+        },
+        "example": {
+          "item": {
+            "family_details": {
+              "add": [
+                "ITEM-0002"
+              ]
+            }
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The family item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        },
+        "body": {
+          "item": {
+            "family_details": {
+              "add": [
+                "ITEM-0002"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "key": "get_item_package_details",
+      "method": "GET",
+      "path": "/items/{item_id}/package_details",
+      "slug": "list-an-items-packages",
+      "title": "List an item's packages",
+      "summary": "Returns the packages defined on an item.",
+      "description": "Returns `{id, name, package_details}` under `item`. Each package has a `uuid`, which the single package endpoints take.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The item with its packages, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        }
+      }
+    },
+    {
+      "key": "get_item_package_detail",
+      "method": "GET",
+      "path": "/items/{item_id}/package_details/{package_detail_id}",
+      "slug": "retrieve-an-item-package",
+      "title": "Retrieve an item package",
+      "summary": "Returns one of an item's packages, by the package's `uuid`.",
+      "description": "Returns the item under `item`, with `package_details` holding only the package whose `uuid` is in the path.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        },
+        {
+          "name": "package_detail_id",
+          "in": "path",
+          "required": true,
+          "description": "The package's `uuid`, from the item's package listing.",
+          "schema": {
+            "type": "string",
+            "example": "5b1c2d3e-4f50-4a6b-8c7d-9e0f1a2b3c4d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The item with the one package, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        },
+        "404": {
+          "description": "The item has no package with that `uuid`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001",
+          "package_detail_id": "5b1c2d3e-4f50-4a6b-8c7d-9e0f1a2b3c4d"
+        }
+      }
+    },
+    {
+      "key": "create_item_package_details",
+      "method": "POST",
+      "path": "/items/{item_id}/package_details",
+      "slug": "create-an-item-package",
+      "title": "Create an item package",
+      "summary": "Adds a package to an item and returns the item.",
+      "description": "Send `package_details` inside `item` with the package's `name`, its `rank`, and a `rate_list` of member item ids and quantities. The new package appears in the item's `package_details` with a `uuid`.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "object",
+              "properties": {
+                "package_details": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "rank": {
+                      "type": "integer"
+                    },
+                    "rate_list": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "A member item's `id`."
+                          },
+                          "quantity": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "required": [
+                "package_details"
+              ]
+            }
+          },
+          "required": [
+            "item"
+          ]
+        },
+        "example": {
+          "item": {
+            "package_details": {
+              "name": "Starter pack",
+              "rank": 1,
+              "rate_list": [
+                {
+                  "id": "ITEM-0002",
+                  "quantity": 1
+                }
+              ]
+            }
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        },
+        "body": {
+          "item": {
+            "package_details": {
+              "name": "Starter pack",
+              "rank": 1,
+              "rate_list": [
+                {
+                  "id": "ITEM-0002",
+                  "quantity": 1
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_item_package_detail",
+      "method": "DELETE",
+      "path": "/items/{item_id}/package_details/{package_detail_id}",
+      "slug": "delete-an-item-package",
+      "title": "Delete an item package",
+      "summary": "Deletes one of an item's packages. A successful call returns `204` with no body.",
+      "description": "Deletes the package whose `uuid` is in the path; a later read of it returns `404`.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        },
+        {
+          "name": "package_detail_id",
+          "in": "path",
+          "required": true,
+          "description": "The package's `uuid`, from the item's package listing.",
+          "schema": {
+            "type": "string",
+            "example": "5b1c2d3e-4f50-4a6b-8c7d-9e0f1a2b3c4d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The package is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001",
+          "package_detail_id": "5b1c2d3e-4f50-4a6b-8c7d-9e0f1a2b3c4d"
+        }
+      }
+    },
+    {
+      "key": "get_item_notes",
+      "method": "GET",
+      "path": "/items/{item_id}/notes",
+      "slug": "list-an-items-notes",
+      "title": "List an item's notes",
+      "summary": "Returns a page of the notes on an item.",
+      "description": "Returns the item's notes under `data`, each with its `content`, `attachments` and `watchers`. The listing pages by cursor.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of notes, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemNoteList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_item_note",
+      "method": "GET",
+      "path": "/items/{item_id}/notes/{note_id}",
+      "slug": "retrieve-an-item-note",
+      "title": "Retrieve an item note",
+      "summary": "Returns one note on an item, under `note`.",
+      "description": "Returns the note with its `content`, `attachments` and `watchers` under `note`.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "note_8a1f2b3c4d5e6f708192a3b4c5d6e7f8"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The note, under `note`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemNoteResponse"
+          }
+        },
+        "404": {
+          "description": "The item has no note with that `id`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001",
+          "note_id": "note_8a1f2b3c4d5e6f708192a3b4c5d6e7f8"
+        }
+      }
+    },
+    {
+      "key": "create_item_note",
+      "method": "POST",
+      "path": "/items/{item_id}/notes",
+      "slug": "create-an-item-note",
+      "title": "Create an item note",
+      "summary": "Adds a note to an item, with optional files, and returns the note.",
+      "description": "Send a multipart form with the text in the `note` field. Add files as extra parts; they become the note's `attachments`.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "note": {
+              "type": "string",
+              "description": "The note's text."
+            },
+            "file": {
+              "type": "string",
+              "format": "binary",
+              "description": "A file to attach. Optional; send one part per file."
+            }
+          },
+          "required": [
+            "note"
+          ]
+        },
+        "example": {
+          "note": "Reorder when stock is low."
+        }
+      },
+      "multipart": true,
+      "responses": {
+        "201": {
+          "description": "The new note, under `note`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemNoteResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        },
+        "note": "Reorder when stock is low.",
+        "file": "notes.txt"
+      }
+    },
+    {
+      "key": "update_item_note",
+      "method": "PATCH",
+      "path": "/items/{item_id}/notes/{note_id}",
+      "slug": "update-an-item-note",
+      "title": "Update an item note",
+      "summary": "Changes a note's text, optionally adding files, and returns the note.",
+      "description": "Send a multipart form with the new text in the `note` field, as the create does. Files sent with the update are added to the note's files alongside the ones it already has.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "note_8a1f2b3c4d5e6f708192a3b4c5d6e7f8"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "note": {
+              "type": "string",
+              "description": "The note's new text."
+            },
+            "file": {
+              "type": "string",
+              "format": "binary",
+              "description": "A file to attach. Optional; send one part per file."
+            }
+          },
+          "required": [
+            "note"
+          ]
+        },
+        "example": {
+          "note": "Reorder when fewer than ten remain."
+        }
+      },
+      "multipart": true,
+      "responses": {
+        "200": {
+          "description": "The updated note, under `note`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemNoteResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001",
+          "note_id": "note_8a1f2b3c4d5e6f708192a3b4c5d6e7f8"
+        },
+        "note": "Reorder when fewer than ten remain.",
+        "file": "notes-2.txt"
+      }
+    },
+    {
+      "key": "delete_item_note",
+      "method": "DELETE",
+      "path": "/items/{item_id}/notes/{note_id}",
+      "slug": "delete-an-item-note",
+      "title": "Delete an item note",
+      "summary": "Deletes a note from an item. A successful call returns `204` with no body.",
+      "description": "Deletes the note with that `id`; a later read of it returns `404`.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "note_8a1f2b3c4d5e6f708192a3b4c5d6e7f8"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The note is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001",
+          "note_id": "note_8a1f2b3c4d5e6f708192a3b4c5d6e7f8"
+        }
+      }
+    },
+    {
+      "key": "get_item_note_files",
+      "method": "GET",
+      "path": "/items/{item_id}/notes/{note_id}/files",
+      "slug": "list-a-notes-files",
+      "title": "List a note's files",
+      "summary": "Returns the files attached to an item note.",
+      "description": "Returns the note's files under `data`, each with its `uuid`, `filename`, `content_type`, `size` and `href`.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "note_8a1f2b3c4d5e6f708192a3b4c5d6e7f8"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The note's files, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemNoteFileList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001",
+          "note_id": "note_8a1f2b3c4d5e6f708192a3b4c5d6e7f8"
+        }
+      }
+    },
+    {
+      "key": "get_item_note_file",
+      "method": "GET",
+      "path": "/items/{item_id}/notes/{note_id}/files/{file_id}",
+      "slug": "retrieve-a-note-file",
+      "title": "Retrieve a note file",
+      "summary": "Returns the details of one file on an item note.",
+      "description": "Returns a description of the file under `file`: its `uuid`, `filename`, `content_type`, `size` and `href`. It does not return the file's contents.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "note_8a1f2b3c4d5e6f708192a3b4c5d6e7f8"
+          }
+        },
+        {
+          "name": "file_id",
+          "in": "path",
+          "required": true,
+          "description": "The file's `uuid`, from the note's files listing.",
+          "schema": {
+            "type": "string",
+            "example": "6c7d8e9f-0a1b-4c2d-8e3f-4a5b6c7d8e9f"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The file's details, under `file`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemNoteFileResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001",
+          "note_id": "note_8a1f2b3c4d5e6f708192a3b4c5d6e7f8",
+          "file_id": "6c7d8e9f-0a1b-4c2d-8e3f-4a5b6c7d8e9f"
+        }
+      }
+    },
+    {
+      "key": "create_item_inventories",
+      "method": "POST",
+      "path": "/items/{item_id}/inventories",
+      "slug": "create-an-items-inventory-section",
+      "title": "Create an item's inventory section",
+      "summary": "Adds an inventory section to an item and returns the whole item.",
+      "description": "Send `inventories` inside `item`, with `enabled` and `warehouse_enabled`. An item takes one inventory section, and it must be a `STANDARD` item with sale or purchase turned on.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "object",
+              "properties": {
+                "inventories": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "description": "Set `true` to turn inventory on."
+                    },
+                    "warehouse_enabled": {
+                      "type": "boolean",
+                      "description": "Whether stock is kept per warehouse."
+                    }
+                  }
+                }
+              },
+              "required": [
+                "inventories"
+              ]
+            }
+          },
+          "required": [
+            "item"
+          ]
+        },
+        "example": {
+          "item": {
+            "inventories": {
+              "enabled": true,
+              "warehouse_enabled": false
+            }
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The whole item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        },
+        "body": {
+          "item": {
+            "inventories": {
+              "enabled": true,
+              "warehouse_enabled": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "key": "add_item_inventories",
+      "method": "POST",
+      "path": "/items/{item_id}/inventories/add",
+      "slug": "add-stock-to-a-warehouse-inventories-path",
+      "title": "Add stock to a warehouse (inventories path)",
+      "summary": "Adds stock to an item's warehouses through the plural `inventories/add` path.",
+      "description": "Behaves the same as `POST /items/{item_id}/inventory/add`. List the warehouses inside `item.inventories.warehouses`, each by `name` with the `quantity` to add; a negative quantity removes stock.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "object",
+              "properties": {
+                "inventories": {
+                  "type": "object",
+                  "properties": {
+                    "warehouses": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "The warehouse's name."
+                          },
+                          "quantity": {
+                            "type": "number",
+                            "description": "How much stock to add. A negative number removes stock."
+                          }
+                        },
+                        "required": [
+                          "name",
+                          "quantity"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "warehouses"
+                  ]
+                }
+              },
+              "required": [
+                "inventories"
+              ]
+            }
+          },
+          "required": [
+            "item"
+          ]
+        },
+        "example": {
+          "item": {
+            "inventories": {
+              "warehouses": [
+                {
+                  "name": "Main Warehouse",
+                  "quantity": 1
+                }
+              ]
+            }
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        },
+        "body": {
+          "item": {
+            "inventories": {
+              "warehouses": [
+                {
+                  "name": "Main Warehouse",
+                  "quantity": 1
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "key": "create_item_inventory",
+      "method": "POST",
+      "path": "/items/{item_id}/inventory",
+      "slug": "create-an-items-inventory-section-inventory-path",
+      "title": "Create an item's inventory section (inventory path)",
+      "summary": "Adds an inventory section to an item through the singular `inventory` path.",
+      "description": "Behaves the same as `POST /items/{item_id}/inventories`. Send `inventories` inside `item`, with `enabled` and `warehouse_enabled`.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "object",
+              "properties": {
+                "inventories": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "description": "Set `true` to turn inventory on."
+                    },
+                    "warehouse_enabled": {
+                      "type": "boolean",
+                      "description": "Whether stock is kept per warehouse."
+                    }
+                  }
+                }
+              },
+              "required": [
+                "inventories"
+              ]
+            }
+          },
+          "required": [
+            "item"
+          ]
+        },
+        "example": {
+          "item": {
+            "inventories": {
+              "enabled": true,
+              "warehouse_enabled": false
+            }
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The whole item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        },
+        "body": {
+          "item": {
+            "inventories": {
+              "enabled": true,
+              "warehouse_enabled": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_item_note_file",
+      "method": "DELETE",
+      "path": "/items/{item_id}/notes/{note_id}/files/{file_id}",
+      "slug": "delete-a-note-file",
+      "title": "Delete a note file",
+      "summary": "Deletes one file from an item note. A successful call returns `204` with no body.",
+      "description": "Pass the file's `uuid` from the note's files listing. Any failure to delete the file is reported as `404`, whatever its cause.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "note_8a1f2b3c4d5e6f708192a3b4c5d6e7f8"
+          }
+        },
+        {
+          "name": "file_id",
+          "in": "path",
+          "required": true,
+          "description": "The file's `uuid`, from the note's files listing.",
+          "schema": {
+            "type": "string",
+            "example": "6c7d8e9f-0a1b-4c2d-8e3f-4a5b6c7d8e9f"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The file is deleted. No body."
+        },
+        "404": {
+          "description": "The file could not be deleted. Every failure is reported with this status."
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001",
+          "note_id": "note_8a1f2b3c4d5e6f708192a3b4c5d6e7f8",
+          "file_id": "6c7d8e9f-0a1b-4c2d-8e3f-4a5b6c7d8e9f"
+        }
+      }
+    },
+    {
+      "key": "update_item_package_detail",
+      "method": "PATCH",
+      "path": "/items/{item_id}/package_details/{package_detail_id}",
+      "slug": "update-an-item-package",
+      "title": "Update an item package",
+      "summary": "Changes one of an item's packages and returns the item.",
+      "description": "Pass the package's `uuid` in the path and send the changes inside `item.package_details`, such as a new `name`.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        },
+        {
+          "name": "package_detail_id",
+          "in": "path",
+          "required": true,
+          "description": "The package's `uuid`, from the item's package listing.",
+          "schema": {
+            "type": "string",
+            "example": "5b1c2d3e-4f50-4a6b-8c7d-9e0f1a2b3c4d"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "object",
+              "properties": {
+                "package_details": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "rank": {
+                      "type": "integer"
+                    },
+                    "rate_list": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "A member item's `id`."
+                          },
+                          "quantity": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "required": [
+                "package_details"
+              ]
+            }
+          },
+          "required": [
+            "item"
+          ]
+        },
+        "example": {
+          "item": {
+            "package_details": {
+              "name": "Starter pack plus"
+            }
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The item, under `item`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001",
+          "package_detail_id": "5b1c2d3e-4f50-4a6b-8c7d-9e0f1a2b3c4d"
+        },
+        "body": {
+          "item": {
+            "package_details": {
+              "name": "Starter pack plus"
+            }
+          }
+        }
+      }
+    },
+    {
+      "key": "get_item_kpis",
+      "method": "GET",
+      "path": "/items/{item_id}/kpis",
+      "slug": "retrieve-an-items-kpis",
+      "title": "Retrieve an item's KPIs",
+      "summary": "Returns an item's KPI summary under `item_kpis`.",
+      "description": "Returns the item's KPI summary under `item_kpis`. It can be an empty object.",
+      "parameters": [
+        {
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "description": "The item's `id`, such as `ITEM-0001`. Not its `uuid`.",
+          "schema": {
+            "type": "string",
+            "example": "ITEM-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The KPI summary, under `item_kpis`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "item_id": "ITEM-0001"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "Item": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The item's `id`, such as `ITEM-0001`. Use it in every item path."
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "description": "The item type in lower case, such as `standard`, `bundle`, `family` or `variation_based`."
+        },
+        "status": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "invoice_note": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string"
+        },
+        "sale_enabled": {
+          "type": "boolean"
+        },
+        "purchase_enabled": {
+          "type": "boolean"
+        },
+        "inventory_enabled": {
+          "type": "boolean"
+        },
+        "variations_enabled": {
+          "type": "boolean"
+        },
+        "parent": {
+          "type": "boolean",
+          "description": "Whether the item is a variation parent."
+        },
+        "child": {
+          "type": "boolean",
+          "description": "Whether the item is a variation child."
+        },
+        "parent_item_id": {
+          "type": "string"
+        },
+        "custom_form": {
+          "$ref": "#/components/schemas/ItemCustomForm"
+        },
+        "manager": {
+          "$ref": "#/components/schemas/ItemReference"
+        },
+        "group": {
+          "$ref": "#/components/schemas/ItemReference"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/ItemUser"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/ItemUser"
+        },
+        "codes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemCode"
+          }
+        },
+        "currencies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemCurrency"
+          }
+        },
+        "sale": {
+          "$ref": "#/components/schemas/ItemSale",
+          "description": "The sale section."
+        },
+        "purchase": {
+          "$ref": "#/components/schemas/ItemPurchase",
+          "description": "The purchase section."
+        },
+        "inventories": {
+          "$ref": "#/components/schemas/ItemInventories",
+          "description": "The inventory section."
+        },
+        "bundle_details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemBundleDetail"
+          }
+        },
+        "family_details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemFamilyDetail"
+          }
+        },
+        "package_details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemPackageDetail"
+          }
+        },
+        "configure_variations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemVariationOption"
+          }
+        },
+        "use_variations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemVariationOption"
+          }
+        },
+        "custom_objects": {
+          "type": "array"
+        },
+        "uoms": {
+          "type": "array"
+        },
+        "custom_attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemCustomAttribute"
+          }
+        },
+        "activity_logs": {
+          "type": "array"
+        },
+        "base_uom": {},
+        "image_url": {}
+      }
+    },
+    "ItemCustomForm": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemReference": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemUser": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemCode": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemCurrency": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "used_for_sale": {
+          "type": "boolean"
+        },
+        "default_for_sale": {
+          "type": "boolean"
+        },
+        "used_for_purchase": {
+          "type": "boolean"
+        },
+        "default_for_purchase": {
+          "type": "boolean"
+        },
+        "suppliers": {
+          "type": "array"
+        }
+      }
+    },
+    "ItemSale": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "enable_back_order": {
+          "type": "boolean"
+        },
+        "invoice_note": {
+          "type": "string"
+        },
+        "default_sale_price": {
+          "type": "number"
+        },
+        "pricing_method": {
+          "type": "string"
+        },
+        "sale_price_variant": {
+          "type": "string"
+        },
+        "use_on_sale_price": {
+          "type": "boolean"
+        },
+        "tax_exempt_when_sold": {
+          "type": "boolean"
+        },
+        "tax_configuration": {
+          "$ref": "#/components/schemas/ItemTaxConfiguration"
+        },
+        "charge": {
+          "$ref": "#/components/schemas/ItemSaleCharge"
+        },
+        "pricing": {
+          "$ref": "#/components/schemas/ItemPricing"
+        },
+        "pricing_levels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemSalePricingLevel"
+          }
+        },
+        "pricing_schedules": {
+          "type": "array"
+        },
+        "payment_properties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemSalePaymentProperty"
+          }
+        },
+        "accounting_code": {},
+        "discount_profile": {},
+        "pricing_profile": {},
+        "shipping_profile": {},
+        "sale_price": {},
+        "start_date": {},
+        "end_date": {},
+        "height": {
+          "$ref": "#/components/schemas/ItemSaleHeight"
+        },
+        "length": {
+          "$ref": "#/components/schemas/ItemSaleLength"
+        },
+        "weight": {
+          "$ref": "#/components/schemas/ItemSaleWeight"
+        },
+        "width": {
+          "$ref": "#/components/schemas/ItemSaleWidth"
+        }
+      }
+    },
+    "ItemTaxConfiguration": {
+      "type": "object",
+      "properties": {
+        "sale_price_entered_inclusive_of_tax": {
+          "type": "boolean"
+        },
+        "purchase_price_entered_inclusive_of_tax": {
+          "type": "boolean"
+        },
+        "sale_price_based_on": {
+          "type": "string"
+        },
+        "tax_code": {
+          "$ref": "#/components/schemas/ItemReference"
+        }
+      }
+    },
+    "ItemSaleCharge": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "price_period": {
+          "type": "string"
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemSaleChargeProperty"
+          }
+        }
+      }
+    },
+    "ItemSaleChargeProperty": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemPricing": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "latest_used_pricing_version": {
+          "type": "integer"
+        },
+        "pricing_module": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemPricingPricingModule"
+          }
+        }
+      }
+    },
+    "ItemPricingPricingModule": {
+      "type": "object",
+      "properties": {
+        "average_purchase_price": {},
+        "currency": {
+          "type": "string"
+        },
+        "last_purchase_price": {},
+        "price": {
+          "type": "number"
+        },
+        "price_type": {
+          "type": "string"
+        },
+        "pricing_level": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemSalePricingLevel": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemSalePaymentProperty": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemSaleHeight": {
+      "type": "object",
+      "properties": {
+        "uom": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number"
+        }
+      }
+    },
+    "ItemSaleLength": {
+      "type": "object",
+      "properties": {
+        "uom": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number"
+        }
+      }
+    },
+    "ItemSaleWeight": {
+      "type": "object",
+      "properties": {
+        "uom": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number"
+        }
+      }
+    },
+    "ItemSaleWidth": {
+      "type": "object",
+      "properties": {
+        "uom": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number"
+        }
+      }
+    },
+    "ItemPurchase": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "supplier_management_enabled": {
+          "type": "boolean"
+        },
+        "purchase_order_note": {
+          "type": "string"
+        },
+        "default_purchase_price": {
+          "type": "number"
+        },
+        "tax_exempt_when_purchase": {
+          "type": "boolean"
+        },
+        "tax_configuration": {
+          "$ref": "#/components/schemas/ItemTaxConfiguration"
+        },
+        "pricing": {
+          "$ref": "#/components/schemas/ItemPricing"
+        },
+        "purchase_properties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemPurchasePurchaseProperty"
+          }
+        },
+        "accounting_code": {},
+        "pricing_profile": {},
+        "suppliers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemPurchaseSupplier"
+          }
+        }
+      }
+    },
+    "ItemPurchasePurchaseProperty": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemPurchaseSupplier": {
+      "type": "object",
+      "properties": {
+        "accounting_code": {},
+        "default_purchase_price": {
+          "type": "number"
+        },
+        "id": {},
+        "name": {
+          "type": "string"
+        },
+        "pricing": {
+          "$ref": "#/components/schemas/ItemPricing"
+        },
+        "purchase_order_note": {},
+        "tax_configuration": {
+          "$ref": "#/components/schemas/ItemPurchaseSupplierTaxConfiguration"
+        },
+        "tax_exempt_when_purchase": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ItemPurchaseSupplierTaxConfiguration": {
+      "type": "object",
+      "properties": {
+        "purchase_price_entered_inclusive_of_tax": {
+          "type": "boolean"
+        },
+        "tax_code": {
+          "$ref": "#/components/schemas/ItemReference"
+        }
+      }
+    },
+    "ItemInventories": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "enable_warehouse_management": {
+          "type": "boolean"
+        },
+        "default_warehouse": {
+          "type": "string"
+        },
+        "inventory_properties": {
+          "$ref": "#/components/schemas/ItemInventoryProperties"
+        },
+        "warehouses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemWarehouseInventory"
+          }
+        }
+      }
+    },
+    "ItemInventoryProperties": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "enable_batch_tracking": {
+          "type": "boolean"
+        },
+        "enable_serialization": {
+          "type": "boolean"
+        },
+        "enable_inventory_costing": {
+          "type": "boolean"
+        },
+        "enable_low_stock_notification": {
+          "type": "boolean"
+        },
+        "enable_preorder": {
+          "type": "boolean"
+        },
+        "enable_reordering": {
+          "type": "boolean"
+        },
+        "low_stock_threshold_based_on": {
+          "type": "string"
+        },
+        "reordering_threshold_based_on": {
+          "type": "string"
+        },
+        "quantity_available_for_sale": {
+          "type": "string"
+        },
+        "quantity_available_for_sale_determination": {
+          "type": "array"
+        },
+        "use_atp_value_as_quantity_available_for_webhook": {
+          "type": "boolean"
+        },
+        "default_cost_per_unit": {},
+        "preorder_configuration": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemInventoryPropertiesPreorderConfiguration"
+          }
+        },
+        "preorder_period": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemInventoryPropertiesPreorderConfiguration": {
+      "type": "object",
+      "properties": {
+        "end_date": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "start_date": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemWarehouseInventory": {
+      "type": "object",
+      "properties": {
+        "quantity_on_hand": {
+          "type": "integer",
+          "description": "The stock held in the warehouse, as an integer."
+        },
+        "quantity_on_hand_value": {
+          "type": "string"
+        },
+        "quantity_available": {
+          "type": "number"
+        },
+        "quantity_available_value": {
+          "type": "string"
+        },
+        "quantity_on_order": {
+          "type": "integer"
+        },
+        "quantity_promised": {
+          "type": "number"
+        },
+        "quantity_on_return": {
+          "type": "integer"
+        },
+        "quantity_on_purchase_return": {
+          "type": "integer"
+        },
+        "warehouse": {
+          "$ref": "#/components/schemas/ItemReference"
+        },
+        "uom": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemBundleDetail": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "number"
+        },
+        "uom": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemFamilyDetail": {
+      "type": "object",
+      "properties": {
+        "item_id": {
+          "type": "string"
+        },
+        "item_name": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemPackageDetail": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string",
+          "description": "Identifies the package in the package paths."
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "rank": {
+          "type": "integer"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemPackageDetailItem"
+          }
+        },
+        "billing_periods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemPackageDetailBillingPeriod"
+          }
+        },
+        "custom_attributes": {
+          "type": "array"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/ItemUser"
+        },
+        "last_updated_on": {},
+        "last_updated_by": {}
+      }
+    },
+    "ItemPackageDetailItem": {
+      "type": "object",
+      "properties": {
+        "item_id": {
+          "type": "string"
+        },
+        "item_name": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "number"
+        },
+        "uom": {}
+      }
+    },
+    "ItemPackageDetailBillingPeriod": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "rank": {
+          "type": "integer"
+        }
+      }
+    },
+    "ItemVariationOption": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemVariationOptionValue"
+          }
+        }
+      }
+    },
+    "ItemVariationOptionValue": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemCustomAttribute": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/components/schemas/Item"
+        }
+      }
+    },
+    "ItemList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Item"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ItemPagination"
+        }
+      }
+    },
+    "ItemPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size the API applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "type": "object",
+          "properties": {
+            "next": {
+              "type": "string"
+            },
+            "prev": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "ItemSaleView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "An integer id, not the item's `id` code."
+        },
+        "name": {
+          "type": "string"
+        },
+        "sale": {
+          "$ref": "#/components/schemas/ItemSale"
+        }
+      }
+    },
+    "ItemSaleViewResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/components/schemas/ItemSaleView"
+        }
+      }
+    },
+    "ItemPurchaseView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "An integer id, not the item's `id` code."
+        },
+        "name": {
+          "type": "string"
+        },
+        "purchase": {
+          "$ref": "#/components/schemas/ItemPurchase"
+        }
+      }
+    },
+    "ItemPurchaseViewResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/components/schemas/ItemPurchaseView"
+        }
+      }
+    },
+    "ItemInventoriesView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The item's `id` code, such as `ITEM-0001`."
+        },
+        "name": {
+          "type": "string"
+        },
+        "inventories": {
+          "$ref": "#/components/schemas/ItemInventories"
+        }
+      }
+    },
+    "ItemInventoriesViewResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/components/schemas/ItemInventoriesView"
+        }
+      }
+    },
+    "ItemInventoryAdjustmentList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemInventoryAdjustment"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ItemPagination"
+        }
+      }
+    },
+    "ItemInventoryAdjustment": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "item_id": {
+          "type": "string"
+        },
+        "item_name": {
+          "type": "string"
+        },
+        "warehouse_name": {
+          "type": "string"
+        },
+        "adjustment_amount": {
+          "type": "string",
+          "description": "The change in stock, as a string."
+        },
+        "adjustment_type": {
+          "type": "string"
+        },
+        "reference": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "quantity_on_hand": {
+          "type": "string"
+        },
+        "quantity_available": {
+          "type": "string"
+        },
+        "quantity_on_order": {
+          "type": "string"
+        },
+        "quantity_promised": {
+          "type": "string"
+        },
+        "quantity_on_return": {
+          "type": "string"
+        },
+        "quantity_on_purchase_return": {
+          "type": "string"
+        },
+        "quantity_on_reserve": {
+          "type": "string"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "created_by": {},
+        "last_updated_by": {}
+      }
+    },
+    "ItemNoteList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemNote"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ItemPagination"
+        }
+      }
+    },
+    "ItemNote": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/ItemUser"
+        },
+        "item": {
+          "$ref": "#/components/schemas/ItemReference"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemNoteAttachment"
+          }
+        },
+        "watchers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemNoteWatcher"
+          }
+        },
+        "group": {},
+        "user": {},
+        "last_updated_on": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/ItemNoteLastUpdatedBy"
+        }
+      }
+    },
+    "ItemNoteAttachment": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "content_type": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string",
+          "description": "Identifies the file in the note file paths."
+        }
+      }
+    },
+    "ItemNoteWatcher": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemNoteLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemNoteView": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/ItemUser"
+        },
+        "item": {
+          "$ref": "#/components/schemas/ItemReference"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemNoteAttachment"
+          }
+        },
+        "watchers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemNoteViewWatcher"
+          }
+        },
+        "group": {},
+        "user": {},
+        "last_updated_on": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/ItemNoteViewLastUpdatedBy"
+        }
+      }
+    },
+    "ItemNoteViewWatcher": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemNoteViewLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemNoteResponse": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "$ref": "#/components/schemas/ItemNoteView"
+        }
+      }
+    },
+    "ItemNoteFileList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemNoteAttachment"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ItemPagination"
+        }
+      }
+    },
+    "ItemNoteFile": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string",
+          "description": "Identifies the file in the note file paths."
+        }
+      }
+    },
+    "ItemNoteFileResponse": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "$ref": "#/components/schemas/ItemNoteFile"
+        }
+      }
+    }
+  }
+}
