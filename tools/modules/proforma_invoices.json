@@ -1,0 +1,193 @@
+{
+  "family": "proforma_invoices",
+  "tag": "Pro-forma invoices",
+  "slug": "pro-forma-invoices",
+  "icon": "file-invoice-dollar",
+  "base": "/proforma_invoices",
+  "overview_description": "List, read, delete and pay pro-forma invoices, the advance bills sent before a final invoice.",
+  "intro": "A pro-forma invoice is an advance bill that can be paid before the final invoice. This area has 4 endpoints: list pro-forma invoices, retrieve one, delete one, and record a payment against one. All seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**A pro-forma invoice is named by its code.** The same code comes back as both `id` and `invoice_id`.",
+    "**The listing shows only active ones.** Only pro-forma invoices whose invoice status is active are listed, under `data`, paged by cursor.",
+    "**A paid pro-forma invoice cannot be deleted.** The delete is refused with `400` and the code `already_paid`.",
+    "**Paying returns a short confirmation, not the payment.** The body under `payment` carries `object`, `payment_id` with the new payment's code, and `message`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_proforma_invoices",
+      "method": "GET",
+      "path": "/proforma_invoices",
+      "slug": "list-pro-forma-invoices",
+      "title": "List pro-forma invoices",
+      "summary": "Returns one page of pro-forma invoices whose invoice status is active.",
+      "description": "Lists pro-forma invoices one page at a time, under `data`, paged by cursor. Only pro-forma invoices whose invoice status is active are listed. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of pro-forma invoices, under `data`, with `pagination`."
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_proforma_invoice",
+      "method": "GET",
+      "path": "/proforma_invoices/{proforma_id}",
+      "slug": "retrieve-a-pro-forma-invoice",
+      "title": "Retrieve a pro-forma invoice",
+      "summary": "Returns one pro-forma invoice by its code.",
+      "description": "Fetches a single pro-forma invoice, named by its code.",
+      "parameters": [
+        {
+          "name": "proforma_id",
+          "in": "path",
+          "required": true,
+          "description": "The pro-forma invoice's code, which it returns as both `id` and `invoice_id`.",
+          "schema": {
+            "type": "string",
+            "example": "PF-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The pro-forma invoice, under `proforma_invoice`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "proforma_id": "PF-0001"
+        }
+      }
+    },
+    {
+      "key": "delete_proforma_invoice",
+      "method": "DELETE",
+      "path": "/proforma_invoices/{proforma_id}",
+      "slug": "delete-a-pro-forma-invoice",
+      "title": "Delete a pro-forma invoice",
+      "summary": "Deletes a pro-forma invoice that has not been paid.",
+      "description": "Deletes the pro-forma invoice. One that has been paid is refused with `400` and the code `already_paid`.",
+      "parameters": [
+        {
+          "name": "proforma_id",
+          "in": "path",
+          "required": true,
+          "description": "The pro-forma invoice's code, which it returns as both `id` and `invoice_id`.",
+          "schema": {
+            "type": "string",
+            "example": "PF-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The pro-forma invoice is deleted. The response has no body."
+        },
+        "400": {
+          "description": "The pro-forma invoice is already paid (`already_paid`)."
+        }
+      },
+      "example_call": {
+        "path": {
+          "proforma_id": "PF-0001"
+        }
+      }
+    },
+    {
+      "key": "create_proforma_invoice_payment",
+      "method": "POST",
+      "path": "/proforma_invoices/{proforma_id}/payments",
+      "slug": "pay-a-pro-forma-invoice",
+      "title": "Pay a pro-forma invoice",
+      "summary": "Records a payment against a pro-forma invoice and returns the new payment's code.",
+      "description": "Takes a payment for the pro-forma invoice from the fields under `payment`. The response is not the payment itself: it carries `object`, `payment_id` with the new payment's code, and a `message`, under `payment`.",
+      "parameters": [
+        {
+          "name": "proforma_id",
+          "in": "path",
+          "required": true,
+          "description": "The pro-forma invoice's code, which it returns as both `id` and `invoice_id`.",
+          "schema": {
+            "type": "string",
+            "example": "PF-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "payment": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "required": [
+            "payment"
+          ]
+        },
+        "example": {
+          "payment": {}
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new payment's code as `payment.payment_id`, with `object` and `message`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "proforma_id": "PF-0001"
+        },
+        "body": {
+          "payment": {}
+        }
+      }
+    }
+  ],
+  "schemas": {}
+}

@@ -1,0 +1,29 @@
+---
+title: "Pro-forma invoices"
+sidebarTitle: "Overview"
+description: "List, read, delete and pay pro-forma invoices, the advance bills sent before a final invoice."
+---
+
+A pro-forma invoice is an advance bill that can be paid before the final invoice. This area has 4 endpoints: list pro-forma invoices, retrieve one, delete one, and record a payment against one. All seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List pro-forma invoices](/api-reference/pro-forma-invoices/list-pro-forma-invoices) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/proforma_invoices` | Returns one page of pro-forma invoices whose invoice status is active. |
+| [Retrieve a pro-forma invoice](/api-reference/pro-forma-invoices/retrieve-a-pro-forma-invoice) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/proforma_invoices/{proforma_id}` | Returns one pro-forma invoice by its code. |
+| [Delete a pro-forma invoice](/api-reference/pro-forma-invoices/delete-a-pro-forma-invoice) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/proforma_invoices/{proforma_id}` | Deletes a pro-forma invoice that has not been paid. |
+| [Pay a pro-forma invoice](/api-reference/pro-forma-invoices/pay-a-pro-forma-invoice) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/proforma_invoices/{proforma_id}/payments` | Records a payment against a pro-forma invoice and returns the new payment's code. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **A pro-forma invoice is named by its code.** The same code comes back as both `id` and `invoice_id`.
+- **The listing shows only active ones.** Only pro-forma invoices whose invoice status is active are listed, under `data`, paged by cursor.
+- **A paid pro-forma invoice cannot be deleted.** The delete is refused with `400` and the code `already_paid`.
+- **Paying returns a short confirmation, not the payment.** The body under `payment` carries `object`, `payment_id` with the new payment's code, and `message`.
