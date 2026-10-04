@@ -6,7 +6,7 @@
   "base": "/tasks",
   "overview_description": "Manage tasks in Exsited: create, read, update and delete tasks, their checklist items, notes and note files.",
   "intro": "Tasks are units of work in Exsited, with a checklist, assignees, notes and attached files. You can create, list, retrieve, update and delete tasks, manage their checklist items, and add, read, change and remove notes and note files. This area has 18 endpoints, each available in all seven SDKs.",
-  "warning": "**Adding a note to a task currently fails.** `POST /tasks/{task_id}/notes` returns `409`, so the calls that need an existing note (read, update and delete a note, and list, read and delete its files) have not been confirmed to work. Deletes in this area cannot be undone; a deleted task returns `404`.",
+  "warning": "**Adding a note to a task currently fails.** `POST /tasks/{task_code}/notes` returns `409`, so the calls that need an existing note (read, update and delete a note, and list, read and delete its files) have not been confirmed to work. Deletes in this area cannot be undone; a deleted task returns `404`.",
   "notes": [
     "**Task bodies go under `work_task`.** The create and the update wrap their fields in `work_task`, `name` is required to create, and a key the API does not know is refused.",
     "**The note routes take the task's `code`, not its `wt_` id.** A `wt_` id returns `404` on every `/notes` path; the task, checklist and update calls take the `wt_` id.",
@@ -337,14 +337,14 @@
     {
       "key": "get_task_notes",
       "method": "GET",
-      "path": "/tasks/{task_id}/notes",
+      "path": "/tasks/{task_code}/notes",
       "slug": "list-a-tasks-notes",
       "title": "List a task's notes",
       "summary": "Lists the notes on one task, found by the task's code.",
       "description": "Returns the task's notes under `data`, with `pagination`. The path takes the task's `code`; a `wt_` id returns `404`. A task with no notes returns an empty `data` list.",
       "parameters": [
         {
-          "name": "task_id",
+          "name": "task_code",
           "in": "path",
           "required": true,
           "description": "The task's `code`. The note routes look the task up by its code, and a `wt_` id returns `404`.",
@@ -388,7 +388,7 @@
       },
       "example_call": {
         "path": {
-          "task_id": "TASK-00012"
+          "task_code": "TASK-00012"
         },
         "query": {
           "limit": 20
@@ -398,7 +398,7 @@
     {
       "key": "create_task_note",
       "method": "POST",
-      "path": "/tasks/{task_id}/notes",
+      "path": "/tasks/{task_code}/notes",
       "slug": "add-a-note-to-a-task",
       "title": "Add a note to a task",
       "summary": "Adds a note, with an optional file, to a task found by its code.",
@@ -406,7 +406,7 @@
       "warning": "**This call currently returns `409`.** Adding a note to a task fails on the API, so no task note can be created yet.",
       "parameters": [
         {
-          "name": "task_id",
+          "name": "task_code",
           "in": "path",
           "required": true,
           "description": "The task's `code`. The note routes look the task up by its code, and a `wt_` id returns `404`.",
@@ -453,7 +453,7 @@
       },
       "example_call": {
         "path": {
-          "task_id": "TASK-00012"
+          "task_code": "TASK-00012"
         },
         "file": "site-visit.txt",
         "note": "<p>Call the client back on Monday.</p>"
@@ -509,7 +509,7 @@
     {
       "key": "delete_task_note",
       "method": "DELETE",
-      "path": "/tasks/{task_id}/notes/{task_note_id}",
+      "path": "/tasks/{task_code}/notes/{note_id}",
       "slug": "delete-a-task-note",
       "title": "Delete a task note",
       "summary": "Deletes one note from a task found by its code.",
@@ -517,7 +517,7 @@
       "warning": "**This call has not been confirmed to work.** It needs an existing note, and adding a note to a task currently fails.",
       "parameters": [
         {
-          "name": "task_id",
+          "name": "task_code",
           "in": "path",
           "required": true,
           "description": "The task's `code`. The note routes look the task up by its code, and a `wt_` id returns `404`.",
@@ -527,7 +527,7 @@
           }
         },
         {
-          "name": "task_note_id",
+          "name": "note_id",
           "in": "path",
           "required": true,
           "description": "The note's `id`.",
@@ -546,8 +546,8 @@
       },
       "example_call": {
         "path": {
-          "task_id": "TASK-00012",
-          "task_note_id": "6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f"
+          "task_code": "TASK-00012",
+          "note_id": "6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f"
         }
       }
     },
@@ -910,7 +910,7 @@
     {
       "key": "get_task_note",
       "method": "GET",
-      "path": "/tasks/{task_id}/notes/{task_note_id}",
+      "path": "/tasks/{task_code}/notes/{note_id}",
       "slug": "retrieve-a-task-note",
       "title": "Retrieve a task note",
       "summary": "Retrieves one note of a task found by its code.",
@@ -918,7 +918,7 @@
       "warning": "**This call has not been confirmed to work.** It needs an existing note, and adding a note to a task currently fails.",
       "parameters": [
         {
-          "name": "task_id",
+          "name": "task_code",
           "in": "path",
           "required": true,
           "description": "The task's `code`. The note routes look the task up by its code, and a `wt_` id returns `404`.",
@@ -928,7 +928,7 @@
           }
         },
         {
-          "name": "task_note_id",
+          "name": "note_id",
           "in": "path",
           "required": true,
           "description": "The note's `id`.",
@@ -953,15 +953,15 @@
       },
       "example_call": {
         "path": {
-          "task_id": "TASK-00012",
-          "task_note_id": "6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f"
+          "task_code": "TASK-00012",
+          "note_id": "6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f"
         }
       }
     },
     {
       "key": "update_task_note",
       "method": "PATCH",
-      "path": "/tasks/{task_id}/notes/{task_note_id}",
+      "path": "/tasks/{task_code}/notes/{note_id}",
       "slug": "update-a-task-note",
       "title": "Update a task note",
       "summary": "Changes the text of one task note.",
@@ -969,7 +969,7 @@
       "warning": "**This call has not been confirmed to work.** It needs an existing note, and adding a note to a task currently fails.",
       "parameters": [
         {
-          "name": "task_id",
+          "name": "task_code",
           "in": "path",
           "required": true,
           "description": "The task's `code`. The note routes look the task up by its code, and a `wt_` id returns `404`.",
@@ -979,7 +979,7 @@
           }
         },
         {
-          "name": "task_note_id",
+          "name": "note_id",
           "in": "path",
           "required": true,
           "description": "The note's `id`.",
@@ -1023,8 +1023,8 @@
       },
       "example_call": {
         "path": {
-          "task_id": "TASK-00012",
-          "task_note_id": "6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f"
+          "task_code": "TASK-00012",
+          "note_id": "6b1d3f5a-7c9e-4b2d-8f0a-1c3e5a7b9d2f"
         },
         "file": "site-visit.txt",
         "note": "<p>Client confirmed Monday.</p>"
