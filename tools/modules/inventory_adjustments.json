@@ -1,0 +1,236 @@
+{
+  "family": "inventory_adjustments",
+  "tag": "Inventory adjustments",
+  "slug": "inventory-adjustments",
+  "icon": "boxes-stacked",
+  "base": "/inventory_adjustments",
+  "overview_description": "List the stock changes recorded for every item and warehouse, and read one inventory adjustment by its id.",
+  "intro": "An inventory adjustment records one change to an item's stock in a warehouse, such as stock added through the item's inventory endpoints. These endpoints list adjustments across all items and read one by its `id`. This area has 2 endpoints, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**Quantities are strings.** `adjustment_amount` and every `quantity_*` field arrive as text, so convert them before doing arithmetic.",
+    "**Adjustments are read only.** Adding stock to an item through `POST /items/{item_id}/inventory/add` creates an adjustment, which these endpoints then return.",
+    "**One adjustment comes back under `inventory_adjustment`.** The listing puts its records under `data`.",
+    "**The listing pages by cursor.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor` until `has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_inventory_adjustments",
+      "method": "GET",
+      "path": "/inventory_adjustments",
+      "slug": "list-inventory-adjustments",
+      "title": "List inventory adjustments",
+      "summary": "Returns a page of inventory adjustments across all items.",
+      "description": "Returns adjustments under `data`, each naming the item, the warehouse, the `adjustment_amount` and the quantities after the change. Set the page size with `limit` and fetch the next page with `cursor`. Other fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` to sort descending, as in `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of inventory adjustments, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/InventoryAdjustmentList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_inventory_adjustment",
+      "method": "GET",
+      "path": "/inventory_adjustments/{inventory_adjustment_id}",
+      "slug": "retrieve-an-inventory-adjustment",
+      "title": "Retrieve an inventory adjustment",
+      "summary": "Returns one inventory adjustment by its `id`.",
+      "description": "Returns the adjustment under `inventory_adjustment`, with the item, the warehouse, the `adjustment_amount` and the quantities after the change, each quantity as a string.",
+      "parameters": [
+        {
+          "name": "inventory_adjustment_id",
+          "in": "path",
+          "required": true,
+          "description": "The adjustment's `id`, from the listing.",
+          "schema": {
+            "type": "string",
+            "example": "ia_3c4d5e6f708192a3b4c5d6e7f8091a2b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The adjustment, under `inventory_adjustment`.",
+          "schema": {
+            "$ref": "#/components/schemas/InventoryAdjustmentResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "inventory_adjustment_id": "ia_3c4d5e6f708192a3b4c5d6e7f8091a2b"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "InventoryAdjustmentList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/InventoryAdjustment"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/InventoryAdjustmentPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "InventoryAdjustment": {
+      "type": "object",
+      "properties": {
+        "adjustment_amount": {
+          "type": "string",
+          "description": "The change in stock, as a string."
+        },
+        "adjustment_type": {
+          "type": "string"
+        },
+        "created_by": {},
+        "created_on": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "item_id": {
+          "type": "string"
+        },
+        "item_name": {
+          "type": "string"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "quantity_available": {
+          "type": "string"
+        },
+        "quantity_on_hand": {
+          "type": "string",
+          "description": "The stock on hand after the change, as a string."
+        },
+        "quantity_on_order": {
+          "type": "string"
+        },
+        "quantity_on_purchase_return": {
+          "type": "string"
+        },
+        "quantity_on_reserve": {
+          "type": "string"
+        },
+        "quantity_on_return": {
+          "type": "string"
+        },
+        "quantity_promised": {
+          "type": "string"
+        },
+        "reference": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "warehouse_name": {
+          "type": "string"
+        }
+      }
+    },
+    "InventoryAdjustmentPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size the API applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "type": "object",
+          "properties": {
+            "next": {
+              "type": "string"
+            },
+            "prev": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "InventoryAdjustmentResponse": {
+      "type": "object",
+      "properties": {
+        "inventory_adjustment": {
+          "$ref": "#/components/schemas/InventoryAdjustment"
+        }
+      }
+    }
+  }
+}
