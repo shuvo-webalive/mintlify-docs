@@ -95,6 +95,9 @@
     },
     {
       "name": "Shipping rules"
+    },
+    {
+      "name": "Fulfillment profiles"
     }
   ],
   "paths": {
@@ -32037,6 +32040,498 @@
           }
         }
       }
+    },
+    "/settings/fulfillment_profiles": {
+      "get": {
+        "tags": [
+          "Fulfillment profiles"
+        ],
+        "summary": "List fulfillment profiles",
+        "operationId": "fulfillment_profiles_get_settings_fulfillment_profiles",
+        "description": "Returns profiles under `data`, each with its `name`, `display_name`, `description`, `status` and `version`. Set the page size with `limit` and fetch the next page with `cursor`. Other fields filter as `filter_<field>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` to sort descending, as in `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of fulfillment profiles, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FulfillmentProfileList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/fulfillment_profiles?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.fulfillment_profiles.get_settings_fulfillment_profiles({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.fulfillmentProfiles.getSettingsFulfillmentProfiles({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->fulfillmentProfiles->getSettingsFulfillmentProfiles(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.fulfillment_profiles.fulfillment_profiles_dto.FulfillmentProfilesDto.SettingsFulfillmentProfileList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsFulfillmentProfileList> response = client.fulfillmentProfiles().getSettingsFulfillmentProfiles(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.FulfillmentProfiles.GetSettingsFulfillmentProfilesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.fulfillmentProfiles\n    .getSettingsFulfillmentProfiles(queryParams: {'limit': 20});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.FulfillmentProfiles().GetSettingsFulfillmentProfiles(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Fulfillment profiles"
+        ],
+        "summary": "Create a fulfillment profile",
+        "operationId": "fulfillment_profiles_create_settings_fulfillment_profile",
+        "description": "Send the profile under `fulfillment_profile` with its `name` and a `statuses` list of one or more statuses.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new fulfillment profile, under `fulfillment_profile`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FulfillmentProfileResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/fulfillment_profiles\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"fulfillment_profile\": {\n      \"name\": \"Standard fulfillment\",\n      \"statuses\": [\n        {\n          \"name\": \"Open\",\n          \"status_index\": 0\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.fulfillment_profiles.create_settings_fulfillment_profile(\n    {\n        \"fulfillment_profile\": {\n            \"name\": \"Standard fulfillment\",\n            \"statuses\": [{\"name\": \"Open\", \"status_index\": 0}],\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.fulfillmentProfiles.createSettingsFulfillmentProfile({\n    fulfillment_profile: {name: 'Standard fulfillment', statuses: [{name: 'Open', status_index: 0}]},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->fulfillmentProfiles->createSettingsFulfillmentProfile([\n    'fulfillment_profile' => [\n        'name' => 'Standard fulfillment',\n        'statuses' => [['name' => 'Open', 'status_index' => 0]],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.fulfillment_profiles.fulfillment_profiles_dto.FulfillmentProfilesDto.SettingsFulfillmentProfile;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsFulfillmentProfile> response = client.fulfillmentProfiles().createSettingsFulfillmentProfile(\n        Map.of(\n                \"fulfillment_profile\", Map.of(\n                        \"name\", \"Standard fulfillment\",\n                        \"statuses\", List.of(Map.of(\"name\", \"Open\", \"status_index\", 0)))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.FulfillmentProfiles.CreateSettingsFulfillmentProfileAsync(new Dictionary<string, object?>\n{\n    [\"fulfillment_profile\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Standard fulfillment\",\n        [\"statuses\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"name\"] = \"Open\",\n                [\"status_index\"] = 0,\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.fulfillmentProfiles\n    .createSettingsFulfillmentProfile({\n      'fulfillment_profile': {\n        'name': 'Standard fulfillment',\n        'statuses': [\n          {'name': 'Open', 'status_index': 0},\n        ],\n      },\n    });\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.FulfillmentProfiles().CreateSettingsFulfillmentProfile(context.Background(), map[string]any{\n\t\"fulfillment_profile\": map[string]any{\n\t\t\"name\": \"Standard fulfillment\",\n\t\t\"statuses\": []any{\n\t\t\tmap[string]any{\"name\": \"Open\", \"status_index\": 0},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fulfillment_profile": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "statuses": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "status_index": {
+                              "type": "integer",
+                              "description": "The status's position, from `0`."
+                            }
+                          }
+                        },
+                        "description": "The profile's statuses. One at least on a create."
+                      }
+                    },
+                    "required": [
+                      "statuses"
+                    ]
+                  }
+                },
+                "required": [
+                  "fulfillment_profile"
+                ]
+              },
+              "example": {
+                "fulfillment_profile": {
+                  "name": "Standard fulfillment",
+                  "statuses": [
+                    {
+                      "name": "Open",
+                      "status_index": 0
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/fulfillment_profiles/{fulfillment_profile_id}": {
+      "get": {
+        "tags": [
+          "Fulfillment profiles"
+        ],
+        "summary": "Retrieve a fulfillment profile",
+        "operationId": "fulfillment_profiles_get_settings_fulfillment_profile",
+        "description": "Returns the profile under `fulfillment_profile`, with its `name`, `display_name`, `description`, `status` and `version`.",
+        "parameters": [
+          {
+            "name": "fulfillment_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The fulfillment profile's `id`, from the listing.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The fulfillment profile, under `fulfillment_profile`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FulfillmentProfileResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No fulfillment profile has that `id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/fulfillment_profiles/fp_5d6e7f8091a2b3c4d5e6f708192a3b4c\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.fulfillment_profiles.get_settings_fulfillment_profile(\n    \"fp_5d6e7f8091a2b3c4d5e6f708192a3b4c\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.fulfillmentProfiles.getSettingsFulfillmentProfile('fp_5d6e7f8091a2b3c4d5e6f708192a3b4c');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->fulfillmentProfiles->getSettingsFulfillmentProfile(\n    'fp_5d6e7f8091a2b3c4d5e6f708192a3b4c',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.fulfillment_profiles.fulfillment_profiles_dto.FulfillmentProfilesDto.SettingsFulfillmentProfile;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsFulfillmentProfile> response = client.fulfillmentProfiles().getSettingsFulfillmentProfile(\n        \"fp_5d6e7f8091a2b3c4d5e6f708192a3b4c\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.FulfillmentProfiles.GetSettingsFulfillmentProfileAsync(\"fp_5d6e7f8091a2b3c4d5e6f708192a3b4c\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.fulfillmentProfiles\n    .getSettingsFulfillmentProfile('fp_5d6e7f8091a2b3c4d5e6f708192a3b4c');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.FulfillmentProfiles().GetSettingsFulfillmentProfile(context.Background(), \"fp_5d6e7f8091a2b3c4d5e6f708192a3b4c\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Fulfillment profiles"
+        ],
+        "summary": "Delete a fulfillment profile",
+        "operationId": "fulfillment_profiles_delete_settings_fulfillment_profile",
+        "description": "Deletes the profile with that `id`; a later read of it returns `404`.",
+        "parameters": [
+          {
+            "name": "fulfillment_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The fulfillment profile's `id`, from the listing.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The fulfillment profile is deleted. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/fulfillment_profiles/fp_5d6e7f8091a2b3c4d5e6f708192a3b4c\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.fulfillment_profiles.delete_settings_fulfillment_profile(\n    \"fp_5d6e7f8091a2b3c4d5e6f708192a3b4c\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.fulfillmentProfiles.deleteSettingsFulfillmentProfile(\n    'fp_5d6e7f8091a2b3c4d5e6f708192a3b4c',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->fulfillmentProfiles->deleteSettingsFulfillmentProfile(\n    'fp_5d6e7f8091a2b3c4d5e6f708192a3b4c',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.fulfillmentProfiles().deleteSettingsFulfillmentProfile(\n        \"fp_5d6e7f8091a2b3c4d5e6f708192a3b4c\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.FulfillmentProfiles.DeleteSettingsFulfillmentProfileAsync(\"fp_5d6e7f8091a2b3c4d5e6f708192a3b4c\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.fulfillmentProfiles\n    .deleteSettingsFulfillmentProfile('fp_5d6e7f8091a2b3c4d5e6f708192a3b4c');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.FulfillmentProfiles().DeleteSettingsFulfillmentProfile(context.Background(), \"fp_5d6e7f8091a2b3c4d5e6f708192a3b4c\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Fulfillment profiles"
+        ],
+        "summary": "Update a fulfillment profile",
+        "operationId": "fulfillment_profiles_update_settings_fulfillment_profile",
+        "description": "Send the changes under `fulfillment_profile`, such as a new `display_name` or `description`.",
+        "parameters": [
+          {
+            "name": "fulfillment_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The fulfillment profile's `id`, from the listing.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated fulfillment profile, under `fulfillment_profile`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FulfillmentProfileResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/fulfillment_profiles/fp_5d6e7f8091a2b3c4d5e6f708192a3b4c\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"fulfillment_profile\": {\n      \"display_name\": \"Standard fulfillment\",\n      \"description\": \"Open, packed and sent\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.fulfillment_profiles.update_settings_fulfillment_profile(\n    \"fp_5d6e7f8091a2b3c4d5e6f708192a3b4c\",\n    {\n        \"fulfillment_profile\": {\n            \"display_name\": \"Standard fulfillment\",\n            \"description\": \"Open, packed and sent\",\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.fulfillmentProfiles.updateSettingsFulfillmentProfile(\n    'fp_5d6e7f8091a2b3c4d5e6f708192a3b4c',\n    {fulfillment_profile: {display_name: 'Standard fulfillment', description: 'Open, packed and sent'}},\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->fulfillmentProfiles->updateSettingsFulfillmentProfile(\n    'fp_5d6e7f8091a2b3c4d5e6f708192a3b4c',\n    [\n        'fulfillment_profile' => [\n            'display_name' => 'Standard fulfillment',\n            'description' => 'Open, packed and sent',\n        ],\n    ],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.fulfillment_profiles.fulfillment_profiles_dto.FulfillmentProfilesDto.SettingsFulfillmentProfile;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsFulfillmentProfile> response = client.fulfillmentProfiles().updateSettingsFulfillmentProfile(\n        \"fp_5d6e7f8091a2b3c4d5e6f708192a3b4c\",\n        Map.of(\n                \"fulfillment_profile\", Map.of(\n                        \"display_name\", \"Standard fulfillment\",\n                        \"description\", \"Open, packed and sent\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.FulfillmentProfiles.UpdateSettingsFulfillmentProfileAsync(\n    \"fp_5d6e7f8091a2b3c4d5e6f708192a3b4c\",\n    new Dictionary<string, object?>\n    {\n        [\"fulfillment_profile\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Standard fulfillment\",\n            [\"description\"] = \"Open, packed and sent\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.fulfillmentProfiles\n    .updateSettingsFulfillmentProfile('fp_5d6e7f8091a2b3c4d5e6f708192a3b4c', {\n      'fulfillment_profile': {\n        'display_name': 'Standard fulfillment',\n        'description': 'Open, packed and sent',\n      },\n    });\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.FulfillmentProfiles().UpdateSettingsFulfillmentProfile(context.Background(), \"fp_5d6e7f8091a2b3c4d5e6f708192a3b4c\", map[string]any{\n\t\"fulfillment_profile\": map[string]any{\n\t\t\"display_name\": \"Standard fulfillment\",\n\t\t\"description\":  \"Open, packed and sent\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fulfillment_profile": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "statuses": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "status_index": {
+                              "type": "integer",
+                              "description": "The status's position, from `0`."
+                            }
+                          }
+                        },
+                        "description": "The profile's statuses. One at least on a create."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "fulfillment_profile"
+                ]
+              },
+              "example": {
+                "fulfillment_profile": {
+                  "display_name": "Standard fulfillment",
+                  "description": "Open, packed and sent"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -47121,6 +47616,102 @@
         "properties": {
           "shipping_rule": {
             "$ref": "#/components/schemas/ShippingRule"
+          }
+        }
+      },
+      "FulfillmentProfileList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FulfillmentProfile"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/FulfillmentProfilePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "FulfillmentProfile": {
+        "type": "object",
+        "properties": {
+          "created_by": {},
+          "created_on": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "FulfillmentProfilePagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size the API applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "next": {
+                "type": "string"
+              },
+              "prev": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "FulfillmentProfileResponse": {
+        "type": "object",
+        "properties": {
+          "fulfillment_profile": {
+            "$ref": "#/components/schemas/FulfillmentProfile"
           }
         }
       },

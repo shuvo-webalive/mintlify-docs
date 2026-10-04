@@ -1,0 +1,30 @@
+---
+title: "Fulfillment profiles"
+sidebarTitle: "Overview"
+description: "List, read, create, update and delete fulfillment profiles, each a named set of fulfillment statuses."
+---
+
+A fulfillment profile is a named set of fulfillment statuses. These endpoints list, read, create, update and delete profiles. This area has 5 endpoints, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List fulfillment profiles](/api-reference/fulfillment-profiles/list-fulfillment-profiles) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/fulfillment_profiles` | Returns a page of fulfillment profiles. |
+| [Create a fulfillment profile](/api-reference/fulfillment-profiles/create-a-fulfillment-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/fulfillment_profiles` | Creates a fulfillment profile with its statuses and returns it. |
+| [Retrieve a fulfillment profile](/api-reference/fulfillment-profiles/retrieve-a-fulfillment-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/fulfillment_profiles/{fulfillment_profile_id}` | Returns one fulfillment profile by its `id`. |
+| [Delete a fulfillment profile](/api-reference/fulfillment-profiles/delete-a-fulfillment-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/fulfillment_profiles/{fulfillment_profile_id}` | Deletes a fulfillment profile. A successful call returns `204` with no body. |
+| [Update a fulfillment profile](/api-reference/fulfillment-profiles/update-a-fulfillment-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/fulfillment_profiles/{fulfillment_profile_id}` | Changes a fulfillment profile and returns it. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **A profile needs at least one status.** `statuses` lists each status with a `name` and a `status_index`, starting at `0`.
+- **Writes are wrapped in `fulfillment_profile`, and one profile comes back under `fulfillment_profile`.**
+- **Each profile carries a `version` number.** It is an integer.
+- **The listing pages by cursor.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor` until `has_more` is `false`.
