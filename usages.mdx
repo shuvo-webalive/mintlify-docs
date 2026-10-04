@@ -4,7 +4,7 @@ sidebarTitle: "Overview"
 description: "Record, list, read, change and delete the usage that Exsited bills on metered order lines."
 ---
 
-A usage records how much of a metered item a customer used in a billing period, against one order line. This area records usages one at a time or several at once, and lists, reads, changes and deletes them. It has 6 endpoints, and all seven SDKs call every one.
+A usage records how much of a metered item a customer used in a billing period, against one order line. This area records usages one at a time or several at once, and lists, reads, changes and deletes them. It has 6 endpoints, and every SDK supports all of them.
 
 ## At a glance
 
@@ -28,5 +28,5 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 - **A usage belongs to a metered order line.** `charge_item_id` is the `id` of an order line whose item is charged as `METERED`.
 - **`charging_period` is two dates joined by a hyphen.** It runs from the order's `order_start_date` to the day before its `next_billing_from_date`, such as `2026-10-01-2026-10-31`.
 - **One usage goes under `usage`, several under `usages`.** A list sent under `usage` returns `400`. For several, the response lists each one under `usages.success` or `usages.failed`.
-- **Updates return a reference, not the usage.** `update_usage` and `replace_usage` return the usage's `id` and `href` under `usage`; read it again for the new values.
+- **Updates return a reference, not the usage.** [Update a usage](/api-reference/usages/update-a-usage) and [Replace a usage](/api-reference/usages/replace-a-usage) return only the usage's `id` and `href` under `usage`; retrieve the usage again to see the new values.
 - **The listing pages by cursor.** Send `limit`, then pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`.
