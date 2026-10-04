@@ -5,14 +5,14 @@
   "icon": "list-check",
   "base": "/tasks",
   "overview_description": "Manage tasks in Exsited: create, read, update and delete tasks, their checklist items, notes and note files.",
-  "intro": "Tasks are units of work in Exsited, with a checklist, assignees, notes and attached files. You can create, list, retrieve, update and delete tasks, manage their checklist items, and add, read, change and remove notes and note files. This area has 18 endpoints, and all seven SDKs call every one.",
-  "warning": "**Deletes in this area cannot be undone.** Deleting a task, a checklist item, a note or a note file removes it; a deleted task then returns `404`.",
+  "intro": "Tasks are units of work in Exsited, with a checklist, assignees, notes and attached files. You can create, list, retrieve, update and delete tasks, manage their checklist items, and add, read, change and remove notes and note files. This area has 18 endpoints, each available in all seven SDKs.",
+  "warning": "**Adding a note to a task currently fails.** `POST /tasks/{task_id}/notes` returns `409`, so the calls that need an existing note (read, update and delete a note, and list, read and delete its files) have not been confirmed to work. Deletes in this area cannot be undone; a deleted task returns `404`.",
   "notes": [
     "**Task bodies go under `work_task`.** The create and the update wrap their fields in `work_task`, `name` is required to create, and a key the API does not know is refused.",
     "**The note routes take the task's `code`, not its `wt_` id.** A `wt_` id returns `404` on every `/notes` path; the task, checklist and update calls take the `wt_` id.",
     "**Checklist bodies go under `checklist`.** Adding items sends an array of `{\"name\": ...}`; updating one item sends a single object. Most checklist calls return the whole task under `work_task`.",
     "**`checklist` changes shape.** It is an array on the task and on the checklist list, and a single object when you retrieve one checklist item.",
-    "**Notes are multipart forms.** Send the text as the `note` field and an optional `file`; a file's details come from its `uuid` in the note's file list, not its contents.",
+    "**Notes are multipart forms.** Send the text as the `note` field and, optionally, a `file`. To read an attached file's details, use the `uuid` from the note's file list; the call returns the file's details, not its contents.",
     "**A `COMPLETED` checklist item cannot be deleted.** The delete returns `409`."
   ],
   "endpoints": [
@@ -403,6 +403,7 @@
       "title": "Add a note to a task",
       "summary": "Adds a note, with an optional file, to a task found by its code.",
       "description": "Send a multipart form with the note's text as `note` and, optionally, a `file` to attach. The path takes the task's `code`. The new note comes back under `note`, with its `id`.",
+      "warning": "**This call currently returns `409`.** Adding a note to a task fails on the API, so no task note can be created yet.",
       "parameters": [
         {
           "name": "task_id",
@@ -445,6 +446,9 @@
           "schema": {
             "$ref": "#/components/schemas/TaskNoteResponse"
           }
+        },
+        "409": {
+          "description": "Adding a note to a task currently fails."
         }
       },
       "example_call": {
@@ -510,6 +514,7 @@
       "title": "Delete a task note",
       "summary": "Deletes one note from a task found by its code.",
       "description": "Deletes the note with this `id` from the task. The path takes the task's `code`; a `wt_` id returns `404`. After the delete, the task's note list no longer holds the note.",
+      "warning": "**This call has not been confirmed to work.** It needs an existing note, and adding a note to a task currently fails.",
       "parameters": [
         {
           "name": "task_id",
@@ -747,6 +752,7 @@
       "title": "Delete a task note file",
       "summary": "Deletes one file attached to a task note; the response has no body.",
       "description": "Deletes the attachment with this `uuid` from the note. The path takes the task's `code` and the file's `uuid` from the note's file list. A successful delete returns `204` with no body.",
+      "warning": "**This call has not been confirmed to work.** It needs an existing note, and adding a note to a task currently fails.",
       "parameters": [
         {
           "name": "task_code",
@@ -802,6 +808,7 @@
       "title": "List a task note's files",
       "summary": "Lists the files attached to one task note.",
       "description": "Returns the note's attachments under `data`, with `pagination`. Each attachment carries its `uuid`, `filename`, `content_type`, `size` and `href`. The path takes the task's `code`.",
+      "warning": "**This call has not been confirmed to work.** It needs an existing note, and adding a note to a task currently fails.",
       "parameters": [
         {
           "name": "task_code",
@@ -849,6 +856,7 @@
       "title": "Retrieve a task note file",
       "summary": "Retrieves the details of one file attached to a task note.",
       "description": "Returns a description of the attachment under `file`: its `uuid`, `filename`, `content_type`, `size` and `href`. It does not return the file's contents.",
+      "warning": "**This call has not been confirmed to work.** It needs an existing note, and adding a note to a task currently fails.",
       "parameters": [
         {
           "name": "task_code",
@@ -907,6 +915,7 @@
       "title": "Retrieve a task note",
       "summary": "Retrieves one note of a task found by its code.",
       "description": "Returns the note under `note`, with its `id` and `content`. The path takes the task's `code`; a `wt_` id returns `404`.",
+      "warning": "**This call has not been confirmed to work.** It needs an existing note, and adding a note to a task currently fails.",
       "parameters": [
         {
           "name": "task_id",
@@ -957,6 +966,7 @@
       "title": "Update a task note",
       "summary": "Changes the text of one task note.",
       "description": "Send a multipart form with the new text as `note` and, optionally, a `file` to attach, as for adding a note. The path takes the task's `code`. The note comes back under `note`.",
+      "warning": "**This call has not been confirmed to work.** It needs an existing note, and adding a note to a task currently fails.",
       "parameters": [
         {
           "name": "task_id",
