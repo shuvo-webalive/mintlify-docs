@@ -1,0 +1,27 @@
+---
+title: "Inventory adjustments"
+sidebarTitle: "Overview"
+description: "List the stock changes recorded for every item and warehouse, and read one inventory adjustment by its id."
+---
+
+An inventory adjustment records one change to an item's stock in a warehouse, such as stock added through the item's inventory endpoints. These endpoints list adjustments across all items and read one by its `id`. This area has 2 endpoints, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List inventory adjustments](/api-reference/inventory-adjustments/list-inventory-adjustments) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/inventory_adjustments` | Returns a page of inventory adjustments across all items. |
+| [Retrieve an inventory adjustment](/api-reference/inventory-adjustments/retrieve-an-inventory-adjustment) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/inventory_adjustments/{inventory_adjustment_id}` | Returns one inventory adjustment by its `id`. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Quantities are strings.** `adjustment_amount` and every `quantity_*` field arrive as text, so convert them before doing arithmetic.
+- **Adjustments are read only.** Adding stock to an item through `POST /items/{item_id}/inventory/add` creates an adjustment, which these endpoints then return.
+- **One adjustment comes back under `inventory_adjustment`.** The listing puts its records under `data`.
+- **The listing pages by cursor.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor` until `has_more` is `false`.

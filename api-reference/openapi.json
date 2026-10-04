@@ -80,6 +80,9 @@
     },
     {
       "name": "Items"
+    },
+    {
+      "name": "Inventory adjustments"
     }
   ],
   "paths": {
@@ -29798,6 +29801,176 @@
           }
         ]
       }
+    },
+    "/inventory_adjustments": {
+      "get": {
+        "tags": [
+          "Inventory adjustments"
+        ],
+        "summary": "List inventory adjustments",
+        "operationId": "inventory_adjustments_get_inventory_adjustments",
+        "description": "Returns adjustments under `data`, each naming the item, the warehouse, the `adjustment_amount` and the quantities after the change. Set the page size with `limit` and fetch the next page with `cursor`. Other fields filter as `filter_<field>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` to sort descending, as in `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of inventory adjustments, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryAdjustmentList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/inventory_adjustments?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.inventory_adjustments.get_inventory_adjustments({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.inventoryAdjustments.getInventoryAdjustments({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->inventoryAdjustments->getInventoryAdjustments(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.inventory_adjustments.inventory_adjustments_dto.InventoryAdjustmentsDto.InventoryAdjustmentList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<InventoryAdjustmentList> response = client.inventoryAdjustments().getInventoryAdjustments(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.InventoryAdjustments.GetInventoryAdjustmentsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.inventoryAdjustments.getInventoryAdjustments(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.InventoryAdjustments().GetInventoryAdjustments(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/inventory_adjustments/{inventory_adjustment_id}": {
+      "get": {
+        "tags": [
+          "Inventory adjustments"
+        ],
+        "summary": "Retrieve an inventory adjustment",
+        "operationId": "inventory_adjustments_get_inventory_adjustment",
+        "description": "Returns the adjustment under `inventory_adjustment`, with the item, the warehouse, the `adjustment_amount` and the quantities after the change, each quantity as a string.",
+        "parameters": [
+          {
+            "name": "inventory_adjustment_id",
+            "in": "path",
+            "required": true,
+            "description": "The adjustment's `id`, from the listing.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The adjustment, under `inventory_adjustment`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryAdjustmentResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/inventory_adjustments/ia_3c4d5e6f708192a3b4c5d6e7f8091a2b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.inventory_adjustments.get_inventory_adjustment(\n    \"ia_3c4d5e6f708192a3b4c5d6e7f8091a2b\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.inventoryAdjustments.getInventoryAdjustment('ia_3c4d5e6f708192a3b4c5d6e7f8091a2b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->inventoryAdjustments->getInventoryAdjustment(\n    'ia_3c4d5e6f708192a3b4c5d6e7f8091a2b',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.inventory_adjustments.inventory_adjustments_dto.InventoryAdjustmentsDto.InventoryAdjustment;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<InventoryAdjustment> response = client.inventoryAdjustments().getInventoryAdjustment(\n        \"ia_3c4d5e6f708192a3b4c5d6e7f8091a2b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.InventoryAdjustments.GetInventoryAdjustmentAsync(\"ia_3c4d5e6f708192a3b4c5d6e7f8091a2b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.inventoryAdjustments.getInventoryAdjustment(\n  'ia_3c4d5e6f708192a3b4c5d6e7f8091a2b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.InventoryAdjustments().GetInventoryAdjustment(context.Background(), \"ia_3c4d5e6f708192a3b4c5d6e7f8091a2b\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -44325,6 +44498,131 @@
         "properties": {
           "file": {
             "$ref": "#/components/schemas/ItemNoteFile"
+          }
+        }
+      },
+      "InventoryAdjustmentList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InventoryAdjustment"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/InventoryAdjustmentPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "InventoryAdjustment": {
+        "type": "object",
+        "properties": {
+          "adjustment_amount": {
+            "type": "string",
+            "description": "The change in stock, as a string."
+          },
+          "adjustment_type": {
+            "type": "string"
+          },
+          "created_by": {},
+          "created_on": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "item_name": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "quantity_available": {
+            "type": "string"
+          },
+          "quantity_on_hand": {
+            "type": "string",
+            "description": "The stock on hand after the change, as a string."
+          },
+          "quantity_on_order": {
+            "type": "string"
+          },
+          "quantity_on_purchase_return": {
+            "type": "string"
+          },
+          "quantity_on_reserve": {
+            "type": "string"
+          },
+          "quantity_on_return": {
+            "type": "string"
+          },
+          "quantity_promised": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "warehouse_name": {
+            "type": "string"
+          }
+        }
+      },
+      "InventoryAdjustmentPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size the API applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "next": {
+                "type": "string"
+              },
+              "prev": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "InventoryAdjustmentResponse": {
+        "type": "object",
+        "properties": {
+          "inventory_adjustment": {
+            "$ref": "#/components/schemas/InventoryAdjustment"
           }
         }
       },
