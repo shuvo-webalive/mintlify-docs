@@ -1,0 +1,26 @@
+{
+  "sdk": "dotnet",
+  "module": "purchase_refunds",
+  "endpoints": {
+    "get_purchase_refunds": {
+      "function": "PurchaseRefunds.GetPurchaseRefundsAsync",
+      "code": "var response = await client.PurchaseRefunds.GetPurchaseRefundsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "get_purchase_refund": {
+      "function": "PurchaseRefunds.GetPurchaseRefundAsync",
+      "code": "var response = await client.PurchaseRefunds.GetPurchaseRefundAsync(\"PR-0001\");\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "create_purchase_credit_note_purchase_refund": {
+      "function": "PurchaseRefunds.CreatePurchaseCreditNotePurchaseRefundAsync",
+      "code": "var response = await client.PurchaseRefunds.CreatePurchaseCreditNotePurchaseRefundAsync(\n    \"pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b\",\n    new Dictionary<string, object?>\n    {\n        [\"purchase_refund\"] = new Dictionary<string, object?>\n        {\n            [\"amount\"] = \"0.50\",\n            [\"payment_method\"] = \"Acme Pty Ltd bank account\",\n            [\"reference\"] = \"REF-1001\",\n            [\"note\"] = \"Refund for returned stock.\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "update_purchase_refund": {
+      "function": "PurchaseRefunds.UpdatePurchaseRefundAsync",
+      "code": "var response = await client.PurchaseRefunds.UpdatePurchaseRefundAsync(\n    \"PR-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"purchase_refund\"] = new Dictionary<string, object?>\n        {\n            [\"reference\"] = \"REF-1002\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+    },
+    "delete_purchase_refund": {
+      "function": "PurchaseRefunds.DeletePurchaseRefundAsync",
+      "code": "var response = await client.PurchaseRefunds.DeletePurchaseRefundAsync(\"PR-0001\");\n\nConsole.WriteLine(response.Json);\n"
+    }
+  }
+}

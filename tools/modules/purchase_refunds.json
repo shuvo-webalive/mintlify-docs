@@ -1,0 +1,662 @@
+{
+  "family": "purchase_refunds",
+  "tag": "Purchase refunds",
+  "slug": "purchase-refunds",
+  "icon": "rotate-left",
+  "base": "/purchase_refunds",
+  "overview_description": "Record refunds from suppliers against purchase credit notes, and read, update and delete purchase refunds.",
+  "intro": "A purchase refund records money a supplier pays back against a purchase credit note. These endpoints record a refund from a credit note and read, update and delete refunds. There are 5 endpoints, and all seven SDKs call every one.",
+  "warning": "**Deleting a purchase refund cannot be undone.**",
+  "notes": [
+    "**A purchase refund is created from a purchase credit note.** Post it to `/purchase_credit_notes/{purchase_credit_note_id}/purchase_refunds`.",
+    "**Every write body is wrapped in `purchase_refund`.**",
+    "**`payment_method` is the reference of one of the supplier's payment methods.**",
+    "**The update takes only `alternate_date`, `reference`, `note` and `custom_attributes`.** Any other key returns `400`, and the amount cannot change.",
+    "**The update and delete address a refund by its code.** They match nothing else."
+  ],
+  "endpoints": [
+    {
+      "key": "get_purchase_refunds",
+      "method": "GET",
+      "path": "/purchase_refunds",
+      "slug": "list-purchase-refunds",
+      "title": "List purchase refunds",
+      "summary": "Returns one page of purchase refunds.",
+      "description": "Lists the refunds received from suppliers, one page at a time, under `data`. Pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter the list as `filter_<field>` or `filter_<field>_<operator>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` value from the previous page, to read the next one.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of purchase refunds.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseRefundList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_purchase_refund",
+      "method": "GET",
+      "path": "/purchase_refunds/{purchase_refund_id}",
+      "slug": "retrieve-a-purchase-refund",
+      "title": "Retrieve a purchase refund",
+      "summary": "Returns one purchase refund under `purchase_refund`.",
+      "description": "Returns the refund with its supplier, credit note, amount, payment method and custom attributes under `purchase_refund`.",
+      "parameters": [
+        {
+          "name": "purchase_refund_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase refund's `code`. The update and delete accept nothing else.",
+          "schema": {
+            "type": "string",
+            "example": "PR-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The purchase refund, under `purchase_refund`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseRefundResponse"
+          }
+        },
+        "404": {
+          "description": "No purchase refund has that code, for example after it is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_refund_id": "PR-0001"
+        }
+      }
+    },
+    {
+      "key": "create_purchase_credit_note_purchase_refund",
+      "method": "POST",
+      "path": "/purchase_credit_notes/{purchase_credit_note_id}/purchase_refunds",
+      "slug": "create-a-purchase-refund-from-a-purchase-credit-note",
+      "title": "Create a purchase refund from a purchase credit note",
+      "summary": "Records a refund from a supplier against a purchase credit note and returns it under `purchase_refund`.",
+      "description": "Records a refund against the purchase credit note in the path, wrapped in `purchase_refund`. `payment_method` is the reference of one of the supplier's payment methods. A purchase refund is always raised against a purchase credit note; there is no create on the purchase refunds path.",
+      "parameters": [
+        {
+          "name": "purchase_credit_note_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase credit note's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "purchase_refund": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "description": "The amount refunded, as a decimal string such as `0.50`."
+                },
+                "payment_method": {
+                  "type": "string",
+                  "description": "The reference of one of the supplier's payment methods."
+                },
+                "reference": {
+                  "type": "string",
+                  "description": "Your reference for the refund."
+                },
+                "note": {
+                  "type": "string"
+                },
+                "custom_attributes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "purchase_refund"
+          ]
+        },
+        "example": {
+          "purchase_refund": {
+            "amount": "0.50",
+            "payment_method": "Acme Pty Ltd bank account",
+            "reference": "REF-1001",
+            "note": "Refund for returned stock."
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new purchase refund, under `purchase_refund`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseRefundResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_credit_note_id": "pcn_5e4d3c2b1a0f4e9d8c7b6a5f4e3d2c1b"
+        },
+        "body": {
+          "purchase_refund": {
+            "amount": "0.50",
+            "payment_method": "Acme Pty Ltd bank account",
+            "reference": "REF-1001",
+            "note": "Refund for returned stock."
+          }
+        }
+      }
+    },
+    {
+      "key": "update_purchase_refund",
+      "method": "PATCH",
+      "path": "/purchase_refunds/{purchase_refund_id}",
+      "slug": "update-a-purchase-refund",
+      "title": "Update a purchase refund",
+      "summary": "Changes a refund's reference, note, date or custom attributes and returns it under `purchase_refund`.",
+      "description": "Updates the refund, wrapped in `purchase_refund`. Only `alternate_date`, `reference`, `note` and `custom_attributes` can change; any other key returns `400`, and the amount cannot change.",
+      "parameters": [
+        {
+          "name": "purchase_refund_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase refund's `code`. The update and delete accept nothing else.",
+          "schema": {
+            "type": "string",
+            "example": "PR-0001"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "purchase_refund": {
+              "type": "object",
+              "properties": {
+                "alternate_date": {
+                  "type": "string"
+                },
+                "reference": {
+                  "type": "string"
+                },
+                "note": {
+                  "type": "string"
+                },
+                "custom_attributes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "purchase_refund"
+          ]
+        },
+        "example": {
+          "purchase_refund": {
+            "reference": "REF-1002"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated purchase refund, under `purchase_refund`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseRefundResponse"
+          }
+        },
+        "400": {
+          "description": "The body holds a key other than `alternate_date`, `reference`, `note` and `custom_attributes`."
+        },
+        "500": {
+          "description": "The server can fail with `500` on this call even for a valid body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_refund_id": "PR-0001"
+        },
+        "body": {
+          "purchase_refund": {
+            "reference": "REF-1002"
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_purchase_refund",
+      "method": "DELETE",
+      "path": "/purchase_refunds/{purchase_refund_id}",
+      "slug": "delete-a-purchase-refund",
+      "title": "Delete a purchase refund",
+      "summary": "Deletes a purchase refund. Nothing comes back.",
+      "description": "Deletes the refund, addressed by its code. The call returns `204` with no body, and reading the refund afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "purchase_refund_id",
+          "in": "path",
+          "required": true,
+          "description": "The purchase refund's `code`. The update and delete accept nothing else.",
+          "schema": {
+            "type": "string",
+            "example": "PR-0001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The purchase refund is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "purchase_refund_id": "PR-0001"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "PurchaseRefundsData": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/PurchaseRefundsDataAccount"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchaseRefundsDataCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "credit_note": {
+          "$ref": "#/components/schemas/PurchaseRefundsDataCreditNote"
+        },
+        "custom_attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseRefundsDataCustomAttribute"
+          }
+        },
+        "id": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {},
+        "note": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "payment_method": {
+          "type": "string"
+        },
+        "payment_processor": {
+          "type": "string"
+        },
+        "reference": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchaseRefundsDataAccount": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseRefundsDataCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseRefundsDataCreditNote": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseRefundsDataCustomAttribute": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseRefundPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseRefundPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size the API applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can be set on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": "string",
+          "description": "The cursor of the previous page."
+        },
+        "links": {
+          "$ref": "#/components/schemas/PurchaseRefundPaginationLinks"
+        }
+      }
+    },
+    "PurchaseRefundList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseRefundsData"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/PurchaseRefundPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseRefund": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/PurchaseRefundAccount"
+        },
+        "alternate_date": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchaseRefundCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "credit_note": {
+          "$ref": "#/components/schemas/PurchaseRefundCreditNote"
+        },
+        "credit_note_id": {
+          "type": "string"
+        },
+        "custom_attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PurchaseRefundCustomAttribute"
+          }
+        },
+        "date": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "payment_method": {
+          "type": "string"
+        },
+        "payment_processor": {
+          "type": "string"
+        },
+        "purchase_refund": {},
+        "reference": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchaseRefundAccount": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseRefundCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseRefundCreditNote": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseRefundCustomAttribute": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseRefundResponse": {
+      "type": "object",
+      "properties": {
+        "purchase_refund": {
+          "$ref": "#/components/schemas/PurchaseRefund"
+        }
+      }
+    }
+  }
+}
