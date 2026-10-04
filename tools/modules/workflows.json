@@ -1,0 +1,1208 @@
+{
+  "family": "workflows",
+  "tag": "Workflows",
+  "slug": "workflows",
+  "icon": "diagram-project",
+  "base": "/workflows",
+  "overview_description": "Create, read, update and delete workflows, and read their stages, milestones and component instance history.",
+  "intro": "Workflows define the stages and milestones a record moves through. Use these endpoints to create and change workflows and to read their stages, milestones and the workflow history of custom component instances. This area has 15 endpoints, and all seven Exsited SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**Creates and updates are wrapped in `workflow`.** One workflow comes back under `workflow` too, and `name` is required to create one.",
+    "**A new workflow starts as a draft.** An update can move a draft to active, and move an active workflow to inactive and back.",
+    "**A workflow is read by its `wf_` id or its `code`.** The milestone listing takes the `wf_` id in its `workflow_uuid` slot.",
+    "**Component instance routes take the component's dashed uuid.** Under `/workflows/custom_components`, `component_uuid` is the hex of the `cmp_` id with the dashes put back and `object_code` is the instance's `code`; the `cmp_` id and the bare hex return `404`.",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_workflows",
+      "method": "GET",
+      "path": "/workflows",
+      "slug": "list-workflows",
+      "title": "List workflows",
+      "summary": "Lists the workflows on your instance, one page at a time.",
+      "description": "Returns a page of workflows under `data`, with cursor `pagination`. A deleted workflow is not listed. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of workflows.",
+          "schema": {
+            "$ref": "#/components/schemas/WorkflowList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_workflow",
+      "method": "GET",
+      "path": "/workflows/{workflow_id}",
+      "slug": "retrieve-a-workflow",
+      "title": "Retrieve a workflow",
+      "summary": "Retrieves one workflow by its `wf_` id or its `code`.",
+      "description": "Returns the workflow under `workflow`. A deleted workflow returns `404`.",
+      "parameters": [
+        {
+          "name": "workflow_id",
+          "in": "path",
+          "required": true,
+          "description": "The workflow's `wf_` id, or its `code`.",
+          "schema": {
+            "type": "string",
+            "example": "wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The workflow, under `workflow`.",
+          "schema": {
+            "$ref": "#/components/schemas/WorkflowResponse"
+          }
+        },
+        "404": {
+          "description": "No workflow has that id or code, or the workflow is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "workflow_id": "wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b"
+        }
+      }
+    },
+    {
+      "key": "create_workflow",
+      "method": "POST",
+      "path": "/workflows",
+      "slug": "create-a-workflow",
+      "title": "Create a workflow",
+      "summary": "Creates a workflow as a draft and returns it.",
+      "description": "Send the workflow wrapped in `workflow`. `name` is required, and a key the API does not read is refused. The new workflow starts with the status `draft` and comes back under `workflow`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "workflow": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The workflow's name."
+                },
+                "entity": {
+                  "type": "string",
+                  "description": "The entity the workflow belongs to, such as `account`."
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "description": "The new workflow. Keys the API does not read are refused."
+            }
+          },
+          "required": [
+            "workflow"
+          ]
+        },
+        "example": {
+          "workflow": {
+            "name": "Account onboarding",
+            "entity": "account"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new workflow, under `workflow`.",
+          "schema": {
+            "$ref": "#/components/schemas/WorkflowResponse"
+          }
+        }
+      },
+      "example_call": {
+        "body": {
+          "workflow": {
+            "name": "Account onboarding",
+            "entity": "account"
+          }
+        }
+      }
+    },
+    {
+      "key": "update_workflow",
+      "method": "PATCH",
+      "path": "/workflows/{workflow_id}",
+      "slug": "update-a-workflow",
+      "title": "Update a workflow",
+      "summary": "Changes a workflow's fields or moves its status, and returns the workflow.",
+      "description": "Send the fields to change wrapped in `workflow`. A draft can move to active, and an active workflow can move to inactive and back. The updated workflow comes back under `workflow`.",
+      "parameters": [
+        {
+          "name": "workflow_id",
+          "in": "path",
+          "required": true,
+          "description": "The workflow's `wf_` id.",
+          "schema": {
+            "type": "string",
+            "example": "wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "workflow": {
+              "type": "object",
+              "properties": {
+                "display_name": {
+                  "type": "string",
+                  "description": "The name shown for the workflow."
+                },
+                "status": {
+                  "type": "string",
+                  "description": "The status to move to. A draft can become active, and active and inactive can switch."
+                }
+              },
+              "description": "The fields to change."
+            }
+          },
+          "required": [
+            "workflow"
+          ]
+        },
+        "example": {
+          "workflow": {
+            "display_name": "Account onboarding (revised)"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated workflow, under `workflow`.",
+          "schema": {
+            "$ref": "#/components/schemas/WorkflowResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "workflow_id": "wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b"
+        },
+        "body": {
+          "workflow": {
+            "display_name": "Account onboarding (revised)"
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_workflow",
+      "method": "DELETE",
+      "path": "/workflows/{workflow_id}",
+      "slug": "delete-a-workflow",
+      "title": "Delete a workflow",
+      "summary": "Deletes a workflow. Nothing comes back.",
+      "description": "Returns `204` with no body. The workflow is marked deleted, is no longer listed, and a read of it returns `404`. A pre-built workflow cannot be deleted.",
+      "parameters": [
+        {
+          "name": "workflow_id",
+          "in": "path",
+          "required": true,
+          "description": "The workflow's `wf_` id.",
+          "schema": {
+            "type": "string",
+            "example": "wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The workflow is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "workflow_id": "wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b"
+        }
+      }
+    },
+    {
+      "key": "get_workflow_stages",
+      "method": "GET",
+      "path": "/workflows/{workflow_id}/stages",
+      "slug": "list-a-workflows-stages",
+      "title": "List a workflow's stages",
+      "summary": "Lists the stages of one workflow, one page at a time.",
+      "description": "Returns a page of the workflow's stages under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+      "parameters": [
+        {
+          "name": "workflow_id",
+          "in": "path",
+          "required": true,
+          "description": "The workflow's `wf_` id.",
+          "schema": {
+            "type": "string",
+            "example": "wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of the workflow's stages.",
+          "schema": {
+            "$ref": "#/components/schemas/WorkflowStageList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "workflow_id": "wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_workflow_stage",
+      "method": "GET",
+      "path": "/workflows/{workflow_id}/stages/{stage_id}",
+      "slug": "retrieve-a-workflow-stage",
+      "title": "Retrieve a workflow stage",
+      "summary": "Retrieves one stage of a workflow by its `wfs_` id.",
+      "description": "Returns the stage under `workflow_stage`. A stage id the workflow does not hold returns `404` with the code `resource_not_found`.",
+      "parameters": [
+        {
+          "name": "workflow_id",
+          "in": "path",
+          "required": true,
+          "description": "The workflow's `wf_` id.",
+          "schema": {
+            "type": "string",
+            "example": "wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b"
+          }
+        },
+        {
+          "name": "stage_id",
+          "in": "path",
+          "required": true,
+          "description": "The stage's `wfs_` id.",
+          "schema": {
+            "type": "string",
+            "example": "wfs_2b7e4d1c9a8f4e3b8c6d5a4f3e2d1c0b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The stage, under `workflow_stage`."
+        },
+        "404": {
+          "description": "No stage has that id."
+        }
+      },
+      "example_call": {
+        "path": {
+          "workflow_id": "wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b",
+          "stage_id": "wfs_2b7e4d1c9a8f4e3b8c6d5a4f3e2d1c0b"
+        }
+      }
+    },
+    {
+      "key": "get_workflow_milestones",
+      "method": "GET",
+      "path": "/workflows/{workflow_uuid}/milestones",
+      "slug": "list-a-workflows-milestones",
+      "title": "List a workflow's milestones",
+      "summary": "Lists the milestones defined on one workflow, one page at a time.",
+      "description": "Returns a page of the workflow's milestones under `data`, with cursor `pagination`. The `workflow_uuid` slot takes the workflow's `wf_` id. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+      "parameters": [
+        {
+          "name": "workflow_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The workflow's `wf_` id.",
+          "schema": {
+            "type": "string",
+            "example": "wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of the workflow's milestones.",
+          "schema": {
+            "$ref": "#/components/schemas/WorkflowMilestoneList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "workflow_uuid": "wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_workflow_milestone",
+      "method": "GET",
+      "path": "/workflows/{workflow_id}/milestones/{milestone_id}",
+      "slug": "retrieve-a-workflow-milestone",
+      "title": "Retrieve a workflow milestone",
+      "summary": "Retrieves one milestone defined on a workflow, by its `wfm_` id.",
+      "description": "Returns the milestone under `workflow_milestone`, with the same fields a listed milestone carries.",
+      "parameters": [
+        {
+          "name": "workflow_id",
+          "in": "path",
+          "required": true,
+          "description": "The workflow's `wf_` id.",
+          "schema": {
+            "type": "string",
+            "example": "wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b"
+          }
+        },
+        {
+          "name": "milestone_id",
+          "in": "path",
+          "required": true,
+          "description": "The milestone's `wfm_` id.",
+          "schema": {
+            "type": "string",
+            "example": "wfm_9d3a5c7e1f2b4a6c8e0d2f4b6a8c0e1d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The milestone, under `workflow_milestone`.",
+          "schema": {
+            "$ref": "#/components/schemas/WorkflowMilestoneResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "workflow_id": "wf_6f1c2a9e4b3d4c8e9a7b5d2f0e1c3a4b",
+          "milestone_id": "wfm_9d3a5c7e1f2b4a6c8e0d2f4b6a8c0e1d"
+        }
+      }
+    },
+    {
+      "key": "delete_milestone",
+      "method": "DELETE",
+      "path": "/milestones/{milestone_uuid}",
+      "slug": "delete-a-milestone",
+      "title": "Delete a milestone",
+      "summary": "Deletes one milestone. Nothing comes back.",
+      "description": "Returns `204` with no body. A milestone id that does not exist returns `404` with the code `resource_not_found`.",
+      "parameters": [
+        {
+          "name": "milestone_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The milestone's id: its `wfm_` id or its raw uuid.",
+          "schema": {
+            "type": "string",
+            "example": "4c8e2a6d-1b3f-4d5e-9a7c-0e2f4b6d8a1c"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The milestone is deleted."
+        },
+        "404": {
+          "description": "No milestone has that id."
+        }
+      },
+      "example_call": {
+        "path": {
+          "milestone_uuid": "4c8e2a6d-1b3f-4d5e-9a7c-0e2f4b6d8a1c"
+        }
+      }
+    },
+    {
+      "key": "get_workflow_custom_component_history",
+      "method": "GET",
+      "path": "/workflows/custom_components/{component_uuid}/{object_code}/history",
+      "slug": "list-a-component-instances-workflow-history",
+      "title": "List a component instance's workflow history",
+      "summary": "Lists the workflow history of one custom component instance, one page at a time.",
+      "description": "Name the component by its dashed uuid and the instance by its `code`. Returns a page of history entries under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component's dashed uuid: the hex of its `cmp_` id with the dashes put back. The `cmp_` id itself returns `404`.",
+          "schema": {
+            "type": "string",
+            "example": "7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d"
+          }
+        },
+        {
+          "name": "object_code",
+          "in": "path",
+          "required": true,
+          "description": "The component instance's `code`, not its `cco_` id.",
+          "schema": {
+            "type": "string",
+            "example": "CC-1001"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of the instance's workflow history.",
+          "schema": {
+            "$ref": "#/components/schemas/WorkflowComponentRecordList"
+          }
+        },
+        "404": {
+          "description": "The component is given by its `cmp_` id or its bare hex rather than its dashed uuid."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d",
+          "object_code": "CC-1001"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_workflow_custom_component_milestones",
+      "method": "GET",
+      "path": "/workflows/custom_components/{component_uuid}/{object_code}/milestones",
+      "slug": "list-a-component-instances-milestones",
+      "title": "List a component instance's milestones",
+      "summary": "Lists the workflow milestones of one custom component instance, one page at a time.",
+      "description": "Name the component by its dashed uuid and the instance by its `code`. Returns a page of milestones under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component's dashed uuid: the hex of its `cmp_` id with the dashes put back. The `cmp_` id itself returns `404`.",
+          "schema": {
+            "type": "string",
+            "example": "7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d"
+          }
+        },
+        {
+          "name": "object_code",
+          "in": "path",
+          "required": true,
+          "description": "The component instance's `code`, not its `cco_` id.",
+          "schema": {
+            "type": "string",
+            "example": "CC-1001"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of the instance's milestones.",
+          "schema": {
+            "$ref": "#/components/schemas/WorkflowComponentRecordList"
+          }
+        },
+        "404": {
+          "description": "The component is given by its `cmp_` id or its bare hex rather than its dashed uuid."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d",
+          "object_code": "CC-1001"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_workflow_custom_component_milestone",
+      "method": "GET",
+      "path": "/workflows/custom_components/{component_uuid}/{object_code}/milestones/{milestone_id}",
+      "slug": "retrieve-a-component-instances-milestone",
+      "title": "Retrieve a component instance's milestone",
+      "summary": "Retrieves one workflow milestone of a custom component instance, by its `wfmi_` id.",
+      "description": "Name the component by its dashed uuid and the instance by its `code`. Returns the milestone under `workflow_milestone_instance`. A milestone id that does not exist returns `404` with the code `resource_not_found`.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component's dashed uuid: the hex of its `cmp_` id with the dashes put back. The `cmp_` id itself returns `404`.",
+          "schema": {
+            "type": "string",
+            "example": "7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d"
+          }
+        },
+        {
+          "name": "object_code",
+          "in": "path",
+          "required": true,
+          "description": "The component instance's `code`, not its `cco_` id.",
+          "schema": {
+            "type": "string",
+            "example": "CC-1001"
+          }
+        },
+        {
+          "name": "milestone_id",
+          "in": "path",
+          "required": true,
+          "description": "The instance milestone's `wfmi_` id.",
+          "schema": {
+            "type": "string",
+            "example": "wfmi_5e7a9c1b3d4f4e6a8b0c2d4e6f8a0b1c"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The milestone, under `workflow_milestone_instance`."
+        },
+        "404": {
+          "description": "No milestone has that id, or the component is given by its `cmp_` id or bare hex rather than its dashed uuid."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d",
+          "object_code": "CC-1001",
+          "milestone_id": "wfmi_5e7a9c1b3d4f4e6a8b0c2d4e6f8a0b1c"
+        }
+      }
+    },
+    {
+      "key": "get_workflow_component_history",
+      "method": "GET",
+      "path": "/workflow/component/{component_object_id}/history",
+      "slug": "retrieve-a-component-instances-workflow-history-by-code",
+      "title": "Retrieve a component instance's workflow history by code",
+      "summary": "Retrieves the workflow history of one custom component instance, named by its code.",
+      "description": "Returns the history under `histories`, with `pagination` beside it.",
+      "parameters": [
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component instance's `code`.",
+          "schema": {
+            "type": "string",
+            "example": "CC-1001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The instance's workflow history, under `histories`, with `pagination`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_object_id": "CC-1001"
+        }
+      }
+    },
+    {
+      "key": "get_workflow_component_cc_instance_cc_milestone",
+      "method": "GET",
+      "path": "/workflow/component/{component_uuid}/{component_object_id}/milestone",
+      "slug": "retrieve-a-component-instances-milestones-by-code",
+      "title": "Retrieve a component instance's milestones by code",
+      "summary": "Retrieves the workflow milestones of one custom component instance, named by the component's uuid and the instance's code.",
+      "description": "Returns the milestones under `milestones`, with `pagination` beside it.",
+      "parameters": [
+        {
+          "name": "component_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The component's `uuid`, as the component settings listing shows it.",
+          "schema": {
+            "type": "string",
+            "example": "7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d"
+          }
+        },
+        {
+          "name": "component_object_id",
+          "in": "path",
+          "required": true,
+          "description": "The component instance's `code`.",
+          "schema": {
+            "type": "string",
+            "example": "CC-1001"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The instance's milestones, under `milestones`, with `pagination`."
+        }
+      },
+      "example_call": {
+        "path": {
+          "component_uuid": "7a1b3c5d-9e2f-4a6b-8c0d-1e3f5a7b9c2d",
+          "component_object_id": "CC-1001"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "Workflow": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "description": "Always `workflow`."
+        },
+        "id": {
+          "type": "string",
+          "description": "The workflow's `wf_` id."
+        },
+        "status": {
+          "type": "string",
+          "description": "The workflow's status. A new workflow reads `draft`."
+        },
+        "code": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "description": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "entity": {
+          "type": "string",
+          "description": "The entity the workflow belongs to, such as `account`."
+        },
+        "entity_id": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "event": {
+          "type": "string"
+        },
+        "is_pre_built": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the workflow comes built in. A pre-built workflow cannot be deleted."
+        },
+        "enable_stage": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "current_version": {
+          "$ref": "#/components/schemas/WorkflowCurrentVersion"
+        },
+        "custom_form": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/WorkflowCreatedBy"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/WorkflowLastUpdatedBy"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "WorkflowResponse": {
+      "type": "object",
+      "properties": {
+        "workflow": {
+          "$ref": "#/components/schemas/Workflow"
+        }
+      }
+    },
+    "WorkflowList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "description": "Always `list`."
+        },
+        "url": {
+          "type": "string",
+          "description": "The path this page was read from."
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Workflow"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/WorkflowPagination"
+        }
+      }
+    },
+    "WorkflowCurrentVersion": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "WorkflowCreatedBy": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "WorkflowLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "WorkflowStageList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "description": "Always `list`."
+        },
+        "url": {
+          "type": "string",
+          "description": "The path this page was read from."
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "The workflow's stages."
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/WorkflowPagination"
+        }
+      }
+    },
+    "WorkflowMilestone": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The milestone's `wfm_` id."
+        },
+        "status": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "description": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "icon": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "priority": {
+          "type": "string"
+        },
+        "sort_order": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "auto_create": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "estimated_hours": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "workflow": {
+          "$ref": "#/components/schemas/WorkflowMilestoneWorkflow"
+        },
+        "activity_definition": {
+          "$ref": "#/components/schemas/WorkflowMilestoneActivityDefinition"
+        },
+        "workflow_version": {
+          "$ref": "#/components/schemas/WorkflowMilestoneWorkflowVersion"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "WorkflowMilestoneResponse": {
+      "type": "object",
+      "properties": {
+        "workflow_milestone": {
+          "$ref": "#/components/schemas/WorkflowMilestone"
+        }
+      }
+    },
+    "WorkflowMilestoneList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "description": "Always `list`."
+        },
+        "url": {
+          "type": "string",
+          "description": "The path this page was read from."
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/WorkflowMilestone"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/WorkflowPagination"
+        }
+      }
+    },
+    "WorkflowMilestoneWorkflow": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "WorkflowMilestoneActivityDefinition": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "WorkflowMilestoneWorkflowVersion": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "WorkflowComponentRecordList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "description": "Always `list`."
+        },
+        "url": {
+          "type": "string",
+          "description": "The path this page was read from."
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "The component instance's history entries or milestones."
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/WorkflowPagination"
+        }
+      }
+    },
+    "WorkflowPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Pass as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "links": {
+          "$ref": "#/components/schemas/WorkflowPaginationLinks"
+        }
+      }
+    },
+    "WorkflowPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}
