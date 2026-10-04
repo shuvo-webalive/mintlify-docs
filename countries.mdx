@@ -1,0 +1,32 @@
+---
+title: "Countries"
+sidebarTitle: "Overview"
+description: "List and read countries, and update a country's status, description and default address fields."
+---
+
+Countries are the settings records an address or a warehouse refers to. You can list them, read one, and update a country's status, description or default address fields. This area has 3 endpoints, and all seven SDKs call every one.
+
+<Warning>
+  **An update returns the country's values from before the change, so read the country again to see what is stored.**
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List countries](/api-reference/countries/list-countries) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/countries` | Returns a page of countries under `data`, with paging details under `pagination`. |
+| [Retrieve a country](/api-reference/countries/retrieve-a-country) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/countries/{country_id}` | Returns one country by its `country_` `id`, under `country`. |
+| [Update a country](/api-reference/countries/update-a-country) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/countries/{country_id}` | Changes a country's status, description or default address fields. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **A country `id` starts with `country_`.** Other records, such as a warehouse, refer to a country by this `id`.
+- **A country's `name` holds its two letter code.** For example `AU` for Australia.
+- **The listing pages by cursor with the `cursor` parameter.** `starting_after` is ignored and returns the first page again.
+- **An update accepts `status`, `description` and the `default_*` fields.** Send them under `country`.
