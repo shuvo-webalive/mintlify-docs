@@ -1,0 +1,321 @@
+{
+  "family": "events",
+  "tag": "Events",
+  "slug": "events",
+  "icon": "calendar",
+  "base": "/events",
+  "overview_description": "List and read scheduled events, run one now, or remove one before it runs.",
+  "intro": "Events are actions scheduled to run later, such as an order cancellation with a future date. You can list and read them, run one straight away, or remove one so it never runs. This area has 4 endpoints, and all seven Exsited SDKs call every one.",
+  "warning": "**Executing an event runs its scheduled action straight away.** Use remove instead if the action should not happen.",
+  "notes": [
+    "**A scheduled change creates an event.** Cancelling an order with a future `effective_date` adds an `Order Cancel` event whose `executed_on` is null until it runs.",
+    "**Execute and remove take an empty body.** Send `{}`; the event is named in the path.",
+    "**A removed event cannot be removed again.** A second remove returns `404`.",
+    "**One event comes back under `event`.** A listing puts its records under `data`.",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_events",
+      "method": "GET",
+      "path": "/events",
+      "slug": "list-events",
+      "title": "List events",
+      "summary": "Lists scheduled and executed events, one page at a time.",
+      "description": "Returns a page of events under `data`, with cursor `pagination`. Sort with `sort`, such as `-created_on` for the newest first. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of events.",
+          "schema": {
+            "$ref": "#/components/schemas/EventList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_event",
+      "method": "GET",
+      "path": "/events/{event_uuid}",
+      "slug": "retrieve-an-event",
+      "title": "Retrieve an event",
+      "summary": "Retrieves one event by its id.",
+      "description": "Returns the event under `event`. `executed_on` is null until the event runs.",
+      "parameters": [
+        {
+          "name": "event_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The event's `id`, as the listing shows it.",
+          "schema": {
+            "type": "string",
+            "example": "9f2e4d6c-8b1a-4c3e-a5d7-f9b1c3e5a7d9"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The event, under `event`.",
+          "schema": {
+            "$ref": "#/components/schemas/EventResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "event_uuid": "9f2e4d6c-8b1a-4c3e-a5d7-f9b1c3e5a7d9"
+        }
+      }
+    },
+    {
+      "key": "create_event_execute",
+      "method": "POST",
+      "path": "/events/{event_uuid}/execute",
+      "slug": "execute-an-event",
+      "title": "Execute an event",
+      "summary": "Runs a scheduled event now instead of at its scheduled time.",
+      "description": "Send an empty object as the body. Once the call succeeds, a read of the event shows `executed_on` set.",
+      "parameters": [
+        {
+          "name": "event_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The event's `id`, as the listing shows it.",
+          "schema": {
+            "type": "string",
+            "example": "9f2e4d6c-8b1a-4c3e-a5d7-f9b1c3e5a7d9"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "description": "An empty object."
+        },
+        "example": {}
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The event is run."
+        }
+      },
+      "example_call": {
+        "path": {
+          "event_uuid": "9f2e4d6c-8b1a-4c3e-a5d7-f9b1c3e5a7d9"
+        },
+        "body": {}
+      }
+    },
+    {
+      "key": "create_event_remove",
+      "method": "POST",
+      "path": "/events/{event_uuid}/remove",
+      "slug": "remove-an-event",
+      "title": "Remove an event",
+      "summary": "Removes a scheduled event so it does not run, and returns it.",
+      "description": "Send an empty object as the body. The event comes back under `event`. Removing the same event again returns `404`.",
+      "parameters": [
+        {
+          "name": "event_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The event's `id`, as the listing shows it.",
+          "schema": {
+            "type": "string",
+            "example": "9f2e4d6c-8b1a-4c3e-a5d7-f9b1c3e5a7d9"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "description": "An empty object."
+        },
+        "example": {}
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The removed event, under `event`.",
+          "schema": {
+            "$ref": "#/components/schemas/EventResponse"
+          }
+        },
+        "404": {
+          "description": "The event is already removed."
+        }
+      },
+      "example_call": {
+        "path": {
+          "event_uuid": "9f2e4d6c-8b1a-4c3e-a5d7-f9b1c3e5a7d9"
+        },
+        "body": {}
+      }
+    }
+  ],
+  "schemas": {
+    "Event": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The event's id."
+        },
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "event_name": {
+          "type": "string",
+          "description": "What the event does, such as `Order Cancel`."
+        },
+        "resource_type": {
+          "type": "string",
+          "description": "The kind of record the event acts on."
+        },
+        "resource_uuid": {
+          "type": "string",
+          "description": "The uuid of the record the event acts on."
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "scheduled_to_execute_on": {
+          "type": "string",
+          "description": "When the event is due to run."
+        },
+        "executed_on": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "When the event ran. Null until it runs."
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "EventResponse": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "$ref": "#/components/schemas/Event"
+        }
+      }
+    },
+    "EventList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "description": "Always `list`."
+        },
+        "url": {
+          "type": "string",
+          "description": "The path this page was read from."
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Event"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/EventPagination"
+        }
+      }
+    },
+    "EventPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Pass as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "links": {
+          "$ref": "#/components/schemas/EventPaginationLinks"
+        }
+      }
+    },
+    "EventPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

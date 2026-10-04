@@ -1,0 +1,34 @@
+---
+title: "Events"
+sidebarTitle: "Overview"
+description: "List and read scheduled events, run one now, or remove one before it runs."
+---
+
+Events are actions scheduled to run later, such as an order cancellation with a future date. You can list and read them, run one straight away, or remove one so it never runs. This area has 4 endpoints, and all seven Exsited SDKs call every one.
+
+<Warning>
+  **Executing an event runs its scheduled action straight away.** Use remove instead if the action should not happen.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List events](/api-reference/events/list-events) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/events` | Lists scheduled and executed events, one page at a time. |
+| [Retrieve an event](/api-reference/events/retrieve-an-event) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/events/{event_uuid}` | Retrieves one event by its id. |
+| [Execute an event](/api-reference/events/execute-an-event) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/events/{event_uuid}/execute` | Runs a scheduled event now instead of at its scheduled time. |
+| [Remove an event](/api-reference/events/remove-an-event) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/events/{event_uuid}/remove` | Removes a scheduled event so it does not run, and returns it. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **A scheduled change creates an event.** Cancelling an order with a future `effective_date` adds an `Order Cancel` event whose `executed_on` is null until it runs.
+- **Execute and remove take an empty body.** Send `{}`; the event is named in the path.
+- **A removed event cannot be removed again.** A second remove returns `404`.
+- **One event comes back under `event`.** A listing puts its records under `data`.
+- **Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.
