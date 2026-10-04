@@ -1,0 +1,774 @@
+{
+  "family": "usages",
+  "tag": "Usages",
+  "slug": "usages",
+  "icon": "gauge",
+  "base": "/usages",
+  "overview_description": "Record, list, read, change and delete the usage that Exsited bills on metered order lines.",
+  "intro": "A usage records how much of a metered item a customer used in a billing period, against one order line. This area records usages one at a time or several at once, and lists, reads, changes and deletes them. It has 6 endpoints, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**A usage belongs to a metered order line.** `charge_item_id` is the `id` of an order line whose item is charged as `METERED`.",
+    "**`charging_period` is two dates joined by a hyphen.** It runs from the order's `order_start_date` to the day before its `next_billing_from_date`, such as `2026-10-01-2026-10-31`.",
+    "**One usage goes under `usage`, several under `usages`.** A list sent under `usage` returns `400`. For several, the response lists each one under `usages.success` or `usages.failed`.",
+    "**Updates return a reference, not the usage.** `update_usage` and `replace_usage` return the usage's `id` and `href` under `usage`; read it again for the new values.",
+    "**The listing pages by cursor.** Send `limit`, then pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_usages",
+      "method": "GET",
+      "path": "/usages",
+      "slug": "list-usages",
+      "title": "List usages",
+      "summary": "Lists recorded usages, one page at a time.",
+      "description": "The records are under `data`, and `pagination` holds the cursor for the next page. Other fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by. Prefix it with `-` to sort in descending order.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of usages, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/UsageList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_usage",
+      "method": "POST",
+      "path": "/usages",
+      "slug": "create-usages",
+      "title": "Create usages",
+      "summary": "Records one usage, or several in one call, against a metered order line.",
+      "description": "Send one usage as an object under `usage`, or several as a list under `usages`. `charge_item_id` is the `id` of an order line whose item is charged as `METERED`, and `charging_period` names the billing period the usage falls in. For several usages the response lists each one under `usages.success` or `usages.failed`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "description": "Send one usage as an object under `usage`, or several as a list under `usages`.",
+          "properties": {
+            "usage": {
+              "type": "object",
+              "properties": {
+                "charge_item_id": {
+                  "type": "string",
+                  "description": "The `id` of the order line that bills the usage. The line's item must be charged as `METERED`."
+                },
+                "charging_period": {
+                  "type": "string",
+                  "description": "The billing period the usage falls in, as `<start date>-<end date>`, such as `2026-10-01-2026-10-31`."
+                },
+                "quantity": {
+                  "type": "number"
+                },
+                "start_time": {
+                  "type": "string",
+                  "description": "When the usage started, in UTC, such as `2026-10-01T09:00:00Z`."
+                },
+                "end_time": {
+                  "type": "string",
+                  "description": "When the usage ended, in UTC."
+                },
+                "type": {
+                  "type": "string",
+                  "description": "Such as `INCREMENTAL`."
+                }
+              }
+            },
+            "usages": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "charge_item_id": {
+                    "type": "string",
+                    "description": "The `id` of the order line that bills the usage. The line's item must be charged as `METERED`."
+                  },
+                  "charging_period": {
+                    "type": "string",
+                    "description": "The billing period the usage falls in, as `<start date>-<end date>`, such as `2026-10-01-2026-10-31`."
+                  },
+                  "quantity": {
+                    "type": "number"
+                  },
+                  "start_time": {
+                    "type": "string",
+                    "description": "When the usage started, in UTC, such as `2026-10-01T09:00:00Z`."
+                  },
+                  "end_time": {
+                    "type": "string",
+                    "description": "When the usage ended, in UTC."
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "Such as `INCREMENTAL`."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "usage": {
+            "charge_item_id": "6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c",
+            "charging_period": "2026-10-01-2026-10-31",
+            "quantity": 1,
+            "start_time": "2026-10-01T09:00:00Z",
+            "end_time": "2026-10-01T09:05:00Z",
+            "type": "INCREMENTAL"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new usage under `usage`, or the outcome of each one under `usages`.",
+          "schema": {
+            "$ref": "#/components/schemas/UsageCreateResponse"
+          }
+        },
+        "400": {
+          "description": "`usage` holds a list. Send several usages under `usages` instead."
+        }
+      },
+      "example_call": {
+        "body": {
+          "usage": {
+            "charge_item_id": "6f1d2c3b-4a5e-4f60-8b7c-9d0e1f2a3b4c",
+            "charging_period": "2026-10-01-2026-10-31",
+            "quantity": 1,
+            "start_time": "2026-10-01T09:00:00Z",
+            "end_time": "2026-10-01T09:05:00Z",
+            "type": "INCREMENTAL"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_usage",
+      "method": "GET",
+      "path": "/usages/{usage_id}",
+      "slug": "retrieve-a-usage",
+      "title": "Retrieve a usage",
+      "summary": "Returns one usage, under `usage`.",
+      "description": "Pass the usage's `id`. The response holds the quantity, the times, the charging period and the order line it is billed on, under `charge_item`.",
+      "parameters": [
+        {
+          "name": "usage_id",
+          "in": "path",
+          "required": true,
+          "description": "The usage's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The usage, under `usage`.",
+          "schema": {
+            "$ref": "#/components/schemas/UsageResponse"
+          }
+        },
+        "404": {
+          "description": "No usage has that `id`, for example after it is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "usage_id": "usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b"
+        }
+      }
+    },
+    {
+      "key": "delete_usage",
+      "method": "DELETE",
+      "path": "/usages/{usage_id}",
+      "slug": "delete-a-usage",
+      "title": "Delete a usage",
+      "summary": "Deletes a usage and returns no content.",
+      "description": "Pass the usage's `id`. A successful delete returns `204` with an empty body, and reading the usage afterwards returns `404`.",
+      "parameters": [
+        {
+          "name": "usage_id",
+          "in": "path",
+          "required": true,
+          "description": "The usage's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The usage is deleted. The body is empty."
+        }
+      },
+      "example_call": {
+        "path": {
+          "usage_id": "usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b"
+        }
+      }
+    },
+    {
+      "key": "update_usage",
+      "method": "PATCH",
+      "path": "/usages/{usage_id}",
+      "slug": "update-a-usage",
+      "title": "Update a usage",
+      "summary": "Changes some of a usage's fields and returns a reference to it.",
+      "description": "Send only the fields to change under `usage`, such as `quantity`. The response holds the usage's `id` and `href` under `usage`.",
+      "parameters": [
+        {
+          "name": "usage_id",
+          "in": "path",
+          "required": true,
+          "description": "The usage's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "usage": {
+              "type": "object",
+              "properties": {
+                "charge_item_id": {
+                  "type": "string",
+                  "description": "The `id` of the order line that bills the usage. The line's item must be charged as `METERED`."
+                },
+                "charging_period": {
+                  "type": "string",
+                  "description": "The billing period the usage falls in, as `<start date>-<end date>`, such as `2026-10-01-2026-10-31`."
+                },
+                "quantity": {
+                  "type": "number"
+                },
+                "start_time": {
+                  "type": "string",
+                  "description": "When the usage started, in UTC, such as `2026-10-01T09:00:00Z`."
+                },
+                "end_time": {
+                  "type": "string",
+                  "description": "When the usage ended, in UTC."
+                },
+                "type": {
+                  "type": "string",
+                  "description": "Such as `INCREMENTAL`."
+                }
+              }
+            }
+          },
+          "required": [
+            "usage"
+          ]
+        },
+        "example": {
+          "usage": {
+            "quantity": 5
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A reference to the updated usage, under `usage`.",
+          "schema": {
+            "$ref": "#/components/schemas/UsageUpdated"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "usage_id": "usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b"
+        },
+        "body": {
+          "usage": {
+            "quantity": 5
+          }
+        }
+      }
+    },
+    {
+      "key": "replace_usage",
+      "method": "PUT",
+      "path": "/usages/{usage_id}",
+      "slug": "replace-a-usage",
+      "title": "Replace a usage",
+      "summary": "Replaces a usage's quantity, times and custom attributes and returns a reference to it.",
+      "description": "Send the full usage under `usage`: `quantity`, `start_time`, `end_time` and `custom_attributes`. The response holds the usage's `id` and `href` under `usage`.",
+      "parameters": [
+        {
+          "name": "usage_id",
+          "in": "path",
+          "required": true,
+          "description": "The usage's `id`.",
+          "schema": {
+            "type": "string",
+            "example": "usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "usage": {
+              "type": "object",
+              "properties": {
+                "quantity": {
+                  "type": "number"
+                },
+                "start_time": {
+                  "type": "string"
+                },
+                "end_time": {
+                  "type": "string"
+                },
+                "custom_attributes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "usage"
+          ]
+        },
+        "example": {
+          "usage": {
+            "quantity": 4,
+            "start_time": "2026-10-01T09:00:00Z",
+            "end_time": "2026-10-01T09:05:00Z",
+            "custom_attributes": []
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A reference to the replaced usage, under `usage`.",
+          "schema": {
+            "$ref": "#/components/schemas/UsageUpdated"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "usage_id": "usg_3e7a1c9b5d2f4a6e8c0b1d3f5a7c9e2b"
+        },
+        "body": {
+          "usage": {
+            "quantity": 4,
+            "start_time": "2026-10-01T09:00:00Z",
+            "end_time": "2026-10-01T09:05:00Z",
+            "custom_attributes": []
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "UsageList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Usage"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/UsagePagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "Usage": {
+      "type": "object",
+      "properties": {
+        "charge_item": {
+          "$ref": "#/components/schemas/UsageChargeItem"
+        },
+        "charging_end_date": {
+          "type": "string"
+        },
+        "charging_period": {
+          "type": "string"
+        },
+        "charging_start_date": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/UsageCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "custom_attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/UsageCustomAttribute"
+          }
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/UsageLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "number"
+        },
+        "source": {},
+        "start_time": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "uom": {},
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "UsageChargeItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "UsageCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "UsageCustomAttribute": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "UsageLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "UsageResponse": {
+      "type": "object",
+      "properties": {
+        "usage": {
+          "$ref": "#/components/schemas/Usage"
+        }
+      }
+    },
+    "UsageCreated": {
+      "type": "object",
+      "properties": {
+        "activity_logs": {
+          "type": "array"
+        },
+        "charge_item_name": {
+          "type": "string"
+        },
+        "charge_item_uuid": {
+          "type": "string"
+        },
+        "charge_status": {
+          "type": "string"
+        },
+        "charging_period": {
+          "type": "string"
+        },
+        "created_by": {
+          "type": "string"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "custom_attributes": {
+          "type": "array"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "event_id": {
+          "type": "string"
+        },
+        "failed": {
+          "type": "array"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "success": {
+          "type": "array"
+        },
+        "type": {
+          "type": "string"
+        },
+        "uom": {
+          "type": "string"
+        },
+        "usages": {
+          "$ref": "#/components/schemas/UsageBatch"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "UsageBatch": {
+      "type": "object",
+      "properties": {
+        "activity_logs": {
+          "type": "array"
+        },
+        "failed": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/UsageBatchFailed"
+          }
+        },
+        "success": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/UsageBatchSuccess"
+          }
+        }
+      }
+    },
+    "UsageBatchFailed": {
+      "type": "object",
+      "properties": {
+        "charge_item_id": {
+          "type": "string"
+        },
+        "charging_period": {
+          "type": "string"
+        },
+        "error": {
+          "type": "object"
+        }
+      }
+    },
+    "UsageBatchSuccess": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "UsageCreateResponse": {
+      "type": "object",
+      "properties": {
+        "usage": {
+          "$ref": "#/components/schemas/UsageCreated"
+        },
+        "usages": {
+          "$ref": "#/components/schemas/UsageBatch"
+        }
+      },
+      "description": "`usage` when one usage was sent, `usages` when several were."
+    },
+    "UsageUpdated": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "usage": {
+          "$ref": "#/components/schemas/UsageUpdatedDetail"
+        }
+      }
+    },
+    "UsageUpdatedDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "UsagePagination": {
+      "type": "object",
+      "description": "Cursor paging for the listing.",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size the API applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. `false` ends the listing even when `next_cursor` is present."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Send as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "type": "object",
+          "properties": {
+            "next": {
+              "type": "string"
+            },
+            "prev": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
