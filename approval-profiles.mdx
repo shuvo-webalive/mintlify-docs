@@ -1,0 +1,35 @@
+---
+title: "Approval profiles"
+sidebarTitle: "Overview"
+description: "Create, read, update and delete the approval profiles that hold transactions for sign-off."
+---
+
+Approval profiles decide which transactions need approval and who approves them. You can list, create, read, update and delete them. This area has 5 endpoints, and all seven Exsited SDKs call every one.
+
+<Warning>
+  **An approval profile gates every matching transaction while it exists.** Create one only when those transactions should wait for approval.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List approval profiles](/api-reference/approval-profiles/list-approval-profiles) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/approval_profiles` | Lists the approval profiles on your instance, one page at a time. |
+| [Create an approval profile](/api-reference/approval-profiles/create-an-approval-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/approval_profiles` | Creates an approval profile that holds matching transactions for approval. |
+| [Retrieve an approval profile](/api-reference/approval-profiles/retrieve-an-approval-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/approval_profiles/{approval_profile_id}` | Retrieves one approval profile by its `ap_` id. |
+| [Delete an approval profile](/api-reference/approval-profiles/delete-an-approval-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/approval_profiles/{approval_profile_id}` | Deletes an approval profile that is not in use. Nothing comes back. |
+| [Update an approval profile](/api-reference/approval-profiles/update-an-approval-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/approval_profiles/{approval_profile_id}` | Changes an approval profile's fields or its status. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Five fields are required to create a profile.** `name`, `entity`, `event`, `approver_type` and `approver`.
+- **A profile takes effect as soon as it exists.** It gates every matching transaction until it is deleted or its status changes.
+- **Approval profile ids start with `ap_`.** One profile comes back under `approval_profile`.
+- **A profile in use cannot be deleted.**
+- **Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.
