@@ -1,0 +1,834 @@
+{
+  "family": "reports",
+  "tag": "Reports",
+  "slug": "reports",
+  "icon": "chart-line",
+  "base": "/reports",
+  "overview_description": "Read overview reports for accounts, invoices, orders, purchases, payments and refunds over a date range.",
+  "intro": "Reports return overview figures as a list of dated entries over a period: accounts, invoices, orders, purchase invoices, purchase orders, payments and refunds, and purchase payments and refunds. Each report is a single read with a date range. This area has 7 endpoints, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**Every report comes back under `report`.** Inside it, one key names the report, such as `accounts` holding an `account_overview` list.",
+    "**Choose the period with `date_range`.** Send `date_range=custom` with `from` and `to` dates as `YYYY-MM-DD`; an unrecognised `date_range` returns `400`.",
+    "**A report has a default period.** Called with no parameters, it gives 7 dated entries, the same count as a seven day `custom` range.",
+    "**Amounts and counts are strings.** Fields such as `amount`, `count`, `net_gain` and `invoice_total` are JSON strings, not numbers.",
+    "**A report can take up to 90 seconds.** Set a client timeout above the default 30 seconds, such as 120."
+  ],
+  "endpoints": [
+    {
+      "key": "get_reports_accounts_account_overview",
+      "method": "GET",
+      "path": "/reports/accounts/account_overview",
+      "slug": "retrieve-the-account-overview-report",
+      "title": "Retrieve the account overview report",
+      "summary": "Returns new, cancelled, reactivated and deleted account counts, with the net gain, for each dated entry in a period.",
+      "description": "The report is under `report.accounts.account_overview`, one entry per `date` with `new`, `cancelled`, `reactivated`, `deleted` and `net_gain`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+      "parameters": [
+        {
+          "name": "date_range",
+          "in": "query",
+          "required": false,
+          "description": "The reporting period. `custom` uses `from` and `to`; an unrecognised value returns `400`. Without it, a default period applies.",
+          "schema": {
+            "type": "string",
+            "example": "custom"
+          }
+        },
+        {
+          "name": "from",
+          "in": "query",
+          "required": false,
+          "description": "The first day of a `custom` period, as `YYYY-MM-DD`.",
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-01"
+          }
+        },
+        {
+          "name": "to",
+          "in": "query",
+          "required": false,
+          "description": "The last day of a `custom` period, as `YYYY-MM-DD`.",
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-07"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The account overview report, under `report`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReportAccountOverviewResponse"
+          }
+        },
+        "400": {
+          "description": "`date_range` is not a recognised value."
+        }
+      },
+      "example_call": {
+        "query": {
+          "date_range": "custom",
+          "from": "2026-09-01",
+          "to": "2026-09-07"
+        }
+      }
+    },
+    {
+      "key": "get_reports_invoices_invoice_overview",
+      "method": "GET",
+      "path": "/reports/invoices/invoice_overview",
+      "slug": "retrieve-the-invoice-overview-report",
+      "title": "Retrieve the invoice overview report",
+      "summary": "Returns invoice totals and the amount and count of new, cancelled, reactivated, voided and amended invoices for each dated entry in a period.",
+      "description": "The report is under `report.invoices.invoice_overview`. Each entry has a `date`, an `invoice_total`, and an `amount` and `count` for `new`, `cancelled`, `reactivated`, `voided`, `amended` and `net_gain`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+      "parameters": [
+        {
+          "name": "date_range",
+          "in": "query",
+          "required": false,
+          "description": "The reporting period. `custom` uses `from` and `to`; an unrecognised value returns `400`. Without it, a default period applies.",
+          "schema": {
+            "type": "string",
+            "example": "custom"
+          }
+        },
+        {
+          "name": "from",
+          "in": "query",
+          "required": false,
+          "description": "The first day of a `custom` period, as `YYYY-MM-DD`.",
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-01"
+          }
+        },
+        {
+          "name": "to",
+          "in": "query",
+          "required": false,
+          "description": "The last day of a `custom` period, as `YYYY-MM-DD`.",
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-07"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The invoice overview report, under `report`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReportInvoiceOverviewResponse"
+          }
+        },
+        "400": {
+          "description": "`date_range` is not a recognised value."
+        }
+      },
+      "example_call": {
+        "query": {
+          "date_range": "custom",
+          "from": "2026-09-01",
+          "to": "2026-09-07"
+        }
+      }
+    },
+    {
+      "key": "get_reports_orders_order_overview",
+      "method": "GET",
+      "path": "/reports/orders/order_overview",
+      "slug": "retrieve-the-order-overview-report",
+      "title": "Retrieve the order overview report",
+      "summary": "Returns order totals and the amount and count of new, cancelled, reactivated, changed and deleted orders for each dated entry in a period.",
+      "description": "The report is under `report.orders.order_overview`. Each entry has a `date`, an `order_total`, and an `amount` and `count` for `new`, `cancelled`, `reactivated`, `changed`, `deleted` and `net_gain`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+      "parameters": [
+        {
+          "name": "date_range",
+          "in": "query",
+          "required": false,
+          "description": "The reporting period. `custom` uses `from` and `to`; an unrecognised value returns `400`. Without it, a default period applies.",
+          "schema": {
+            "type": "string",
+            "example": "custom"
+          }
+        },
+        {
+          "name": "from",
+          "in": "query",
+          "required": false,
+          "description": "The first day of a `custom` period, as `YYYY-MM-DD`.",
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-01"
+          }
+        },
+        {
+          "name": "to",
+          "in": "query",
+          "required": false,
+          "description": "The last day of a `custom` period, as `YYYY-MM-DD`.",
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-07"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The order overview report, under `report`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReportOrderOverviewResponse"
+          }
+        },
+        "400": {
+          "description": "`date_range` is not a recognised value."
+        }
+      },
+      "example_call": {
+        "query": {
+          "date_range": "custom",
+          "from": "2026-09-01",
+          "to": "2026-09-07"
+        }
+      }
+    },
+    {
+      "key": "get_reports_purchase_invoices_purchase_invoice_overview",
+      "method": "GET",
+      "path": "/reports/purchase_invoices/purchase_invoice_overview",
+      "slug": "retrieve-the-purchase-invoice-overview-report",
+      "title": "Retrieve the purchase invoice overview report",
+      "summary": "Returns purchase invoice totals and the amount and count of new, cancelled, reactivated, voided and amended purchase invoices for each dated entry in a period.",
+      "description": "The report is under `report.purchase_invoices.purchase_invoice_overview`. Each entry has a `date`, a `purchase_invoice_total`, and an `amount` and `count` for `new`, `cancelled`, `reactivated`, `voided`, `amended` and `net_gain`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+      "parameters": [
+        {
+          "name": "date_range",
+          "in": "query",
+          "required": false,
+          "description": "The reporting period. `custom` uses `from` and `to`; an unrecognised value returns `400`. Without it, a default period applies.",
+          "schema": {
+            "type": "string",
+            "example": "custom"
+          }
+        },
+        {
+          "name": "from",
+          "in": "query",
+          "required": false,
+          "description": "The first day of a `custom` period, as `YYYY-MM-DD`.",
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-01"
+          }
+        },
+        {
+          "name": "to",
+          "in": "query",
+          "required": false,
+          "description": "The last day of a `custom` period, as `YYYY-MM-DD`.",
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-07"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The purchase invoice overview report, under `report`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReportPurchaseInvoiceOverviewResponse"
+          }
+        },
+        "400": {
+          "description": "`date_range` is not a recognised value."
+        }
+      },
+      "example_call": {
+        "query": {
+          "date_range": "custom",
+          "from": "2026-09-01",
+          "to": "2026-09-07"
+        }
+      }
+    },
+    {
+      "key": "get_reports_purchase_orders_purchase_order_overview",
+      "method": "GET",
+      "path": "/reports/purchase_orders/purchase_order_overview",
+      "slug": "retrieve-the-purchase-order-overview-report",
+      "title": "Retrieve the purchase order overview report",
+      "summary": "Returns purchase order totals and the amount and count of new, cancelled, reactivated, changed and deleted purchase orders for each dated entry in a period.",
+      "description": "The report is under `report.purchase_orders.purchase_order_overview`. Each entry has a `date`, a `purchase_order_total`, and an `amount` and `count` for `new`, `cancelled`, `reactivated`, `changed`, `deleted` and `net_purchases`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+      "parameters": [
+        {
+          "name": "date_range",
+          "in": "query",
+          "required": false,
+          "description": "The reporting period. `custom` uses `from` and `to`; an unrecognised value returns `400`. Without it, a default period applies.",
+          "schema": {
+            "type": "string",
+            "example": "custom"
+          }
+        },
+        {
+          "name": "from",
+          "in": "query",
+          "required": false,
+          "description": "The first day of a `custom` period, as `YYYY-MM-DD`.",
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-01"
+          }
+        },
+        {
+          "name": "to",
+          "in": "query",
+          "required": false,
+          "description": "The last day of a `custom` period, as `YYYY-MM-DD`.",
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-07"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The purchase order overview report, under `report`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReportPurchaseOrderOverviewResponse"
+          }
+        },
+        "400": {
+          "description": "`date_range` is not a recognised value."
+        }
+      },
+      "example_call": {
+        "query": {
+          "date_range": "custom",
+          "from": "2026-09-01",
+          "to": "2026-09-07"
+        }
+      }
+    },
+    {
+      "key": "get_reports_purchase_transactions_purchase_payment_and_refund_overview",
+      "method": "GET",
+      "path": "/reports/purchase_transactions/purchase_payment_and_refund_overview",
+      "slug": "retrieve-the-purchase-payment-and-refund-overview-report",
+      "title": "Retrieve the purchase payment and refund overview report",
+      "summary": "Returns the purchase payments and purchase refunds made and deleted for each dated entry in a period.",
+      "description": "The report is under `report.purchase_payment_and_refund_overview`, with a `purchase_payments` list and a `purchase_refunds` list. Each entry has a `date` and an `amount` and `count` for `new` and `deleted`; a purchase payment entry also has `purchase_payment_applied`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+      "parameters": [
+        {
+          "name": "date_range",
+          "in": "query",
+          "required": false,
+          "description": "The reporting period. `custom` uses `from` and `to`; an unrecognised value returns `400`. Without it, a default period applies.",
+          "schema": {
+            "type": "string",
+            "example": "custom"
+          }
+        },
+        {
+          "name": "from",
+          "in": "query",
+          "required": false,
+          "description": "The first day of a `custom` period, as `YYYY-MM-DD`.",
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-01"
+          }
+        },
+        {
+          "name": "to",
+          "in": "query",
+          "required": false,
+          "description": "The last day of a `custom` period, as `YYYY-MM-DD`.",
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-07"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The purchase payment and refund overview report, under `report`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReportPurchasePaymentAndRefundOverviewResponse"
+          }
+        },
+        "400": {
+          "description": "`date_range` is not a recognised value."
+        }
+      },
+      "example_call": {
+        "query": {
+          "date_range": "custom",
+          "from": "2026-09-01",
+          "to": "2026-09-07"
+        }
+      }
+    },
+    {
+      "key": "get_reports_transactions_payment_and_refund_overview",
+      "method": "GET",
+      "path": "/reports/transactions/payment_and_refund_overview",
+      "slug": "retrieve-the-payment-and-refund-overview-report",
+      "title": "Retrieve the payment and refund overview report",
+      "summary": "Returns the payments and refunds made and deleted for each dated entry in a period.",
+      "description": "The report is under `report.payment_and_refund_overview`, with a `payments` list and a `refunds` list. Each entry has a `date` and an `amount` and `count` for `new` and `deleted`; a payment entry also has `payment_applied`. Choose the period with `date_range`, or `custom` with `from` and `to`.",
+      "parameters": [
+        {
+          "name": "date_range",
+          "in": "query",
+          "required": false,
+          "description": "The reporting period. `custom` uses `from` and `to`; an unrecognised value returns `400`. Without it, a default period applies.",
+          "schema": {
+            "type": "string",
+            "example": "custom"
+          }
+        },
+        {
+          "name": "from",
+          "in": "query",
+          "required": false,
+          "description": "The first day of a `custom` period, as `YYYY-MM-DD`.",
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-01"
+          }
+        },
+        {
+          "name": "to",
+          "in": "query",
+          "required": false,
+          "description": "The last day of a `custom` period, as `YYYY-MM-DD`.",
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-07"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The payment and refund overview report, under `report`.",
+          "schema": {
+            "$ref": "#/components/schemas/ReportPaymentAndRefundOverviewResponse"
+          }
+        },
+        "400": {
+          "description": "`date_range` is not a recognised value."
+        }
+      },
+      "example_call": {
+        "query": {
+          "date_range": "custom",
+          "from": "2026-09-01",
+          "to": "2026-09-07"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "ReportAmountCount": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string"
+        },
+        "count": {
+          "type": "string"
+        }
+      },
+      "description": "An amount and a count, both as strings."
+    },
+    "ReportAccountOverviewResponse": {
+      "type": "object",
+      "properties": {
+        "report": {
+          "type": "object",
+          "properties": {
+            "accounts": {
+              "type": "object",
+              "properties": {
+                "account_overview": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportAccountOverviewEntry"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ReportAccountOverviewEntry": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "new": {
+          "type": "string"
+        },
+        "cancelled": {
+          "type": "string"
+        },
+        "reactivated": {
+          "type": "string"
+        },
+        "deleted": {
+          "type": "string"
+        },
+        "net_gain": {
+          "type": "string"
+        }
+      }
+    },
+    "ReportInvoiceOverviewResponse": {
+      "type": "object",
+      "properties": {
+        "report": {
+          "type": "object",
+          "properties": {
+            "invoices": {
+              "type": "object",
+              "properties": {
+                "invoice_overview": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportInvoiceOverviewEntry"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ReportInvoiceOverviewEntry": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "invoice_total": {
+          "type": "string"
+        },
+        "new": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "cancelled": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "reactivated": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "voided": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "amended": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "net_gain": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        }
+      }
+    },
+    "ReportOrderOverviewResponse": {
+      "type": "object",
+      "properties": {
+        "report": {
+          "type": "object",
+          "properties": {
+            "orders": {
+              "type": "object",
+              "properties": {
+                "order_overview": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportOrderOverviewEntry"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ReportOrderOverviewEntry": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "order_total": {
+          "type": "string"
+        },
+        "new": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "cancelled": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "reactivated": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "changed": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "deleted": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "net_gain": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        }
+      }
+    },
+    "ReportPurchaseInvoiceOverviewResponse": {
+      "type": "object",
+      "properties": {
+        "report": {
+          "type": "object",
+          "properties": {
+            "purchase_invoices": {
+              "type": "object",
+              "properties": {
+                "purchase_invoice_overview": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportPurchaseInvoiceOverviewEntry"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ReportPurchaseInvoiceOverviewEntry": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "purchase_invoice_total": {
+          "type": "string"
+        },
+        "new": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "cancelled": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "reactivated": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "voided": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "amended": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "net_gain": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        }
+      }
+    },
+    "ReportPurchaseOrderOverviewResponse": {
+      "type": "object",
+      "properties": {
+        "report": {
+          "type": "object",
+          "properties": {
+            "purchase_orders": {
+              "type": "object",
+              "properties": {
+                "purchase_order_overview": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportPurchaseOrderOverviewEntry"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ReportPurchaseOrderOverviewEntry": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "purchase_order_total": {
+          "type": "string"
+        },
+        "new": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "cancelled": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "reactivated": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "changed": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "deleted": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "net_purchases": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        }
+      }
+    },
+    "ReportPurchasePaymentAndRefundOverviewResponse": {
+      "type": "object",
+      "properties": {
+        "report": {
+          "type": "object",
+          "properties": {
+            "purchase_payment_and_refund_overview": {
+              "type": "object",
+              "properties": {
+                "purchase_payments": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportPurchasePaymentEntry"
+                  }
+                },
+                "purchase_refunds": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportPurchaseRefundEntry"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ReportPurchasePaymentEntry": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "purchase_payment_applied": {
+          "type": "string"
+        },
+        "new": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "deleted": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        }
+      }
+    },
+    "ReportPurchaseRefundEntry": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "new": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "deleted": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        }
+      }
+    },
+    "ReportPaymentAndRefundOverviewResponse": {
+      "type": "object",
+      "properties": {
+        "report": {
+          "type": "object",
+          "properties": {
+            "payment_and_refund_overview": {
+              "type": "object",
+              "properties": {
+                "payments": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportPaymentEntry"
+                  }
+                },
+                "refunds": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportRefundEntry"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ReportPaymentEntry": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "payment_applied": {
+          "type": "string"
+        },
+        "new": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "deleted": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        }
+      }
+    },
+    "ReportRefundEntry": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "new": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        },
+        "deleted": {
+          "$ref": "#/components/schemas/ReportAmountCount"
+        }
+      }
+    }
+  }
+}
