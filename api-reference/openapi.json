@@ -119,6 +119,9 @@
     },
     {
       "name": "Purchase orders"
+    },
+    {
+      "name": "Purchase invoices"
     }
   ],
   "paths": {
@@ -42937,6 +42940,2153 @@
           }
         ]
       }
+    },
+    "/purchase_invoices": {
+      "get": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "List purchase invoices",
+        "operationId": "purchase_invoices_get_purchase_invoices",
+        "description": "Lists the purchase invoices on the account, one page at a time, under `data`. Pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter the list as `filter_<field>` or `filter_<field>_<operator>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of purchase invoices.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoiceList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_invoices?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.get_purchase_invoices({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.getPurchaseInvoices({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->getPurchaseInvoices(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_invoices.purchase_invoices_dto.PurchaseInvoicesDto.PurchaseInvoiceList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseInvoiceList> response = client.purchaseInvoices().getPurchaseInvoices(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.GetPurchaseInvoicesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices.getPurchaseInvoices(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().GetPurchaseInvoices(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "Create a purchase invoice",
+        "operationId": "purchase_invoices_create_purchase_invoice",
+        "description": "Creates a purchase invoice from a supplier's `account_id` and its lines, wrapped in `purchase_invoice`. A line takes an existing item by `item_id`, or a new one by `item_name` with a price under `item_price_snapshot`. The new invoice is `active`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new purchase invoice, under `purchase_invoice`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoiceResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/purchase_invoices\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"purchase_invoice\": {\n      \"account_id\": \"W13ZGY\",\n      \"lines\": [\n        {\n          \"item_name\": \"Copy paper A4\",\n          \"item_quantity\": 1,\n          \"item_price_snapshot\": {\n            \"pricing_rule\": {\n              \"price\": 5\n            }\n          }\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.create_purchase_invoice(\n    {\n        \"purchase_invoice\": {\n            \"account_id\": \"W13ZGY\",\n            \"lines\": [\n                {\n                    \"item_name\": \"Copy paper A4\",\n                    \"item_quantity\": 1,\n                    \"item_price_snapshot\": {\"pricing_rule\": {\"price\": 5}},\n                }\n            ],\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.createPurchaseInvoice({\n    purchase_invoice: {\n        account_id: 'W13ZGY',\n        lines: [{item_name: 'Copy paper A4', item_quantity: 1, item_price_snapshot: {pricing_rule: {price: 5}}}],\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->createPurchaseInvoice([\n    'purchase_invoice' => [\n        'account_id' => 'W13ZGY',\n        'lines' => [\n            [\n                'item_name' => 'Copy paper A4',\n                'item_quantity' => 1,\n                'item_price_snapshot' => ['pricing_rule' => ['price' => 5]],\n            ],\n        ],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_invoices.purchase_invoices_dto.PurchaseInvoicesDto.PurchaseInvoiceRead;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseInvoiceRead> response = client.purchaseInvoices().createPurchaseInvoice(\n        Map.of(\n                \"purchase_invoice\", Map.of(\n                        \"account_id\", \"W13ZGY\",\n                        \"lines\", List.of(\n                                Map.of(\n                                        \"item_name\", \"Copy paper A4\",\n                                        \"item_quantity\", 1,\n                                        \"item_price_snapshot\", Map.of(\n                                                \"pricing_rule\", Map.of(\"price\", 5)))))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.CreatePurchaseInvoiceAsync(new Dictionary<string, object?>\n{\n    [\"purchase_invoice\"] = new Dictionary<string, object?>\n    {\n        [\"account_id\"] = \"W13ZGY\",\n        [\"lines\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"item_name\"] = \"Copy paper A4\",\n                [\"item_quantity\"] = 1,\n                [\"item_price_snapshot\"] = new Dictionary<string, object?>\n                {\n                    [\"pricing_rule\"] = new Dictionary<string, object?>\n                    {\n                        [\"price\"] = 5,\n                    },\n                },\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices.createPurchaseInvoice({\n  'purchase_invoice': {\n    'account_id': 'W13ZGY',\n    'lines': [\n      {\n        'item_name': 'Copy paper A4',\n        'item_quantity': 1,\n        'item_price_snapshot': {\n          'pricing_rule': {'price': 5},\n        },\n      },\n    ],\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().CreatePurchaseInvoice(context.Background(), map[string]any{\n\t\"purchase_invoice\": map[string]any{\n\t\t\"account_id\": \"W13ZGY\",\n\t\t\"lines\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"item_name\":     \"Copy paper A4\",\n\t\t\t\t\"item_quantity\": 1,\n\t\t\t\t\"item_price_snapshot\": map[string]any{\n\t\t\t\t\t\"pricing_rule\": map[string]any{\"price\": 5},\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "purchase_invoice": {
+                    "type": "object",
+                    "properties": {
+                      "account_id": {
+                        "type": "string",
+                        "description": "The supplier account's `id`."
+                      },
+                      "lines": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "item_name": {
+                              "type": "string",
+                              "description": "The name of an item that does not exist yet."
+                            },
+                            "item_quantity": {
+                              "type": "number"
+                            },
+                            "item_price_snapshot": {
+                              "type": "object",
+                              "properties": {
+                                "pricing_rule": {
+                                  "type": "object",
+                                  "properties": {
+                                    "price": {
+                                      "type": "number"
+                                    }
+                                  }
+                                }
+                              },
+                              "description": "The unit price for a new item, under `pricing_rule.price`."
+                            },
+                            "item_id": {
+                              "type": "string",
+                              "description": "The `id` of an existing item, instead of `item_name`."
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "purchase_invoice"
+                ]
+              },
+              "example": {
+                "purchase_invoice": {
+                  "account_id": "W13ZGY",
+                  "lines": [
+                    {
+                      "item_name": "Copy paper A4",
+                      "item_quantity": 1,
+                      "item_price_snapshot": {
+                        "pricing_rule": {
+                          "price": 5
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/purchase_invoices/notes": {
+      "get": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "List notes across purchase invoices",
+        "operationId": "purchase_invoices_get_purchase_invoices_notes",
+        "description": "Lists the notes of all purchase invoices together, one page at a time, under `data`. Other fields filter the list as `filter_<field>` or `filter_<field>_<operator>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of purchase invoice notes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoicesNoteList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_invoices/notes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.get_purchase_invoices_notes({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.getPurchaseInvoicesNotes({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->getPurchaseInvoicesNotes(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_invoices.purchase_invoices_dto.PurchaseInvoicesDto.PurchaseInvoicesNoteList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseInvoicesNoteList> response = client.purchaseInvoices().getPurchaseInvoicesNotes(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.GetPurchaseInvoicesNotesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices.getPurchaseInvoicesNotes(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().GetPurchaseInvoicesNotes(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_invoices/{purchase_invoice_id}": {
+      "delete": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "Delete a purchase invoice",
+        "operationId": "purchase_invoices_delete_purchase_invoice",
+        "description": "Deletes the purchase invoice. The call returns `204` with no body, and reading the invoice afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase invoice's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The purchase invoice is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.delete_purchase_invoice(\"PI-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.deletePurchaseInvoice('PI-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->deletePurchaseInvoice('PI-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.purchaseInvoices().deletePurchaseInvoice(\"PI-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.DeletePurchaseInvoiceAsync(\"PI-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices.deletePurchaseInvoice(\n  'PI-0001',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().DeletePurchaseInvoice(context.Background(), \"PI-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "Retrieve a purchase invoice",
+        "operationId": "purchase_invoices_get_purchase_invoice",
+        "description": "Returns the purchase invoice with its supplier, lines, totals, payment status and KPIs under `purchase_invoice`.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase invoice's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The purchase invoice, under `purchase_invoice`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoiceResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No purchase invoice has that `id`, for example after it is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.get_purchase_invoice(\"PI-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.getPurchaseInvoice('PI-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->getPurchaseInvoice('PI-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_invoices.purchase_invoices_dto.PurchaseInvoicesDto.PurchaseInvoiceRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseInvoiceRead> response = client.purchaseInvoices().getPurchaseInvoice(\"PI-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.GetPurchaseInvoiceAsync(\"PI-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices.getPurchaseInvoice('PI-0001');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().GetPurchaseInvoice(context.Background(), \"PI-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_invoices/{purchase_invoice_id}/amend": {
+      "post": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "Amend a purchase invoice's lines",
+        "operationId": "purchase_invoices_amend_purchase_invoice",
+        "description": "Changes the lines of the purchase invoice, wrapped in `purchase_invoice.lines`. Each entry has an `op`: `add` with an `item_id` and `item_quantity` adds a line, and `change` with the line's dashed `uuid` changes its quantity or price.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase invoice's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The amended purchase invoice, under `purchase_invoice`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoiceResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001/amend\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"purchase_invoice\": {\n      \"lines\": [\n        {\n          \"op\": \"add\",\n          \"item_id\": \"ITEM-0001\",\n          \"item_quantity\": 1\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.amend_purchase_invoice(\n    \"PI-0001\",\n    {\n        \"purchase_invoice\": {\n            \"lines\": [{\"op\": \"add\", \"item_id\": \"ITEM-0001\", \"item_quantity\": 1}]\n        }\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.amendPurchaseInvoice('PI-0001', {\n    purchase_invoice: {lines: [{op: 'add', item_id: 'ITEM-0001', item_quantity: 1}]},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->amendPurchaseInvoice('PI-0001', [\n    'purchase_invoice' => [\n        'lines' => [['op' => 'add', 'item_id' => 'ITEM-0001', 'item_quantity' => 1]],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_invoices.purchase_invoices_dto.PurchaseInvoicesDto.PurchaseInvoiceRead;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseInvoiceRead> response = client.purchaseInvoices().amendPurchaseInvoice(\n        \"PI-0001\",\n        Map.of(\n                \"purchase_invoice\", Map.of(\n                        \"lines\", List.of(\n                                Map.of(\"op\", \"add\", \"item_id\", \"ITEM-0001\", \"item_quantity\", 1)))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.AmendPurchaseInvoiceAsync(\n    \"PI-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"purchase_invoice\"] = new Dictionary<string, object?>\n        {\n            [\"lines\"] = new List<object?>\n            {\n                new Dictionary<string, object?>\n                {\n                    [\"op\"] = \"add\",\n                    [\"item_id\"] = \"ITEM-0001\",\n                    [\"item_quantity\"] = 1,\n                },\n            },\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices.amendPurchaseInvoice(\n  'PI-0001',\n  {\n    'purchase_invoice': {\n      'lines': [\n        {'op': 'add', 'item_id': 'ITEM-0001', 'item_quantity': 1},\n      ],\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().AmendPurchaseInvoice(context.Background(), \"PI-0001\", map[string]any{\n\t\"purchase_invoice\": map[string]any{\n\t\t\"lines\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"op\":            \"add\",\n\t\t\t\t\"item_id\":       \"ITEM-0001\",\n\t\t\t\t\"item_quantity\": 1,\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "purchase_invoice": {
+                    "type": "object",
+                    "properties": {
+                      "lines": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "op": {
+                              "type": "string",
+                              "description": "`add` to add a line, or `change` to change one.",
+                              "enum": [
+                                "add",
+                                "change"
+                              ]
+                            },
+                            "uuid": {
+                              "type": "string",
+                              "description": "For `change`: the line's `uuid`, in dashed form."
+                            },
+                            "item_id": {
+                              "type": "string",
+                              "description": "For `add`: the `id` of the item to add."
+                            },
+                            "item_quantity": {
+                              "type": "number"
+                            },
+                            "item_price_snapshot": {
+                              "type": "object",
+                              "properties": {
+                                "pricing_rule": {
+                                  "type": "object",
+                                  "properties": {
+                                    "price": {
+                                      "type": "number"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "required": [
+                            "op"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "purchase_invoice"
+                ]
+              },
+              "example": {
+                "purchase_invoice": {
+                  "lines": [
+                    {
+                      "op": "add",
+                      "item_id": "ITEM-0001",
+                      "item_quantity": 1
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/purchase_invoices/{purchase_invoice_id}/cancel": {
+      "post": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "Cancel a purchase invoice",
+        "operationId": "purchase_invoices_cancel_purchase_invoice",
+        "description": "Cancels the purchase invoice, which sets its status to `inactive`. Send an empty object as the body. Reactivate it with the reactivate call.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase invoice's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The cancelled purchase invoice, under `purchase_invoice`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoiceCancelResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001/cancel\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{}'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.cancel_purchase_invoice(\"PI-0001\", {})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.cancelPurchaseInvoice('PI-0001', {});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->cancelPurchaseInvoice('PI-0001', '{}');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_invoices.purchase_invoices_dto.PurchaseInvoicesDto.PurchaseInvoiceCancel;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseInvoiceCancel> response = client.purchaseInvoices().cancelPurchaseInvoice(\n        \"PI-0001\",\n        Map.of());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.CancelPurchaseInvoiceAsync(\n    \"PI-0001\",\n    new Dictionary<string, object?>());\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices.cancelPurchaseInvoice(\n  'PI-0001',\n  {},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().CancelPurchaseInvoice(context.Background(), \"PI-0001\", map[string]any{}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {}
+            }
+          }
+        }
+      }
+    },
+    "/purchase_invoices/{purchase_invoice_id}/information": {
+      "get": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "Retrieve a purchase invoice's information",
+        "operationId": "purchase_invoices_get_purchase_invoice_information",
+        "description": "Returns the purchase invoice's header fields, such as its dates, totals, status and supplier, under `purchase_invoice`, without its lines.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase invoice's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The purchase invoice's information, under `purchase_invoice`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoiceInformationResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001/information\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.get_purchase_invoice_information(\"PI-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.getPurchaseInvoiceInformation('PI-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->getPurchaseInvoiceInformation('PI-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_invoices.purchase_invoices_dto.PurchaseInvoicesDto.PurchaseInvoice;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseInvoice> response = client.purchaseInvoices().getPurchaseInvoiceInformation(\"PI-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.GetPurchaseInvoiceInformationAsync(\"PI-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices.getPurchaseInvoiceInformation(\n  'PI-0001',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().GetPurchaseInvoiceInformation(context.Background(), \"PI-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "Update a purchase invoice's information",
+        "operationId": "purchase_invoices_update_purchase_invoice_information",
+        "description": "Updates header fields of the purchase invoice, such as `origin`, wrapped in `purchase_invoice`. The updated invoice comes back under `purchase_invoice`.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase invoice's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated purchase invoice, under `purchase_invoice`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoiceInformationUpdatedResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001/information\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"purchase_invoice\": {\n      \"origin\": \"Supplier portal\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.update_purchase_invoice_information(\n    \"PI-0001\", {\"purchase_invoice\": {\"origin\": \"Supplier portal\"}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.updatePurchaseInvoiceInformation('PI-0001', {\n    purchase_invoice: {origin: 'Supplier portal'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->updatePurchaseInvoiceInformation('PI-0001', [\n    'purchase_invoice' => ['origin' => 'Supplier portal'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_invoices.purchase_invoices_dto.PurchaseInvoicesDto.PurchaseInvoiceInformation;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseInvoiceInformation> response = client.purchaseInvoices().updatePurchaseInvoiceInformation(\n        \"PI-0001\",\n        Map.of(\"purchase_invoice\", Map.of(\"origin\", \"Supplier portal\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.UpdatePurchaseInvoiceInformationAsync(\n    \"PI-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"purchase_invoice\"] = new Dictionary<string, object?>\n        {\n            [\"origin\"] = \"Supplier portal\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices\n    .updatePurchaseInvoiceInformation('PI-0001', {\n      'purchase_invoice': {'origin': 'Supplier portal'},\n    });\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().UpdatePurchaseInvoiceInformation(context.Background(), \"PI-0001\", map[string]any{\n\t\"purchase_invoice\": map[string]any{\"origin\": \"Supplier portal\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "purchase_invoice": {
+                    "type": "object",
+                    "properties": {
+                      "origin": {
+                        "type": "string",
+                        "description": "Where the invoice came from."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "purchase_invoice"
+                ]
+              },
+              "example": {
+                "purchase_invoice": {
+                  "origin": "Supplier portal"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/purchase_invoices/{purchase_invoice_id}/lines": {
+      "get": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "List a purchase invoice's lines",
+        "operationId": "purchase_invoices_get_purchase_invoice_lines",
+        "description": "Returns the purchase invoice's lines as `purchase_invoice.lines`, not as a paged `data` list. Use a line's `uuid` or `id` to read it on its own.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase invoice's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The invoice's lines, under `purchase_invoice.lines`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoiceLinesResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001/lines?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.get_purchase_invoice_lines(\"PI-0001\", {\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.getPurchaseInvoiceLines('PI-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->getPurchaseInvoiceLines('PI-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_invoices.purchase_invoices_dto.PurchaseInvoicesDto.PurchaseInvoiceLines;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseInvoiceLines> response = client.purchaseInvoices().getPurchaseInvoiceLines(\n        \"PI-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.GetPurchaseInvoiceLinesAsync(\n    \"PI-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices.getPurchaseInvoiceLines(\n  'PI-0001',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().GetPurchaseInvoiceLines(context.Background(), \"PI-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_invoices/{purchase_invoice_id}/notes": {
+      "get": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "List a purchase invoice's notes",
+        "operationId": "purchase_invoices_get_purchase_invoice_notes",
+        "description": "Lists the notes on the purchase invoice under `data`.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase invoice's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of the invoice's notes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoiceNoteList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001/notes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.get_purchase_invoice_notes(\"PI-0001\", {\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.getPurchaseInvoiceNotes('PI-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->getPurchaseInvoiceNotes('PI-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_invoices.purchase_invoices_dto.PurchaseInvoicesDto.PurchaseInvoiceNoteList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseInvoiceNoteList> response = client.purchaseInvoices().getPurchaseInvoiceNotes(\n        \"PI-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.GetPurchaseInvoiceNotesAsync(\n    \"PI-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices.getPurchaseInvoiceNotes(\n  'PI-0001',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().GetPurchaseInvoiceNotes(context.Background(), \"PI-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "Create a purchase invoice note",
+        "operationId": "purchase_invoices_create_purchase_invoice_note",
+        "description": "Adds a note to the purchase invoice. Send a multipart form with the text as the `note` field and, optionally, a file to attach. The new note comes back under `note`.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase invoice's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The new note, under `note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoiceNoteCreatedResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001/notes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -F \"file=@delivery-note.pdf\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.create_purchase_invoice_note(\n    \"PI-0001\",\n    \"<p>Goods received in full.</p>\",\n    files={\"file\": open(\"delivery-note.pdf\", \"rb\")},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {readFileSync} from 'node:fs';\nimport {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.createPurchaseInvoiceNote('PI-0001', '<p>Goods received in full.</p>', {\n    files: {file: ['delivery-note.pdf', readFileSync('delivery-note.pdf')]},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->createPurchaseInvoiceNote(\n    'PI-0001',\n    '<p>Goods received in full.</p>',\n    ['file' => ['delivery-note.pdf', fopen('delivery-note.pdf', 'r')]],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.client.RequestOptions;\nimport com.exsited.sdk.resources.purchase_invoices.purchase_invoices_dto.PurchaseInvoicesDto.PurchaseInvoiceNotes;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseInvoiceNotes> response = client.purchaseInvoices().createPurchaseInvoiceNote(\n        \"PI-0001\",\n        \"<p>Goods received in full.</p>\",\n        Map.of(\"file\", Path.of(\"delivery-note.pdf\")),\n        RequestOptions.none());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.CreatePurchaseInvoiceNoteAsync(\n    \"PI-0001\",\n    \"<p>Goods received in full.</p>\",\n    new Dictionary<string, object?> { [\"file\"] = new object?[] { \"delivery-note.pdf\", File.ReadAllBytes(\"delivery-note.pdf\") } });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'dart:io';\n\nimport 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices.createPurchaseInvoiceNote(\n  'PI-0001',\n  '<p>Goods received in full.</p>',\n  files: {\n    'file': [\n      'delivery-note.pdf',\n      File('delivery-note.pdf').readAsBytesSync(),\n    ],\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nfile, err := os.ReadFile(\"delivery-note.pdf\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.PurchaseInvoices().CreatePurchaseInvoiceNote(context.Background(), \"PI-0001\", \"<p>Goods received in full.</p>\", map[string]any{\"file\": []any{\"delivery-note.pdf\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "note"
+                ],
+                "properties": {
+                  "note": {
+                    "type": "string",
+                    "description": "The note text. HTML is accepted."
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "An optional file to attach to the note."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/purchase_invoices/{purchase_invoice_id}/purchase_credit_note_applications": {
+      "get": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "List a purchase invoice's credit note applications",
+        "operationId": "purchase_invoices_get_purchase_invoice_purchase_credit_note_applications",
+        "description": "Lists the purchase credit note applications on the purchase invoice under `data`: each one shows the credit note spent, the payment that spent it and the amount.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase invoice's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of the invoice's credit note applications.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001/purchase_credit_note_applications?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = (\n    client.purchase_invoices.get_purchase_invoice_purchase_credit_note_applications(\n        \"PI-0001\", {\"limit\": 20}\n    )\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.getPurchaseInvoicePurchaseCreditNoteApplications('PI-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->getPurchaseInvoicePurchaseCreditNoteApplications('PI-0001', [\n    'limit' => 20,\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_invoices.purchase_invoices_dto.PurchaseInvoicesDto.AccountPurchaseInvoices;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<AccountPurchaseInvoices> response = client.purchaseInvoices().getPurchaseInvoicePurchaseCreditNoteApplications(\n        \"PI-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.GetPurchaseInvoicePurchaseCreditNoteApplicationsAsync(\n    \"PI-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices\n    .getPurchaseInvoicePurchaseCreditNoteApplications(\n      'PI-0001',\n      queryParams: {'limit': 20},\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().GetPurchaseInvoicePurchaseCreditNoteApplications(context.Background(), \"PI-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_invoices/{purchase_invoice_id}/purchase_payments": {
+      "get": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "List a purchase invoice's purchase payments",
+        "operationId": "purchase_invoices_get_purchase_invoice_purchase_payments",
+        "description": "Lists the purchase payments applied to the purchase invoice under `data`.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase invoice's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of the invoice's purchase payments.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001/purchase_payments?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.get_purchase_invoice_purchase_payments(\n    \"PI-0001\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.getPurchaseInvoicePurchasePayments('PI-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->getPurchaseInvoicePurchasePayments('PI-0001', [\n    'limit' => 20,\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_invoices.purchase_invoices_dto.PurchaseInvoicesDto.PurchaseInvoicePurchasePaymentList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseInvoicePurchasePaymentList> response = client.purchaseInvoices().getPurchaseInvoicePurchasePayments(\n        \"PI-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.GetPurchaseInvoicePurchasePaymentsAsync(\n    \"PI-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices\n    .getPurchaseInvoicePurchasePayments(\n      'PI-0001',\n      queryParams: {'limit': 20},\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().GetPurchaseInvoicePurchasePayments(context.Background(), \"PI-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_invoices/{purchase_invoice_id}/reactivate": {
+      "post": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "Reactivate a purchase invoice",
+        "operationId": "purchase_invoices_reactivate_purchase_invoice",
+        "description": "Reactivates a cancelled purchase invoice, which sets its status back to `active`. Send an empty object as the body.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase invoice's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The reactivated purchase invoice, under `purchase_invoice`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoiceResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001/reactivate\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{}'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.reactivate_purchase_invoice(\"PI-0001\", {})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.reactivatePurchaseInvoice('PI-0001', {});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->reactivatePurchaseInvoice('PI-0001', '{}');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_invoices.purchase_invoices_dto.PurchaseInvoicesDto.PurchaseInvoiceRead;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseInvoiceRead> response = client.purchaseInvoices().reactivatePurchaseInvoice(\n        \"PI-0001\",\n        Map.of());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.ReactivatePurchaseInvoiceAsync(\n    \"PI-0001\",\n    new Dictionary<string, object?>());\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices.reactivatePurchaseInvoice(\n  'PI-0001',\n  {},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().ReactivatePurchaseInvoice(context.Background(), \"PI-0001\", map[string]any{}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {}
+            }
+          }
+        }
+      }
+    },
+    "/purchase_invoices/{purchase_invoice_id}/lines/{purchase_invoice_line_uuid}": {
+      "get": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "Retrieve a purchase invoice line",
+        "operationId": "purchase_invoices_get_purchase_invoice_line",
+        "description": "Returns a single line of the purchase invoice under `purchase_invoice.line`. Address the line by its `uuid` in dashed form, or by the `id` the lines list shows.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase invoice's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "purchase_invoice_line_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The line's `uuid` in dashed form, or its `id` from the lines list.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The line, under `purchase_invoice.line`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoiceLineResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The purchase invoice has no line with that `uuid`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001/lines/3f2a9c1e-7b4d-4e8a-9c0b-1d2e3f4a5b6c\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.get_purchase_invoice_line(\n    \"PI-0001\", \"3f2a9c1e-7b4d-4e8a-9c0b-1d2e3f4a5b6c\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.getPurchaseInvoiceLine(\n    'PI-0001',\n    '3f2a9c1e-7b4d-4e8a-9c0b-1d2e3f4a5b6c',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->getPurchaseInvoiceLine(\n    'PI-0001',\n    '3f2a9c1e-7b4d-4e8a-9c0b-1d2e3f4a5b6c',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_invoices.purchase_invoices_dto.PurchaseInvoicesDto.PurchaseInvoiceLine;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseInvoiceLine> response = client.purchaseInvoices().getPurchaseInvoiceLine(\n        \"PI-0001\",\n        \"3f2a9c1e-7b4d-4e8a-9c0b-1d2e3f4a5b6c\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.GetPurchaseInvoiceLineAsync(\n    \"PI-0001\",\n    \"3f2a9c1e-7b4d-4e8a-9c0b-1d2e3f4a5b6c\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices.getPurchaseInvoiceLine(\n  'PI-0001',\n  '3f2a9c1e-7b4d-4e8a-9c0b-1d2e3f4a5b6c',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().GetPurchaseInvoiceLine(context.Background(), \"PI-0001\", \"3f2a9c1e-7b4d-4e8a-9c0b-1d2e3f4a5b6c\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_invoices/{purchase_invoice_id}/notes/{note_id}": {
+      "patch": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "Update a purchase invoice note",
+        "operationId": "purchase_invoices_update_purchase_invoice_note",
+        "description": "Changes the note's text. Send a multipart form with the new text as the `note` field and, optionally, a file to attach. The updated note comes back under `note`.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase invoice's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, from the note create or the notes list.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated note, under `note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoiceNoteUpdatedResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001/notes/note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -F \"file=@delivery-note.pdf\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.update_purchase_invoice_note(\n    \"PI-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"<p>Goods received in full.</p>\",\n    files={\"file\": open(\"delivery-note.pdf\", \"rb\")},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {readFileSync} from 'node:fs';\nimport {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.updatePurchaseInvoiceNote(\n    'PI-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    '<p>Goods received in full.</p>',\n    {files: {file: ['delivery-note.pdf', readFileSync('delivery-note.pdf')]}},\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->updatePurchaseInvoiceNote(\n    'PI-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    '<p>Goods received in full.</p>',\n    ['file' => ['delivery-note.pdf', fopen('delivery-note.pdf', 'r')]],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.client.RequestOptions;\nimport com.exsited.sdk.resources.purchase_invoices.purchase_invoices_dto.PurchaseInvoicesDto.PurchaseInvoiceNoteUpdated;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseInvoiceNoteUpdated> response = client.purchaseInvoices().updatePurchaseInvoiceNote(\n        \"PI-0001\",\n        \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n        \"<p>Goods received in full.</p>\",\n        Map.of(\"file\", Path.of(\"delivery-note.pdf\")),\n        RequestOptions.none());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.UpdatePurchaseInvoiceNoteAsync(\n    \"PI-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"<p>Goods received in full.</p>\",\n    new Dictionary<string, object?> { [\"file\"] = new object?[] { \"delivery-note.pdf\", File.ReadAllBytes(\"delivery-note.pdf\") } });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'dart:io';\n\nimport 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices.updatePurchaseInvoiceNote(\n  'PI-0001',\n  'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n  '<p>Goods received in full.</p>',\n  files: {\n    'file': [\n      'delivery-note.pdf',\n      File('delivery-note.pdf').readAsBytesSync(),\n    ],\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nfile, err := os.ReadFile(\"delivery-note.pdf\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.PurchaseInvoices().UpdatePurchaseInvoiceNote(context.Background(), \"PI-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", \"<p>Goods received in full.</p>\", map[string]any{\"file\": []any{\"delivery-note.pdf\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "note"
+                ],
+                "properties": {
+                  "note": {
+                    "type": "string",
+                    "description": "The new note text. HTML is accepted."
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "An optional file to attach to the note."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "Retrieve a purchase invoice note",
+        "operationId": "purchase_invoices_get_purchase_invoice_note",
+        "description": "Returns the note with its content, attachments and watchers under `note`.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase invoice's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, from the note create or the notes list.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note, under `note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoiceNoteResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The purchase invoice has no note with that `id`, for example after it is deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001/notes/note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.get_purchase_invoice_note(\n    \"PI-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.getPurchaseInvoiceNote(\n    'PI-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->getPurchaseInvoiceNote(\n    'PI-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_invoices.purchase_invoices_dto.PurchaseInvoicesDto.PurchaseInvoiceNoteRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseInvoiceNoteRead> response = client.purchaseInvoices().getPurchaseInvoiceNote(\n        \"PI-0001\",\n        \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.GetPurchaseInvoiceNoteAsync(\n    \"PI-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices.getPurchaseInvoiceNote(\n  'PI-0001',\n  'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().GetPurchaseInvoiceNote(context.Background(), \"PI-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "Delete a purchase invoice note",
+        "operationId": "purchase_invoices_delete_purchase_invoice_note",
+        "description": "Deletes the note. The call returns `204` with no body, and reading the note afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase invoice's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, from the note create or the notes list.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The note is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001/notes/note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.delete_purchase_invoice_note(\n    \"PI-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.deletePurchaseInvoiceNote(\n    'PI-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->deletePurchaseInvoiceNote(\n    'PI-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.purchaseInvoices().deletePurchaseInvoiceNote(\n        \"PI-0001\",\n        \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.DeletePurchaseInvoiceNoteAsync(\n    \"PI-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices.deletePurchaseInvoiceNote(\n  'PI-0001',\n  'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().DeletePurchaseInvoiceNote(context.Background(), \"PI-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_invoices/{purchase_invoice_id}/notes/{note_id}/files": {
+      "get": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "List a purchase invoice note's files",
+        "operationId": "purchase_invoices_get_purchase_invoice_note_files",
+        "description": "Lists the files attached to the note under `data`, with each file's name, type, size and `uuid`.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase invoice's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, from the note create or the notes list.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to read the next one.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note's files.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoiceNoteFileList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001/notes/note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a/files?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.get_purchase_invoice_note_files(\n    \"PI-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.getPurchaseInvoiceNoteFiles(\n    'PI-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    {limit: 20},\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->getPurchaseInvoiceNoteFiles(\n    'PI-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    ['limit' => 20],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_invoices.purchase_invoices_dto.PurchaseInvoicesDto.PurchaseInvoiceNoteRead;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseInvoiceNoteRead> response = client.purchaseInvoices().getPurchaseInvoiceNoteFiles(\n        \"PI-0001\",\n        \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.GetPurchaseInvoiceNoteFilesAsync(\n    \"PI-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices.getPurchaseInvoiceNoteFiles(\n  'PI-0001',\n  'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().GetPurchaseInvoiceNoteFiles(context.Background(), \"PI-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_invoices/{purchase_invoice_id}/notes/{note_id}/files/{file_id}": {
+      "get": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "Retrieve a purchase invoice note file",
+        "operationId": "purchase_invoices_get_purchase_invoice_note_file",
+        "description": "Returns one attachment's name, content type, size, `uuid` and link under `file`. Address the file by its `uuid`.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase invoice's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, from the note create or the notes list.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The attachment's `uuid`, from the note's `attachments`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file's details, under `file`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoiceNoteFileResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001/notes/note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a/files/6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.purchase_invoices.get_purchase_invoice_note_file(\n    \"PI-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\",\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.getPurchaseInvoiceNoteFile(\n    'PI-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    '6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->getPurchaseInvoiceNoteFile(\n    'PI-0001',\n    'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n    '6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_invoices.purchase_invoices_dto.PurchaseInvoicesDto.PurchaseInvoiceNoteFile;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseInvoiceNoteFile> response = client.purchaseInvoices().getPurchaseInvoiceNoteFile(\n        \"PI-0001\",\n        \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n        \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.GetPurchaseInvoiceNoteFileAsync(\n    \"PI-0001\",\n    \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\",\n    \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices.getPurchaseInvoiceNoteFile(\n  'PI-0001',\n  'note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a',\n  '6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().GetPurchaseInvoiceNoteFile(context.Background(), \"PI-0001\", \"note_8d1e2f3a4b5c4d6e8f9a0b1c2d3e4f5a\", \"6b2c1d0e-4f3a-4b5c-8d9e-0f1a2b3c4d5e\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_invoices/{purchase_invoice_id}/purchase_credit_note_applications/{application_id}": {
+      "get": {
+        "tags": [
+          "Purchase invoices"
+        ],
+        "summary": "Retrieve a purchase invoice's credit note application",
+        "operationId": "purchase_invoices_get_purchase_invoice_purchase_credit_note_application",
+        "description": "Returns the application with the credit note, the payment and the amount under `purchase_credit_note_application`. The application is not checked against the invoice in the path: any application can be read through any purchase invoice that exists.",
+        "parameters": [
+          {
+            "name": "purchase_invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase invoice's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase credit note application's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The application, under `purchase_credit_note_application`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_invoices/PI-0001/purchase_credit_note_applications/PCNA-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = (\n    client.purchase_invoices.get_purchase_invoice_purchase_credit_note_application(\n        \"PI-0001\", \"PCNA-0001\"\n    )\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.purchaseInvoices.getPurchaseInvoicePurchaseCreditNoteApplication('PI-0001', 'PCNA-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->purchaseInvoices->getPurchaseInvoicePurchaseCreditNoteApplication(\n    'PI-0001',\n    'PCNA-0001',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.purchase_credit_note_applications.purchase_credit_note_applications_dto.PurchaseCreditNoteApplicationsDto.PurchaseCreditNoteApplicationRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseCreditNoteApplicationRead> response = client.purchaseInvoices().getPurchaseInvoicePurchaseCreditNoteApplication(\n        \"PI-0001\",\n        \"PCNA-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.PurchaseInvoices.GetPurchaseInvoicePurchaseCreditNoteApplicationAsync(\n    \"PI-0001\",\n    \"PCNA-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.purchaseInvoices\n    .getPurchaseInvoicePurchaseCreditNoteApplication('PI-0001', 'PCNA-0001');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.PurchaseInvoices().GetPurchaseInvoicePurchaseCreditNoteApplication(context.Background(), \"PI-0001\", \"PCNA-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -66653,6 +68803,2331 @@
         "properties": {
           "purchase_order_kpis": {
             "$ref": "#/components/schemas/PurchaseOrderKpis"
+          }
+        }
+      },
+      "PurchaseInvoice": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PurchaseInvoiceAccount"
+          },
+          "alternate_due_date": {
+            "type": "string"
+          },
+          "alternate_issue_date": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCurrency"
+          },
+          "custom_form": {},
+          "due_date": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchaseInvoiceLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "payment_status": {
+            "type": "string"
+          },
+          "price_tax_inclusive": {
+            "type": "boolean"
+          },
+          "purchase_order": {
+            "$ref": "#/components/schemas/PurchaseInvoicePurchaseOrder"
+          },
+          "status": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchaseInvoiceAccount": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoicePurchaseOrder": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoicePaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoicePagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size the API applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can be set on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass as `cursor` to read the next page."
+          },
+          "prev_cursor": {
+            "type": "string",
+            "description": "The cursor of the previous page."
+          },
+          "links": {
+            "$ref": "#/components/schemas/PurchaseInvoicePaginationLinks"
+          }
+        }
+      },
+      "PurchaseInvoiceList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoice"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PurchaseInvoicePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceRead": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PurchaseInvoiceReadAccount"
+          },
+          "activity_logs": {
+            "type": "array",
+            "items": {}
+          },
+          "alternate_due_date": {
+            "type": "string"
+          },
+          "alternate_issue_date": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseInvoiceReadCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/PurchaseInvoiceReadCurrency"
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoiceReadCustomAttribute"
+            }
+          },
+          "custom_form": {},
+          "due_date": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "kpis": {
+            "$ref": "#/components/schemas/PurchaseInvoiceReadKpis"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchaseInvoiceReadLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoiceReadLine"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "payment_status": {
+            "type": "string"
+          },
+          "price_tax_inclusive": {
+            "type": "boolean"
+          },
+          "purchase_order": {
+            "$ref": "#/components/schemas/PurchaseInvoiceReadPurchaseOrder"
+          },
+          "status": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchaseInvoiceReadAccount": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceReadCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceReadCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceReadCustomAttribute": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceReadKpis": {
+        "type": "object",
+        "properties": {
+          "credit_applied": {
+            "type": "string"
+          },
+          "credit_issued": {
+            "type": "string"
+          },
+          "deleted_on": {},
+          "last_amended_on": {},
+          "last_cancelled_on": {},
+          "last_payment_date": {},
+          "last_reactivated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "outstanding": {
+            "type": "string"
+          },
+          "overdue": {
+            "type": "string"
+          },
+          "payment_applied": {
+            "type": "string"
+          },
+          "voided_on": {}
+        }
+      },
+      "PurchaseInvoiceReadLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceReadLine": {
+        "type": "object",
+        "properties": {
+          "accounting_code": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "item": {
+            "$ref": "#/components/schemas/PurchaseInvoiceReadLineItem"
+          },
+          "object": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "uom": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "warehouse": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceReadLineItem": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceReadPurchaseOrder": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_invoice": {
+            "$ref": "#/components/schemas/PurchaseInvoiceRead"
+          }
+        }
+      },
+      "PurchaseInvoicesNote": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {}
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseInvoicesNoteCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "group": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchaseInvoicesNoteLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "user": {},
+          "version": {
+            "type": "integer"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoicesNoteWatcher"
+            }
+          }
+        }
+      },
+      "PurchaseInvoicesNoteCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoicesNoteLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoicesNoteWatcher": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoicesNoteList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoicesNote"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PurchaseInvoicePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceCancelDetail": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCancelDetailAccount"
+          },
+          "activity_logs": {
+            "type": "array",
+            "items": {}
+          },
+          "alternate_due_date": {
+            "type": "string"
+          },
+          "alternate_issue_date": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCancelDetailCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCancelDetailCurrency"
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {}
+          },
+          "custom_form": {},
+          "due_date": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "kpis": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCancelDetailKpis"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCancelDetailLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoiceCancelDetailLine"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "payment_status": {
+            "type": "string"
+          },
+          "price_tax_inclusive": {
+            "type": "boolean"
+          },
+          "purchase_order": {},
+          "status": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchaseInvoiceCancelDetailAccount": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceCancelDetailCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceCancelDetailCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceCancelDetailKpis": {
+        "type": "object",
+        "properties": {
+          "credit_applied": {
+            "type": "string"
+          },
+          "credit_issued": {
+            "type": "string"
+          },
+          "deleted_on": {},
+          "last_amended_on": {},
+          "last_cancelled_on": {},
+          "last_payment_date": {},
+          "last_reactivated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "outstanding": {
+            "type": "string"
+          },
+          "overdue": {
+            "type": "string"
+          },
+          "payment_applied": {
+            "type": "string"
+          },
+          "voided_on": {}
+        }
+      },
+      "PurchaseInvoiceCancelDetailLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceCancelDetailLine": {
+        "type": "object",
+        "properties": {
+          "accounting_code": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "item": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCancelDetailLineItem"
+          },
+          "object": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "uom": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "warehouse": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceCancelDetailLineItem": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceCancelResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_invoice": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCancelDetail"
+          }
+        }
+      },
+      "PurchaseInvoiceInformationResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_invoice": {
+            "$ref": "#/components/schemas/PurchaseInvoice"
+          }
+        }
+      },
+      "PurchaseInvoiceInformation": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PurchaseInvoiceInformationAccount"
+          },
+          "activity_logs": {
+            "type": "array",
+            "items": {}
+          },
+          "alternate_due_date": {
+            "type": "string"
+          },
+          "alternate_issue_date": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseInvoiceInformationCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/PurchaseInvoiceInformationCurrency"
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {}
+          },
+          "custom_form": {},
+          "due_date": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "invoice_note": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "kpis": {
+            "$ref": "#/components/schemas/PurchaseInvoiceInformationKpis"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchaseInvoiceInformationLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoiceInformationLine"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "payment_status": {
+            "type": "string"
+          },
+          "price_tax_inclusive": {
+            "type": "boolean"
+          },
+          "purchase_order": {},
+          "status": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchaseInvoiceInformationAccount": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceInformationCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceInformationCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceInformationKpis": {
+        "type": "object",
+        "properties": {
+          "credit_applied": {
+            "type": "string"
+          },
+          "credit_issued": {
+            "type": "string"
+          },
+          "deleted_on": {},
+          "last_amended_on": {},
+          "last_cancelled_on": {},
+          "last_payment_date": {},
+          "last_reactivated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "outstanding": {
+            "type": "string"
+          },
+          "overdue": {
+            "type": "string"
+          },
+          "payment_applied": {
+            "type": "string"
+          },
+          "voided_on": {}
+        }
+      },
+      "PurchaseInvoiceInformationLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceInformationLine": {
+        "type": "object",
+        "properties": {
+          "accounting_code": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "item": {
+            "$ref": "#/components/schemas/PurchaseInvoiceInformationLineItem"
+          },
+          "object": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "uom": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "warehouse": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceInformationLineItem": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceInformationUpdatedResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_invoice": {
+            "$ref": "#/components/schemas/PurchaseInvoiceInformation"
+          }
+        }
+      },
+      "PurchaseInvoiceLines": {
+        "type": "object",
+        "properties": {
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoiceLinesRow"
+            }
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceLinesRow": {
+        "type": "object",
+        "properties": {
+          "accounting_code": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "item": {
+            "$ref": "#/components/schemas/PurchaseInvoiceLinesRowItem"
+          },
+          "object": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "uom": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "warehouse": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceLinesRowItem": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceLinesResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_invoice": {
+            "$ref": "#/components/schemas/PurchaseInvoiceLines"
+          }
+        }
+      },
+      "PurchaseInvoiceNote": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoiceNoteAttachment"
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "group": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "purchase_invoice": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteDetail"
+          },
+          "user": {},
+          "version": {
+            "type": "integer"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoiceNoteWatcher"
+            }
+          }
+        }
+      },
+      "PurchaseInvoiceNoteAttachment": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNoteCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNoteLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNoteDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNoteWatcher": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNoteList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoiceNote"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PurchaseInvoicePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNotesNote": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoiceNotesNoteAttachment"
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNotesNoteCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "group": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "purchase_invoice": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNotesNoteDetail"
+          },
+          "user": {},
+          "version": {
+            "type": "integer"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoiceNotesNoteWatcher"
+            }
+          }
+        }
+      },
+      "PurchaseInvoiceNotesNoteAttachment": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNotesNoteCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNotesNoteDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNotesNoteWatcher": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNoteCreatedResponse": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNotesNote"
+          }
+        }
+      },
+      "PurchaseInvoiceCreditNoteApplication": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationDetail"
+          },
+          "alternate_due_date": {
+            "type": "string"
+          },
+          "alternate_issue_date": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationCurrency"
+          },
+          "custom_form": {},
+          "due_date": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "payment_status": {
+            "type": "string"
+          },
+          "price_tax_inclusive": {
+            "type": "boolean"
+          },
+          "purchase_credit_note": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationPurchaseCreditNote"
+          },
+          "purchase_order": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationPurchaseOrder"
+          },
+          "purchase_payment": {
+            "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplicationPurchasePayment"
+          },
+          "remaining_balance": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchaseInvoiceCreditNoteApplicationDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceCreditNoteApplicationCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceCreditNoteApplicationCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceCreditNoteApplicationLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceCreditNoteApplicationPurchaseCreditNote": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceCreditNoteApplicationPurchaseOrder": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceCreditNoteApplicationPurchasePayment": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceCreditNoteApplicationList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoiceCreditNoteApplication"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PurchaseInvoicePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoicePurchasePayment": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentAccount"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "credit_note_applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentCreditNoteApplication"
+            }
+          },
+          "credit_note_total": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentCurrency"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "paid_total": {
+            "type": "string"
+          },
+          "payment_date": {
+            "type": "string"
+          },
+          "payment_method_applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentPaymentMethodApplication"
+            }
+          },
+          "payment_note": {
+            "type": "string"
+          },
+          "payment_reference": {},
+          "purchase_invoice_applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentPurchaseInvoiceApplication"
+            }
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchaseInvoicePurchasePaymentAccount": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoicePurchasePaymentCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoicePurchasePaymentCreditNoteApplication": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "purchase_credit_note": {
+            "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentCreditNoteApplicationPurchaseCreditNote"
+          }
+        }
+      },
+      "PurchaseInvoicePurchasePaymentCreditNoteApplicationPurchaseCreditNote": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoicePurchasePaymentCurrency": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoicePurchasePaymentLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoicePurchasePaymentPaymentMethodApplication": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "payment_method": {
+            "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentPaymentMethodApplicationDetail"
+          },
+          "payment_processor": {
+            "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentPaymentMethodApplicationPaymentProcessor"
+          },
+          "reference": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoicePurchasePaymentPaymentMethodApplicationDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoicePurchasePaymentPaymentMethodApplicationPaymentProcessor": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoicePurchasePaymentPurchaseInvoiceApplication": {
+        "type": "object",
+        "properties": {
+          "applied": {
+            "type": "string"
+          },
+          "due_date": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "outstanding": {
+            "type": "string"
+          },
+          "purchase_invoice": {
+            "$ref": "#/components/schemas/PurchaseInvoicePurchasePaymentPurchaseInvoiceApplicationDetail"
+          },
+          "total": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoicePurchasePaymentPurchaseInvoiceApplicationDetail": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoicePurchasePaymentList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoicePurchasePayment"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PurchaseInvoicePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceLine": {
+        "type": "object",
+        "properties": {
+          "line": {
+            "$ref": "#/components/schemas/PurchaseInvoiceLineDetail"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceLineDetail": {
+        "type": "object",
+        "properties": {
+          "accounting_code": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "item": {
+            "$ref": "#/components/schemas/PurchaseInvoiceLineDetailItem"
+          },
+          "object": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "uom": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "warehouse": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceLineDetailItem": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceLineResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_invoice": {
+            "$ref": "#/components/schemas/PurchaseInvoiceLine"
+          }
+        }
+      },
+      "PurchaseInvoiceNoteUpdated": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {}
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteUpdatedCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "group": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteUpdatedLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "purchase_invoice": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteUpdatedDetail"
+          },
+          "user": {},
+          "version": {
+            "type": "integer"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {}
+          }
+        }
+      },
+      "PurchaseInvoiceNoteUpdatedCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNoteUpdatedLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNoteUpdatedDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNoteUpdatedResponse": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteUpdated"
+          }
+        }
+      },
+      "PurchaseInvoiceNoteReadDetail": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoiceNoteReadDetailAttachment"
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteReadDetailCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "group": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "purchase_invoice": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteReadDetailPurchaseInvoice"
+          },
+          "user": {},
+          "version": {
+            "type": "integer"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoiceNoteReadDetailWatcher"
+            }
+          }
+        }
+      },
+      "PurchaseInvoiceNoteReadDetailAttachment": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNoteReadDetailCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNoteReadDetailPurchaseInvoice": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNoteReadDetailWatcher": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNoteResponse": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteReadDetail"
+          }
+        }
+      },
+      "PurchaseInvoiceNoteReadData": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNoteFileList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseInvoiceNoteReadData"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PurchaseInvoicePagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNoteFile": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceNoteFileResponse": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "$ref": "#/components/schemas/PurchaseInvoiceNoteFile"
+          }
+        }
+      },
+      "PurchaseInvoicePurchaseCreditNoteApplicationRead": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PurchaseInvoicePurchaseCreditNoteApplicationReadCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "purchase_credit_note": {
+            "$ref": "#/components/schemas/PurchaseInvoicePurchaseCreditNoteApplicationReadDetail"
+          },
+          "purchase_payment": {
+            "$ref": "#/components/schemas/PurchaseInvoicePurchaseCreditNoteApplicationReadPurchasePayment"
+          },
+          "remaining_balance": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PurchaseInvoicePurchaseCreditNoteApplicationReadCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoicePurchaseCreditNoteApplicationReadDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoicePurchaseCreditNoteApplicationReadPurchasePayment": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseInvoiceCreditNoteApplicationResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_credit_note_application": {
+            "$ref": "#/components/schemas/PurchaseInvoicePurchaseCreditNoteApplicationRead"
           }
         }
       },
