@@ -10,7 +10,7 @@
   "notes": [
     "**Requests and responses wrap the record in `salutation`.** A create sends `{\"salutation\": {...}}`.",
     "**A create needs only a `name`.** The new salutation's `display_name` takes the same value.",
-    "**Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true.",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.",
     "**A delete returns `204` with no body.** Reading the salutation afterwards returns `404`."
   ],
   "endpoints": [
@@ -128,7 +128,7 @@
       "slug": "retrieve-a-salutation",
       "title": "Retrieve a salutation",
       "summary": "Returns one salutation by its `id`, under `salutation`.",
-      "description": "Reads the salutation with this `id`. The `id` is the one a listing or a create returns.",
+      "description": "Reads the salutation with this `id`.",
       "parameters": [
         {
           "name": "salutation_id",
@@ -287,7 +287,7 @@
       "type": "object",
       "properties": {
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -305,7 +305,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
