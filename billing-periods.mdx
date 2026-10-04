@@ -24,9 +24,9 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 
 ## Things to know
 
-- **A create takes the time period's hyphenated uuid, not its `tp_` id.** For a time period `tp_580762f904bd2bd26d3d7e71ae87aa72`, send `580762f9-04bd-2bd2-6d3d-7e71ae87aa72` as `time_period`.
+- **A create takes the time period's hyphenated uuid, not its `tp_` id.** For a time period `tp_580762f904bd2bd26d3d7e71ae87aa72`, send `580762f9-04bd-2bd2-6d3d-7e71ae87aa72` as `time_period`. Charging and pricing periods take the `tp_` id instead.
 - **`name` and `time_period` are required on a create.** Both go under the `billing_period` key.
 - **An update returns `time_period` in place of `period` and `duration`.** Read the billing period again to see those two fields.
 - **A billing period `id` starts with `bp_`.**
-- **Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true.
+- **Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.
 - **A delete returns `204` with no body.** Reading the billing period afterwards returns `404`.
