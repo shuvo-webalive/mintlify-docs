@@ -1,0 +1,410 @@
+{
+  "family": "approvals",
+  "tag": "Approvals",
+  "slug": "approvals",
+  "icon": "circle-check",
+  "base": "/approvals",
+  "overview_description": "List account and sale order approvals, read one, and approve or reject a pending approval.",
+  "intro": "Approvals hold an action until someone signs it off. You can list account and sale order approvals, read one account approval, and approve or reject a pending one. This area has 5 endpoints, and all seven Exsited SDKs call every one.",
+  "warning": "**Approving or rejecting takes effect at once.** An approve runs the held action, and both send notifications.",
+  "notes": [
+    "**Approve and reject name the record in the body.** Send `{\"approval\": {\"entity\", \"resource_id\", \"note\"}}`; the same two routes serve all 16 entities.",
+    "**A decision takes effect at once.** Approving runs the held action, and both decisions send notifications.",
+    "**The sale order listing path is camel case.** It is `/approvals/saleOrder`, not `sale_order`.",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_approvals_account",
+      "method": "GET",
+      "path": "/approvals/account",
+      "slug": "list-account-approvals",
+      "title": "List account approvals",
+      "summary": "Lists the account approvals, one page at a time.",
+      "description": "Returns a page of account approvals under `data`, with cursor `pagination`. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of account approvals.",
+          "schema": {
+            "$ref": "#/components/schemas/ApprovalAccountList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_approvals_saleorder",
+      "method": "GET",
+      "path": "/approvals/saleOrder",
+      "slug": "list-sale-order-approvals",
+      "title": "List sale order approvals",
+      "summary": "Lists the sale order approvals, one page at a time.",
+      "description": "Returns a page of sale order approvals under `data`, with cursor `pagination`. The path is written `saleOrder`, in camel case. Other fields filter as `filter_<field>` for equality or `filter_<field>_<operator>`, such as `filter_created_on_gte`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` of the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by. Prefix it with `-` for descending order, such as `-created_on`.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of sale order approvals.",
+          "schema": {
+            "$ref": "#/components/schemas/ApprovalSaleOrderList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_approvals_account_by_uuid",
+      "method": "GET",
+      "path": "/approvals/account/{account_uuid}",
+      "slug": "retrieve-an-account-approval",
+      "title": "Retrieve an account approval",
+      "summary": "Retrieves one account approval.",
+      "description": "Name the approval by the `id` an entry of the account approvals listing carries.",
+      "parameters": [
+        {
+          "name": "account_uuid",
+          "in": "path",
+          "required": true,
+          "description": "The `id` of an entry in the account approvals listing.",
+          "schema": {
+            "type": "string",
+            "example": "1a3c5e7b-9d2f-4b6d-8f0a-2c4e6b8d0f1a"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The account approval."
+        }
+      },
+      "example_call": {
+        "path": {
+          "account_uuid": "1a3c5e7b-9d2f-4b6d-8f0a-2c4e6b8d0f1a"
+        }
+      }
+    },
+    {
+      "key": "approve_approval",
+      "method": "POST",
+      "path": "/approvals/approve",
+      "slug": "approve-a-pending-approval",
+      "title": "Approve a pending approval",
+      "summary": "Approves a pending approval and runs the action it holds.",
+      "description": "Send the record to approve wrapped in `approval`, with its `entity`, its `resource_id` and a `note`. One route serves every entity. The held action runs and notifications go out straight away.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "approval": {
+              "type": "object",
+              "properties": {
+                "entity": {
+                  "type": "string",
+                  "description": "The kind of record the approval is for. One route serves all 16 entities."
+                },
+                "resource_id": {
+                  "type": "string",
+                  "description": "The id of the record waiting for approval."
+                },
+                "note": {
+                  "type": "string",
+                  "description": "A note to keep with the decision."
+                }
+              }
+            }
+          },
+          "required": [
+            "approval"
+          ]
+        },
+        "example": {
+          "approval": {
+            "entity": "account",
+            "resource_id": "W13ZGY",
+            "note": "Checked and approved."
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The approval is approved."
+        }
+      },
+      "example_call": {
+        "body": {
+          "approval": {
+            "entity": "account",
+            "resource_id": "W13ZGY",
+            "note": "Checked and approved."
+          }
+        }
+      }
+    },
+    {
+      "key": "reject_approval",
+      "method": "POST",
+      "path": "/approvals/reject",
+      "slug": "reject-a-pending-approval",
+      "title": "Reject a pending approval",
+      "summary": "Rejects a pending approval.",
+      "description": "Send the same body as an approve: `entity`, `resource_id` and `note`, wrapped in `approval`. One route serves every entity, and notifications go out straight away.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "approval": {
+              "type": "object",
+              "properties": {
+                "entity": {
+                  "type": "string",
+                  "description": "The kind of record the approval is for. One route serves all 16 entities."
+                },
+                "resource_id": {
+                  "type": "string",
+                  "description": "The id of the record waiting for approval."
+                },
+                "note": {
+                  "type": "string",
+                  "description": "A note to keep with the decision."
+                }
+              }
+            }
+          },
+          "required": [
+            "approval"
+          ]
+        },
+        "example": {
+          "approval": {
+            "entity": "account",
+            "resource_id": "W13ZGY",
+            "note": "Missing billing details."
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The approval is rejected."
+        }
+      },
+      "example_call": {
+        "body": {
+          "approval": {
+            "entity": "account",
+            "resource_id": "W13ZGY",
+            "note": "Missing billing details."
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "ApprovalAccount": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "description": {
+          "description": "No type is known: this field is null in every record read."
+        },
+        "event": {
+          "type": "string"
+        },
+        "entity": {
+          "type": "string"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "ApprovalAccountList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "description": "Always `list`."
+        },
+        "url": {
+          "type": "string",
+          "description": "The path this page was read from."
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ApprovalAccount"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ApprovalPagination"
+        }
+      }
+    },
+    "ApprovalSaleOrderList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "description": "Always `list`."
+        },
+        "url": {
+          "type": "string",
+          "description": "The path this page was read from."
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "The sale order approvals."
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ApprovalPagination"
+        }
+      }
+    },
+    "ApprovalPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Pass as `cursor` to read the next page."
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "links": {
+          "$ref": "#/components/schemas/ApprovalPaginationLinks"
+        }
+      }
+    },
+    "ApprovalPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}
