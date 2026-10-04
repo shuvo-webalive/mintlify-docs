@@ -1,0 +1,1172 @@
+{
+  "family": "item_fulfillments",
+  "tag": "Item fulfillments",
+  "slug": "item-fulfillments",
+  "icon": "truck",
+  "base": "/item_fulfillments",
+  "overview_description": "Record items sent against a sale invoice's lines, then list, read, update and delete fulfillments and manage their notes.",
+  "intro": "An item fulfillment records items sent against the lines of a sale invoice. These endpoints create, list, read, update and delete fulfillments, and add, list, read and delete their notes. This area has 9 endpoints, and all seven SDKs call every one.",
+  "warning": "**A fulfillment cannot be deleted once any of its stock has been sent.** The delete is refused with `400` `stock_committed`.",
+  "notes": [
+    "**Writes are wrapped in `item_fulfillment`.** A create names the sale invoice in `invoice_id` and lists `fulfillments`, each with an `invoice_line` id and a `fulfillment_quantity`.",
+    "**Fulfillment ids start with `ifm_`, and note ids with `note_`.** Pass them in the paths as they are.",
+    "**Notes are stored on the fulfillment's sale invoice.** The notes listing returns the invoice's notes, and a single note read comes back under `item_fulfillment.note`.",
+    "**Deleting a note looks on the fulfillment itself.** A note added through the create note endpoint is stored on the invoice, so that delete does not find it.",
+    "**A new fulfillment comes back with `fulfillment_status` `shipped`.** Each update raises its `version`.",
+    "**The listing pages by cursor.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor` until `has_more` is `false`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_item_fulfillments",
+      "method": "GET",
+      "path": "/item_fulfillments",
+      "slug": "list-item-fulfillments",
+      "title": "List item fulfillments",
+      "summary": "Returns a page of item fulfillments.",
+      "description": "Returns fulfillments under `data`, each with its account, invoice, `fulfillment_status`, `tracking_number` and `fulfillments` lines. Set the page size with `limit` and fetch the next page with `cursor`. Other fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of item fulfillments, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemFulfillmentList"
+          }
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_item_fulfillment",
+      "method": "POST",
+      "path": "/item_fulfillments",
+      "slug": "create-an-item-fulfillment",
+      "title": "Create an item fulfillment",
+      "summary": "Records items sent against a sale invoice's lines and returns the fulfillment.",
+      "description": "Send the fulfillment under `item_fulfillment`: the `invoice_id`, and `fulfillments` listing each invoice line by its id in `invoice_line` with the `fulfillment_quantity` sent. The new fulfillment comes back under `item_fulfillment` with `fulfillment_status` `shipped`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item_fulfillment": {
+              "type": "object",
+              "properties": {
+                "invoice_id": {
+                  "type": "string",
+                  "description": "The sale invoice's `id`."
+                },
+                "fulfillments": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "invoice_line": {
+                        "type": "string",
+                        "description": "The invoice line's `id`."
+                      },
+                      "fulfillment_quantity": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "invoice_line",
+                      "fulfillment_quantity"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "invoice_id",
+                "fulfillments"
+              ]
+            }
+          },
+          "required": [
+            "item_fulfillment"
+          ]
+        },
+        "example": {
+          "item_fulfillment": {
+            "invoice_id": "INV-0001",
+            "fulfillments": [
+              {
+                "invoice_line": "8e7d6c5b-4a39-4281-9706-f5e4d3c2b1a0",
+                "fulfillment_quantity": 1
+              }
+            ]
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new fulfillment, under `item_fulfillment`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemFulfillments"
+          }
+        }
+      },
+      "example_call": {
+        "body": {
+          "item_fulfillment": {
+            "invoice_id": "INV-0001",
+            "fulfillments": [
+              {
+                "invoice_line": "8e7d6c5b-4a39-4281-9706-f5e4d3c2b1a0",
+                "fulfillment_quantity": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "get_item_fulfillment",
+      "method": "GET",
+      "path": "/item_fulfillments/{fulfillment_id}",
+      "slug": "retrieve-an-item-fulfillment",
+      "title": "Retrieve an item fulfillment",
+      "summary": "Returns one item fulfillment by its `id`.",
+      "description": "Returns the fulfillment under `item_fulfillment`, with its account, invoice, status, `tracking_number`, `version` and `fulfillments` lines.",
+      "parameters": [
+        {
+          "name": "fulfillment_id",
+          "in": "path",
+          "required": true,
+          "description": "The fulfillment's `id`, which starts with `ifm_`.",
+          "schema": {
+            "type": "string",
+            "example": "ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The fulfillment, under `item_fulfillment`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemFulfillmentReadResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "fulfillment_id": "ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9"
+        }
+      }
+    },
+    {
+      "key": "update_item_fulfillment",
+      "method": "PATCH",
+      "path": "/item_fulfillments/{fulfillment_id}",
+      "slug": "update-an-item-fulfillment",
+      "title": "Update an item fulfillment",
+      "summary": "Changes an item fulfillment, such as its tracking number, and returns a short record.",
+      "description": "Send the changes under `item_fulfillment`, such as a new `tracking_number`. The response gives the fulfillment's `id`, `code`, `status` and new `version` under `item_fulfillment`.",
+      "parameters": [
+        {
+          "name": "fulfillment_id",
+          "in": "path",
+          "required": true,
+          "description": "The fulfillment's `id`, which starts with `ifm_`.",
+          "schema": {
+            "type": "string",
+            "example": "ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "item_fulfillment": {
+              "type": "object",
+              "properties": {
+                "tracking_number": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "item_fulfillment"
+          ]
+        },
+        "example": {
+          "item_fulfillment": {
+            "tracking_number": "TRK-0001"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The short fulfillment record, under `item_fulfillment`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemFulfillmentUpdated"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "fulfillment_id": "ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9"
+        },
+        "body": {
+          "item_fulfillment": {
+            "tracking_number": "TRK-0001"
+          }
+        }
+      }
+    },
+    {
+      "key": "create_item_fulfillment_note",
+      "method": "POST",
+      "path": "/item_fulfillments/{fulfillment_id}/notes",
+      "slug": "create-an-item-fulfillment-note",
+      "title": "Create an item fulfillment note",
+      "summary": "Adds a note to a fulfillment, with optional files, and returns the note's id.",
+      "description": "Send a multipart form with the text in the `note` field and any files as extra parts. The note is stored on the fulfillment's sale invoice, and the response gives its `id` under `note`.",
+      "parameters": [
+        {
+          "name": "fulfillment_id",
+          "in": "path",
+          "required": true,
+          "description": "The fulfillment's `id`, which starts with `ifm_`.",
+          "schema": {
+            "type": "string",
+            "example": "ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "note": {
+              "type": "string",
+              "description": "The note's text."
+            },
+            "file": {
+              "type": "string",
+              "format": "binary",
+              "description": "A file to attach. Optional; send one part per file."
+            }
+          },
+          "required": [
+            "note"
+          ]
+        },
+        "example": {
+          "note": "<p>Left with reception.</p>"
+        }
+      },
+      "multipart": true,
+      "responses": {
+        "201": {
+          "description": "The new note's `id` and links, under `note`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemFulfillmentNotesResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "fulfillment_id": "ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9"
+        },
+        "note": "<p>Left with reception.</p>",
+        "file": "delivery-photo.jpg"
+      }
+    },
+    {
+      "key": "delete_item_fulfillment",
+      "method": "DELETE",
+      "path": "/item_fulfillments/{fulfillment_id}",
+      "slug": "delete-an-item-fulfillment",
+      "title": "Delete an item fulfillment",
+      "summary": "Deletes an item fulfillment. A successful call returns `204` with no body.",
+      "description": "Deletes the fulfillment with that `ifm_` id. Once any of its stock has been sent the delete is refused.",
+      "parameters": [
+        {
+          "name": "fulfillment_id",
+          "in": "path",
+          "required": true,
+          "description": "The fulfillment's `id`, which starts with `ifm_`.",
+          "schema": {
+            "type": "string",
+            "example": "ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The fulfillment is deleted. No body."
+        },
+        "400": {
+          "description": "Some of the fulfillment's stock has been sent (`stock_committed`)."
+        }
+      },
+      "example_call": {
+        "path": {
+          "fulfillment_id": "ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9"
+        }
+      }
+    },
+    {
+      "key": "delete_item_fulfillment_note",
+      "method": "DELETE",
+      "path": "/item_fulfillments/{fulfillment_id}/notes/{note_id}",
+      "slug": "delete-an-item-fulfillment-note",
+      "title": "Delete an item fulfillment note",
+      "summary": "Deletes a note held on the fulfillment itself. A successful call returns `204` with no body.",
+      "description": "Pass the fulfillment's `ifm_` id and the note's `note_` id. The delete looks for the note on the fulfillment, not on its sale invoice, where the create note endpoint stores notes.",
+      "parameters": [
+        {
+          "name": "fulfillment_id",
+          "in": "path",
+          "required": true,
+          "description": "The fulfillment's `id`, which starts with `ifm_`.",
+          "schema": {
+            "type": "string",
+            "example": "ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, which starts with `note_`.",
+          "schema": {
+            "type": "string",
+            "example": "note_b1c2d3e4f5061728394a5b6c7d8e9f00"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The note is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "fulfillment_id": "ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9",
+          "note_id": "note_b1c2d3e4f5061728394a5b6c7d8e9f00"
+        }
+      }
+    },
+    {
+      "key": "get_item_fulfillment_notes",
+      "method": "GET",
+      "path": "/item_fulfillments/{fulfillment_id}/notes",
+      "slug": "list-an-item-fulfillments-notes",
+      "title": "List an item fulfillment's notes",
+      "summary": "Returns a page of the notes on a fulfillment's sale invoice.",
+      "description": "Returns notes under `data`, each with its `content`, `attachments` and `watchers`. These are the notes of the fulfillment's sale invoice, which is where the create note endpoint puts them.",
+      "parameters": [
+        {
+          "name": "fulfillment_id",
+          "in": "path",
+          "required": true,
+          "description": "The fulfillment's `id`, which starts with `ifm_`.",
+          "schema": {
+            "type": "string",
+            "example": "ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "How many records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "A page of notes, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemFulfillmentNoteList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "fulfillment_id": "ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9"
+        },
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_item_fulfillment_note",
+      "method": "GET",
+      "path": "/item_fulfillments/{fulfillment_id}/notes/{note_id}",
+      "slug": "retrieve-an-item-fulfillment-note",
+      "title": "Retrieve an item fulfillment note",
+      "summary": "Returns one fulfillment note, under `item_fulfillment.note`.",
+      "description": "Returns the note with its `content`, `attachments` and `watchers`, nested as `item_fulfillment.note`.",
+      "parameters": [
+        {
+          "name": "fulfillment_id",
+          "in": "path",
+          "required": true,
+          "description": "The fulfillment's `id`, which starts with `ifm_`.",
+          "schema": {
+            "type": "string",
+            "example": "ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9"
+          }
+        },
+        {
+          "name": "note_id",
+          "in": "path",
+          "required": true,
+          "description": "The note's `id`, which starts with `note_`.",
+          "schema": {
+            "type": "string",
+            "example": "note_b1c2d3e4f5061728394a5b6c7d8e9f00"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The note, under `item_fulfillment.note`.",
+          "schema": {
+            "$ref": "#/components/schemas/ItemFulfillmentNoteReadResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "fulfillment_id": "ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9",
+          "note_id": "note_b1c2d3e4f5061728394a5b6c7d8e9f00"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "ItemFulfillmentList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemFulfillment"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ItemFulfillmentPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemFulfillment": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/ItemFulfillmentAccount"
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/ItemFulfillmentCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "custom_attributes": {
+          "type": "object"
+        },
+        "date": {
+          "type": "string"
+        },
+        "delivery_status": {},
+        "fulfillment_completed": {
+          "type": "boolean"
+        },
+        "fulfillment_date": {
+          "type": "string"
+        },
+        "fulfillment_note": {
+          "type": "string"
+        },
+        "fulfillment_status": {
+          "type": "string"
+        },
+        "fulfillments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemFulfillmentRow"
+          }
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The fulfillment's `id`, which starts with `ifm_`."
+        },
+        "invoice": {
+          "$ref": "#/components/schemas/ItemFulfillmentInvoice"
+        },
+        "invoice_id": {
+          "type": "string"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/ItemFulfillmentLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "order": {},
+        "order_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "tracking_number": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "ItemFulfillmentAccount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemFulfillmentCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemFulfillmentRow": {
+      "type": "object",
+      "properties": {
+        "fulfillment_index": {
+          "type": "integer"
+        },
+        "fulfillment_qty": {
+          "type": "number"
+        },
+        "fulfillment_sent_qty": {
+          "type": "number"
+        },
+        "id": {
+          "type": "string"
+        },
+        "inventory_tracking": {},
+        "item": {
+          "$ref": "#/components/schemas/ItemFulfillmentRowItem"
+        },
+        "object": {
+          "type": "string"
+        },
+        "pending_return": {
+          "type": "number"
+        },
+        "returned": {
+          "type": "number"
+        },
+        "serving_status": {
+          "type": "string"
+        },
+        "uom": {
+          "type": "string"
+        },
+        "uom_precision": {
+          "type": "integer"
+        }
+      }
+    },
+    "ItemFulfillmentRowItem": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemFulfillmentInvoice": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemFulfillmentLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemFulfillmentPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size the API applied."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "type": "object",
+          "properties": {
+            "next": {
+              "type": "string"
+            },
+            "prev": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "ItemFulfillments": {
+      "type": "object",
+      "properties": {
+        "activity_logs": {
+          "type": "array"
+        },
+        "item_fulfillment": {
+          "$ref": "#/components/schemas/ItemFulfillmentsItemFulfillment"
+        }
+      }
+    },
+    "ItemFulfillmentsItemFulfillment": {
+      "type": "object",
+      "properties": {
+        "activity_logs": {
+          "type": "array"
+        },
+        "code": {
+          "type": "string"
+        },
+        "fulfillment_date": {
+          "type": "string"
+        },
+        "fulfillment_note": {},
+        "fulfillment_status": {
+          "type": "string",
+          "description": "Such as `shipped`."
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "ItemFulfillmentRead": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/ItemFulfillmentReadAccount"
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/ItemFulfillmentReadCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "custom_attributes": {
+          "type": "object"
+        },
+        "delivery_status": {},
+        "fulfillment_completed": {
+          "type": "boolean"
+        },
+        "fulfillment_date": {
+          "type": "string"
+        },
+        "fulfillment_note": {
+          "type": "string"
+        },
+        "fulfillment_status": {
+          "type": "string"
+        },
+        "fulfillments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemFulfillmentReadRow"
+          }
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The fulfillment's `id`, which starts with `ifm_`."
+        },
+        "invoice": {
+          "$ref": "#/components/schemas/ItemFulfillmentReadInvoice"
+        },
+        "last_updated_by": {
+          "$ref": "#/components/schemas/ItemFulfillmentReadLastUpdatedBy"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "order": {},
+        "status": {
+          "type": "string"
+        },
+        "tracking_number": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer",
+          "description": "Goes up with each change."
+        }
+      }
+    },
+    "ItemFulfillmentReadAccount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemFulfillmentReadCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemFulfillmentReadRow": {
+      "type": "object",
+      "properties": {
+        "fulfillment_index": {
+          "type": "integer"
+        },
+        "fulfillment_qty": {
+          "type": "number"
+        },
+        "fulfillment_sent_qty": {
+          "type": "number"
+        },
+        "id": {
+          "type": "string"
+        },
+        "inventory_tracking": {},
+        "item": {
+          "$ref": "#/components/schemas/ItemFulfillmentReadRowItem"
+        },
+        "object": {
+          "type": "string"
+        },
+        "pending_return": {
+          "type": "number"
+        },
+        "returned": {
+          "type": "number"
+        },
+        "serving_status": {
+          "type": "string"
+        },
+        "uom": {
+          "type": "string"
+        },
+        "uom_precision": {
+          "type": "integer"
+        }
+      }
+    },
+    "ItemFulfillmentReadRowItem": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemFulfillmentReadInvoice": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemFulfillmentReadLastUpdatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemFulfillmentReadResponse": {
+      "type": "object",
+      "properties": {
+        "item_fulfillment": {
+          "$ref": "#/components/schemas/ItemFulfillmentRead"
+        }
+      }
+    },
+    "ItemFulfillmentUpdated": {
+      "type": "object",
+      "properties": {
+        "item_fulfillment": {
+          "$ref": "#/components/schemas/ItemFulfillmentUpdatedDetail"
+        },
+        "note": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemFulfillmentUpdatedDetail": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      }
+    },
+    "ItemFulfillmentNotes": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "item_fulfillment": {
+          "$ref": "#/components/schemas/ItemFulfillmentNotesDetail"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemFulfillmentNotesDetail": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemFulfillmentNotesResponse": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "$ref": "#/components/schemas/ItemFulfillmentNotes"
+        }
+      }
+    },
+    "ItemFulfillmentNoteList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemFulfillmentNote"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/ItemFulfillmentPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemFulfillmentNote": {
+      "type": "object",
+      "properties": {
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemFulfillmentNoteAttachment"
+          }
+        },
+        "content": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/ItemFulfillmentCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "group": {},
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "item_fulfillment": {
+          "$ref": "#/components/schemas/ItemFulfillmentNotesDetail"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {},
+        "object": {
+          "type": "string"
+        },
+        "user": {},
+        "version": {
+          "type": "integer"
+        },
+        "watchers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ItemFulfillmentNoteWatcher"
+          }
+        }
+      }
+    },
+    "ItemFulfillmentNoteAttachment": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemFulfillmentNoteWatcher": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemFulfillmentNoteRead": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "$ref": "#/components/schemas/ItemFulfillmentNote"
+        }
+      }
+    },
+    "ItemFulfillmentNoteReadResponse": {
+      "type": "object",
+      "properties": {
+        "item_fulfillment": {
+          "$ref": "#/components/schemas/ItemFulfillmentNoteRead"
+        }
+      }
+    }
+  }
+}
