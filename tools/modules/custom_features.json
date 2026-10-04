@@ -1,0 +1,700 @@
+{
+  "family": "custom_features",
+  "tag": "Custom features",
+  "slug": "custom-features",
+  "icon": "puzzle-piece",
+  "base": "/custom_feature",
+  "overview_description": "List, create, read, update and delete custom features, and set the form layout and attributes of a feature.",
+  "intro": "A custom feature is a component you define, such as a service contract attached to accounts, with its own form of custom attributes. This area has 6 endpoints to list, create, read, update and delete features and to set a feature's form layout, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**The path is singular.** Call `/custom_feature`; the `href`, `url` and `links.next` values in responses name `/custom_features`, which returns 405.",
+    "**Writes send their fields under `component`.** The create and update bodies wrap the fields in `component`, and the feature comes back under `custom_feature`.",
+    "**A custom feature id starts with `cmp_`.** It is the same id the custom components area uses for a component definition.",
+    "**The listing returns active features only, paged by cursor.** Pass `limit`, then the `next_cursor` from `pagination` as `cursor` while `has_more` is true.",
+    "**The form layout call takes `configuration` with no other wrapper.** It sets `settings.form_layout` and the attributes in `column_1` and `column_2`.",
+    "**A deleted feature returns 404.** The delete itself returns 204 with no body."
+  ],
+  "endpoints": [
+    {
+      "key": "get_custom_features",
+      "method": "GET",
+      "path": "/custom_feature",
+      "slug": "list-custom-features",
+      "title": "List custom features",
+      "summary": "Returns one page of the active custom features.",
+      "description": "Lists the active custom features with each one's name, where it is used, its relation and its forms. Records are under `data` and paging details under `pagination`. Fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most records to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to read the page after it.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "A field to sort by, such as `created_on`, or `-created_on` for newest first.",
+          "schema": {
+            "type": "string",
+            "example": "-created_on"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of active custom features, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/CustomFeatureList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "get_custom_feature_by_id",
+      "method": "GET",
+      "path": "/custom_feature/{custom_feature_id}",
+      "slug": "retrieve-a-custom-feature",
+      "title": "Retrieve a custom feature",
+      "summary": "Returns one custom feature, under `custom_feature`.",
+      "description": "Reads a single custom feature by its `cmp_` id, with its forms, custom objects and child components.",
+      "parameters": [
+        {
+          "name": "custom_feature_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom feature's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The custom feature, under `custom_feature`.",
+          "schema": {
+            "$ref": "#/components/schemas/CustomFeatureResponse"
+          }
+        },
+        "404": {
+          "description": "No custom feature has that `id`, or it is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "custom_feature_id": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+        }
+      }
+    },
+    {
+      "key": "create_custom_feature",
+      "method": "POST",
+      "path": "/custom_feature",
+      "slug": "create-a-custom-feature",
+      "title": "Create a custom feature",
+      "summary": "Creates a custom feature and returns it, under `custom_feature`.",
+      "description": "Defines a new custom feature. Send its fields under `component`: a `name`, and optionally `display_name`, `description`, `use_in` such as `account` and `relation` such as `ONE_TO_MANY`. The new feature comes back with its `cmp_` id.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "component": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The feature's name, an identifier such as `service_contract`."
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "use_in": {
+                  "type": "string",
+                  "description": "Where the feature is used, such as `account`."
+                },
+                "relation": {
+                  "type": "string",
+                  "description": "How records relate to the feature, such as `ONE_TO_MANY`."
+                }
+              }
+            }
+          },
+          "required": [
+            "component"
+          ]
+        },
+        "example": {
+          "component": {
+            "name": "service_contract",
+            "display_name": "Service contract",
+            "use_in": "account",
+            "relation": "ONE_TO_MANY"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new custom feature, under `custom_feature`.",
+          "schema": {
+            "$ref": "#/components/schemas/CustomFeatureResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "component": {
+            "name": "service_contract",
+            "display_name": "Service contract",
+            "use_in": "account",
+            "relation": "ONE_TO_MANY"
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_custom_feature_by_id",
+      "method": "DELETE",
+      "path": "/custom_feature/{custom_feature_id}",
+      "slug": "delete-a-custom-feature",
+      "title": "Delete a custom feature",
+      "summary": "Deletes a custom feature and returns no body.",
+      "description": "Removes the custom feature with this `cmp_` id. A successful call returns 204 with an empty body, and reading the feature afterwards returns 404.",
+      "parameters": [
+        {
+          "name": "custom_feature_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom feature's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The custom feature is deleted. No body."
+        }
+      },
+      "example_call": {
+        "path": {
+          "custom_feature_id": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+        }
+      }
+    },
+    {
+      "key": "update_custom_feature_by_id",
+      "method": "PATCH",
+      "path": "/custom_feature/{custom_feature_id}",
+      "slug": "update-a-custom-feature",
+      "title": "Update a custom feature",
+      "summary": "Changes a custom feature's fields and returns the updated feature.",
+      "description": "Send the fields to change under `component`, such as `display_name` and `description`. The updated feature comes back under `custom_feature`.",
+      "parameters": [
+        {
+          "name": "custom_feature_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom feature's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "component": {
+              "type": "object",
+              "properties": {
+                "display_name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "component"
+          ]
+        },
+        "example": {
+          "component": {
+            "display_name": "Service contract (updated)",
+            "description": "Support contracts held by Acme Pty Ltd"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated custom feature, under `custom_feature`.",
+          "schema": {
+            "$ref": "#/components/schemas/CustomFeatureResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "custom_feature_id": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+        },
+        "body": {
+          "component": {
+            "display_name": "Service contract (updated)",
+            "description": "Support contracts held by Acme Pty Ltd"
+          }
+        }
+      }
+    },
+    {
+      "key": "create_custom_feature_by_id",
+      "method": "POST",
+      "path": "/custom_feature/{custom_feature_id}",
+      "slug": "set-a-custom-features-form-layout-and-attributes",
+      "title": "Set a custom feature's form layout and attributes",
+      "summary": "Sets the form layout of a custom feature and the attributes in each column, and returns the feature.",
+      "description": "Customizes the form of an existing feature. Send `configuration` with `settings.form_layout`, such as `TWO_COLS`, and the entries of `column_1` and `column_2`: each entry is an `ATTRIBUTE`, named by a custom attribute's `name`, or a `LABEL`. The feature comes back under `custom_feature`.",
+      "parameters": [
+        {
+          "name": "custom_feature_id",
+          "in": "path",
+          "required": true,
+          "description": "The custom feature's `id`, which starts with `cmp_`.",
+          "schema": {
+            "type": "string",
+            "example": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "configuration": {
+              "type": "object",
+              "properties": {
+                "settings": {
+                  "type": "object",
+                  "properties": {
+                    "form_layout": {
+                      "type": "string",
+                      "description": "The layout, such as `TWO_COLS`."
+                    }
+                  }
+                },
+                "column_1": {
+                  "type": "object",
+                  "properties": {
+                    "attributes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "description": "`ATTRIBUTE` for a custom attribute, or `LABEL` for a label."
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "The custom attribute's `name`, or the label text."
+                          },
+                          "required": {
+                            "type": "string"
+                          },
+                          "show_in_list_view": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "type",
+                          "name"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "column_2": {
+                  "type": "object",
+                  "properties": {
+                    "attributes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "description": "`ATTRIBUTE` for a custom attribute, or `LABEL` for a label."
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "The custom attribute's `name`, or the label text."
+                          },
+                          "required": {
+                            "type": "string"
+                          },
+                          "show_in_list_view": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "type",
+                          "name"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "configuration"
+          ]
+        },
+        "example": {
+          "configuration": {
+            "settings": {
+              "form_layout": "TWO_COLS"
+            },
+            "column_1": {
+              "attributes": [
+                {
+                  "type": "ATTRIBUTE",
+                  "name": "contract_tier",
+                  "required": "false",
+                  "show_in_list_view": "true"
+                }
+              ]
+            },
+            "column_2": {
+              "attributes": [
+                {
+                  "type": "LABEL",
+                  "name": "Contract details"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The custom feature with its new form, under `custom_feature`.",
+          "schema": {
+            "$ref": "#/components/schemas/CustomFeatureResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "custom_feature_id": "cmp_4b7d2e9a1c3f4e8a9b6d5c2e1f0a3b7d"
+        },
+        "body": {
+          "configuration": {
+            "settings": {
+              "form_layout": "TWO_COLS"
+            },
+            "column_1": {
+              "attributes": [
+                {
+                  "type": "ATTRIBUTE",
+                  "name": "contract_tier",
+                  "required": "false",
+                  "show_in_list_view": "true"
+                }
+              ]
+            },
+            "column_2": {
+              "attributes": [
+                {
+                  "type": "LABEL",
+                  "name": "Contract details"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "CustomFeature": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "use_in": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "relation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "custom_component": {},
+        "custom_objects": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "custom_forms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CustomFeatureForm"
+          }
+        },
+        "child_custom_components": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "activity_logs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "created_by": {},
+        "last_updated_by": {},
+        "version": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string",
+          "description": "Names the plural `/custom_features` path, which is not served; call the singular `/custom_feature` path."
+        }
+      }
+    },
+    "CustomFeatureForm": {
+      "type": "object",
+      "properties": {
+        "configuration": {
+          "$ref": "#/components/schemas/CustomFeatureFormConfiguration"
+        }
+      }
+    },
+    "CustomFeatureFormConfiguration": {
+      "type": "object",
+      "properties": {
+        "settings": {
+          "$ref": "#/components/schemas/CustomFeatureFormSettings"
+        },
+        "column_1": {
+          "$ref": "#/components/schemas/CustomFeatureFormColumn1"
+        },
+        "column_2": {
+          "$ref": "#/components/schemas/CustomFeatureFormColumn2"
+        }
+      }
+    },
+    "CustomFeatureFormSettings": {
+      "type": "object",
+      "properties": {
+        "custom_form": {
+          "type": "string"
+        },
+        "form_layout": {
+          "type": "string"
+        }
+      }
+    },
+    "CustomFeatureFormColumn1": {
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CustomFeatureFormColumn1Attribute"
+          }
+        }
+      }
+    },
+    "CustomFeatureFormColumn2": {
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CustomFeatureFormColumn2Attribute"
+          }
+        }
+      }
+    },
+    "CustomFeatureFormColumn1Attribute": {
+      "type": "object",
+      "properties": {
+        "data_type": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "show_in_list_view": {
+          "type": "boolean"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "CustomFeatureFormColumn2Attribute": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "CustomFeatureResponse": {
+      "type": "object",
+      "properties": {
+        "custom_feature": {
+          "$ref": "#/components/schemas/CustomFeature"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "CustomFeatureList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CustomFeature"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/CustomFeaturePagination"
+        }
+      }
+    },
+    "CustomFeaturePagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "The page size applied to this page."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Trust this over `next_cursor`, which can be stale on the last page."
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "links": {
+          "$ref": "#/components/schemas/CustomFeaturePaginationLinks"
+        }
+      }
+    },
+    "CustomFeaturePaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}
