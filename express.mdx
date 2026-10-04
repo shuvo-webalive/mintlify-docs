@@ -4,13 +4,13 @@ sidebarTitle: "Overview"
 description: "Create an active order and its invoice for an existing account in a single Exsited API call."
 ---
 
-Express creates a complete order for an account in one request: the order, its lines and its invoice. This area has 1 endpoint, and all seven SDKs call it.
+Express creates a complete order for an account in one request: the order, its lines and its invoice. This area has 1 endpoint, and every SDK supports it.
 
 ## At a glance
 
 | Endpoint | Method | Path | What it does |
 | --- | --- | --- | --- |
-| [Create an express order](/api-reference/express/create-an-express-order) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/express` | Creates an active order for an existing account in one call and returns it under `express`. |
+| [Create an order with its invoice](/api-reference/express/create-an-order-with-its-invoice) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/express` | Creates an active order for an existing account in one call and returns it under `express`. |
 
 ## Before you call
 
@@ -20,7 +20,7 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 
 ## Things to know
 
-- **The body sits under `account`.** Name the account by `id` and nest the order under `account.order`.
+- **Send the body under `account`.** Name the account by `id` and nest the order under `account.order`.
 - **The order is created active.** The new order's `status` is `active`, and one invoice is raised for it straight away.
-- **The response sits under `express`.** It holds the order as `get_order` reads it, including `lines`, `kpis` and `billing_preferences`.
+- **The response comes back under `express`.** It holds the order as [Retrieve an order](/api-reference/orders/retrieve-an-order) returns it, including `lines`, `kpis` and `billing_preferences`.
 - **Each line names an item by `item_id`.** `item_price_snapshot.pricing_rule.price` sets the line's price, and `tax_exempt_when_sold` removes tax from the line.
