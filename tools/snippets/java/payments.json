@@ -1,0 +1,66 @@
+{
+  "sdk": "java",
+  "module": "payments",
+  "endpoints": {
+    "get_payments": {
+      "function": "payments().getPayments",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentList;\nimport java.util.Map;\n\nApiResponse<PaymentList> response = client.payments().getPayments(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_payments_notes": {
+      "function": "payments().getPaymentsNotes",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentsNoteList;\nimport java.util.Map;\n\nApiResponse<PaymentsNoteList> response = client.payments().getPaymentsNotes(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "delete_payment": {
+      "function": "payments().deletePayment",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\n\nApiResponse<Dto> response = client.payments().deletePayment(\"PAY-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "update_payment": {
+      "function": "payments().updatePayment",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentRead;\nimport java.util.Map;\n\nApiResponse<PaymentRead> response = client.payments().updatePayment(\n        \"PAY-0001\",\n        Map.of(\"payment\", Map.of(\"note\", \"Paid at the front counter.\")));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_payment": {
+      "function": "payments().getPayment",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentRead;\n\nApiResponse<PaymentRead> response = client.payments().getPayment(\"PAY-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice_payments": {
+      "function": "payments().getInvoicePayments",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentList;\nimport java.util.Map;\n\nApiResponse<PaymentList> response = client.payments().getInvoicePayments(\n        \"INV-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_order_payments": {
+      "function": "payments().getOrderPayments",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentList;\nimport java.util.Map;\n\nApiResponse<PaymentList> response = client.payments().getOrderPayments(\n        \"ORD-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_payment_notes": {
+      "function": "payments().getPaymentNotes",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentNoteList;\nimport java.util.Map;\n\nApiResponse<PaymentNoteList> response = client.payments().getPaymentNotes(\n        \"PAY-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+    },
+    "create_payment_note": {
+      "function": "payments().createPaymentNote",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.RequestOptions;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentNotes;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nApiResponse<PaymentNotes> response = client.payments().createPaymentNote(\n        \"PAY-0001\",\n        \"Customer asked for a copy by post.\",\n        Map.of(\"file\", Path.of(\"receipt.pdf\")),\n        RequestOptions.none());\nSystem.out.println(response.getMap());\n"
+    },
+    "get_payment_note": {
+      "function": "payments().getPaymentNote",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentNoteRead;\n\nApiResponse<PaymentNoteRead> response = client.payments().getPaymentNote(\n        \"PAY-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+    },
+    "delete_payment_note": {
+      "function": "payments().deletePaymentNote",
+      "code": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\n\nApiResponse<Dto> response = client.payments().deletePaymentNote(\"PAY-0001\", \"3f2b8c1d-9e4a-4f6b-8c2d-1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_payment_note_file": {
+      "function": "payments().getPaymentNoteFile",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentNoteFile;\n\nApiResponse<PaymentNoteFile> response = client.payments().getPaymentNoteFile(\n        \"PAY-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n        \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\nSystem.out.println(response.getMap());\n"
+    },
+    "create_payment": {
+      "function": "payments().createPayment",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentRead;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse<PaymentRead> response = client.payments().createPayment(\n        Map.of(\n                \"payment\", Map.of(\n                        \"date\", \"2026-10-01\",\n                        \"payment_note\", \"October invoice\",\n                        \"payment_applied\", List.of(\n                                Map.of(\n                                        \"processor\", \"Cash\",\n                                        \"amount\", \"10.00\",\n                                        \"reference\", \"RCPT-1001\")),\n                        \"invoices\", List.of(Map.of(\"id\", \"INV-0001\", \"applied\", \"10.00\")))));\nSystem.out.println(response.getMap());\n"
+    },
+    "get_invoice_payment": {
+      "function": "payments().getInvoicePayment",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentRead;\n\nApiResponse<PaymentRead> response = client.payments().getInvoicePayment(\"INV-0001\", \"PAY-0001\");\nSystem.out.println(response.getMap());\n"
+    },
+    "get_payment_note_files": {
+      "function": "payments().getPaymentNoteFiles",
+      "code": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.resources.accounts.accounts_dto.AccountsDto.NoteFileList;\n\nApiResponse<NoteFileList> response = client.payments().getPaymentNoteFiles(\n        \"PAY-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+    }
+  }
+}

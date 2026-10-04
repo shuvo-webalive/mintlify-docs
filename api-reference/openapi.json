@@ -62,6 +62,9 @@
     },
     {
       "name": "Pro-forma invoices"
+    },
+    {
+      "name": "Payments"
     }
   ],
   "paths": {
@@ -20728,6 +20731,1470 @@
           }
         }
       }
+    },
+    "/payments": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "List payments",
+        "operationId": "payments_get_payments",
+        "description": "Lists every payment, one page at a time, under `data`. Each record carries its `status`, `reconcile_status`, the money received under `payment_applied`, any credit or gift certificate spent, and the `invoices` it paid. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of payments, under `data`, with `pagination`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/payments?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.payments.get_payments({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.payments.getPayments({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->payments->getPayments(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PaymentList> response = client.payments().getPayments(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Payments.GetPaymentsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.payments.getPayments(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Payments().GetPayments(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Create a payment",
+        "operationId": "payments_create_payment",
+        "description": "Records a payment from the fields under `payment`. Only the keys shown are accepted; any other returns `400`. A `payment_applied` entry whose processor holds a card token charges the card.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new payment, under `payment`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentReadResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body has a key the payment does not accept.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/payments\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"payment\": {\n      \"date\": \"2026-10-01\",\n      \"payment_note\": \"October invoice\",\n      \"payment_applied\": [\n        {\n          \"processor\": \"Cash\",\n          \"amount\": \"10.00\",\n          \"reference\": \"RCPT-1001\"\n        }\n      ],\n      \"invoices\": [\n        {\n          \"id\": \"INV-0001\",\n          \"applied\": \"10.00\"\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.payments.create_payment(\n    {\n        \"payment\": {\n            \"date\": \"2026-10-01\",\n            \"payment_note\": \"October invoice\",\n            \"payment_applied\": [\n                {\"processor\": \"Cash\", \"amount\": \"10.00\", \"reference\": \"RCPT-1001\"}\n            ],\n            \"invoices\": [{\"id\": \"INV-0001\", \"applied\": \"10.00\"}],\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.payments.createPayment({\n    payment: {\n        date: '2026-10-01',\n        payment_note: 'October invoice',\n        payment_applied: [{processor: 'Cash', amount: '10.00', reference: 'RCPT-1001'}],\n        invoices: [{id: 'INV-0001', applied: '10.00'}],\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->payments->createPayment([\n    'payment' => [\n        'date' => '2026-10-01',\n        'payment_note' => 'October invoice',\n        'payment_applied' => [\n            ['processor' => 'Cash', 'amount' => '10.00', 'reference' => 'RCPT-1001'],\n        ],\n        'invoices' => [['id' => 'INV-0001', 'applied' => '10.00']],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentRead;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PaymentRead> response = client.payments().createPayment(\n        Map.of(\n                \"payment\", Map.of(\n                        \"date\", \"2026-10-01\",\n                        \"payment_note\", \"October invoice\",\n                        \"payment_applied\", List.of(\n                                Map.of(\n                                        \"processor\", \"Cash\",\n                                        \"amount\", \"10.00\",\n                                        \"reference\", \"RCPT-1001\")),\n                        \"invoices\", List.of(Map.of(\"id\", \"INV-0001\", \"applied\", \"10.00\")))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Payments.CreatePaymentAsync(new Dictionary<string, object?>\n{\n    [\"payment\"] = new Dictionary<string, object?>\n    {\n        [\"date\"] = \"2026-10-01\",\n        [\"payment_note\"] = \"October invoice\",\n        [\"payment_applied\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"processor\"] = \"Cash\",\n                [\"amount\"] = \"10.00\",\n                [\"reference\"] = \"RCPT-1001\",\n            },\n        },\n        [\"invoices\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"id\"] = \"INV-0001\",\n                [\"applied\"] = \"10.00\",\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.payments.createPayment({\n  'payment': {\n    'date': '2026-10-01',\n    'payment_note': 'October invoice',\n    'payment_applied': [\n      {'processor': 'Cash', 'amount': '10.00', 'reference': 'RCPT-1001'},\n    ],\n    'invoices': [\n      {'id': 'INV-0001', 'applied': '10.00'},\n    ],\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Payments().CreatePayment(context.Background(), map[string]any{\n\t\"payment\": map[string]any{\n\t\t\"date\":         \"2026-10-01\",\n\t\t\"payment_note\": \"October invoice\",\n\t\t\"payment_applied\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"processor\": \"Cash\",\n\t\t\t\t\"amount\":    \"10.00\",\n\t\t\t\t\"reference\": \"RCPT-1001\",\n\t\t\t},\n\t\t},\n\t\t\"invoices\": []any{\n\t\t\tmap[string]any{\"id\": \"INV-0001\", \"applied\": \"10.00\"},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "payment": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "date": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "origin": {
+                        "type": "string"
+                      },
+                      "payment_note": {
+                        "type": "string"
+                      },
+                      "note": {
+                        "type": "string"
+                      },
+                      "invoices": {
+                        "type": "array",
+                        "description": "The invoices the payment is for.",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "description": "The invoice's `id`."
+                            },
+                            "applied": {
+                              "type": "string",
+                              "description": "The amount applied to this invoice."
+                            }
+                          }
+                        }
+                      },
+                      "payment_applied": {
+                        "type": "array",
+                        "description": "The money received, by processor.",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "processor": {
+                              "type": "string",
+                              "description": "The payment processor, such as `Cash`."
+                            },
+                            "amount": {
+                              "type": "string"
+                            },
+                            "reference": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "credit_applied": {
+                        "type": "array",
+                        "description": "Credit notes spent on the payment.",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "description": "The credit note's `code`."
+                            },
+                            "amount": {
+                              "type": "number"
+                            }
+                          }
+                        }
+                      },
+                      "gift_certificates": {
+                        "type": "array",
+                        "items": {
+                          "type": "object"
+                        }
+                      },
+                      "custom_attributes": {
+                        "type": "array",
+                        "items": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "payment"
+                ]
+              },
+              "example": {
+                "payment": {
+                  "date": "2026-10-01",
+                  "payment_note": "October invoice",
+                  "payment_applied": [
+                    {
+                      "processor": "Cash",
+                      "amount": "10.00",
+                      "reference": "RCPT-1001"
+                    }
+                  ],
+                  "invoices": [
+                    {
+                      "id": "INV-0001",
+                      "applied": "10.00"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payments/notes": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "List notes across all payments",
+        "operationId": "payments_get_payments_notes",
+        "description": "Lists the notes on all payments together, one page at a time, under `data`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of payment notes, under `data`, with `pagination`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentsNoteList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/payments/notes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.payments.get_payments_notes({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.payments.getPaymentsNotes({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->payments->getPaymentsNotes(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentsNoteList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PaymentsNoteList> response = client.payments().getPaymentsNotes(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Payments.GetPaymentsNotesAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.payments.getPaymentsNotes(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Payments().GetPaymentsNotes(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/payments/{payment_id}": {
+      "delete": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Delete a payment",
+        "operationId": "payments_delete_payment",
+        "description": "Deletes the payment. The invoice it paid goes back to `payment_status` `unpaid`, and a read of the payment returns `404`.",
+        "parameters": [
+          {
+            "name": "payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The payment is deleted. The response has no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/payments/PAY-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.payments.delete_payment(\"PAY-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.payments.deletePayment('PAY-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->payments->deletePayment('PAY-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.payments().deletePayment(\"PAY-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Payments.DeletePaymentAsync(\"PAY-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.payments.deletePayment('PAY-0001');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Payments().DeletePayment(context.Background(), \"PAY-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Update a payment",
+        "operationId": "payments_update_payment",
+        "description": "Updates the payment from the fields under `payment`. A `note` sent here is stored as the payment's `payment_note`.",
+        "parameters": [
+          {
+            "name": "payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated payment, under `payment`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentReadResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/payments/PAY-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"payment\": {\n      \"note\": \"Paid at the front counter.\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.payments.update_payment(\n    \"PAY-0001\", {\"payment\": {\"note\": \"Paid at the front counter.\"}}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.payments.updatePayment('PAY-0001', {payment: {note: 'Paid at the front counter.'}});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->payments->updatePayment('PAY-0001', [\n    'payment' => ['note' => 'Paid at the front counter.'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentRead;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PaymentRead> response = client.payments().updatePayment(\n        \"PAY-0001\",\n        Map.of(\"payment\", Map.of(\"note\", \"Paid at the front counter.\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Payments.UpdatePaymentAsync(\n    \"PAY-0001\",\n    new Dictionary<string, object?>\n    {\n        [\"payment\"] = new Dictionary<string, object?>\n        {\n            [\"note\"] = \"Paid at the front counter.\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.payments.updatePayment('PAY-0001', {\n  'payment': {'note': 'Paid at the front counter.'},\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Payments().UpdatePayment(context.Background(), \"PAY-0001\", map[string]any{\n\t\"payment\": map[string]any{\"note\": \"Paid at the front counter.\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "payment": {
+                    "type": "object",
+                    "properties": {
+                      "note": {
+                        "type": "string",
+                        "description": "Stored as the payment's `payment_note`."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "payment"
+                ]
+              },
+              "example": {
+                "payment": {
+                  "note": "Paid at the front counter."
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Retrieve a payment",
+        "operationId": "payments_get_payment",
+        "description": "Fetches a single payment with its account, the money received, any credit or gift certificate spent, the invoices it paid and its custom attributes.",
+        "parameters": [
+          {
+            "name": "payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The payment, under `payment`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentReadResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No payment has that `id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/payments/PAY-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.payments.get_payment(\"PAY-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.payments.getPayment('PAY-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->payments->getPayment('PAY-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PaymentRead> response = client.payments().getPayment(\"PAY-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Payments.GetPaymentAsync(\"PAY-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.payments.getPayment('PAY-0001');\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Payments().GetPayment(context.Background(), \"PAY-0001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/invoices/{invoice_id}/payments": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "List an invoice's payments",
+        "operationId": "payments_get_invoice_payments",
+        "description": "Lists the payments against the invoice, one page at a time, under `data`. Each record has the same fields as an entry of the payment listing.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of the invoice's payments, under `data`, with `pagination`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/payments?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.payments.get_invoice_payments(\"INV-0001\", {\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.payments.getInvoicePayments('INV-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->payments->getInvoicePayments('INV-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PaymentList> response = client.payments().getInvoicePayments(\n        \"INV-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Payments.GetInvoicePaymentsAsync(\n    \"INV-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.payments.getInvoicePayments(\n  'INV-0001',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Payments().GetInvoicePayments(context.Background(), \"INV-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/orders/{order_id}/payments": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "List an order's payments",
+        "operationId": "payments_get_order_payments",
+        "description": "Lists the payments against the order's invoices, one page at a time, under `data`.",
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "description": "The order's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of the order's payments, under `data`, with `pagination`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/orders/ORD-0001/payments?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.payments.get_order_payments(\"ORD-0001\", {\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.payments.getOrderPayments('ORD-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->payments->getOrderPayments('ORD-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PaymentList> response = client.payments().getOrderPayments(\n        \"ORD-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Payments.GetOrderPaymentsAsync(\n    \"ORD-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.payments.getOrderPayments(\n  'ORD-0001',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Payments().GetOrderPayments(context.Background(), \"ORD-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/payments/{payment_id}/notes": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "List a payment's notes",
+        "operationId": "payments_get_payment_notes",
+        "description": "Lists the payment's notes, one page at a time, under `data`. Each note carries its `content`, its `attachments` and who created it.",
+        "parameters": [
+          {
+            "name": "payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` value from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by. Put `-` in front for descending order, such as `-created_on`.",
+            "schema": {
+              "type": "string",
+              "example": "-created_on"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of notes, under `data`, with `pagination`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentNoteList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/payments/PAY-0001/notes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.payments.get_payment_notes(\"PAY-0001\", {\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.payments.getPaymentNotes('PAY-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->payments->getPaymentNotes('PAY-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentNoteList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PaymentNoteList> response = client.payments().getPaymentNotes(\n        \"PAY-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Payments.GetPaymentNotesAsync(\n    \"PAY-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.payments.getPaymentNotes(\n  'PAY-0001',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Payments().GetPaymentNotes(context.Background(), \"PAY-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Create a payment note",
+        "operationId": "payments_create_payment_note",
+        "description": "Sends a multipart form: the text as the `note` field and any attachment as `file`. The text can contain HTML such as `<p>` tags. The new note comes back with its `id` and the `uuid` of each attachment.",
+        "parameters": [
+          {
+            "name": "payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The new note, under `note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentNotesResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/payments/PAY-0001/notes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -F \"file=@receipt.pdf\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.payments.create_payment_note(\n    \"PAY-0001\",\n    \"Customer asked for a copy by post.\",\n    files={\"file\": open(\"receipt.pdf\", \"rb\")},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {readFileSync} from 'node:fs';\nimport {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.payments.createPaymentNote('PAY-0001', 'Customer asked for a copy by post.', {\n    files: {file: ['receipt.pdf', readFileSync('receipt.pdf')]},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->payments->createPaymentNote('PAY-0001', 'Customer asked for a copy by post.', [\n    'file' => ['receipt.pdf', fopen('receipt.pdf', 'r')],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.client.RequestOptions;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentNotes;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PaymentNotes> response = client.payments().createPaymentNote(\n        \"PAY-0001\",\n        \"Customer asked for a copy by post.\",\n        Map.of(\"file\", Path.of(\"receipt.pdf\")),\n        RequestOptions.none());\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Payments.CreatePaymentNoteAsync(\n    \"PAY-0001\",\n    \"Customer asked for a copy by post.\",\n    new Dictionary<string, object?> { [\"file\"] = new object?[] { \"receipt.pdf\", File.ReadAllBytes(\"receipt.pdf\") } });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'dart:io';\n\nimport 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.payments.createPaymentNote(\n  'PAY-0001',\n  'Customer asked for a copy by post.',\n  files: {\n    'file': ['receipt.pdf', File('receipt.pdf').readAsBytesSync()],\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nfile, err := os.ReadFile(\"receipt.pdf\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresponse, err := client.Payments().CreatePaymentNote(context.Background(), \"PAY-0001\", \"Customer asked for a copy by post.\", map[string]any{\"file\": []any{\"receipt.pdf\", file}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "note"
+                ],
+                "properties": {
+                  "note": {
+                    "type": "string",
+                    "description": "The note text. HTML such as `<p>` tags is kept."
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "An optional file to attach to the note."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payments/{payment_id}/notes/{payment_note_id}": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Retrieve a payment note",
+        "operationId": "payments_get_payment_note",
+        "description": "Fetches a single note by the `id` the notes listing gives it.",
+        "parameters": [
+          {
+            "name": "payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "payment_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, as the payment's notes listing returns it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note, under `note`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentNotesResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/payments/PAY-0001/notes/note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.payments.get_payment_note(\n    \"PAY-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.payments.getPaymentNote('PAY-0001', 'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->payments->getPaymentNote('PAY-0001', 'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentNoteRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PaymentNoteRead> response = client.payments().getPaymentNote(\n        \"PAY-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Payments.GetPaymentNoteAsync(\n    \"PAY-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.payments.getPaymentNote(\n  'PAY-0001',\n  'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Payments().GetPaymentNote(context.Background(), \"PAY-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Delete a payment note",
+        "operationId": "payments_delete_payment_note",
+        "description": "Deletes the note. Name it by its uuid in dashed form: the hex part of the note's `id`, after the prefix, with the dashes put back. Afterwards the note and its files return `404`.",
+        "parameters": [
+          {
+            "name": "payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "payment_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's uuid in dashed form, such as `3f2b8c1d-9e4a-4f6b-8c2d-1e0f9a8b7c6d` for the note `note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The note is deleted. The response has no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/payments/PAY-0001/notes/3f2b8c1d-9e4a-4f6b-8c2d-1e0f9a8b7c6d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.payments.delete_payment_note(\n    \"PAY-0001\", \"3f2b8c1d-9e4a-4f6b-8c2d-1e0f9a8b7c6d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.payments.deletePaymentNote('PAY-0001', '3f2b8c1d-9e4a-4f6b-8c2d-1e0f9a8b7c6d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->payments->deletePaymentNote(\n    'PAY-0001',\n    '3f2b8c1d-9e4a-4f6b-8c2d-1e0f9a8b7c6d',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.payments().deletePaymentNote(\"PAY-0001\", \"3f2b8c1d-9e4a-4f6b-8c2d-1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Payments.DeletePaymentNoteAsync(\n    \"PAY-0001\",\n    \"3f2b8c1d-9e4a-4f6b-8c2d-1e0f9a8b7c6d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.payments.deletePaymentNote(\n  'PAY-0001',\n  '3f2b8c1d-9e4a-4f6b-8c2d-1e0f9a8b7c6d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Payments().DeletePaymentNote(context.Background(), \"PAY-0001\", \"3f2b8c1d-9e4a-4f6b-8c2d-1e0f9a8b7c6d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/payments/{payment_id}/notes/{payment_note_id}/files/{payment_file_id}": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Retrieve a payment note file",
+        "operationId": "payments_get_payment_note_file",
+        "description": "Fetches a JSON description of the attachment under `file`: its `uuid`, `filename`, `content_type`, `size` and `href`.",
+        "parameters": [
+          {
+            "name": "payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "payment_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, as the payment's notes listing returns it.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "payment_file_id",
+            "in": "path",
+            "required": true,
+            "description": "The attachment's `uuid`, from the note's `attachments`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file's details, under `file`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentNoteFileResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/payments/PAY-0001/notes/note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d/files/6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.payments.get_payment_note_file(\n    \"PAY-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n    \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\",\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.payments.getPaymentNoteFile(\n    'PAY-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n    '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->payments->getPaymentNoteFile(\n    'PAY-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n    '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentNoteFile;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PaymentNoteFile> response = client.payments().getPaymentNoteFile(\n        \"PAY-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n        \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Payments.GetPaymentNoteFileAsync(\n    \"PAY-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\",\n    \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.payments.getPaymentNoteFile(\n  'PAY-0001',\n  'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n  '6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Payments().GetPaymentNoteFile(context.Background(), \"PAY-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", \"6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/invoices/{invoice_id}/payments/{payment_id}": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Retrieve a payment through an invoice",
+        "operationId": "payments_get_invoice_payment",
+        "description": "Fetches a payment under `payment`. The server checks only that the invoice exists, not that the payment belongs to it. Each entry of the payment's `invoices` names its invoice by the invoice's `inv_` uuid, not by its `id`.",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "description": "The invoice's `id`, such as `INV-0001`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The payment, under `payment`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentReadResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/invoices/INV-0001/payments/PAY-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.payments.get_invoice_payment(\"INV-0001\", \"PAY-0001\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.payments.getInvoicePayment('INV-0001', 'PAY-0001');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->payments->getInvoicePayment('INV-0001', 'PAY-0001');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.payments.payments_dto.PaymentsDto.PaymentRead;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PaymentRead> response = client.payments().getInvoicePayment(\"INV-0001\", \"PAY-0001\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Payments.GetInvoicePaymentAsync(\"INV-0001\", \"PAY-0001\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.payments.getInvoicePayment(\n  'INV-0001',\n  'PAY-0001',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Payments().GetInvoicePayment(context.Background(), \"INV-0001\", \"PAY-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/payments/{payment_id}/notes/{payment_note_id}/files": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "List a payment note's files",
+        "operationId": "payments_get_payment_note_files",
+        "description": "Lists the note's attachments under `data`, each with its `uuid`, `filename`, `content_type`, `size` and `href`.",
+        "parameters": [
+          {
+            "name": "payment_id",
+            "in": "path",
+            "required": true,
+            "description": "The payment's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "payment_note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, as the payment's notes listing returns it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The note's files, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentNoteFileList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/payments/PAY-0001/notes/note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d/files\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.payments.get_payment_note_files(\n    \"PAY-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.payments.getPaymentNoteFiles('PAY-0001', 'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->payments->getPaymentNoteFiles(\n    'PAY-0001',\n    'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.accounts.accounts_dto.AccountsDto.NoteFileList;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<NoteFileList> response = client.payments().getPaymentNoteFiles(\n        \"PAY-0001\",\n        \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Payments.GetPaymentNoteFilesAsync(\n    \"PAY-0001\",\n    \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.payments.getPaymentNoteFiles(\n  'PAY-0001',\n  'note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Payments().GetPaymentNoteFiles(context.Background(), \"PAY-0001\", \"note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -31578,6 +33045,868 @@
         "properties": {
           "credit_note_application": {
             "$ref": "#/components/schemas/InvoiceCreditNoteApplicationRead"
+          }
+        }
+      },
+      "PaymentList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Payment"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaymentPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "Payment": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PaymentAccount"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PaymentCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "credit_applied": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentCreditApplied"
+            }
+          },
+          "gift_certificate_applied": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentGiftCertificateApplied"
+            }
+          },
+          "id": {
+            "type": "string"
+          },
+          "invoices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentInvoice"
+            }
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PaymentLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "payment_applied": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentPaymentApplied"
+            }
+          },
+          "payment_note": {
+            "type": "string"
+          },
+          "reconcile_status": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PaymentAccount": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentCreditApplied": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentGiftCertificateApplied": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentInvoice": {
+        "type": "object",
+        "properties": {
+          "applied": {
+            "type": "string"
+          },
+          "due_date": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "outstanding": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentPaymentApplied": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "gateway_response": {},
+          "method": {
+            "type": "string"
+          },
+          "processor": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust this over `next_cursor`, which can be stale on the last page."
+          },
+          "next_cursor": {
+            "type": "string"
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/PaymentPaginationLinks"
+          },
+          "records": {
+            "type": "integer",
+            "description": "The total number of matching records, not the length of this page."
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "next_page": {
+            "type": "string",
+            "description": "On the last page this is the string `NULL`, not JSON null."
+          },
+          "previous_page": {
+            "type": "string"
+          },
+          "has_next": {
+            "type": "boolean"
+          },
+          "has_prev": {
+            "type": "boolean"
+          },
+          "per_page": {
+            "type": "integer"
+          }
+        }
+      },
+      "PaymentPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentsNoteList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentsNote"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaymentPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentsNote": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentsNoteAttachment"
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PaymentsNoteCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "group": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "user": {},
+          "version": {
+            "type": "integer"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentsNoteWatcher"
+            }
+          }
+        }
+      },
+      "PaymentsNoteAttachment": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentsNoteCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentsNoteWatcher": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentRead": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PaymentReadAccount"
+          },
+          "activity_logs": {
+            "type": "array",
+            "items": {}
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PaymentReadCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "credit_applied": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentReadCreditApplied"
+            }
+          },
+          "custom_attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentReadCustomAttribute"
+            }
+          },
+          "gift_certificate_applied": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentReadGiftCertificateApplied"
+            }
+          },
+          "id": {
+            "type": "string"
+          },
+          "invoices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentReadInvoice"
+            }
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/PaymentReadLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "payment_applied": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentReadPaymentApplied"
+            }
+          },
+          "payment_note": {
+            "type": "string"
+          },
+          "reconcile_status": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "PaymentReadAccount": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentReadCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentReadCreditApplied": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentReadCustomAttribute": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentReadGiftCertificateApplied": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentReadInvoice": {
+        "type": "object",
+        "properties": {
+          "applied": {
+            "type": "string"
+          },
+          "due_date": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string"
+          },
+          "outstanding": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentReadLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentReadPaymentApplied": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "gateway_response": {},
+          "method": {
+            "type": "string"
+          },
+          "processor": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentReadResponse": {
+        "type": "object",
+        "properties": {
+          "payment": {
+            "$ref": "#/components/schemas/PaymentRead"
+          }
+        }
+      },
+      "PaymentNoteList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentNote"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaymentPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentNote": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentNoteAttachment"
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PaymentNoteCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "group": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "payment": {
+            "$ref": "#/components/schemas/PaymentNoteDetail"
+          },
+          "user": {},
+          "version": {
+            "type": "integer"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentNoteWatcher"
+            }
+          }
+        }
+      },
+      "PaymentNoteAttachment": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentNoteCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentNoteDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentNoteWatcher": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentNotes": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentNotesAttachment"
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/PaymentNotesCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "group": {},
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {},
+          "last_updated_on": {},
+          "object": {
+            "type": "string"
+          },
+          "payment": {
+            "$ref": "#/components/schemas/PaymentNotesDetail"
+          },
+          "user": {},
+          "version": {
+            "type": "integer"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentNotesWatcher"
+            }
+          }
+        }
+      },
+      "PaymentNotesAttachment": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentNotesCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentNotesDetail": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentNotesWatcher": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentNotesResponse": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "$ref": "#/components/schemas/PaymentNotes"
+          }
+        }
+      },
+      "PaymentNoteFile": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentNoteFileResponse": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "$ref": "#/components/schemas/PaymentNoteFile"
+          }
+        }
+      },
+      "PaymentNoteFileList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentNoteFileEntry"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaymentPagination"
+          }
+        }
+      },
+      "PaymentNoteFileEntry": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "content_type": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "href": {
+            "type": "string"
           }
         }
       },
