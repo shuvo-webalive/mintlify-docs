@@ -1,0 +1,301 @@
+{
+  "family": "purchase_express",
+  "tag": "Purchase express",
+  "slug": "purchase-express",
+  "icon": "bolt",
+  "base": "/purchase_express",
+  "overview_description": "Create a purchase order, with its purchase invoice and payment if you nest them, in a single call.",
+  "intro": "Purchase express creates a purchase order for a supplier in one call, and its purchase invoice and payment too when the body nests them. There is 1 endpoint, and all seven SDKs call it.",
+  "warning": null,
+  "notes": [
+    "**The body is wrapped in `account`.** The supplier goes in `account.id` and the order in `account.purchase_order`.",
+    "**Without a nested purchase invoice, nothing is billed or paid.** Only the purchase order is created.",
+    "**The new purchase order comes back under `purchase_express`.** Read or manage it afterwards through the purchase order endpoints."
+  ],
+  "endpoints": [
+    {
+      "key": "create_purchase_express",
+      "method": "POST",
+      "path": "/purchase_express",
+      "slug": "create-a-purchase-order-in-one-call",
+      "title": "Create a purchase order in one call",
+      "summary": "Creates a purchase order, and optionally its purchase invoice and payment, and returns the order under `purchase_express`.",
+      "description": "Creates a purchase order for a supplier in one call, with the body under `account.purchase_order`. If the body also nests a purchase invoice and payment, they are created in the same call; without them, nothing is billed or paid. The new purchase order comes back under `purchase_express`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "account": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "The supplier account's `id`."
+                },
+                "purchase_order": {
+                  "type": "object",
+                  "properties": {
+                    "lines": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "item_id": {
+                            "type": "string"
+                          },
+                          "item_quantity": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "description": "The purchase order to create, with its lines."
+                }
+              }
+            }
+          },
+          "required": [
+            "account"
+          ]
+        },
+        "example": {
+          "account": {
+            "id": "W13ZGY",
+            "purchase_order": {
+              "lines": [
+                {
+                  "item_id": "ITEM-0001",
+                  "item_quantity": 1
+                }
+              ]
+            }
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new purchase order, under `purchase_express`.",
+          "schema": {
+            "$ref": "#/components/schemas/PurchaseExpressResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "account": {
+            "id": "W13ZGY",
+            "purchase_order": {
+              "lines": [
+                {
+                  "item_id": "ITEM-0001",
+                  "item_quantity": 1
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "PurchaseExpress": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/components/schemas/PurchaseExpressAccount"
+        },
+        "activity_logs": {
+          "type": "array",
+          "items": {}
+        },
+        "bill_total": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/components/schemas/PurchaseExpressCreatedBy"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/PurchaseExpressCurrency"
+        },
+        "custom_attributes": {
+          "type": "array",
+          "items": {}
+        },
+        "custom_form": {
+          "$ref": "#/components/schemas/PurchaseExpressCustomForm"
+        },
+        "due_date": {
+          "type": "string"
+        },
+        "due_total": {
+          "type": "string"
+        },
+        "expected_completion_date": {},
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "is_price_tax_inclusive": {},
+        "issue_date": {
+          "type": "string"
+        },
+        "kpis": {
+          "$ref": "#/components/schemas/PurchaseExpressKpis"
+        },
+        "last_updated_by": {},
+        "last_updated_on": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "operational_status": {
+          "type": "string"
+        },
+        "origin": {},
+        "paid_amount": {
+          "type": "string"
+        },
+        "purchase_order_note": {},
+        "sale_order": {},
+        "status": {
+          "type": "string"
+        },
+        "subtotal": {
+          "type": "string"
+        },
+        "supplier_invoice_id": {},
+        "tax_total": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "warehouse": {}
+      }
+    },
+    "PurchaseExpressAccount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseExpressCreatedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseExpressCurrency": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseExpressCustomForm": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseExpressKpis": {
+      "type": "object",
+      "properties": {
+        "estimated_total": {
+          "type": "string"
+        },
+        "issue_date": {},
+        "last_cancelled_on": {},
+        "last_changed_on": {},
+        "last_deleted_on": {},
+        "last_invoice_issue_date": {},
+        "last_invoice_total": {
+          "type": "string"
+        },
+        "last_reactivated_on": {},
+        "object": {
+          "type": "string"
+        },
+        "total_expense": {
+          "type": "string"
+        },
+        "total_outstanding": {
+          "type": "string"
+        },
+        "total_overdue": {
+          "type": "string"
+        },
+        "total_purchase_invoice": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchaseExpressResponse": {
+      "type": "object",
+      "properties": {
+        "purchase_express": {
+          "$ref": "#/components/schemas/PurchaseExpress"
+        }
+      }
+    }
+  }
+}
