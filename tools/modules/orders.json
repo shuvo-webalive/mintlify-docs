@@ -5,13 +5,13 @@
   "icon": "cart-shopping",
   "base": "/orders",
   "overview_description": "Create, read, change, cancel and delete Exsited orders, quotes and contracts, with their lines, notes and billing.",
-  "intro": "An order is what an account buys: its lines, billing preferences, invoices and payments. This area creates and reads orders, quotes and contracts, changes their lines and billing, moves them through their states, and manages their notes and files. It has 60 endpoints, and all seven SDKs call every one.",
-  "warning": "**Only a path that ends in `preview` is a dry run.** Every other state change, such as `upgrade`, `cancel` or `discard_draft`, changes the order at once, and `discard_draft` removes the draft so the order can no longer be read.",
+  "intro": "An order is what an account buys: its lines, billing preferences, invoices and payments. This area creates and reads orders, quotes and contracts, changes their lines and billing, moves them through their states, and manages their notes and files. It has 60 endpoints, and every SDK supports all of them.",
+  "warning": "**Only the preview endpoints are dry runs.** Every other state change, such as `upgrade`, `cancel` or `discard_draft`, takes effect at once. Discarding a draft removes it, so the order can no longer be read.",
   "notes": [
-    "**Most order bodies sit under `order`.** The exceptions are `upgrade`, `downgrade`, `contract_adjustment` and their previews, which take `effective_date` and `lines` at the top level, and the dormant invoice call, which takes `activate`.",
+    "**Most order bodies go under `order`.** The exceptions are `upgrade`, `downgrade`, `contract_adjustment` and their previews (`effective_date` and `lines` at the top level), the dormant invoice call (`activate`), the express call (`account`), and the note calls, which take a multipart form.",
     "**A contract needs a recurring or metered item on a line.** Set `allow_contract` to `true` and send `contract_properties` when you create the order.",
     "**Lines are named two ways.** Line paths take the line's `id` as `line_uuid`; a change body names a line by its `charge_item_uuid`, sent as `uuid`.",
-    "**Previewing an order still creates its account.** `POST /orders/preview` creates no order, but an `account` object in the body creates that account.",
+    "**Previewing an order can still create an account.** `POST /orders/preview` creates no order, but a body that names a new account creates that account.",
     "**Payments and fulfillments are not checked against the order.** `GET /orders/{order_id}/payments/{payment_id}` and `.../item_fulfillments/{fulfillment_id}` read the record by its own `id`.",
     "**Listings page by cursor.** Send `limit`, then pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`."
   ],
@@ -23,7 +23,7 @@
       "slug": "list-orders",
       "title": "List orders",
       "summary": "Lists orders, one page at a time.",
-      "description": "The records are under `data`, and `pagination` holds the cursor for the next page. Each record holds the order's header fields; read one order for its lines and totals. Other fields filter as `filter_<field>`.",
+      "description": "The records are under `data`, and `pagination` holds the cursor for the next page. Each record holds the order's header fields; read one order for its lines and totals. To filter, add `filter_<field>=<value>`.",
       "parameters": [
         {
           "name": "limit",
@@ -398,7 +398,7 @@
       "slug": "activate-an-order",
       "title": "Activate an order",
       "summary": "Activates an order from the date you give.",
-      "description": "Send `effective_date` under `order`. After the call the order's `status` is `active`.",
+      "description": "Send `effective_date` under `order`. After the call the order's `status` is `active`. The response body is not documented yet.",
       "parameters": [
         {
           "name": "order_id",
@@ -661,7 +661,7 @@
       "slug": "replace-an-orders-billing-preferences",
       "title": "Replace an order's billing preferences",
       "summary": "Sets an order's billing preferences with `PUT` and returns the order under `order`.",
-      "description": "Send the preferences under `order.billing_preferences`, as for the `PATCH` call. Read the preferences again to see the stored values.",
+      "description": "Send the preferences under `order.billing_preferences`, as for the `PATCH` call. Read the preferences again to see the stored values. Whether fields you do not send are cleared is not documented.",
       "parameters": [
         {
           "name": "order_id",
@@ -1034,8 +1034,8 @@
       "key": "get_order_custom_objects_instances",
       "method": "GET",
       "path": "/orders/{order_id}/custom_objects_instances",
-      "slug": "list-an-orders-custom-object-instances",
-      "title": "List an order's custom object instances",
+      "slug": "list-an-orders-custom-objects-instances-path",
+      "title": "List an order's custom objects (instances path)",
       "summary": "Lists an order's custom objects through the `custom_objects_instances` path, one page at a time.",
       "description": "This path returns the same listing as `GET /orders/{order_id}/custom_objects`. The records are under `data`, and `pagination` holds the cursor for the next page.",
       "parameters": [
@@ -1189,10 +1189,12 @@
               "type": "object",
               "properties": {
                 "trial_start_date": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "As `YYYY-MM-DD`."
                 },
                 "trial_end_date": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "As `YYYY-MM-DD`."
                 }
               }
             }
@@ -1203,8 +1205,8 @@
         },
         "example": {
           "order": {
-            "trial_start_date": "2026-10-04",
-            "trial_end_date": "2026-10-11"
+            "trial_start_date": "2026-10-07",
+            "trial_end_date": "2026-10-14"
           }
         }
       },
@@ -1223,8 +1225,8 @@
         },
         "body": {
           "order": {
-            "trial_start_date": "2026-10-04",
-            "trial_end_date": "2026-10-11"
+            "trial_start_date": "2026-10-07",
+            "trial_end_date": "2026-10-14"
           }
         }
       }
@@ -1699,8 +1701,8 @@
       "key": "create_order_relinquish",
       "method": "POST",
       "path": "/orders/{order_id}/relinquish",
-      "slug": "relinquish-a-pre-order",
-      "title": "Relinquish a pre-order",
+      "slug": "relinquish-an-order",
+      "title": "Relinquish an order",
       "summary": "Relinquishes an order from the date you give and returns it under `order`.",
       "description": "Send `effective_date` under `order`. After the call the order's `status` is `relinquished`.",
       "parameters": [
@@ -1915,7 +1917,7 @@
           "description": "The note's `id`, from the create call or the notes listing.",
           "schema": {
             "type": "string",
-            "example": "nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f"
+            "example": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
           }
         }
       ],
@@ -1929,7 +1931,7 @@
       "example_call": {
         "path": {
           "order_id": "ORD-0001",
-          "order_note_id": "nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f"
+          "order_note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
         }
       }
     },
@@ -1959,7 +1961,7 @@
           "description": "The note's `id`, from the create call or the notes listing.",
           "schema": {
             "type": "string",
-            "example": "nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f"
+            "example": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
           }
         }
       ],
@@ -1979,7 +1981,7 @@
       "example_call": {
         "path": {
           "order_id": "ORD-0001",
-          "order_note_id": "nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f"
+          "order_note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
         }
       }
     },
@@ -2009,7 +2011,7 @@
           "description": "The note's `id`, from the create call or the notes listing.",
           "schema": {
             "type": "string",
-            "example": "nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f"
+            "example": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
           }
         }
       ],
@@ -2047,7 +2049,7 @@
       "example_call": {
         "path": {
           "order_id": "ORD-0001",
-          "order_note_id": "nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f"
+          "order_note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
         },
         "note": "<p>Customer called back.</p>",
         "file": "call-notes.txt"
@@ -2200,7 +2202,7 @@
       "slug": "replace-an-order-lines-billing-preferences",
       "title": "Replace an order line's billing preferences",
       "summary": "Sets one line's billing settings with `PUT` and returns the order under `order`.",
-      "description": "Send the settings under `order.line.billing_preferences`, not `item_properties` as the `PATCH` call takes. The line reads them back under `item_properties`.",
+      "description": "Send the settings under `order.line.billing_preferences`, not `item_properties` as the `PATCH` call takes. The line reads them back under `item_properties`. Whether fields you do not send are cleared is not documented.",
       "parameters": [
         {
           "name": "order_id",
@@ -2312,7 +2314,7 @@
           "description": "The note's `id`, from the create call or the notes listing.",
           "schema": {
             "type": "string",
-            "example": "nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f"
+            "example": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
           }
         },
         {
@@ -2358,7 +2360,7 @@
       "example_call": {
         "path": {
           "order_id": "ORD-0001",
-          "order_note_id": "nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f"
+          "order_note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
         },
         "query": {
           "limit": 20
@@ -2391,7 +2393,7 @@
           "description": "The note's `id`, from the create call or the notes listing.",
           "schema": {
             "type": "string",
-            "example": "nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f"
+            "example": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
           }
         },
         {
@@ -2421,7 +2423,7 @@
       "example_call": {
         "path": {
           "order_id": "ORD-0001",
-          "order_note_id": "nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f",
+          "order_note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d",
           "order_file_id": "b7c8d9e0-f1a2-4b3c-8d4e-5f6a7b8c9d0e"
         }
       }
@@ -2487,8 +2489,8 @@
       "path": "/orders/preview",
       "slug": "preview-an-order",
       "title": "Preview an order",
-      "summary": "Prices an order without creating it.",
-      "description": "Send the same body as create order. No order is created, and the response holds only an empty `activity_logs` under `order`. An `account` object in the body still creates that account.",
+      "summary": "Checks an order body without creating the order.",
+      "description": "Send the same body as create order. No order is created, and the response holds only an empty `activity_logs` under `order`. A body that names a new account still creates that account.",
       "parameters": [],
       "body": {
         "schema": {
@@ -2730,8 +2732,8 @@
       "key": "create_order_express",
       "method": "POST",
       "path": "/orders/express",
-      "slug": "create-an-express-order",
-      "title": "Create an express order",
+      "slug": "create-an-order-through-the-express-path",
+      "title": "Create an order through the express path",
       "summary": "Creates an order, and its invoice and payment if the body nests them, in one call.",
       "description": "Send the account's `id` and the order under `account`, as for `POST /express`. Nest an invoice and payment in the body to create them in the same call.",
       "parameters": [],
@@ -2862,7 +2864,8 @@
             }
           }
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work as described.** `POST /orders/express` currently behaves as [Create an order](/api-reference/orders/create-an-order). To create an order with its invoice in one call, use [Create an order with its invoice](/api-reference/express/create-an-order-with-its-invoice)."
     },
     {
       "key": "accept_order",
@@ -2895,7 +2898,8 @@
         "path": {
           "order_id": "ORD-0001"
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** The response body is not documented yet."
     },
     {
       "key": "activate_order_invoice_from_dormant",
@@ -2904,7 +2908,7 @@
       "slug": "activate-a-dormant-invoice",
       "title": "Activate a dormant invoice",
       "summary": "Activates one of an order's dormant invoices with a due date and an amount.",
-      "description": "Pass the order's `id` and the invoice's uuid, and send `due_date` and `amount` under `activate`.",
+      "description": "Pass the order's `id` and the invoice's `uuid`, and send `due_date` and `amount` under `activate`.",
       "parameters": [
         {
           "name": "order_id",
@@ -2920,7 +2924,7 @@
           "name": "invoice_uuid",
           "in": "path",
           "required": true,
-          "description": "The dormant invoice's uuid.",
+          "description": "The dormant invoice's `uuid`.",
           "schema": {
             "type": "string",
             "example": "4d5e6f70-8192-4a3b-bc4d-5e6f708192a3"
@@ -2972,7 +2976,8 @@
             "amount": "100.00"
           }
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** The response body is not documented yet."
     },
     {
       "key": "preview_order_change",
@@ -3139,7 +3144,8 @@
             "workflow_status": "Approved"
           }
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** The response body is not documented yet."
     },
     {
       "key": "adjust_order_contract",
@@ -3186,7 +3192,7 @@
               }
             }
           },
-          "description": "Not wrapped: the fields sit at the top level of the body."
+          "description": "Not wrapped: the fields go at the top level of the body."
         },
         "example": {
           "effective_date": "2026-10-01",
@@ -3217,7 +3223,8 @@
             }
           ]
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** The response body is not documented yet."
     },
     {
       "key": "preview_order_contract_adjustment",
@@ -3264,7 +3271,7 @@
               }
             }
           },
-          "description": "Not wrapped: the fields sit at the top level of the body."
+          "description": "Not wrapped: the fields go at the top level of the body."
         },
         "example": {
           "effective_date": "2026-10-01",
@@ -3295,7 +3302,8 @@
             }
           ]
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** The response body is not documented yet."
     },
     {
       "key": "downgrade_order",
@@ -3342,14 +3350,14 @@
               }
             }
           },
-          "description": "Not wrapped: the fields sit at the top level of the body."
+          "description": "Not wrapped: the fields go at the top level of the body."
         },
         "example": {
           "effective_date": "2026-10-01",
           "lines": [
             {
               "charge_item_uuid": "0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d",
-              "package_name": "Premium"
+              "package_name": "Basic"
             }
           ]
         }
@@ -3369,11 +3377,12 @@
           "lines": [
             {
               "charge_item_uuid": "0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d",
-              "package_name": "Premium"
+              "package_name": "Basic"
             }
           ]
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** The response body is not documented yet."
     },
     {
       "key": "preview_order_downgrade",
@@ -3420,14 +3429,14 @@
               }
             }
           },
-          "description": "Not wrapped: the fields sit at the top level of the body."
+          "description": "Not wrapped: the fields go at the top level of the body."
         },
         "example": {
           "effective_date": "2026-10-01",
           "lines": [
             {
               "charge_item_uuid": "0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d",
-              "package_name": "Premium"
+              "package_name": "Basic"
             }
           ]
         }
@@ -3447,11 +3456,12 @@
           "lines": [
             {
               "charge_item_uuid": "0c9b8a7d-6e5f-4a3b-9c2d-1e0f9a8b7c6d",
-              "package_name": "Premium"
+              "package_name": "Basic"
             }
           ]
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** The response body is not documented yet."
     },
     {
       "key": "upgrade_order",
@@ -3498,7 +3508,7 @@
               }
             }
           },
-          "description": "Not wrapped: the fields sit at the top level of the body."
+          "description": "Not wrapped: the fields go at the top level of the body."
         },
         "example": {
           "effective_date": "2026-10-01",
@@ -3529,7 +3539,8 @@
             }
           ]
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** The response body is not documented yet."
     },
     {
       "key": "preview_order_upgrade",
@@ -3576,7 +3587,7 @@
               }
             }
           },
-          "description": "Not wrapped: the fields sit at the top level of the body."
+          "description": "Not wrapped: the fields go at the top level of the body."
         },
         "example": {
           "effective_date": "2026-10-01",
@@ -3607,7 +3618,8 @@
             }
           ]
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** The response body is not documented yet."
     },
     {
       "key": "terminate_order_trial",
@@ -3640,7 +3652,8 @@
         "path": {
           "order_id": "ORD-0001"
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** The response body is not documented yet."
     },
     {
       "key": "delete_order_note_file",
@@ -3668,7 +3681,7 @@
           "description": "The note's `id`, from the create call or the notes listing.",
           "schema": {
             "type": "string",
-            "example": "nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f"
+            "example": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d"
           }
         },
         {
@@ -3692,7 +3705,7 @@
       "example_call": {
         "path": {
           "order_id": "ORD-0001",
-          "order_note_id": "nt_2a6c9e1f4b7d4a8c0e3f5b7d9a1c3e5f",
+          "order_note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d",
           "order_file_id": "b7c8d9e0-f1a2-4b3c-8d4e-5f6a7b8c9d0e"
         }
       }
@@ -3797,14 +3810,15 @@
           "custom_object_id": "co_4f1c9a2e7b3d4e6f8a0b1c2d3e4f5a6b",
           "instance_id": "coi_9a8b7c6d5e4f40312a1b2c3d4e5f6a7b"
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** The response body is not documented yet."
     },
     {
       "key": "get_order_custom_objects_instance",
       "method": "GET",
       "path": "/orders/{order_id}/custom_objects_instances/{custom_object_id}",
-      "slug": "retrieve-an-orders-custom-object-by-the-instances-path",
-      "title": "Retrieve an order's custom object by the instances path",
+      "slug": "retrieve-an-orders-custom-object-instances-path",
+      "title": "Retrieve an order's custom object (instances path)",
       "summary": "Returns one custom object with the order's instances of it, under `custom_object`, through the `custom_objects_instances` path.",
       "description": "This path returns the same body as `GET /orders/{order_id}/custom_objects/{custom_object_id}`.",
       "parameters": [
@@ -3850,8 +3864,8 @@
       "key": "get_order_custom_objects_instance_instance",
       "method": "GET",
       "path": "/orders/{order_id}/custom_objects_instances/{custom_object_id}/instances/{instance_id}",
-      "slug": "retrieve-an-orders-custom-object-instance-by-the-instances-path",
-      "title": "Retrieve an order's custom object instance by the instances path",
+      "slug": "retrieve-an-orders-custom-object-instance-instances-path",
+      "title": "Retrieve an order's custom object instance (instances path)",
       "summary": "Returns one instance of a custom object on an order, through the `custom_objects_instances` path.",
       "description": "This path returns the same body as `GET /orders/{order_id}/custom_objects/{custom_object_id}/instances/{instance_id}`.",
       "parameters": [
@@ -3899,7 +3913,8 @@
           "custom_object_id": "co_4f1c9a2e7b3d4e6f8a0b1c2d3e4f5a6b",
           "instance_id": "coi_9a8b7c6d5e4f40312a1b2c3d4e5f6a7b"
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** The response body is not documented yet."
     },
     {
       "key": "get_order_item_fulfillment",
@@ -3924,10 +3939,10 @@
           "name": "fulfillment_id",
           "in": "path",
           "required": true,
-          "description": "The item fulfillment's `id`.",
+          "description": "The item fulfillment's `id`, which starts with `ifm_`.",
           "schema": {
             "type": "string",
-            "example": "IF-0001"
+            "example": "ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9"
           }
         }
       ],
@@ -3944,7 +3959,7 @@
       "example_call": {
         "path": {
           "order_id": "ORD-0001",
-          "fulfillment_id": "IF-0001"
+          "fulfillment_id": "ifm_9a8b7c6d5e4f30211203f4e5d6c7b8a9"
         }
       }
     },
@@ -4044,7 +4059,7 @@
           "name": "order_id",
           "in": "path",
           "required": true,
-          "description": "The quote's order `id`. A quote is an order created with `quote_order: true`.",
+          "description": "The order's `id`. For a quote that has not been converted the call returns `400`.",
           "schema": {
             "type": "string",
             "example": "ORD-0002"
@@ -4115,7 +4130,8 @@
           "order_id": "ORD-0001",
           "shipping_line_id": "8e9f0a1b-2c3d-4e5f-a6b7-c8d9e0f1a2b3"
         }
-      }
+      },
+      "warning": "**This call has not been confirmed to work.** The response body is not documented yet."
     }
   ],
   "schemas": {
