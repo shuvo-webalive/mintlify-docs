@@ -1,0 +1,31 @@
+---
+title: "Pricing periods"
+sidebarTitle: "Overview"
+description: "List, create, read, update, enable, disable and delete pricing periods, each linked to a time period."
+---
+
+A pricing period is a settings record linked to a time period. You can list, create, read, update, enable or disable and delete pricing periods. This area has 5 endpoints, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List pricing periods](/api-reference/pricing-periods/list-pricing-periods) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/pricing_periods` | Returns a page of pricing periods under `data`, with paging details under `pagination`. |
+| [Create a pricing period](/api-reference/pricing-periods/create-a-pricing-period) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/pricing_periods` | Creates a pricing period and returns it under `pricing_period`. |
+| [Retrieve a pricing period](/api-reference/pricing-periods/retrieve-a-pricing-period) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/pricing_periods/{pricing_period_id}` | Returns one pricing period by its `id`, under `pricing_period`. |
+| [Delete a pricing period](/api-reference/pricing-periods/delete-a-pricing-period) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/pricing_periods/{pricing_period_id}` | Deletes a pricing period. The response has no body. |
+| [Update a pricing period](/api-reference/pricing-periods/update-a-pricing-period) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/pricing_periods/{pricing_period_id}` | Changes the fields of a pricing period, or enables or disables it, and returns it under `pricing_period`. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Listings and single reads return `time_period` as null.** This happens whatever the record holds; the create response does carry the time period.
+- **A create links the time period by its `tp_` id.** Send it as `time_period`, with `name` and `display_name`, under `pricing_period`.
+- **`status` takes `active` or `inactive`.** Send it in an update to enable or disable a pricing period.
+- **Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true.
+- **A delete returns `204` with no body.** Reading the pricing period afterwards returns `404`.
