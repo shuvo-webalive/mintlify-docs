@@ -11,7 +11,7 @@
     "**`name`, `display_name` and `time_period` are required on a create.** `time_period` is the time period's `tp_` id.",
     "**A read returns `time_period` as an object.** It holds the time period's `id`, `name`, `object` and `href`.",
     "**A charging period `id` starts with `cp_`.**",
-    "**Listings page by cursor.** Pass `limit` for the page size, then pass `pagination.next_cursor` back as `cursor` while `pagination.has_more` is true.",
+    "**Listings page by cursor.** Records sit under `data`; pass `pagination.next_cursor` as `cursor` to read the next page, and stop when `pagination.has_more` is `false`.",
     "**A delete returns `204` with no body.** Reading the charging period afterwards returns `404`."
   ],
   "endpoints": [
@@ -146,7 +146,7 @@
       "slug": "retrieve-a-charging-period",
       "title": "Retrieve a charging period",
       "summary": "Returns one charging period by its `id`, under `charging_period`.",
-      "description": "Reads the charging period with this `cp_` `id`. The `id` is the one a listing or a create returns.",
+      "description": "Reads the charging period with this `cp_` `id`.",
       "parameters": [
         {
           "name": "charging_period_id",
@@ -308,7 +308,7 @@
       "type": "object",
       "properties": {
         "created_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "created_on": {
           "type": "string"
@@ -326,7 +326,7 @@
           "type": "string"
         },
         "last_updated_by": {
-          "description": "Null in every record read so far, so its type is not known."
+          "description": "Can be null."
         },
         "last_updated_on": {
           "type": "string"
