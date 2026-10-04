@@ -104,6 +104,9 @@
     },
     {
       "name": "Item fulfillments"
+    },
+    {
+      "name": "Item receipts"
     }
   ],
   "paths": {
@@ -33820,6 +33823,659 @@
           }
         ]
       }
+    },
+    "/item_receipts": {
+      "get": {
+        "tags": [
+          "Item receipts"
+        ],
+        "summary": "List item receipts",
+        "operationId": "item_receipts_get_item_receipts",
+        "description": "Returns receipts under `data`, each with its purchase order, `receipt_status`, `receipt_date`, `tracking_number` and `lines`. Set the page size with `limit` and fetch the next page with `cursor`. Other fields filter as `filter_<field>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` from the previous page, to fetch the page after it.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of item receipts, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemReceiptList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/item_receipts?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.item_receipts.get_item_receipts({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.itemReceipts.getItemReceipts({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->itemReceipts->getItemReceipts(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.item_receipts.item_receipts_dto.ItemReceiptsDto.ItemReceiptList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ItemReceiptList> response = client.itemReceipts().getItemReceipts(Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ItemReceipts.GetItemReceiptsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.itemReceipts.getItemReceipts(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ItemReceipts().GetItemReceipts(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Item receipts"
+        ],
+        "summary": "Create an item receipt",
+        "operationId": "item_receipts_create_item_receipt",
+        "description": "Send the receipt under `item_receipt`: the `purchase_order` id, a `receipt_status` such as `STARTED`, the `receipt_date`, and `lines` listing each purchase order line by its id with the `receipt_quantity` received.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The new receipt, under `item_receipt`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemReceiptsResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/item_receipts\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"item_receipt\": {\n      \"purchase_order\": \"PO-0001\",\n      \"receipt_status\": \"STARTED\",\n      \"receipt_date\": \"2026-10-01\",\n      \"lines\": [\n        {\n          \"purchase_order_line\": \"d4c3b2a1-0f9e-4d8c-b7a6-958473625140\",\n          \"receipt_quantity\": 1\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.item_receipts.create_item_receipt(\n    {\n        \"item_receipt\": {\n            \"purchase_order\": \"PO-0001\",\n            \"receipt_status\": \"STARTED\",\n            \"receipt_date\": \"2026-10-01\",\n            \"lines\": [\n                {\n                    \"purchase_order_line\": \"d4c3b2a1-0f9e-4d8c-b7a6-958473625140\",\n                    \"receipt_quantity\": 1,\n                }\n            ],\n        }\n    }\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.itemReceipts.createItemReceipt({\n    item_receipt: {\n        purchase_order: 'PO-0001',\n        receipt_status: 'STARTED',\n        receipt_date: '2026-10-01',\n        lines: [{purchase_order_line: 'd4c3b2a1-0f9e-4d8c-b7a6-958473625140', receipt_quantity: 1}],\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->itemReceipts->createItemReceipt([\n    'item_receipt' => [\n        'purchase_order' => 'PO-0001',\n        'receipt_status' => 'STARTED',\n        'receipt_date' => '2026-10-01',\n        'lines' => [\n            [\n                'purchase_order_line' => 'd4c3b2a1-0f9e-4d8c-b7a6-958473625140',\n                'receipt_quantity' => 1,\n            ],\n        ],\n    ],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.item_receipts.item_receipts_dto.ItemReceiptsDto;\nimport java.util.List;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ItemReceiptsDto.ItemReceipts> response = client.itemReceipts().createItemReceipt(\n        Map.of(\n                \"item_receipt\", Map.of(\n                        \"purchase_order\", \"PO-0001\",\n                        \"receipt_status\", \"STARTED\",\n                        \"receipt_date\", \"2026-10-01\",\n                        \"lines\", List.of(\n                                Map.of(\n                                        \"purchase_order_line\", \"d4c3b2a1-0f9e-4d8c-b7a6-958473625140\",\n                                        \"receipt_quantity\", 1)))));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ItemReceipts.CreateItemReceiptAsync(new Dictionary<string, object?>\n{\n    [\"item_receipt\"] = new Dictionary<string, object?>\n    {\n        [\"purchase_order\"] = \"PO-0001\",\n        [\"receipt_status\"] = \"STARTED\",\n        [\"receipt_date\"] = \"2026-10-01\",\n        [\"lines\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"purchase_order_line\"] = \"d4c3b2a1-0f9e-4d8c-b7a6-958473625140\",\n                [\"receipt_quantity\"] = 1,\n            },\n        },\n    },\n});\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.itemReceipts.createItemReceipt({\n  'item_receipt': {\n    'purchase_order': 'PO-0001',\n    'receipt_status': 'STARTED',\n    'receipt_date': '2026-10-01',\n    'lines': [\n      {\n        'purchase_order_line': 'd4c3b2a1-0f9e-4d8c-b7a6-958473625140',\n        'receipt_quantity': 1,\n      },\n    ],\n  },\n});\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ItemReceipts().CreateItemReceipt(context.Background(), map[string]any{\n\t\"item_receipt\": map[string]any{\n\t\t\"purchase_order\": \"PO-0001\",\n\t\t\"receipt_status\": \"STARTED\",\n\t\t\"receipt_date\":   \"2026-10-01\",\n\t\t\"lines\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"purchase_order_line\": \"d4c3b2a1-0f9e-4d8c-b7a6-958473625140\",\n\t\t\t\t\"receipt_quantity\":    1,\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "item_receipt": {
+                    "type": "object",
+                    "properties": {
+                      "purchase_order": {
+                        "type": "string",
+                        "description": "The purchase order's `id`."
+                      },
+                      "receipt_status": {
+                        "type": "string",
+                        "description": "Such as `STARTED`."
+                      },
+                      "receipt_date": {
+                        "type": "string",
+                        "description": "The date received, as `YYYY-MM-DD`."
+                      },
+                      "tracking_number": {
+                        "type": "string"
+                      },
+                      "receipt_note": {
+                        "type": "string"
+                      },
+                      "lines": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "purchase_order_line": {
+                              "type": "string",
+                              "description": "The purchase order line's `id`."
+                            },
+                            "receipt_quantity": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "purchase_order_line",
+                            "receipt_quantity"
+                          ]
+                        }
+                      }
+                    },
+                    "required": [
+                      "purchase_order",
+                      "lines"
+                    ]
+                  }
+                },
+                "required": [
+                  "item_receipt"
+                ]
+              },
+              "example": {
+                "item_receipt": {
+                  "purchase_order": "PO-0001",
+                  "receipt_status": "STARTED",
+                  "receipt_date": "2026-10-01",
+                  "lines": [
+                    {
+                      "purchase_order_line": "d4c3b2a1-0f9e-4d8c-b7a6-958473625140",
+                      "receipt_quantity": 1
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/item_receipts/{item_receipt_id}": {
+      "patch": {
+        "tags": [
+          "Item receipts"
+        ],
+        "summary": "Update an item receipt",
+        "operationId": "item_receipts_update_item_receipt",
+        "description": "Send the changes under `item_receipt`, such as a new `tracking_number`, `receipt_note` or `receipt_date`. The receipt comes back under `item_receipt` with a higher `version`.",
+        "parameters": [
+          {
+            "name": "item_receipt_id",
+            "in": "path",
+            "required": true,
+            "description": "The receipt's `id`, which starts with `ir_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated receipt, under `item_receipt`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemReceiptUpdatedResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/item_receipts/ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"item_receipt\": {\n      \"tracking_number\": \"TRK-0001\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.item_receipts.update_item_receipt(\n    \"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\",\n    {\"item_receipt\": {\"tracking_number\": \"TRK-0001\"}},\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.itemReceipts.updateItemReceipt('ir_4e5f60718293a4b5c6d7e8f90a1b2c3d', {\n    item_receipt: {tracking_number: 'TRK-0001'},\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->itemReceipts->updateItemReceipt('ir_4e5f60718293a4b5c6d7e8f90a1b2c3d', [\n    'item_receipt' => ['tracking_number' => 'TRK-0001'],\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.item_receipts.item_receipts_dto.ItemReceiptsDto.ItemReceiptUpdated;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ItemReceiptUpdated> response = client.itemReceipts().updateItemReceipt(\n        \"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\",\n        Map.of(\"item_receipt\", Map.of(\"tracking_number\", \"TRK-0001\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ItemReceipts.UpdateItemReceiptAsync(\n    \"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\",\n    new Dictionary<string, object?>\n    {\n        [\"item_receipt\"] = new Dictionary<string, object?>\n        {\n            [\"tracking_number\"] = \"TRK-0001\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.itemReceipts.updateItemReceipt(\n  'ir_4e5f60718293a4b5c6d7e8f90a1b2c3d',\n  {\n    'item_receipt': {'tracking_number': 'TRK-0001'},\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ItemReceipts().UpdateItemReceipt(context.Background(), \"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\", map[string]any{\n\t\"item_receipt\": map[string]any{\"tracking_number\": \"TRK-0001\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "item_receipt": {
+                    "type": "object",
+                    "properties": {
+                      "tracking_number": {
+                        "type": "string"
+                      },
+                      "receipt_note": {
+                        "type": "string"
+                      },
+                      "receipt_date": {
+                        "type": "string",
+                        "description": "As `YYYY-MM-DD`."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "item_receipt"
+                ]
+              },
+              "example": {
+                "item_receipt": {
+                  "tracking_number": "TRK-0001"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Item receipts"
+        ],
+        "summary": "Retrieve an item receipt",
+        "operationId": "item_receipts_get_item_receipt",
+        "description": "Returns the receipt under `item_receipt`, with its purchase order, status, dates, `tracking_number` and `lines`.",
+        "parameters": [
+          {
+            "name": "item_receipt_id",
+            "in": "path",
+            "required": true,
+            "description": "The receipt's `id`, which starts with `ir_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The receipt, under `item_receipt`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemReceiptResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No item receipt has that `id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/item_receipts/ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.item_receipts.get_item_receipt(\"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.itemReceipts.getItemReceipt('ir_4e5f60718293a4b5c6d7e8f90a1b2c3d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->itemReceipts->getItemReceipt('ir_4e5f60718293a4b5c6d7e8f90a1b2c3d');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.item_receipts.item_receipts_dto.ItemReceiptsDto.ItemReceipt;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<ItemReceipt> response = client.itemReceipts().getItemReceipt(\"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ItemReceipts.GetItemReceiptAsync(\"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.itemReceipts.getItemReceipt(\n  'ir_4e5f60718293a4b5c6d7e8f90a1b2c3d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ItemReceipts().GetItemReceipt(context.Background(), \"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Item receipts"
+        ],
+        "summary": "Delete an item receipt",
+        "operationId": "item_receipts_delete_item_receipt",
+        "description": "Deletes the receipt with that `ir_` id; a later read of it returns `404`. A completed receipt cannot be deleted.",
+        "parameters": [
+          {
+            "name": "item_receipt_id",
+            "in": "path",
+            "required": true,
+            "description": "The receipt's `id`, which starts with `ir_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The receipt is deleted. No body."
+          },
+          "400": {
+            "description": "The receipt is completed (`stock_committed`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/item_receipts/ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.item_receipts.delete_item_receipt(\n    \"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.itemReceipts.deleteItemReceipt('ir_4e5f60718293a4b5c6d7e8f90a1b2c3d');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->itemReceipts->deleteItemReceipt('ir_4e5f60718293a4b5c6d7e8f90a1b2c3d');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.itemReceipts().deleteItemReceipt(\"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ItemReceipts.DeleteItemReceiptAsync(\"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.itemReceipts.deleteItemReceipt(\n  'ir_4e5f60718293a4b5c6d7e8f90a1b2c3d',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ItemReceipts().DeleteItemReceipt(context.Background(), \"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/purchase_orders/{purchase_order_id}/item_receipts": {
+      "get": {
+        "tags": [
+          "Item receipts"
+        ],
+        "summary": "List a purchase order's item receipts",
+        "operationId": "item_receipts_get_purchase_order_item_receipts",
+        "description": "Returns the purchase order's receipts in `item_receipts`, with a `pagination` block, under `purchase_order`.",
+        "parameters": [
+          {
+            "name": "purchase_order_id",
+            "in": "path",
+            "required": true,
+            "description": "The purchase order's `id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many records to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The receipts, under `purchase_order.item_receipts`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemReceiptPurchaseOrderItemReceiptsResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/purchase_orders/PO-0001/item_receipts?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.item_receipts.get_purchase_order_item_receipts(\n    \"PO-0001\", {\"limit\": 20}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.itemReceipts.getPurchaseOrderItemReceipts('PO-0001', {limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->itemReceipts->getPurchaseOrderItemReceipts('PO-0001', ['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.item_receipts.item_receipts_dto.ItemReceiptsDto.PurchaseOrderItemReceipts;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<PurchaseOrderItemReceipts> response = client.itemReceipts().getPurchaseOrderItemReceipts(\n        \"PO-0001\",\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ItemReceipts.GetPurchaseOrderItemReceiptsAsync(\n    \"PO-0001\",\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.itemReceipts.getPurchaseOrderItemReceipts(\n  'PO-0001',\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ItemReceipts().GetPurchaseOrderItemReceipts(context.Background(), \"PO-0001\", map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/item_receipts/{item_receipt_id}/notes/{note_id}": {
+      "delete": {
+        "tags": [
+          "Item receipts"
+        ],
+        "summary": "Delete an item receipt note",
+        "operationId": "item_receipts_delete_item_receipt_note",
+        "description": "Pass the receipt's `ir_` id and the note's `note_` id. No endpoint lists or creates a receipt's notes.",
+        "parameters": [
+          {
+            "name": "item_receipt_id",
+            "in": "path",
+            "required": true,
+            "description": "The receipt's `id`, which starts with `ir_`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "description": "The note's `id`, which starts with `note_`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The note is deleted. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/item_receipts/ir_4e5f60718293a4b5c6d7e8f90a1b2c3d/notes/note_c2d3e4f5061728394a5b6c7d8e9f0011\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.item_receipts.delete_item_receipt_note(\n    \"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\", \"note_c2d3e4f5061728394a5b6c7d8e9f0011\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.itemReceipts.deleteItemReceiptNote(\n    'ir_4e5f60718293a4b5c6d7e8f90a1b2c3d',\n    'note_c2d3e4f5061728394a5b6c7d8e9f0011',\n);\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->itemReceipts->deleteItemReceiptNote(\n    'ir_4e5f60718293a4b5c6d7e8f90a1b2c3d',\n    'note_c2d3e4f5061728394a5b6c7d8e9f0011',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.itemReceipts().deleteItemReceiptNote(\n        \"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\",\n        \"note_c2d3e4f5061728394a5b6c7d8e9f0011\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.ItemReceipts.DeleteItemReceiptNoteAsync(\n    \"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\",\n    \"note_c2d3e4f5061728394a5b6c7d8e9f0011\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.itemReceipts.deleteItemReceiptNote(\n  'ir_4e5f60718293a4b5c6d7e8f90a1b2c3d',\n  'note_c2d3e4f5061728394a5b6c7d8e9f0011',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.ItemReceipts().DeleteItemReceiptNote(context.Background(), \"ir_4e5f60718293a4b5c6d7e8f90a1b2c3d\", \"note_c2d3e4f5061728394a5b6c7d8e9f0011\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -49779,6 +50435,559 @@
         "properties": {
           "item_fulfillment": {
             "$ref": "#/components/schemas/ItemFulfillmentNoteRead"
+          }
+        }
+      },
+      "ItemReceiptList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemReceipt"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/ItemReceiptPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemReceipt": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/ItemReceiptCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "The receipt's `id`, which starts with `ir_`."
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/ItemReceiptLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemReceiptLine"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "purchase_order": {
+            "$ref": "#/components/schemas/ItemReceiptPurchaseOrder"
+          },
+          "receipt_date": {
+            "type": "string"
+          },
+          "receipt_note": {
+            "type": "string"
+          },
+          "receipt_status": {
+            "type": "string",
+            "description": "Such as `started`."
+          },
+          "receive_completed": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string"
+          },
+          "tracking_number": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "ItemReceiptCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemReceiptLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemReceiptLine": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/ItemReceiptLineDetail"
+          },
+          "pending_return_quantity": {
+            "type": "number"
+          },
+          "purchase_order_line": {
+            "$ref": "#/components/schemas/ItemReceiptLinePurchaseOrderLine"
+          },
+          "receipt_quantity": {
+            "type": "number"
+          },
+          "received_quantity": {
+            "type": "number"
+          },
+          "returned_quantity": {
+            "type": "number"
+          },
+          "uom": {
+            "$ref": "#/components/schemas/ItemReceiptLineUom"
+          },
+          "warehouse": {
+            "$ref": "#/components/schemas/ItemReceiptLineWarehouse"
+          }
+        }
+      },
+      "ItemReceiptLineDetail": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemReceiptLinePurchaseOrderLine": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemReceiptLineUom": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemReceiptLineWarehouse": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemReceiptPurchaseOrder": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemReceiptPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The page size the API applied."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Trust it over `next_cursor`, which can be stale on the last page."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "next": {
+                "type": "string"
+              },
+              "prev": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "ItemReceipts": {
+        "type": "object",
+        "properties": {
+          "activity_logs": {
+            "type": "array"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "purchase_order_id": {
+            "type": "string"
+          },
+          "receipt_status": {
+            "type": "string"
+          },
+          "receipts": {
+            "type": "array"
+          },
+          "tracking_number": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemReceiptsResponse": {
+        "type": "object",
+        "properties": {
+          "item_receipt": {
+            "$ref": "#/components/schemas/ItemReceipts"
+          }
+        }
+      },
+      "ItemReceiptUpdated": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/ItemReceiptUpdatedCreatedBy"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/ItemReceiptUpdatedLastUpdatedBy"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemReceiptUpdatedLine"
+            }
+          },
+          "note": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "purchase_order": {
+            "$ref": "#/components/schemas/ItemReceiptUpdatedPurchaseOrder"
+          },
+          "purchase_order_id": {
+            "type": "string"
+          },
+          "receipt_date": {
+            "type": "string"
+          },
+          "receipt_note": {},
+          "receipt_status": {
+            "type": "string"
+          },
+          "receipts": {
+            "type": "array"
+          },
+          "receive_completed": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string"
+          },
+          "tracking_number": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "description": "Goes up with each change."
+          }
+        }
+      },
+      "ItemReceiptUpdatedCreatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemReceiptUpdatedLastUpdatedBy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemReceiptUpdatedLine": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/ItemReceiptUpdatedLineDetail"
+          },
+          "pending_return_quantity": {
+            "type": "number"
+          },
+          "purchase_order_line": {
+            "$ref": "#/components/schemas/ItemReceiptUpdatedLinePurchaseOrderLine"
+          },
+          "receipt_quantity": {
+            "type": "number"
+          },
+          "received_quantity": {
+            "type": "number"
+          },
+          "returned_quantity": {
+            "type": "number"
+          },
+          "uom": {
+            "$ref": "#/components/schemas/ItemReceiptUpdatedLineUom"
+          },
+          "warehouse": {
+            "$ref": "#/components/schemas/ItemReceiptUpdatedLineWarehouse"
+          }
+        }
+      },
+      "ItemReceiptUpdatedLineDetail": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemReceiptUpdatedLinePurchaseOrderLine": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemReceiptUpdatedLineUom": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemReceiptUpdatedLineWarehouse": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemReceiptUpdatedPurchaseOrder": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemReceiptUpdatedResponse": {
+        "type": "object",
+        "properties": {
+          "item_receipt": {
+            "$ref": "#/components/schemas/ItemReceiptUpdated"
+          }
+        }
+      },
+      "ItemReceiptResponse": {
+        "type": "object",
+        "properties": {
+          "item_receipt": {
+            "$ref": "#/components/schemas/ItemReceipt"
+          }
+        }
+      },
+      "ItemReceiptPurchaseOrderItemReceipts": {
+        "type": "object",
+        "properties": {
+          "item_receipts": {
+            "type": "array"
+          },
+          "pagination": {
+            "type": "object"
+          }
+        }
+      },
+      "ItemReceiptPurchaseOrderItemReceiptsResponse": {
+        "type": "object",
+        "properties": {
+          "purchase_order": {
+            "$ref": "#/components/schemas/ItemReceiptPurchaseOrderItemReceipts"
           }
         }
       },
