@@ -1,0 +1,185 @@
+{
+  "family": "integration_connections",
+  "tag": "Integration connections",
+  "slug": "integration-connections",
+  "icon": "plug",
+  "base": "/integration_connections",
+  "overview_description": "List the integration connections on your Exsited instance, filtered by status, and read one connection.",
+  "intro": "Integration connections are the integrations set up on your Exsited instance. You can list them, filtered by status, and read one by its `uuid`. This area has 2 endpoints, and all seven SDKs call every one.",
+  "warning": null,
+  "notes": [
+    "**Filter by status with `filter_status`.** The values are `ACTIVE`, `INACTIVE` and `DISCONNECTED`; any other value returns `400`.",
+    "**The listing pages by cursor.** Records are under `data`, and `pagination` carries `limit`, `has_more`, `next_cursor`, `prev_cursor` and `links`.",
+    "**A `limit` of `0` returns `400`.** Ask for at least one record per page.",
+    "**Read one connection by its `uuid`.** Take the `uuid` of a record in the listing and pass it as `integration_connection_id`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_integration_connections",
+      "method": "GET",
+      "path": "/integration_connections",
+      "slug": "list-integration-connections",
+      "title": "List integration connections",
+      "summary": "Returns one page of integration connections, which you can filter by status.",
+      "description": "Records are under `data`, and the listing pages by cursor. Filter by status with `filter_status`: `ACTIVE`, `INACTIVE` or `DISCONNECTED`. Other fields filter as `filter_<field>`.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The number of records per page. A `limit` of `0` returns `400`.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `next_cursor` from the previous page, to read the next page.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "description": "The field to sort by; prefix it with `-` for descending order.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "filter_status",
+          "in": "query",
+          "required": false,
+          "description": "Only connections with this status: `ACTIVE`, `INACTIVE` or `DISCONNECTED`. Any other value returns `400`.",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "DISCONNECTED"
+            ],
+            "example": "ACTIVE"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of integration connections, under `data`.",
+          "schema": {
+            "$ref": "#/components/schemas/IntegrationConnectionList"
+          }
+        },
+        "400": {
+          "description": "`limit` is `0`, or `filter_status` is not `ACTIVE`, `INACTIVE` or `DISCONNECTED`."
+        }
+      },
+      "example_call": {
+        "query": {
+          "limit": 20,
+          "filter_status": "ACTIVE"
+        }
+      }
+    },
+    {
+      "key": "get_integration_connection",
+      "method": "GET",
+      "path": "/integration_connections/{integration_connection_id}",
+      "slug": "retrieve-an-integration-connection",
+      "title": "Retrieve an integration connection",
+      "summary": "Returns one integration connection.",
+      "description": "Pass the connection's `uuid`, as the listing shows it, as `integration_connection_id`. The response is the connection as plain JSON.",
+      "parameters": [
+        {
+          "name": "integration_connection_id",
+          "in": "path",
+          "required": true,
+          "description": "The connection's `uuid`, taken from a record in the listing.",
+          "schema": {
+            "type": "string",
+            "example": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The integration connection."
+        }
+      },
+      "example_call": {
+        "path": {
+          "integration_connection_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "IntegrationConnectionList": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "The integration connections on this page."
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/IntegrationConnectionPagination"
+        }
+      }
+    },
+    "IntegrationConnectionPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer"
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "`false` on the last page, even if `next_cursor` is set."
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "links": {
+          "$ref": "#/components/schemas/IntegrationConnectionPaginationLinks"
+        }
+      }
+    },
+    "IntegrationConnectionPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

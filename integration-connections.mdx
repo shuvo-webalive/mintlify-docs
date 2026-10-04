@@ -1,0 +1,27 @@
+---
+title: "Integration connections"
+sidebarTitle: "Overview"
+description: "List the integration connections on your Exsited instance, filtered by status, and read one connection."
+---
+
+Integration connections are the integrations set up on your Exsited instance. You can list them, filtered by status, and read one by its `uuid`. This area has 2 endpoints, and all seven SDKs call every one.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List integration connections](/api-reference/integration-connections/list-integration-connections) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/integration_connections` | Returns one page of integration connections, which you can filter by status. |
+| [Retrieve an integration connection](/api-reference/integration-connections/retrieve-an-integration-connection) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/integration_connections/{integration_connection_id}` | Returns one integration connection. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Filter by status with `filter_status`.** The values are `ACTIVE`, `INACTIVE` and `DISCONNECTED`; any other value returns `400`.
+- **The listing pages by cursor.** Records are under `data`, and `pagination` carries `limit`, `has_more`, `next_cursor`, `prev_cursor` and `links`.
+- **A `limit` of `0` returns `400`.** Ask for at least one record per page.
+- **Read one connection by its `uuid`.** Take the `uuid` of a record in the listing and pass it as `integration_connection_id`.

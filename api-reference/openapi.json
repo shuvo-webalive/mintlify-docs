@@ -275,6 +275,9 @@
     },
     {
       "name": "Portal"
+    },
+    {
+      "name": "Integration connections"
     }
   ],
   "paths": {
@@ -82189,6 +82192,193 @@
           }
         }
       }
+    },
+    "/integration_connections": {
+      "get": {
+        "tags": [
+          "Integration connections"
+        ],
+        "summary": "List integration connections",
+        "operationId": "integration_connections_get_integration_connections",
+        "description": "Records are under `data`, and the listing pages by cursor. Filter by status with `filter_status`: `ACTIVE`, `INACTIVE` or `DISCONNECTED`. Other fields filter as `filter_<field>`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The number of records per page. A `limit` of `0` returns `400`.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `next_cursor` from the previous page, to read the next page.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "The field to sort by; prefix it with `-` for descending order.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter_status",
+            "in": "query",
+            "required": false,
+            "description": "Only connections with this status: `ACTIVE`, `INACTIVE` or `DISCONNECTED`. Any other value returns `400`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ACTIVE",
+                "INACTIVE",
+                "DISCONNECTED"
+              ],
+              "example": "ACTIVE"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of integration connections, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationConnectionList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`limit` is `0`, or `filter_status` is not `ACTIVE`, `INACTIVE` or `DISCONNECTED`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/integration_connections?limit=20&filter_status=ACTIVE\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.integration_connections.get_integration_connections(\n    {\"limit\": 20, \"filter_status\": \"ACTIVE\"}\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.integrationConnections.getIntegrationConnections({limit: 20, filter_status: 'ACTIVE'});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->integrationConnections->getIntegrationConnections([\n    'limit' => 20,\n    'filter_status' => 'ACTIVE',\n]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\nimport com.exsited.sdk.resources.integration_connections.integration_connections_dto.IntegrationConnectionsDto;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<IntegrationConnectionsDto.IntegrationConnections> response = client.integrationConnections().getIntegrationConnections(\n        Map.of(\"limit\", 20, \"filter_status\", \"ACTIVE\"));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.IntegrationConnections.GetIntegrationConnectionsAsync(new Dictionary<string, object?> { [\"limit\"] = 20, [\"filter_status\"] = \"ACTIVE\" });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.integrationConnections\n    .getIntegrationConnections(\n      queryParams: {'limit': 20, 'filter_status': 'ACTIVE'},\n    );\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.IntegrationConnections().GetIntegrationConnections(context.Background(), map[string]any{\"limit\": 20, \"filter_status\": \"ACTIVE\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/integration_connections/{integration_connection_id}": {
+      "get": {
+        "tags": [
+          "Integration connections"
+        ],
+        "summary": "Retrieve an integration connection",
+        "operationId": "integration_connections_get_integration_connection",
+        "description": "Pass the connection's `uuid`, as the listing shows it, as `integration_connection_id`. The response is the connection as plain JSON.",
+        "parameters": [
+          {
+            "name": "integration_connection_id",
+            "in": "path",
+            "required": true,
+            "description": "The connection's `uuid`, taken from a record in the listing.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The integration connection."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/integration_connections/3fa85f64-5717-4562-b3fc-2c963f66afa6\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.integration_connections.get_integration_connection(\n    \"3fa85f64-5717-4562-b3fc-2c963f66afa6\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.integrationConnections.getIntegrationConnection('3fa85f64-5717-4562-b3fc-2c963f66afa6');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->integrationConnections->getIntegrationConnection(\n    '3fa85f64-5717-4562-b3fc-2c963f66afa6',\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.integrationConnections().getIntegrationConnection(\n        \"3fa85f64-5717-4562-b3fc-2c963f66afa6\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.IntegrationConnections.GetIntegrationConnectionAsync(\"3fa85f64-5717-4562-b3fc-2c963f66afa6\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.integrationConnections.getIntegrationConnection(\n  '3fa85f64-5717-4562-b3fc-2c963f66afa6',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.IntegrationConnections().GetIntegrationConnection(context.Background(), \"3fa85f64-5717-4562-b3fc-2c963f66afa6\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -123881,6 +124071,65 @@
             "type": "string"
           },
           "object": {
+            "type": "string"
+          }
+        }
+      },
+      "IntegrationConnectionList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "The integration connections on this page."
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/IntegrationConnectionPagination"
+          }
+        }
+      },
+      "IntegrationConnectionPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer"
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "`false` on the last page, even if `next_cursor` is set."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "prev_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "links": {
+            "$ref": "#/components/schemas/IntegrationConnectionPaginationLinks"
+          }
+        }
+      },
+      "IntegrationConnectionPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
             "type": "string"
           }
         }
