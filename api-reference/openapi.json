@@ -26,6 +26,9 @@
     },
     {
       "name": "Accounts"
+    },
+    {
+      "name": "Account emails"
     }
   ],
   "paths": {
@@ -7649,6 +7652,83 @@
             "lang": "go",
             "label": "Go",
             "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Accounts().GetAccountComponentObject(context.Background(), \"W13ZGY\", \"cmp_4a7c2e9b1d3f4c8a9e6b2d1f3a5c7e9b\", \"cco_6e1b3d9a2c4f4e7b8a5c1d2e3f4a6b8c\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/accounts/{account_id}/communications/emails/{email_uuid}": {
+      "delete": {
+        "tags": [
+          "Account emails"
+        ],
+        "summary": "Delete an account email",
+        "operationId": "account_emails_delete_account_communications_email",
+        "description": "Name the account by its `id` and the email by its `uuid`, as List an account's emails returns it. Returns `200`. Retrieving the email afterwards returns `404`.",
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "path",
+            "required": true,
+            "description": "The account's `id`, such as `W13ZGY`. Not its `uuid`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email_uuid",
+            "in": "path",
+            "required": true,
+            "description": "The email's `uuid`, as returned by List an account's emails.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The email is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/accounts/W13ZGY/communications/emails/EMAIL_UUID\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.account_emails.delete_account_communications_email(\n    \"W13ZGY\", \"EMAIL_UUID\"\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@exsited/sdk';\n\nconst client = await buildClient();\n\nconst response = await client.accountEmails.deleteAccountCommunicationsEmail('W13ZGY', 'EMAIL_UUID');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Sdk\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->accountEmails->deleteAccountCommunicationsEmail('W13ZGY', 'EMAIL_UUID');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.sdk.Dto;\nimport com.exsited.sdk.client.ApiResponse;\nimport com.exsited.sdk.client.ClientRegistry;\nimport com.exsited.sdk.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.accountEmails().deleteAccountCommunicationsEmail(\"W13ZGY\", \"EMAIL_UUID\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Sdk.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.AccountEmails.DeleteAccountCommunicationsEmailAsync(\n    \"W13ZGY\",\n    \"EMAIL_UUID\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited_sdk/exsited_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.accountEmails.deleteAccountCommunicationsEmail(\n  'W13ZGY',\n  'EMAIL_UUID',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"bitbucket.org/webalive/exsited-sdk-go\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.AccountEmails().DeleteAccountCommunicationsEmail(context.Background(), \"W13ZGY\", \"EMAIL_UUID\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
           }
         ]
       }
