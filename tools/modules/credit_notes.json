@@ -5,7 +5,7 @@
   "icon": "receipt",
   "base": "/credit_notes",
   "overview_description": "Create, read, update, apply and delete credit notes, and read their balance items, applications and notes.",
-  "intro": "A credit note holds credit owed to an account, raised against an invoice or by an overpayment, that can be applied to invoices or refunded. This area has 14 endpoints: create, read, update, apply and delete credit notes, read their balance items and applications, and manage their notes and files. All seven SDKs call every one.",
+  "intro": "A credit note holds credit owed to an account, raised against an invoice or by an overpayment, that can be applied to invoices or refunded. This area has 14 endpoints: create, read, update, apply and delete credit notes, read their balance items and applications, and manage their notes and files. Every SDK supports all of them.",
   "warning": "**Applying a credit note records a payment against each invoice it names, and the call returns the credit note rather than those payments.**",
   "notes": [
     "**Creating a credit note takes only `invoice_id` and `amount`.** Both go under `credit_note`, and any other key returns `400`. The amount is drawn from the invoice's active payments, oldest first.",
@@ -22,7 +22,7 @@
       "slug": "list-credit-notes",
       "title": "List credit notes",
       "summary": "Returns one page of credit notes.",
-      "description": "Lists every credit note, one page at a time, under `data`. Each record carries its `code`, the `initial_amount`, `refund_amount` and `remaining_amount` as strings, and whether it is `refundable`. Other fields filter as `filter_<field>`, or `filter_<field>_<operator>` with an operator such as `gte` or `contains`.",
+      "description": "Lists every credit note, one page at a time, under `data`. Each record carries its `code`, the `initial_amount`, `refund_amount` and `remaining_amount` as strings, and whether it is `refundable`. To filter, add `filter_<field>=<value>`, or `filter_<field>_<operator>=<value>` with an operator such as `gte` or `contains`.",
       "parameters": [
         {
           "name": "limit",
@@ -77,8 +77,8 @@
       "path": "/credit_notes/{credit_note_id}",
       "slug": "retrieve-a-credit-note",
       "title": "Retrieve a credit note",
-      "summary": "Returns one credit note by its `id`.",
-      "description": "Fetches a single credit note, named by its `cn_` id or its code, with its account, currency, payment, invoices and amounts. Amounts such as `remaining_amount` are strings.",
+      "summary": "Returns one credit note by its `cn_` id or its code.",
+      "description": "Fetches a single credit note by its `cn_` id or its code, with its account, currency, payment, invoices and amounts. Amounts such as `remaining_amount` are strings.",
       "parameters": [
         {
           "name": "credit_note_id",
@@ -180,7 +180,7 @@
       "slug": "create-a-credit-note",
       "title": "Create a credit note",
       "summary": "Credits an invoice by an amount and creates a credit note.",
-      "description": "Creates a credit note for an invoice. The body takes only `invoice_id` and `amount` under `credit_note`; any other key returns `400`. The amount is drawn from the invoice's active payments, oldest first. Creating a credit note schedules the credit note issued communication.",
+      "description": "Creates a credit note for an invoice. The body takes only `invoice_id` and `amount` under `credit_note`; any other key returns `400`. The amount is drawn from the invoice's active payments, oldest first. Creating a credit note schedules the `CREDIT_NOTE_ISSUED` communication.",
       "parameters": [],
       "body": {
         "schema": {
@@ -237,7 +237,7 @@
       "slug": "delete-a-credit-note",
       "title": "Delete a credit note",
       "summary": "Deletes a credit note.",
-      "description": "Deletes the credit note, named by its `cn_` id or its code. A credit note with an active refund is refused with `400` and the code `in_use`. Your API client needs the `DELETE_CREDIT_NOTE` permission.",
+      "description": "Deletes the credit note by its `cn_` id or its code. A credit note with an active refund is refused with `400` and the code `in_use`. Your API client needs the `DELETE_CREDIT_NOTE` permission.",
       "parameters": [
         {
           "name": "credit_note_id",
@@ -494,8 +494,8 @@
       "key": "get_credit_note_note",
       "method": "GET",
       "path": "/credit_notes/{credit_note_id}/notes/{note_id}",
-      "slug": "retrieve-a-credit-note-note",
-      "title": "Retrieve a credit note note",
+      "slug": "retrieve-a-note-on-a-credit-note",
+      "title": "Retrieve a note on a credit note",
       "summary": "Returns one note on a credit note.",
       "description": "Fetches a single note by its `note_` id.",
       "parameters": [
@@ -541,8 +541,8 @@
       "key": "create_credit_note_note",
       "method": "POST",
       "path": "/credit_notes/{credit_note_id}/notes",
-      "slug": "create-a-credit-note-note",
-      "title": "Create a credit note note",
+      "slug": "add-a-note-to-a-credit-note",
+      "title": "Add a note to a credit note",
       "summary": "Adds a note, and optionally a file, to a credit note.",
       "description": "Sends a multipart form: the text as the `note` field and any attachment as `file`. Your API client needs the `CREATE_CREDIT_NOTE_NOTE` permission.",
       "parameters": [
@@ -600,10 +600,10 @@
       "key": "delete_credit_note_note",
       "method": "DELETE",
       "path": "/credit_notes/{credit_note_id}/notes/{note_id}",
-      "slug": "delete-a-credit-note-note",
-      "title": "Delete a credit note note",
+      "slug": "delete-a-note-from-a-credit-note",
+      "title": "Delete a note from a credit note",
       "summary": "Deletes a note from a credit note.",
-      "description": "Deletes the note, named by its `note_` id.",
+      "description": "Deletes the note by its `note_` id.",
       "parameters": [
         {
           "name": "credit_note_id",
@@ -644,8 +644,8 @@
       "key": "get_credit_note_note_files",
       "method": "GET",
       "path": "/credit_notes/{credit_note_id}/notes/{note_id}/files",
-      "slug": "list-a-credit-note-notes-files",
-      "title": "List a credit note note's files",
+      "slug": "list-the-files-on-a-credit-notes-note",
+      "title": "List the files on a credit note's note",
       "summary": "Returns the files attached to a note on a credit note.",
       "description": "Lists the note's attachments under `data`.",
       "parameters": [
@@ -688,8 +688,8 @@
       "key": "get_credit_note_note_file",
       "method": "GET",
       "path": "/credit_notes/{credit_note_id}/notes/{note_id}/files/{file_id}",
-      "slug": "retrieve-a-credit-note-note-file",
-      "title": "Retrieve a credit note note file",
+      "slug": "retrieve-a-file-on-a-credit-notes-note",
+      "title": "Retrieve a file on a credit note's note",
       "summary": "Returns the details of one file attached to a note, not the file's contents.",
       "description": "Fetches a JSON description of the attachment under `file`, not the file's bytes.",
       "parameters": [
@@ -764,51 +764,26 @@
     "CreditNote": {
       "type": "object",
       "properties": {
-        "account": {
-          "$ref": "#/components/schemas/CreditNoteAccount"
-        },
-        "account_id": {
-          "type": "string"
-        },
-        "amount": {
-          "type": "string"
-        },
-        "code": {
-          "type": "string"
-        },
-        "created_by": {
-          "$ref": "#/components/schemas/CreditNoteCreatedBy"
-        },
-        "created_on": {
-          "type": "string"
-        },
-        "currency": {
-          "$ref": "#/components/schemas/CreditNoteCurrency"
-        },
-        "custom_attributes": {
-          "type": "array",
-          "items": {
-            "$ref": "#/components/schemas/CreditNoteCustomAttribute"
-          }
-        },
-        "custom_objects": {
-          "type": "array",
-          "items": {}
-        },
-        "date": {
-          "type": "string"
-        },
-        "href": {
+        "object": {
           "type": "string"
         },
         "id": {
           "type": "string"
         },
-        "initial_amount": {
+        "status": {
           "type": "string"
         },
-        "invoice_id": {
+        "code": {
           "type": "string"
+        },
+        "account": {
+          "$ref": "#/components/schemas/CreditNoteAccount"
+        },
+        "currency": {
+          "$ref": "#/components/schemas/CreditNoteCurrency"
+        },
+        "payment": {
+          "$ref": "#/components/schemas/CreditNotePayment"
         },
         "invoices": {
           "type": "array",
@@ -819,47 +794,41 @@
         "issue_date": {
           "type": "string"
         },
-        "last_updated_by": {
-          "$ref": "#/components/schemas/CreditNoteLastUpdatedBy"
-        },
-        "last_updated_on": {
-          "type": "string"
-        },
-        "object": {
-          "type": "string"
-        },
-        "payment": {
-          "$ref": "#/components/schemas/CreditNotePayment"
-        },
-        "payment_id": {
+        "initial_amount": {
           "type": "string"
         },
         "refund_amount": {
           "type": "string"
         },
-        "refundable": {
-          "type": "boolean"
-        },
         "remaining_amount": {
           "type": "string"
         },
-        "remaining_balance": {
+        "refundable": {
+          "type": "boolean"
+        },
+        "custom_attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CreditNoteCustomAttribute"
+          }
+        },
+        "created_on": {
           "type": "string"
         },
-        "status": {
+        "last_updated_on": {
           "type": "string"
         },
-        "updated_by": {
-          "type": "string"
+        "created_by": {
+          "$ref": "#/components/schemas/CreditNoteCreatedBy"
         },
-        "updated_on": {
-          "type": "string"
-        },
-        "uuid": {
-          "type": "string"
+        "last_updated_by": {
+          "$ref": "#/components/schemas/CreditNoteLastUpdatedBy"
         },
         "version": {
           "type": "integer"
+        },
+        "href": {
+          "type": "string"
         }
       }
     },
@@ -993,29 +962,6 @@
         },
         "links": {
           "$ref": "#/components/schemas/CreditNotePaginationLinks"
-        },
-        "records": {
-          "type": "integer",
-          "description": "The total number of matching records, not the length of this page."
-        },
-        "offset": {
-          "type": "integer"
-        },
-        "next_page": {
-          "type": "string",
-          "description": "On the last page this is the string `NULL`, not JSON null."
-        },
-        "previous_page": {
-          "type": "string"
-        },
-        "has_next": {
-          "type": "boolean"
-        },
-        "has_prev": {
-          "type": "boolean"
-        },
-        "per_page": {
-          "type": "integer"
         }
       }
     },
