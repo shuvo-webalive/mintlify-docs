@@ -1,0 +1,431 @@
+{
+  "family": "operator_groups",
+  "tag": "Operator groups",
+  "slug": "operator-groups",
+  "icon": "users-gear",
+  "base": "/settings/operator_groups",
+  "overview_description": "List, create, read, update and delete the operator groups that sort your operators and give them a role.",
+  "intro": "Operator groups sort your operators into sets that share a role. Here you list, create, read, update and delete them. This area has 5 endpoints, and every SDK supports all of them.",
+  "notes": [
+    "**Each group's id starts with `rol_`.** List operator groups returns each group's `id`.",
+    "**`role` is required to create a group** and takes the role's dashed uuid, such as `3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73`. The `rol_` id and the same value without dashes are refused as an invalid role.",
+    "**A group on the Implementer role is answered `500` and nothing is saved.** Put the group on a role that is not a system role.",
+    "**One group comes back under `operator_group`; a listing comes back under `data`.** A listing also carries `pagination`; pass `pagination.next_cursor` as `cursor` while `has_more` is `true`.",
+    "**Answers differ in what they carry.** The create answer holds only `object`, `id`, `name`, `display_name`, `description` and `href`. An update answer names `role` as a `reference` with the dashed uuid and no `href`, where reads name it as a `role` with its `rol_` id.",
+    "**A group can be deleted while it has operators in it.** A delete returns `204` with no content."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_operator_groups",
+      "method": "GET",
+      "path": "/settings/operator_groups",
+      "slug": "list-operator-groups",
+      "title": "List operator groups",
+      "summary": "Lists your operator groups, a page at a time.",
+      "description": "Returns the groups under `data`, with `pagination` for the next page.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most operator groups to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` from the previous page, to fetch the next page.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of operator groups.",
+          "schema": {
+            "$ref": "#/components/schemas/OperatorGroupList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_operator_group",
+      "method": "POST",
+      "path": "/settings/operator_groups",
+      "slug": "create-an-operator-group",
+      "title": "Create an operator group",
+      "summary": "Creates an operator group and returns it under `operator_group`.",
+      "description": "`role` is required and takes the role's dashed uuid. The new group comes back under `operator_group`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "operator_group"
+          ],
+          "properties": {
+            "operator_group": {
+              "type": "object",
+              "required": [
+                "role"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The group's name."
+                },
+                "display_name": {
+                  "type": "string",
+                  "description": "The name shown for the group."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "A description of the group."
+                },
+                "role": {
+                  "type": "string",
+                  "description": "The role's dashed uuid. The `rol_` id is refused.",
+                  "example": "3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "operator_group": {
+            "name": "Support",
+            "display_name": "Support team",
+            "description": "Handles customer support",
+            "role": "3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new group, under `operator_group`.",
+          "schema": {
+            "$ref": "#/components/schemas/OperatorGroupResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "operator_group": {
+            "name": "Support",
+            "display_name": "Support team",
+            "description": "Handles customer support",
+            "role": "3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_operator_group",
+      "method": "GET",
+      "path": "/settings/operator_groups/{operator_group_id}",
+      "slug": "retrieve-an-operator-group",
+      "title": "Retrieve an operator group",
+      "summary": "Returns one operator group, under `operator_group`.",
+      "description": "Pass the group's `rol_` id.",
+      "parameters": [
+        {
+          "name": "operator_group_id",
+          "in": "path",
+          "required": true,
+          "description": "The operator group's `rol_` id, as List operator groups returns it in `id`.",
+          "schema": {
+            "type": "string",
+            "example": "rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The group, under `operator_group`.",
+          "schema": {
+            "$ref": "#/components/schemas/OperatorGroupResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "operator_group_id": "rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92"
+        }
+      }
+    },
+    {
+      "key": "update_settings_operator_group",
+      "method": "PATCH",
+      "path": "/settings/operator_groups/{operator_group_id}",
+      "slug": "update-an-operator-group",
+      "title": "Update an operator group",
+      "summary": "Changes an operator group's name, display name, description or role.",
+      "description": "Send the fields to change under `operator_group`. The answer names `role` as a `reference` carrying the dashed uuid.",
+      "parameters": [
+        {
+          "name": "operator_group_id",
+          "in": "path",
+          "required": true,
+          "description": "The operator group's `rol_` id, as List operator groups returns it in `id`.",
+          "schema": {
+            "type": "string",
+            "example": "rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "operator_group"
+          ],
+          "properties": {
+            "operator_group": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The group's new name."
+                },
+                "display_name": {
+                  "type": "string",
+                  "description": "The new name shown for the group."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "The group's new description."
+                },
+                "role": {
+                  "type": "string",
+                  "description": "The role's dashed uuid.",
+                  "example": "3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "operator_group": {
+            "display_name": "Support desk",
+            "description": "Handles support requests"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated group, under `operator_group`.",
+          "schema": {
+            "$ref": "#/components/schemas/OperatorGroupResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "operator_group_id": "rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92"
+        },
+        "body": {
+          "operator_group": {
+            "display_name": "Support desk",
+            "description": "Handles support requests"
+          }
+        }
+      }
+    },
+    {
+      "key": "delete_settings_operator_group",
+      "method": "DELETE",
+      "path": "/settings/operator_groups/{operator_group_id}",
+      "slug": "delete-an-operator-group",
+      "title": "Delete an operator group",
+      "summary": "Deletes an operator group.",
+      "description": "A group is deleted even with operators in it. A delete returns `204` with no content.",
+      "parameters": [
+        {
+          "name": "operator_group_id",
+          "in": "path",
+          "required": true,
+          "description": "The operator group's `rol_` id, as List operator groups returns it in `id`.",
+          "schema": {
+            "type": "string",
+            "example": "rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "204": {
+          "description": "The group is deleted."
+        }
+      },
+      "example_call": {
+        "path": {
+          "operator_group_id": "rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "OperatorGroupRole": {
+      "type": "object",
+      "description": "The group's role. A read names it as a `role` with its `rol_` id and `href`; an update answer names it as a `reference` with the dashed uuid and no `href`.",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "OperatorGroupDepartment": {
+      "type": "object",
+      "description": "A department the group belongs to. `id` is null on the departments the instance ships with.",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "OperatorGroup": {
+      "type": "object",
+      "description": "One operator group.",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The group's `rol_` id."
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/components/schemas/OperatorGroupRole"
+        },
+        "departments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/OperatorGroupDepartment"
+          }
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "created_by": {},
+        "last_updated_by": {},
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "OperatorGroupResponse": {
+      "type": "object",
+      "properties": {
+        "operator_group": {
+          "$ref": "#/components/schemas/OperatorGroup"
+        }
+      }
+    },
+    "OperatorGroupList": {
+      "type": "object",
+      "description": "One page of operator groups.",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/OperatorGroup"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/OperatorGroupPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "OperatorGroupPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer"
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Rely on this rather than `next_cursor`."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass this as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/OperatorGroupPaginationLinks"
+        }
+      }
+    },
+    "OperatorGroupPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

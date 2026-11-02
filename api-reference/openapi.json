@@ -256,6 +256,15 @@
       "name": "Roles"
     },
     {
+      "name": "Operators"
+    },
+    {
+      "name": "Operator groups"
+    },
+    {
+      "name": "User settings"
+    },
+    {
       "name": "Custom attributes"
     },
     {
@@ -75952,6 +75961,1005 @@
         }
       }
     },
+    "/settings/operators": {
+      "get": {
+        "tags": [
+          "Operators"
+        ],
+        "summary": "List operators",
+        "operationId": "operators_get_settings_operators",
+        "description": "Returns the operators under `data`, with `pagination` for the next page.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most operators to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` from the previous page, to fetch the next page.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of operators.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/operators?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.operators.get_settings_operators({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'exsited';\n\nconst client = await buildClient();\n\nconst response = await client.operators.getSettingsOperators({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->operators->getSettingsOperators(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.client.ApiResponse;\nimport com.exsited.client.ClientRegistry;\nimport com.exsited.client.ExsitedClient;\nimport com.exsited.resources.operators.operators_dto.OperatorsDto.SettingsOperatorList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsOperatorList> response = client.operators().getSettingsOperators(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Operators.GetSettingsOperatorsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited/exsited.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.operators.getSettingsOperators(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"github.com/exsited/exsited-sdk-go/v4\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Operators().GetSettingsOperators(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Operators"
+        ],
+        "summary": "Create an operator",
+        "operationId": "operators_create_settings_operator",
+        "description": "`role` is required, and `role` and `operator_group` take dashed uuids. The new operator comes back under `operator`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new operator, under `operator`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/operators\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"operator\": {\n      \"name\": \"Jane Citizen\",\n      \"display_name\": \"Jane\",\n      \"email\": \"jane.citizen@example.com\",\n      \"role\": \"3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73\",\n      \"operator_group\": \"c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.operators.create_settings_operator(\n    {\n        \"operator\": {\n            \"name\": \"Jane Citizen\",\n            \"display_name\": \"Jane\",\n            \"email\": \"jane.citizen@example.com\",\n            \"role\": \"3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73\",\n            \"operator_group\": \"c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50\",\n        },\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'exsited';\n\nconst client = await buildClient();\n\nconst response = await client.operators.createSettingsOperator({\n    operator: {\n        name: 'Jane Citizen',\n        display_name: 'Jane',\n        email: 'jane.citizen@example.com',\n        role: '3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73',\n        operator_group: 'c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50',\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->operators->createSettingsOperator(\n    [\n        'operator' => [\n            'name' => 'Jane Citizen',\n            'display_name' => 'Jane',\n            'email' => 'jane.citizen@example.com',\n            'role' => '3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73',\n            'operator_group' => 'c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50',\n        ],\n    ],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.client.ApiResponse;\nimport com.exsited.client.ClientRegistry;\nimport com.exsited.client.ExsitedClient;\nimport com.exsited.resources.operators.operators_dto.OperatorsDto.SettingsOperator;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsOperator> response = client.operators().createSettingsOperator(\n        Map.of(\"operator\", Map.of(\"name\", \"Jane Citizen\",\n                        \"display_name\", \"Jane\",\n                        \"email\", \"jane.citizen@example.com\",\n                        \"role\", \"3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73\",\n                        \"operator_group\", \"c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Operators.CreateSettingsOperatorAsync(\n    new Dictionary<string, object?>\n    {\n        [\"operator\"] = new Dictionary<string, object?>\n        {\n            [\"name\"] = \"Jane Citizen\",\n            [\"display_name\"] = \"Jane\",\n            [\"email\"] = \"jane.citizen@example.com\",\n            [\"role\"] = \"3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73\",\n            [\"operator_group\"] = \"c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited/exsited.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.operators.createSettingsOperator(\n  {\n    'operator': {\n      'name': 'Jane Citizen',\n      'display_name': 'Jane',\n      'email': 'jane.citizen@example.com',\n      'role': '3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73',\n      'operator_group': 'c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50',\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"github.com/exsited/exsited-sdk-go/v4\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Operators().CreateSettingsOperator(context.Background(), map[string]any{\n\t\"operator\": map[string]any{\n\t\t\"name\": \"Jane Citizen\",\n\t\t\"display_name\": \"Jane\",\n\t\t\"email\": \"jane.citizen@example.com\",\n\t\t\"role\": \"3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73\",\n\t\t\"operator_group\": \"c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "operator"
+                ],
+                "properties": {
+                  "operator": {
+                    "type": "object",
+                    "required": [
+                      "role"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The operator's name."
+                      },
+                      "display_name": {
+                        "type": "string",
+                        "description": "The name shown for the operator."
+                      },
+                      "email": {
+                        "type": "string",
+                        "description": "The operator's email address."
+                      },
+                      "role": {
+                        "type": "string",
+                        "description": "The role's dashed uuid. The `rol_` id is refused.",
+                        "example": "3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73"
+                      },
+                      "operator_group": {
+                        "type": "string",
+                        "description": "The operator group's dashed uuid.",
+                        "example": "c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "operator": {
+                  "name": "Jane Citizen",
+                  "display_name": "Jane",
+                  "email": "jane.citizen@example.com",
+                  "role": "3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73",
+                  "operator_group": "c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/operators/{operator_id}": {
+      "get": {
+        "tags": [
+          "Operators"
+        ],
+        "summary": "Retrieve an operator",
+        "operationId": "operators_get_settings_operator",
+        "description": "Pass the operator's `op_` id.",
+        "parameters": [
+          {
+            "name": "operator_id",
+            "in": "path",
+            "required": true,
+            "description": "The operator's `op_` id, as List operators returns it in `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The operator, under `operator`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/operators/op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.operators.get_settings_operator(\"op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'exsited';\n\nconst client = await buildClient();\n\nconst response = await client.operators.getSettingsOperator('op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->operators->getSettingsOperator('op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.client.ApiResponse;\nimport com.exsited.client.ClientRegistry;\nimport com.exsited.client.ExsitedClient;\nimport com.exsited.resources.operators.operators_dto.OperatorsDto.SettingsOperator;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsOperator> response = client.operators().getSettingsOperator(\n        \"op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Operators.GetSettingsOperatorAsync(\"op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited/exsited.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.operators.getSettingsOperator(\n  'op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"github.com/exsited/exsited-sdk-go/v4\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Operators().GetSettingsOperator(context.Background(), \"op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Operators"
+        ],
+        "summary": "Update an operator",
+        "operationId": "operators_update_settings_operator",
+        "description": "Send the fields to change under `operator`. `description` is refused as not understood.",
+        "parameters": [
+          {
+            "name": "operator_id",
+            "in": "path",
+            "required": true,
+            "description": "The operator's `op_` id, as List operators returns it in `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated operator, under `operator`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/operators/op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"operator\": {\n      \"name\": \"Jane Citizen\",\n      \"display_name\": \"Jane C.\",\n      \"role\": \"3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73\",\n      \"operator_group\": \"c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.operators.update_settings_operator(\n    \"op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b\",\n    {\n        \"operator\": {\n            \"name\": \"Jane Citizen\",\n            \"display_name\": \"Jane C.\",\n            \"role\": \"3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73\",\n            \"operator_group\": \"c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50\",\n        },\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'exsited';\n\nconst client = await buildClient();\n\nconst response = await client.operators.updateSettingsOperator('op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b', {\n    operator: {\n        name: 'Jane Citizen',\n        display_name: 'Jane C.',\n        role: '3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73',\n        operator_group: 'c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50',\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->operators->updateSettingsOperator(\n    'op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b',\n    [\n        'operator' => [\n            'name' => 'Jane Citizen',\n            'display_name' => 'Jane C.',\n            'role' => '3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73',\n            'operator_group' => 'c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50',\n        ],\n    ],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.client.ApiResponse;\nimport com.exsited.client.ClientRegistry;\nimport com.exsited.client.ExsitedClient;\nimport com.exsited.resources.operators.operators_dto.OperatorsDto.SettingsOperator;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsOperator> response = client.operators().updateSettingsOperator(\n        \"op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b\",\n        Map.of(\"operator\", Map.of(\"name\", \"Jane Citizen\",\n                        \"display_name\", \"Jane C.\",\n                        \"role\", \"3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73\",\n                        \"operator_group\", \"c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.Operators.UpdateSettingsOperatorAsync(\n    \"op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b\",\n    new Dictionary<string, object?>\n    {\n        [\"operator\"] = new Dictionary<string, object?>\n        {\n            [\"name\"] = \"Jane Citizen\",\n            [\"display_name\"] = \"Jane C.\",\n            [\"role\"] = \"3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73\",\n            [\"operator_group\"] = \"c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited/exsited.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.operators.updateSettingsOperator(\n  'op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b',\n  {\n    'operator': {\n      'name': 'Jane Citizen',\n      'display_name': 'Jane C.',\n      'role': '3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73',\n      'operator_group': 'c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50',\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"github.com/exsited/exsited-sdk-go/v4\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.Operators().UpdateSettingsOperator(context.Background(), \"op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b\", map[string]any{\n\t\"operator\": map[string]any{\n\t\t\"name\": \"Jane Citizen\",\n\t\t\"display_name\": \"Jane C.\",\n\t\t\"role\": \"3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73\",\n\t\t\"operator_group\": \"c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "operator"
+                ],
+                "properties": {
+                  "operator": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The operator's new name."
+                      },
+                      "display_name": {
+                        "type": "string",
+                        "description": "The new name shown for the operator."
+                      },
+                      "role": {
+                        "type": "string",
+                        "description": "The role's dashed uuid.",
+                        "example": "3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73"
+                      },
+                      "operator_group": {
+                        "type": "string",
+                        "description": "The operator group's dashed uuid.",
+                        "example": "c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "operator": {
+                  "name": "Jane Citizen",
+                  "display_name": "Jane C.",
+                  "role": "3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73",
+                  "operator_group": "c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/operator_groups": {
+      "get": {
+        "tags": [
+          "Operator groups"
+        ],
+        "summary": "List operator groups",
+        "operationId": "operator_groups_get_settings_operator_groups",
+        "description": "Returns the groups under `data`, with `pagination` for the next page.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The most operator groups to return on one page.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The `pagination.next_cursor` from the previous page, to fetch the next page.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of operator groups.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorGroupList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/operator_groups?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.operator_groups.get_settings_operator_groups({\"limit\": 20})\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'exsited';\n\nconst client = await buildClient();\n\nconst response = await client.operatorGroups.getSettingsOperatorGroups({limit: 20});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->operatorGroups->getSettingsOperatorGroups(['limit' => 20]);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.client.ApiResponse;\nimport com.exsited.client.ClientRegistry;\nimport com.exsited.client.ExsitedClient;\nimport com.exsited.resources.operator_groups.operator_groups_dto.OperatorGroupsDto.SettingsOperatorGroupList;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsOperatorGroupList> response = client.operatorGroups().getSettingsOperatorGroups(\n        Map.of(\"limit\", 20));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.OperatorGroups.GetSettingsOperatorGroupsAsync(new Dictionary<string, object?> { [\"limit\"] = 20 });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited/exsited.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.operatorGroups.getSettingsOperatorGroups(\n  queryParams: {'limit': 20},\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"github.com/exsited/exsited-sdk-go/v4\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.OperatorGroups().GetSettingsOperatorGroups(context.Background(), map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Operator groups"
+        ],
+        "summary": "Create an operator group",
+        "operationId": "operator_groups_create_settings_operator_group",
+        "description": "`role` is required and takes the role's dashed uuid. The new group comes back under `operator_group`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new group, under `operator_group`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorGroupResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$EXSITED_BASE_URL/api/v4/settings/operator_groups\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"operator_group\": {\n      \"name\": \"Support\",\n      \"display_name\": \"Support team\",\n      \"description\": \"Handles customer support\",\n      \"role\": \"3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.operator_groups.create_settings_operator_group(\n    {\n        \"operator_group\": {\n            \"name\": \"Support\",\n            \"display_name\": \"Support team\",\n            \"description\": \"Handles customer support\",\n            \"role\": \"3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73\",\n        },\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'exsited';\n\nconst client = await buildClient();\n\nconst response = await client.operatorGroups.createSettingsOperatorGroup({\n    operator_group: {\n        name: 'Support',\n        display_name: 'Support team',\n        description: 'Handles customer support',\n        role: '3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73',\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->operatorGroups->createSettingsOperatorGroup(\n    [\n        'operator_group' => [\n            'name' => 'Support',\n            'display_name' => 'Support team',\n            'description' => 'Handles customer support',\n            'role' => '3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73',\n        ],\n    ],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.client.ApiResponse;\nimport com.exsited.client.ClientRegistry;\nimport com.exsited.client.ExsitedClient;\nimport com.exsited.resources.operator_groups.operator_groups_dto.OperatorGroupsDto.SettingsOperatorGroup;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsOperatorGroup> response = client.operatorGroups().createSettingsOperatorGroup(\n        Map.of(\"operator_group\", Map.of(\"name\", \"Support\",\n                        \"display_name\", \"Support team\",\n                        \"description\", \"Handles customer support\",\n                        \"role\", \"3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.OperatorGroups.CreateSettingsOperatorGroupAsync(\n    new Dictionary<string, object?>\n    {\n        [\"operator_group\"] = new Dictionary<string, object?>\n        {\n            [\"name\"] = \"Support\",\n            [\"display_name\"] = \"Support team\",\n            [\"description\"] = \"Handles customer support\",\n            [\"role\"] = \"3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited/exsited.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.operatorGroups.createSettingsOperatorGroup(\n  {\n    'operator_group': {\n      'name': 'Support',\n      'display_name': 'Support team',\n      'description': 'Handles customer support',\n      'role': '3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73',\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"github.com/exsited/exsited-sdk-go/v4\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.OperatorGroups().CreateSettingsOperatorGroup(context.Background(), map[string]any{\n\t\"operator_group\": map[string]any{\n\t\t\"name\": \"Support\",\n\t\t\"display_name\": \"Support team\",\n\t\t\"description\": \"Handles customer support\",\n\t\t\"role\": \"3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "operator_group"
+                ],
+                "properties": {
+                  "operator_group": {
+                    "type": "object",
+                    "required": [
+                      "role"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The group's name."
+                      },
+                      "display_name": {
+                        "type": "string",
+                        "description": "The name shown for the group."
+                      },
+                      "description": {
+                        "type": "string",
+                        "description": "A description of the group."
+                      },
+                      "role": {
+                        "type": "string",
+                        "description": "The role's dashed uuid. The `rol_` id is refused.",
+                        "example": "3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "operator_group": {
+                  "name": "Support",
+                  "display_name": "Support team",
+                  "description": "Handles customer support",
+                  "role": "3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/operator_groups/{operator_group_id}": {
+      "get": {
+        "tags": [
+          "Operator groups"
+        ],
+        "summary": "Retrieve an operator group",
+        "operationId": "operator_groups_get_settings_operator_group",
+        "description": "Pass the group's `rol_` id.",
+        "parameters": [
+          {
+            "name": "operator_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The operator group's `rol_` id, as List operator groups returns it in `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The group, under `operator_group`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorGroupResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/settings/operator_groups/rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.operator_groups.get_settings_operator_group(\"rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'exsited';\n\nconst client = await buildClient();\n\nconst response = await client.operatorGroups.getSettingsOperatorGroup('rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->operatorGroups->getSettingsOperatorGroup('rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.client.ApiResponse;\nimport com.exsited.client.ClientRegistry;\nimport com.exsited.client.ExsitedClient;\nimport com.exsited.resources.operator_groups.operator_groups_dto.OperatorGroupsDto.SettingsOperatorGroup;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsOperatorGroup> response = client.operatorGroups().getSettingsOperatorGroup(\n        \"rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.OperatorGroups.GetSettingsOperatorGroupAsync(\"rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited/exsited.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.operatorGroups.getSettingsOperatorGroup(\n  'rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"github.com/exsited/exsited-sdk-go/v4\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.OperatorGroups().GetSettingsOperatorGroup(context.Background(), \"rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Operator groups"
+        ],
+        "summary": "Update an operator group",
+        "operationId": "operator_groups_update_settings_operator_group",
+        "description": "Send the fields to change under `operator_group`. The answer names `role` as a `reference` carrying the dashed uuid.",
+        "parameters": [
+          {
+            "name": "operator_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The operator group's `rol_` id, as List operator groups returns it in `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated group, under `operator_group`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorGroupResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$EXSITED_BASE_URL/api/v4/settings/operator_groups/rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"operator_group\": {\n      \"display_name\": \"Support desk\",\n      \"description\": \"Handles support requests\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.operator_groups.update_settings_operator_group(\n    \"rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92\",\n    {\n        \"operator_group\": {\n            \"display_name\": \"Support desk\",\n            \"description\": \"Handles support requests\",\n        },\n    },\n)\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'exsited';\n\nconst client = await buildClient();\n\nconst response = await client.operatorGroups.updateSettingsOperatorGroup('rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92', {\n    operator_group: {\n        display_name: 'Support desk',\n        description: 'Handles support requests',\n    },\n});\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->operatorGroups->updateSettingsOperatorGroup(\n    'rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92',\n    [\n        'operator_group' => [\n            'display_name' => 'Support desk',\n            'description' => 'Handles support requests',\n        ],\n    ],\n);\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.client.ApiResponse;\nimport com.exsited.client.ClientRegistry;\nimport com.exsited.client.ExsitedClient;\nimport com.exsited.resources.operator_groups.operator_groups_dto.OperatorGroupsDto.SettingsOperatorGroup;\nimport java.util.Map;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<SettingsOperatorGroup> response = client.operatorGroups().updateSettingsOperatorGroup(\n        \"rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92\",\n        Map.of(\"operator_group\", Map.of(\"display_name\", \"Support desk\",\n                        \"description\", \"Handles support requests\")));\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.OperatorGroups.UpdateSettingsOperatorGroupAsync(\n    \"rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92\",\n    new Dictionary<string, object?>\n    {\n        [\"operator_group\"] = new Dictionary<string, object?>\n        {\n            [\"display_name\"] = \"Support desk\",\n            [\"description\"] = \"Handles support requests\",\n        },\n    });\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited/exsited.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.operatorGroups.updateSettingsOperatorGroup(\n  'rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92',\n  {\n    'operator_group': {\n      'display_name': 'Support desk',\n      'description': 'Handles support requests',\n    },\n  },\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"github.com/exsited/exsited-sdk-go/v4\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.OperatorGroups().UpdateSettingsOperatorGroup(context.Background(), \"rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92\", map[string]any{\n\t\"operator_group\": map[string]any{\n\t\t\"display_name\": \"Support desk\",\n\t\t\"description\": \"Handles support requests\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "operator_group"
+                ],
+                "properties": {
+                  "operator_group": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The group's new name."
+                      },
+                      "display_name": {
+                        "type": "string",
+                        "description": "The new name shown for the group."
+                      },
+                      "description": {
+                        "type": "string",
+                        "description": "The group's new description."
+                      },
+                      "role": {
+                        "type": "string",
+                        "description": "The role's dashed uuid.",
+                        "example": "3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "operator_group": {
+                  "display_name": "Support desk",
+                  "description": "Handles support requests"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Operator groups"
+        ],
+        "summary": "Delete an operator group",
+        "operationId": "operator_groups_delete_settings_operator_group",
+        "description": "A group is deleted even with operators in it. A delete returns `204` with no content.",
+        "parameters": [
+          {
+            "name": "operator_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The operator group's `rol_` id, as List operator groups returns it in `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The group is deleted."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$EXSITED_BASE_URL/api/v4/settings/operator_groups/rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.operator_groups.delete_settings_operator_group(\"rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'exsited';\n\nconst client = await buildClient();\n\nconst response = await client.operatorGroups.deleteSettingsOperatorGroup('rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->operatorGroups->deleteSettingsOperatorGroup('rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.Dto;\nimport com.exsited.client.ApiResponse;\nimport com.exsited.client.ClientRegistry;\nimport com.exsited.client.ExsitedClient;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<Dto> response = client.operatorGroups().deleteSettingsOperatorGroup(\n        \"rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.OperatorGroups.DeleteSettingsOperatorGroupAsync(\"rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited/exsited.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.operatorGroups.deleteSettingsOperatorGroup(\n  'rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"github.com/exsited/exsited-sdk-go/v4\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.OperatorGroups().DeleteSettingsOperatorGroup(context.Background(), \"rol_9b1e4d7a3c6f4a2e8d5b0c7f1a3e6d92\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/user_settings/{user_id}": {
+      "get": {
+        "tags": [
+          "User settings"
+        ],
+        "summary": "Retrieve a user's settings",
+        "operationId": "user_settings_get_user_settings",
+        "description": "Pass the user's `usr_` id.",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "description": "The user's `usr_` id. It carries the same hex as the user's `op_` operator id, so `op_5e9a...` becomes `usr_5e9a...`. The `op_` id, the bare hex and the dashed uuid are each refused with `404`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The user's settings, under `user_settings`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSettingsResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/user_settings/usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.user_settings.get_user_settings(\"usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'exsited';\n\nconst client = await buildClient();\n\nconst response = await client.userSettings.getUserSettings('usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->userSettings->getUserSettings('usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.client.ApiResponse;\nimport com.exsited.client.ClientRegistry;\nimport com.exsited.client.ExsitedClient;\nimport com.exsited.resources.user_settings.user_settings_dto.UserSettingsDto.UserSettings;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<UserSettings> response = client.userSettings().getUserSettings(\n        \"usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.UserSettings.GetUserSettingsAsync(\"usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited/exsited.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.userSettings.getUserSettings(\n  'usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"github.com/exsited/exsited-sdk-go/v4\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.UserSettings().GetUserSettings(context.Background(), \"usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
+    "/user_settings/{user_id}/profile_image": {
+      "get": {
+        "tags": [
+          "User settings"
+        ],
+        "summary": "Retrieve a user's profile image",
+        "operationId": "user_settings_get_user_settings_profile_image",
+        "description": "`base64` is the image without a data URI prefix. It is an empty string for a user whose `image_link` is set but whose image cannot be served.",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "description": "The user's `usr_` id. It carries the same hex as the user's `op_` operator id, so `op_5e9a...` becomes `usr_5e9a...`. The `op_` id, the bare hex and the dashed uuid are each refused with `404`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The profile image, under `user_settings`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSettingsProfileImageResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$EXSITED_BASE_URL/api/v4/user_settings/usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b/profile_image\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from exsited import build_client\n\nclient = build_client()\n\nresponse = client.user_settings.get_user_settings_profile_image(\"usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b\")\nprint(response.data)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'exsited';\n\nconst client = await buildClient();\n\nconst response = await client.userSettings.getUserSettingsProfileImage('usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b');\nconsole.log(response.data);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use Exsited\\Client\\ClientRegistry;\n\n$client = ClientRegistry::buildClient();\n\n$response = $client->userSettings->getUserSettingsProfileImage('usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b');\nprint_r($response->data);\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.exsited.client.ApiResponse;\nimport com.exsited.client.ClientRegistry;\nimport com.exsited.client.ExsitedClient;\nimport com.exsited.resources.user_settings.user_settings_dto.UserSettingsDto.UserSettingsProfileImage;\n\nExsitedClient client = ClientRegistry.buildClient();\n\nApiResponse<UserSettingsProfileImage> response = client.userSettings().getUserSettingsProfileImage(\n        \"usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b\");\nSystem.out.println(response.getMap());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using Exsited.Client;\n\nawait using var client = ExsitedClient.BuildClient();\n\nvar response = await client.UserSettings.GetUserSettingsProfileImageAsync(\"usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b\");\n\nConsole.WriteLine(response.Json);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:exsited/exsited.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.userSettings.getUserSettingsProfileImage(\n  'usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b',\n);\nprint(response.map);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\texsited \"github.com/exsited/exsited-sdk-go/v4\"\n)\n\nclient, err := exsited.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresponse, err := client.UserSettings().GetUserSettingsProfileImage(context.Background(), \"usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(response.Map)\n"
+          }
+        ]
+      }
+    },
     "/custom_attributes": {
       "get": {
         "tags": [
@@ -124591,6 +125599,348 @@
         "properties": {
           "role": {
             "$ref": "#/components/schemas/Role"
+          }
+        }
+      },
+      "Operator": {
+        "type": "object",
+        "description": "One operator.",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "The operator's `op_` id."
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "description": {},
+          "created_on": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "created_by": {},
+          "last_updated_by": {},
+          "href": {
+            "type": "string"
+          }
+        }
+      },
+      "OperatorResponse": {
+        "type": "object",
+        "properties": {
+          "operator": {
+            "$ref": "#/components/schemas/Operator"
+          }
+        }
+      },
+      "OperatorList": {
+        "type": "object",
+        "description": "One page of operators.",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Operator"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/OperatorPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "OperatorPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer"
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Rely on this rather than `next_cursor`."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass this as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/OperatorPaginationLinks"
+          }
+        }
+      },
+      "OperatorPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "OperatorGroupRole": {
+        "type": "object",
+        "description": "The group's role. A read names it as a `role` with its `rol_` id and `href`; an update answer names it as a `reference` with the dashed uuid and no `href`.",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          }
+        }
+      },
+      "OperatorGroupDepartment": {
+        "type": "object",
+        "description": "A department the group belongs to. `id` is null on the departments the instance ships with.",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "OperatorGroup": {
+        "type": "object",
+        "description": "One operator group.",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "The group's `rol_` id."
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/OperatorGroupRole"
+          },
+          "departments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OperatorGroupDepartment"
+            }
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "created_by": {},
+          "last_updated_by": {},
+          "href": {
+            "type": "string"
+          }
+        }
+      },
+      "OperatorGroupResponse": {
+        "type": "object",
+        "properties": {
+          "operator_group": {
+            "$ref": "#/components/schemas/OperatorGroup"
+          }
+        }
+      },
+      "OperatorGroupList": {
+        "type": "object",
+        "description": "One page of operator groups.",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OperatorGroup"
+            }
+          },
+          "object": {
+            "type": "string"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/OperatorGroupPagination"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "OperatorGroupPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer"
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether another page follows. Rely on this rather than `next_cursor`."
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass this as `cursor` to fetch the next page."
+          },
+          "prev_cursor": {
+            "type": "string"
+          },
+          "links": {
+            "$ref": "#/components/schemas/OperatorGroupPaginationLinks"
+          }
+        }
+      },
+      "OperatorGroupPaginationLinks": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "prev": {
+            "type": "string"
+          }
+        }
+      },
+      "UserSettingsProfile": {
+        "type": "object",
+        "description": "The user's profile.",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "time_zone": {},
+          "image_link": {
+            "type": "string"
+          }
+        }
+      },
+      "UserSettingsDashboard": {
+        "type": "object",
+        "description": "The user's dashboard settings.",
+        "properties": {
+          "use_default": {
+            "type": "boolean"
+          },
+          "enabled_dashboards": {
+            "type": "object"
+          },
+          "default_dashboard": {}
+        }
+      },
+      "UserSettingsDisplaySettings": {
+        "type": "object",
+        "description": "The user's display settings.",
+        "properties": {
+          "use_default": {
+            "type": "boolean"
+          },
+          "modules": {
+            "type": "array",
+            "items": {}
+          }
+        }
+      },
+      "UserSettings": {
+        "type": "object",
+        "description": "One user's settings.",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "The user's `usr_` id."
+          },
+          "profile": {
+            "$ref": "#/components/schemas/UserSettingsProfile"
+          },
+          "dashboard": {
+            "$ref": "#/components/schemas/UserSettingsDashboard"
+          },
+          "display_settings": {
+            "$ref": "#/components/schemas/UserSettingsDisplaySettings"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "last_updated_on": {
+            "type": "string"
+          },
+          "created_by": {},
+          "last_updated_by": {},
+          "href": {
+            "type": "string"
+          }
+        }
+      },
+      "UserSettingsResponse": {
+        "type": "object",
+        "properties": {
+          "user_settings": {
+            "$ref": "#/components/schemas/UserSettings"
+          }
+        }
+      },
+      "UserSettingsProfileImage": {
+        "type": "object",
+        "properties": {
+          "base64": {
+            "type": "string",
+            "description": "The image as base64, without a data URI prefix. Empty when the image cannot be served."
+          }
+        }
+      },
+      "UserSettingsProfileImageResponse": {
+        "type": "object",
+        "properties": {
+          "user_settings": {
+            "$ref": "#/components/schemas/UserSettingsProfileImage"
           }
         }
       },
