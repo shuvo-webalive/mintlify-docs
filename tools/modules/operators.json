@@ -1,0 +1,362 @@
+{
+  "family": "operators",
+  "tag": "Operators",
+  "slug": "operators",
+  "icon": "user-gear",
+  "base": "/settings/operators",
+  "overview_description": "List, create, read and update the operators who sign in to your Exsited instance.",
+  "intro": "An operator is a user of your instance. Here you list, create, read and update operators. This area has 4 endpoints, and every SDK supports all of them.",
+  "warning": "**Operators cannot be deleted through the API.** `DELETE /settings/operators/{operator_id}` returns `500` whether or not the operator exists, and the operator stays, so the SDKs have no delete for operators.",
+  "notes": [
+    "**Each operator's id starts with `op_`.** List operators returns each operator's `id`.",
+    "**One operator comes back under `operator`; a listing comes back under `data`.** A listing also carries `pagination`; pass `pagination.next_cursor` as `cursor` while `has_more` is `true`.",
+    "**`role` and `operator_group` are dashed uuids** such as `3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73`. The `rol_` id and the same value without dashes are refused.",
+    "**An update refuses `description`** as not understood. Send `name`, `display_name`, `role` or `operator_group`."
+  ],
+  "endpoints": [
+    {
+      "key": "get_settings_operators",
+      "method": "GET",
+      "path": "/settings/operators",
+      "slug": "list-operators",
+      "title": "List operators",
+      "summary": "Lists your operators, a page at a time.",
+      "description": "Returns the operators under `data`, with `pagination` for the next page.",
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "The most operators to return on one page.",
+          "schema": {
+            "type": "integer",
+            "example": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "description": "The `pagination.next_cursor` from the previous page, to fetch the next page.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "One page of operators.",
+          "schema": {
+            "$ref": "#/components/schemas/OperatorList"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "query": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "key": "create_settings_operator",
+      "method": "POST",
+      "path": "/settings/operators",
+      "slug": "create-an-operator",
+      "title": "Create an operator",
+      "summary": "Creates an operator and returns it under `operator`.",
+      "description": "`role` is required, and `role` and `operator_group` take dashed uuids. The new operator comes back under `operator`.",
+      "parameters": [],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "operator"
+          ],
+          "properties": {
+            "operator": {
+              "type": "object",
+              "required": [
+                "role"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The operator's name."
+                },
+                "display_name": {
+                  "type": "string",
+                  "description": "The name shown for the operator."
+                },
+                "email": {
+                  "type": "string",
+                  "description": "The operator's email address."
+                },
+                "role": {
+                  "type": "string",
+                  "description": "The role's dashed uuid. The `rol_` id is refused.",
+                  "example": "3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73"
+                },
+                "operator_group": {
+                  "type": "string",
+                  "description": "The operator group's dashed uuid.",
+                  "example": "c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "operator": {
+            "name": "Jane Citizen",
+            "display_name": "Jane",
+            "email": "jane.citizen@example.com",
+            "role": "3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73",
+            "operator_group": "c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "201": {
+          "description": "The new operator, under `operator`.",
+          "schema": {
+            "$ref": "#/components/schemas/OperatorResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {},
+        "body": {
+          "operator": {
+            "name": "Jane Citizen",
+            "display_name": "Jane",
+            "email": "jane.citizen@example.com",
+            "role": "3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73",
+            "operator_group": "c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50"
+          }
+        }
+      }
+    },
+    {
+      "key": "get_settings_operator",
+      "method": "GET",
+      "path": "/settings/operators/{operator_id}",
+      "slug": "retrieve-an-operator",
+      "title": "Retrieve an operator",
+      "summary": "Returns one operator, under `operator`.",
+      "description": "Pass the operator's `op_` id.",
+      "parameters": [
+        {
+          "name": "operator_id",
+          "in": "path",
+          "required": true,
+          "description": "The operator's `op_` id, as List operators returns it in `id`.",
+          "schema": {
+            "type": "string",
+            "example": "op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The operator, under `operator`.",
+          "schema": {
+            "$ref": "#/components/schemas/OperatorResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "operator_id": "op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b"
+        }
+      }
+    },
+    {
+      "key": "update_settings_operator",
+      "method": "PATCH",
+      "path": "/settings/operators/{operator_id}",
+      "slug": "update-an-operator",
+      "title": "Update an operator",
+      "summary": "Changes an operator's name, display name, role or operator group.",
+      "description": "Send the fields to change under `operator`. `description` is refused as not understood.",
+      "parameters": [
+        {
+          "name": "operator_id",
+          "in": "path",
+          "required": true,
+          "description": "The operator's `op_` id, as List operators returns it in `id`.",
+          "schema": {
+            "type": "string",
+            "example": "op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b"
+          }
+        }
+      ],
+      "body": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "operator"
+          ],
+          "properties": {
+            "operator": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The operator's new name."
+                },
+                "display_name": {
+                  "type": "string",
+                  "description": "The new name shown for the operator."
+                },
+                "role": {
+                  "type": "string",
+                  "description": "The role's dashed uuid.",
+                  "example": "3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73"
+                },
+                "operator_group": {
+                  "type": "string",
+                  "description": "The operator group's dashed uuid.",
+                  "example": "c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "operator": {
+            "name": "Jane Citizen",
+            "display_name": "Jane C.",
+            "role": "3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73",
+            "operator_group": "c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50"
+          }
+        }
+      },
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The updated operator, under `operator`.",
+          "schema": {
+            "$ref": "#/components/schemas/OperatorResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "operator_id": "op_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b"
+        },
+        "body": {
+          "operator": {
+            "name": "Jane Citizen",
+            "display_name": "Jane C.",
+            "role": "3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73",
+            "operator_group": "c41e7a92-5b3d-4f08-9a6e-2d8b1f7c3e50"
+          }
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "Operator": {
+      "type": "object",
+      "description": "One operator.",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The operator's `op_` id."
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "description": {},
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "created_by": {},
+        "last_updated_by": {},
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "OperatorResponse": {
+      "type": "object",
+      "properties": {
+        "operator": {
+          "$ref": "#/components/schemas/Operator"
+        }
+      }
+    },
+    "OperatorList": {
+      "type": "object",
+      "description": "One page of operators.",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Operator"
+          }
+        },
+        "object": {
+          "type": "string"
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/OperatorPagination"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "OperatorPagination": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer"
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether another page follows. Rely on this rather than `next_cursor`."
+        },
+        "next_cursor": {
+          "type": "string",
+          "description": "Pass this as `cursor` to fetch the next page."
+        },
+        "prev_cursor": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/components/schemas/OperatorPaginationLinks"
+        }
+      }
+    },
+    "OperatorPaginationLinks": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

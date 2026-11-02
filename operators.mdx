@@ -1,0 +1,33 @@
+---
+title: "Operators"
+sidebarTitle: "Overview"
+description: "List, create, read and update the operators who sign in to your Exsited instance."
+---
+
+An operator is a user of your instance. Here you list, create, read and update operators. This area has 4 endpoints, and every SDK supports all of them.
+
+<Warning>
+  **Operators cannot be deleted through the API.** `DELETE /settings/operators/{operator_id}` returns `500` whether or not the operator exists, and the operator stays, so the SDKs have no delete for operators.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List operators](/api-reference/operators/list-operators) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/settings/operators` | Lists your operators, a page at a time. |
+| [Create an operator](/api-reference/operators/create-an-operator) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/settings/operators` | Creates an operator and returns it under `operator`. |
+| [Retrieve an operator](/api-reference/operators/retrieve-an-operator) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/settings/operators/{operator_id}` | Returns one operator, under `operator`. |
+| [Update an operator](/api-reference/operators/update-an-operator) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `/settings/operators/{operator_id}` | Changes an operator's name, display name, role or operator group. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Each operator's id starts with `op_`.** List operators returns each operator's `id`.
+- **One operator comes back under `operator`; a listing comes back under `data`.** A listing also carries `pagination`; pass `pagination.next_cursor` as `cursor` while `has_more` is `true`.
+- **`role` and `operator_group` are dashed uuids** such as `3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73`. The `rol_` id and the same value without dashes are refused.
+- **An update refuses `description`** as not understood. Send `name`, `display_name`, `role` or `operator_group`.

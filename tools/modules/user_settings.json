@@ -1,0 +1,194 @@
+{
+  "family": "user_settings",
+  "tag": "User settings",
+  "slug": "user-settings",
+  "icon": "user-pen",
+  "base": "/user_settings",
+  "overview_description": "Read one user's profile, dashboard and display settings, and their profile image.",
+  "intro": "User settings hold one user's profile, dashboard and display settings. Here you read a user's settings and their profile image. This area has 2 endpoints, and every SDK supports both.",
+  "notes": [
+    "**The path takes the user's `usr_` id, not the operator's `op_` id.** The two carry the same hex, so change the prefix from `op_` to `usr_`.",
+    "**There is no listing.** `GET /user_settings` returns `400` with `Invalid ID`. List operators to find the users.",
+    "**Both reads wrap their answer in `user_settings`.** The profile image comes back as `base64`, without a data URI prefix.",
+    "**The profile image is read only.** The API does not serve a write for it to these credentials, so the SDKs have none."
+  ],
+  "endpoints": [
+    {
+      "key": "get_user_settings",
+      "method": "GET",
+      "path": "/user_settings/{user_id}",
+      "slug": "retrieve-a-users-settings",
+      "title": "Retrieve a user's settings",
+      "summary": "Returns one user's settings, under `user_settings`.",
+      "description": "Pass the user's `usr_` id.",
+      "parameters": [
+        {
+          "name": "user_id",
+          "in": "path",
+          "required": true,
+          "description": "The user's `usr_` id. It carries the same hex as the user's `op_` operator id, so `op_5e9a...` becomes `usr_5e9a...`. The `op_` id, the bare hex and the dashed uuid are each refused with `404`.",
+          "schema": {
+            "type": "string",
+            "example": "usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The user's settings, under `user_settings`.",
+          "schema": {
+            "$ref": "#/components/schemas/UserSettingsResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "user_id": "usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b"
+        }
+      }
+    },
+    {
+      "key": "get_user_settings_profile_image",
+      "method": "GET",
+      "path": "/user_settings/{user_id}/profile_image",
+      "slug": "retrieve-a-users-profile-image",
+      "title": "Retrieve a user's profile image",
+      "summary": "Returns a user's profile image as base64, under `user_settings`.",
+      "description": "`base64` is the image without a data URI prefix. It is an empty string for a user whose `image_link` is set but whose image cannot be served.",
+      "parameters": [
+        {
+          "name": "user_id",
+          "in": "path",
+          "required": true,
+          "description": "The user's `usr_` id. It carries the same hex as the user's `op_` operator id, so `op_5e9a...` becomes `usr_5e9a...`. The `op_` id, the bare hex and the dashed uuid are each refused with `404`.",
+          "schema": {
+            "type": "string",
+            "example": "usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b"
+          }
+        }
+      ],
+      "body": null,
+      "multipart": false,
+      "responses": {
+        "200": {
+          "description": "The profile image, under `user_settings`.",
+          "schema": {
+            "$ref": "#/components/schemas/UserSettingsProfileImageResponse"
+          }
+        }
+      },
+      "example_call": {
+        "path": {
+          "user_id": "usr_5e9a2c7b1d4f4e8a9b3c6d1f7a2e4c8b"
+        }
+      }
+    }
+  ],
+  "schemas": {
+    "UserSettingsProfile": {
+      "type": "object",
+      "description": "The user's profile.",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "time_zone": {},
+        "image_link": {
+          "type": "string"
+        }
+      }
+    },
+    "UserSettingsDashboard": {
+      "type": "object",
+      "description": "The user's dashboard settings.",
+      "properties": {
+        "use_default": {
+          "type": "boolean"
+        },
+        "enabled_dashboards": {
+          "type": "object"
+        },
+        "default_dashboard": {}
+      }
+    },
+    "UserSettingsDisplaySettings": {
+      "type": "object",
+      "description": "The user's display settings.",
+      "properties": {
+        "use_default": {
+          "type": "boolean"
+        },
+        "modules": {
+          "type": "array",
+          "items": {}
+        }
+      }
+    },
+    "UserSettings": {
+      "type": "object",
+      "description": "One user's settings.",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "The user's `usr_` id."
+        },
+        "profile": {
+          "$ref": "#/components/schemas/UserSettingsProfile"
+        },
+        "dashboard": {
+          "$ref": "#/components/schemas/UserSettingsDashboard"
+        },
+        "display_settings": {
+          "$ref": "#/components/schemas/UserSettingsDisplaySettings"
+        },
+        "created_on": {
+          "type": "string"
+        },
+        "last_updated_on": {
+          "type": "string"
+        },
+        "created_by": {},
+        "last_updated_by": {},
+        "href": {
+          "type": "string"
+        }
+      }
+    },
+    "UserSettingsResponse": {
+      "type": "object",
+      "properties": {
+        "user_settings": {
+          "$ref": "#/components/schemas/UserSettings"
+        }
+      }
+    },
+    "UserSettingsProfileImage": {
+      "type": "object",
+      "properties": {
+        "base64": {
+          "type": "string",
+          "description": "The image as base64, without a data URI prefix. Empty when the image cannot be served."
+        }
+      }
+    },
+    "UserSettingsProfileImageResponse": {
+      "type": "object",
+      "properties": {
+        "user_settings": {
+          "$ref": "#/components/schemas/UserSettingsProfileImage"
+        }
+      }
+    }
+  }
+}

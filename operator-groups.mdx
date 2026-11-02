@@ -1,0 +1,32 @@
+---
+title: "Operator groups"
+sidebarTitle: "Overview"
+description: "List, create, read, update and delete the operator groups that sort your operators and give them a role."
+---
+
+Operator groups sort your operators into sets that share a role. Here you list, create, read, update and delete them. This area has 5 endpoints, and every SDK supports all of them.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List operator groups](/api-reference/operator-groups/list-operator-groups) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/settings/operator_groups` | Lists your operator groups, a page at a time. |
+| [Create an operator group](/api-reference/operator-groups/create-an-operator-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/settings/operator_groups` | Creates an operator group and returns it under `operator_group`. |
+| [Retrieve an operator group](/api-reference/operator-groups/retrieve-an-operator-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/settings/operator_groups/{operator_group_id}` | Returns one operator group, under `operator_group`. |
+| [Update an operator group](/api-reference/operator-groups/update-an-operator-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `/settings/operator_groups/{operator_group_id}` | Changes an operator group's name, display name, description or role. |
+| [Delete an operator group](/api-reference/operator-groups/delete-an-operator-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `/settings/operator_groups/{operator_group_id}` | Deletes an operator group. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Each group's id starts with `rol_`.** List operator groups returns each group's `id`.
+- **`role` is required to create a group** and takes the role's dashed uuid, such as `3f6b8c2e-7a1d-4e95-b0c4-8d2a6f1e9b73`. The `rol_` id and the same value without dashes are refused as an invalid role.
+- **A group on the Implementer role is answered `500` and nothing is saved.** Put the group on a role that is not a system role.
+- **One group comes back under `operator_group`; a listing comes back under `data`.** A listing also carries `pagination`; pass `pagination.next_cursor` as `cursor` while `has_more` is `true`.
+- **Answers differ in what they carry.** The create answer holds only `object`, `id`, `name`, `display_name`, `description` and `href`. An update answer names `role` as a `reference` with the dashed uuid and no `href`, where reads name it as a `role` with its `rol_` id.
+- **A group can be deleted while it has operators in it.** A delete returns `204` with no content.

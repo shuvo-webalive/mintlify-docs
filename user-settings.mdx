@@ -1,0 +1,27 @@
+---
+title: "User settings"
+sidebarTitle: "Overview"
+description: "Read one user's profile, dashboard and display settings, and their profile image."
+---
+
+User settings hold one user's profile, dashboard and display settings. Here you read a user's settings and their profile image. This area has 2 endpoints, and every SDK supports both.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Retrieve a user's settings](/api-reference/user-settings/retrieve-a-users-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/user_settings/{user_id}` | Returns one user's settings, under `user_settings`. |
+| [Retrieve a user's profile image](/api-reference/user-settings/retrieve-a-users-profile-image) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/user_settings/{user_id}/profile_image` | Returns a user's profile image as base64, under `user_settings`. |
+
+## Before you call
+
+Register your API credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **The path takes the user's `usr_` id, not the operator's `op_` id.** The two carry the same hex, so change the prefix from `op_` to `usr_`.
+- **There is no listing.** `GET /user_settings` returns `400` with `Invalid ID`. List operators to find the users.
+- **Both reads wrap their answer in `user_settings`.** The profile image comes back as `base64`, without a data URI prefix.
+- **The profile image is read only.** The API does not serve a write for it to these credentials, so the SDKs have none.
