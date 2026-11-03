@@ -7,7 +7,7 @@ description: "Create, read, update and delete return vendor authorizations, the 
 A return vendor authorization records stock you send back to a supplier against lines of a purchase order. These endpoints create, list, read, update and delete returns and remove their notes and files. This area has 7 endpoints, each available in all seven SDKs.
 
 <Warning>
-  **Creating a return vendor authorization currently fails.** The create currently returns `500`, so the update and delete, which need an existing return, have not been confirmed to work. Only a draft can be deleted, any other status returns `400` `stock_committed`, and a delete cannot be undone.
+  **Only a draft return vendor authorization can be deleted.** Any other status returns `400` `stock_committed`, and a delete cannot be undone.
 </Warning>
 
 ## At a glance
@@ -33,5 +33,4 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 - **Every write body is wrapped in `return_vendor_authorization`.**
 - **The create names a purchase order and its lines.** Each line takes `purchase_order_line` and `rva_qty`; `create_as_draft: true` saves a draft.
 - **The reads and the update accept the `rva_` id or the code.** The delete takes the `rva_` id only; a code returns `404`.
-- **No endpoint lists or creates a return's notes.** The note deletes need ids you already hold.
 - **Listings page by cursor.** Records are under `data`; pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`.

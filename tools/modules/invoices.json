@@ -6,7 +6,6 @@
   "base": "/invoices",
   "overview_description": "Create, read, amend, cancel, reactivate and delete invoices, and reach their lines, notes, files, fulfillments and returns.",
   "intro": "An invoice bills an account for items, either on its own or raised from an order. This area has 30 endpoints: create, read, update, amend, cancel, reactivate and delete invoices; raise an invoice for an order; read their lines, KPIs and PDF links; add, read and delete notes and note files; and read their fulfillments, return merchandise authorisations and custom objects. Every SDK supports all of them.",
-  "warning": "**`GET /invoices/{invoice_id}/lines/{line_id}` ignores `line_id` and always returns the invoice's first line.** Deleting a note file currently returns `404` `attachment not found`, even for a file the note's files listing shows.",
   "notes": [
     "**Pass an invoice's `id`, never its `uuid`.** Every `{invoice_id}` is the invoice's `id`, such as `INV-0001`.",
     "**Write bodies go under an `invoice` key.** Create, update, amend, cancel and reactivate all wrap their fields in `invoice`. Amend, cancel, reactivate and creating an invoice for an order also work with no body.",
@@ -248,7 +247,7 @@
         },
         "example": {
           "invoice": {
-            "account_id": "W13ZGY",
+            "account_id": "ACC0001",
             "issue_date": "2026-10-01",
             "due_date": "2026-10-31",
             "currency": "AUD",
@@ -274,7 +273,7 @@
         "path": {},
         "body": {
           "invoice": {
-            "account_id": "W13ZGY",
+            "account_id": "ACC0001",
             "issue_date": "2026-10-01",
             "due_date": "2026-10-31",
             "currency": "AUD",
@@ -1382,7 +1381,7 @@
       "slug": "retrieve-an-invoice-line",
       "title": "Retrieve an invoice line",
       "summary": "Returns one line of an invoice.",
-      "description": "Fetches a line under `invoice.line`. The server ignores `line_id` and always returns the invoice's first line, so use the lines endpoint to find a specific one.",
+      "description": "Fetches a line under `invoice.line`. To find a specific line, use the lines endpoint.",
       "parameters": [
         {
           "name": "invoice_id",
@@ -1398,7 +1397,7 @@
           "name": "line_id",
           "in": "path",
           "required": true,
-          "description": "The line's `id`. The server ignores it and returns the invoice's first line.",
+          "description": "The line's `id`.",
           "schema": {
             "type": "string",
             "example": "4d2e6f8a-1b3c-4d5e-9f0a-2b4c6d8e0f1a"
@@ -1576,8 +1575,7 @@
           "invoice_id": "INV-0001",
           "custom_object_id": "co_5d2a8f1c3b7e4a9d8c6b1e2f3a4d5c6b"
         }
-      },
-      "warning": "**This call has not been confirmed to work.** The response body is not documented yet."
+      }
     },
     {
       "key": "get_invoice_custom_object_instance",
@@ -1632,8 +1630,7 @@
           "custom_object_id": "co_5d2a8f1c3b7e4a9d8c6b1e2f3a4d5c6b",
           "instance_id": "coi_9f3b6c1d2e8a4b7c9d5e1f2a3b4c6d7e"
         }
-      },
-      "warning": "**This call has not been confirmed to work.** The response body is not documented yet."
+      }
     },
     {
       "key": "delete_invoice_note_file",
@@ -1682,7 +1679,7 @@
           "description": "The file is deleted. The response has no body."
         },
         "404": {
-          "description": "`attachment not found`, returned even for a file the note's files listing shows."
+          "description": "The file was not found."
         }
       },
       "example_call": {
@@ -1691,8 +1688,7 @@
           "note_id": "note_3f2b8c1d9e4a4f6b8c2d1e0f9a8b7c6d",
           "file_id": "6b1f0c2e-8d4a-4e3b-9f5c-2a7d1e0b3c4f"
         }
-      },
-      "warning": "**This call currently returns `404`.** The message is `attachment not found`, even for a file the note's files listing shows."
+      }
     }
   ],
   "schemas": {
