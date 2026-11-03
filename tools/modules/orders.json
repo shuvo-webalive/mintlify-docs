@@ -12,7 +12,6 @@
     "**A contract needs a recurring or metered item on a line.** Set `allow_contract` to `true` and send `contract_properties` when you create the order.",
     "**Lines are named two ways.** Line paths take the line's `id` as `line_uuid`; a change body names a line by its `charge_item_uuid`, sent as `uuid`.",
     "**Previewing an order can still create an account.** `POST /orders/preview` creates no order, but a body that names a new account creates that account.",
-    "**Payments and fulfillments are not checked against the order.** `GET /orders/{order_id}/payments/{payment_id}` and `.../item_fulfillments/{fulfillment_id}` read the record by its own `id`.",
     "**Listings page by cursor.** Send `limit`, then pass `pagination.next_cursor` as `cursor` while `pagination.has_more` is `true`."
   ],
   "endpoints": [
@@ -398,7 +397,7 @@
       "slug": "activate-an-order",
       "title": "Activate an order",
       "summary": "Activates an order from the date you give.",
-      "description": "Send `effective_date` under `order`. After the call the order's `status` is `active`. The response body is not documented yet.",
+      "description": "Send `effective_date` under `order`. After the call the order's `status` is `active`.",
       "parameters": [
         {
           "name": "order_id",
@@ -661,7 +660,7 @@
       "slug": "replace-an-orders-billing-preferences",
       "title": "Replace an order's billing preferences",
       "summary": "Sets an order's billing preferences with `PUT` and returns the order under `order`.",
-      "description": "Send the preferences under `order.billing_preferences`, as for the `PATCH` call. Read the preferences again to see the stored values. Whether fields you do not send are cleared is not documented.",
+      "description": "Send the preferences under `order.billing_preferences`, as for the `PATCH` call. Read the preferences again to see the stored values.",
       "parameters": [
         {
           "name": "order_id",
@@ -2202,7 +2201,7 @@
       "slug": "replace-an-order-lines-billing-preferences",
       "title": "Replace an order line's billing preferences",
       "summary": "Sets one line's billing settings with `PUT` and returns the order under `order`.",
-      "description": "Send the settings under `order.line.billing_preferences`, not `item_properties` as the `PATCH` call takes. The line reads them back under `item_properties`. Whether fields you do not send are cleared is not documented.",
+      "description": "Send the settings under `order.line.billing_preferences`, not `item_properties` as the `PATCH` call takes. The line reads them back under `item_properties`.",
       "parameters": [
         {
           "name": "order_id",
@@ -3911,7 +3910,7 @@
       "slug": "retrieve-an-order-fulfillment",
       "title": "Retrieve an order fulfillment",
       "summary": "Returns one item fulfillment, under `item_fulfillment`.",
-      "description": "Pass an order's `id` and the fulfillment's `id`. The fulfillment is read by its own `id`, without checking that it belongs to the order.",
+      "description": "Pass an order's `id` and the fulfillment's `id`.",
       "parameters": [
         {
           "name": "order_id",
@@ -3994,7 +3993,7 @@
       "slug": "retrieve-an-order-payment",
       "title": "Retrieve an order payment",
       "summary": "Returns one payment, under `payment`.",
-      "description": "Pass an order's `id` and the payment's `id`. The payment is read by its own `id`, without checking that it belongs to the order.",
+      "description": "Pass an order's `id` and the payment's `id`.",
       "parameters": [
         {
           "name": "order_id",
@@ -7123,7 +7122,7 @@
         },
         "has_more": {
           "type": "boolean",
-          "description": "Whether another page follows. `false` ends the listing even when `next_cursor` is present."
+          "description": "Whether another page follows. `false` ends the listing."
         },
         "next_cursor": {
           "type": "string",

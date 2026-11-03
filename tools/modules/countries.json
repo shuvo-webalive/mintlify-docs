@@ -9,7 +9,7 @@
   "notes": [
     "**A country `id` starts with `country_`.** Other records, such as a warehouse, refer to a country by this `id`.",
     "**A country's `name` holds its two letter code.** For example `AU` for Australia.",
-    "**The listing pages by cursor with the `cursor` parameter.** `starting_after` is ignored and returns the first page again.",
+    "**The listing pages by cursor with the `cursor` parameter.**",
     "**An update accepts `status`, `description` and the `default_*` fields.** Send them under `country`."
   ],
   "endpoints": [
@@ -20,7 +20,7 @@
       "slug": "list-countries",
       "title": "List countries",
       "summary": "Returns a page of countries under `data`, with paging details under `pagination`.",
-      "description": "Lists the countries on the instance. A country's `name` holds its two letter code, such as `AU`. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results. `starting_after` is ignored.",
+      "description": "Lists the countries on the instance. A country's `name` holds its two letter code, such as `AU`. Pass `limit` to set the page size, and while `pagination.has_more` is true pass `pagination.next_cursor` back as `cursor` to read the next page. Other fields filter as `filter_<field>` or `filter_<field>_<operator>`, and `sort` orders the results.",
       "parameters": [
         {
           "name": "limit",
@@ -112,7 +112,7 @@
       "slug": "update-a-country",
       "title": "Update a country",
       "summary": "Changes a country's status, description or default address fields.",
-      "description": "Send the fields to change under `country`. You can change `status`, `description` and the `default_*` fields such as `default_state` and `default_city`. The response holds the country's values from before the change, so read the country again to see what is stored.",
+      "description": "Send the fields to change under `country`. You can change `status`, `description` and the `default_*` fields such as `default_state` and `default_city`. The updated country comes back under `country`.",
       "parameters": [
         {
           "name": "country_id",
@@ -163,7 +163,7 @@
       "multipart": false,
       "responses": {
         "200": {
-          "description": "The country's values from before the change, under `country`.",
+          "description": "The updated country, under `country`.",
           "schema": {
             "$ref": "#/components/schemas/CountryResponse"
           }
@@ -267,7 +267,7 @@
         },
         "has_more": {
           "type": "boolean",
-          "description": "Whether another page follows. Trust this over `next_cursor`, which can still be set on the last page."
+          "description": "Whether another page follows."
         },
         "next_cursor": {
           "type": "string",
