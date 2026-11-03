@@ -6,7 +6,7 @@
   "base": "/purchase_payments",
   "overview_description": "Record, update, delete and read payments to suppliers, with their notes, files and the purchase credit notes they raise.",
   "intro": "A purchase payment records money paid to a supplier against purchase invoices. These endpoints record, update, delete and read purchase payments, list the purchase credit notes a payment raised, and manage payment notes and their files. This area has 15 endpoints, each available in all seven SDKs.",
-  "warning": "**Deleting a purchase payment or a note cannot be undone.** Deleting a note file currently returns `404`.",
+  "warning": "**Deleting a purchase payment or a note cannot be undone.**",
   "notes": [
     "**Every JSON write body is wrapped in `purchase_payment`, and amounts are decimal strings such as `\"1.00\"`.** The note create and update are multipart forms.",
     "**A payment needs `payment_method_applications`.** Each entry names a payment processor by `id` and an amount.",
@@ -920,7 +920,6 @@
       "title": "Delete a purchase payment note file",
       "summary": "Removes one attachment from a purchase payment note. Nothing comes back.",
       "description": "Deletes one file from the note, addressed by its `uuid`. A successful call returns `204` with no body.",
-      "warning": "**Deleting a note file currently fails.** This call currently returns `404` \"attachment not found\", even for a file the note's file list shows.",
       "parameters": [
         {
           "name": "purchase_payment_id",
@@ -960,7 +959,7 @@
           "description": "The file is removed from the note."
         },
         "404": {
-          "description": "Attachment not found. This call currently returns `404` for every attachment, including ones the note's file list shows."
+          "description": "The file was not found."
         }
       },
       "example_call": {

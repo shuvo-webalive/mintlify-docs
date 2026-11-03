@@ -6,7 +6,7 @@
   "base": "/purchase_refunds",
   "overview_description": "Record refunds from suppliers against purchase credit notes, and read, update and delete purchase refunds.",
   "intro": "A purchase refund records money a supplier pays back against a purchase credit note. These endpoints record a refund from a credit note and read, update and delete refunds. This area has 5 endpoints, each available in all seven SDKs.",
-  "warning": "**Deleting a purchase refund cannot be undone.** Updating a purchase refund currently returns `500`, even for a valid body such as a new `reference`.",
+  "warning": "**Deleting a purchase refund cannot be undone.**",
   "notes": [
     "**A purchase refund is created from a purchase credit note.** Post it to `/purchase_credit_notes/{purchase_credit_note_id}/purchase_refunds`.",
     "**Every write body is wrapped in `purchase_refund`.**",
@@ -213,7 +213,6 @@
       "title": "Update a purchase refund",
       "summary": "Changes a refund's reference, note, date or custom attributes and returns it under `purchase_refund`.",
       "description": "Updates the refund, wrapped in `purchase_refund`. Only `alternate_date`, `reference`, `note` and `custom_attributes` can change; any other key returns `400`, and the amount cannot change.",
-      "warning": "**Updating a purchase refund currently fails.** This call currently returns `500`, even for a valid body such as the example below.",
       "parameters": [
         {
           "name": "purchase_refund_id",
@@ -279,9 +278,6 @@
         },
         "400": {
           "description": "The body holds a key other than `alternate_date`, `reference`, `note` and `custom_attributes`."
-        },
-        "500": {
-          "description": "The update currently fails with `500`, even for a valid body."
         }
       },
       "example_call": {

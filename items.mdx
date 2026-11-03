@@ -7,7 +7,7 @@ description: "List, read, create, update and delete items, set their sale, purch
 Items are the products and services you sell and buy. These endpoints create, read, update and delete items, set their sale, purchase and inventory sections, add stock to warehouses, and manage bundles, families, variations, packages and notes. This area has 41 endpoints, each available in all seven SDKs.
 
 <Warning>
-  **An item that an order references cannot be deleted.** The delete returns `409`, and retrying does not help. Deactivating or reactivating an item can return `500`, and deleting a note file currently returns `404`.
+  **An item that an order references cannot be deleted.** The delete returns `409`, and retrying does not help.
 </Warning>
 
 ## At a glance
@@ -67,6 +67,6 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 - **Every item JSON write is wrapped in `item`.** Two writes are not: the image upload sends `image_base64` at the top level, and the note writes are multipart forms with a `note` field.
 - **Address an item by its `id`, such as `ITEM-0001`.** Not by its `uuid`, and not by the integer `id` that the sale and purchase reads return.
 - **`type` and `name` are the minimum to create an item.** Send `type` in upper case, such as `STANDARD`, `BUNDLE`, `FAMILY` or `VARIATION_BASED`; it comes back in lower case.
-- **The item listing pages by cursor and filters with `filter_<field>`.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor`; `has_more` tells you when to stop. Filter with `filter_<field>`; a bare `filter` expression is refused with `400`, and `order_by` and `direction` are ignored.
+- **The item listing pages by cursor and filters with `filter_<field>`.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor`; `has_more` tells you when to stop. Filter with `filter_<field>`; a bare `filter` expression is refused with `400`.
 - **The sale, purchase and inventories reads return a short item.** Each carries `id`, `name` and its one section, and the sale and purchase reads give `id` as an integer.
 - **Item notes are sent as a multipart form.** The text goes in the `note` field, and files are optional extra parts.

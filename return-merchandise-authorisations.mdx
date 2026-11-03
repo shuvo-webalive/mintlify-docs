@@ -7,7 +7,7 @@ description: "Authorise customer returns against fulfilled invoices, approve or 
 A return merchandise authorisation (RMA) records the goods a customer may return from a fulfilled invoice. These endpoints create, update, approve, reject and delete RMAs, receive the returned stock, and manage the RMA's notes. This area has 19 endpoints, each available in all seven SDKs.
 
 <Warning>
-  **Receiving returned stock commits it, and a received RMA cannot be deleted.** Updating or deleting an RMA currently returns `500`, even for a draft RMA, and a new RMA is created as `active`, not as a draft.
+  **Receiving returned stock commits it, and a received RMA cannot be deleted.**
 </Warning>
 
 ## At a glance
@@ -46,5 +46,5 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 - **An RMA needs a fulfilled invoice.** The create body names the invoice by its internal id, `inv_` followed by the invoice's `uuid` without hyphens, and each return line by a fulfilled invoice line's `id`.
 - **A new RMA has `status` `active` and `return_status` `pending`.** The create call returns a short record (`id`, `code`, `status`, `version`); read the RMA for the rest.
 - **Approve and reject take no body and can notify approvers.** Both are refused with `422` when the RMA has no pending approval.
-- **Notes are JSON, not forms, and carry no file.** Create an RMA note takes `{"note": {"note": "..."}}` and no attachment. No endpoint attaches a file to an RMA note, so the note file endpoints have not been confirmed to work.
+- **Notes are JSON, not forms, and carry no file.** Create an RMA note takes `{"note": {"note": "..."}}` and no attachment.
 - **Listings page by cursor.** Pass `limit` and the previous page's `pagination.next_cursor` as `cursor`, and stop when `has_more` is `false`.

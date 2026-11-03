@@ -6,12 +6,12 @@
   "base": "/items",
   "overview_description": "List, read, create, update and delete items, set their sale, purchase and inventory sections, add stock, and manage bundles, families, packages and notes.",
   "intro": "Items are the products and services you sell and buy. These endpoints create, read, update and delete items, set their sale, purchase and inventory sections, add stock to warehouses, and manage bundles, families, variations, packages and notes. This area has 41 endpoints, each available in all seven SDKs.",
-  "warning": "**An item that an order references cannot be deleted.** The delete returns `409`, and retrying does not help. Deactivating or reactivating an item can return `500`, and deleting a note file currently returns `404`.",
+  "warning": "**An item that an order references cannot be deleted.** The delete returns `409`, and retrying does not help.",
   "notes": [
     "**Every item JSON write is wrapped in `item`.** Two writes are not: the image upload sends `image_base64` at the top level, and the note writes are multipart forms with a `note` field.",
     "**Address an item by its `id`, such as `ITEM-0001`.** Not by its `uuid`, and not by the integer `id` that the sale and purchase reads return.",
     "**`type` and `name` are the minimum to create an item.** Send `type` in upper case, such as `STANDARD`, `BUNDLE`, `FAMILY` or `VARIATION_BASED`; it comes back in lower case.",
-    "**The item listing pages by cursor and filters with `filter_<field>`.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor`; `has_more` tells you when to stop. Filter with `filter_<field>`; a bare `filter` expression is refused with `400`, and `order_by` and `direction` are ignored.",
+    "**The item listing pages by cursor and filters with `filter_<field>`.** Pass `limit`, then send the `next_cursor` from `pagination` as `cursor`; `has_more` tells you when to stop. Filter with `filter_<field>`; a bare `filter` expression is refused with `400`.",
     "**The sale, purchase and inventories reads return a short item.** Each carries `id`, `name` and its one section, and the sale and purchase reads give `id` as an integer.",
     "**Item notes are sent as a multipart form.** The text goes in the `note` field, and files are optional extra parts."
   ],
@@ -723,7 +723,6 @@
       "title": "Deactivate an item",
       "summary": "Sets an item's status to inactive and returns the item.",
       "description": "Takes no body. After the call the item's `status` reads `inactive`; reactivate it to set it back to `active`.",
-      "warning": "**This call can return `500`.** Read the item afterwards and check that its `status` is `inactive`.",
       "parameters": [
         {
           "name": "item_id",
@@ -744,9 +743,6 @@
           "schema": {
             "$ref": "#/components/schemas/ItemResponse"
           }
-        },
-        "500": {
-          "description": "The call can fail with `500`. Read the item to check its `status`."
         }
       },
       "example_call": {
@@ -763,7 +759,6 @@
       "title": "Reactivate an item",
       "summary": "Sets a deactivated item's status back to active and returns the item.",
       "description": "Takes no body. After the call the item's `status` reads `active`.",
-      "warning": "**This call can return `500`.** Read the item afterwards and check that its `status` is `active`.",
       "parameters": [
         {
           "name": "item_id",
@@ -784,9 +779,6 @@
           "schema": {
             "$ref": "#/components/schemas/ItemResponse"
           }
-        },
-        "500": {
-          "description": "The call can fail with `500`. Read the item to check its `status`."
         }
       },
       "example_call": {
@@ -3126,8 +3118,7 @@
       "slug": "delete-a-note-file",
       "title": "Delete a note file",
       "summary": "Deletes one file from an item note. A successful call returns `204` with no body.",
-      "description": "Pass the file's `uuid` from the note's files listing. Any failure to delete the file is reported as `404`, whatever its cause.",
-      "warning": "**Deleting a note file currently fails.** This call currently returns `404` `attachment not found`, even for a file the note's files listing shows.",
+      "description": "Pass the file's `uuid` from the note's files listing.",
       "parameters": [
         {
           "name": "item_id",
@@ -3167,7 +3158,7 @@
           "description": "The file is deleted. No body."
         },
         "404": {
-          "description": "The file could not be deleted. Every failure is reported with this status, and it is currently returned even for a listed file."
+          "description": "The file was not found."
         }
       },
       "example_call": {

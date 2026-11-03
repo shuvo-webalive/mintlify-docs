@@ -6,7 +6,6 @@
   "base": "/settings/roles",
   "overview_description": "List, read, create, update, enable, disable and delete the user roles on an Exsited instance.",
   "intro": "Roles are the settings records for user roles, and each says whether it is a system role. You can list, read, create, update, enable or disable and delete roles. This area has 5 endpoints, and all seven SDKs call every one.",
-  "warning": "**Known issue: creating or updating a role currently returns `500` after the role is saved.** List the roles to check before you retry.",
   "notes": [
     "**Responses wrap a role in `role`.** A single read returns `{\"role\": {...}}`.",
     "**`is_system_role` marks the built-in roles.** A delete of a system role is refused.",
@@ -76,7 +75,7 @@
       "slug": "create-a-role",
       "title": "Create a role",
       "summary": "Creates a role and returns it under `role`.",
-      "description": "Send the new role under `role`. The body fields are not documented yet; `name` is shown as an example. This call currently returns `500` even though the role is saved, so list the roles before you retry.",
+      "description": "Send the new role under `role`, for example with a `name`.",
       "parameters": [],
       "body": {
         "schema": {
@@ -100,9 +99,6 @@
       "responses": {
         "201": {
           "description": "The role is created."
-        },
-        "500": {
-          "description": "Known issue: the role is saved but the call returns `500`."
         }
       },
       "example_call": {
@@ -112,8 +108,7 @@
             "name": "Support staff"
           }
         }
-      },
-      "warning": "**This call currently returns `500` after the role is saved.** List the roles before you retry."
+      }
     },
     {
       "key": "get_settings_role",
@@ -131,7 +126,7 @@
           "description": "The role's `id`, as the listing returns it.",
           "schema": {
             "type": "string",
-            "example": "29a7e96467b69a9f5a93332e29e9b0de"
+            "example": "201b2c3d4e5f4a6b8c7d9e0f1a2b3c4d"
           }
         }
       ],
@@ -147,7 +142,7 @@
       },
       "example_call": {
         "path": {
-          "role_id": "29a7e96467b69a9f5a93332e29e9b0de"
+          "role_id": "201b2c3d4e5f4a6b8c7d9e0f1a2b3c4d"
         }
       }
     },
@@ -167,7 +162,7 @@
           "description": "The role's `id`, as the listing returns it.",
           "schema": {
             "type": "string",
-            "example": "29a7e96467b69a9f5a93332e29e9b0de"
+            "example": "201b2c3d4e5f4a6b8c7d9e0f1a2b3c4d"
           }
         }
       ],
@@ -180,7 +175,7 @@
       },
       "example_call": {
         "path": {
-          "role_id": "29a7e96467b69a9f5a93332e29e9b0de"
+          "role_id": "201b2c3d4e5f4a6b8c7d9e0f1a2b3c4d"
         }
       }
     },
@@ -191,7 +186,7 @@
       "slug": "update-a-role",
       "title": "Update a role",
       "summary": "Changes a role, or enables or disables it.",
-      "description": "Send the fields to change under `role`, or its `status` to enable or disable it. The body fields are not documented yet; `display_name` is shown as an example. This call currently returns `500` even though the change is saved, so read the role again to see the result.",
+      "description": "Send the fields to change under `role`, or its `status` to enable or disable it, for example `display_name`.",
       "parameters": [
         {
           "name": "role_id",
@@ -200,7 +195,7 @@
           "description": "The role's `id`, as the listing returns it.",
           "schema": {
             "type": "string",
-            "example": "29a7e96467b69a9f5a93332e29e9b0de"
+            "example": "201b2c3d4e5f4a6b8c7d9e0f1a2b3c4d"
           }
         }
       ],
@@ -226,22 +221,18 @@
       "responses": {
         "200": {
           "description": "The role is updated."
-        },
-        "500": {
-          "description": "Known issue: the role is saved but the call returns `500`."
         }
       },
       "example_call": {
         "path": {
-          "role_id": "29a7e96467b69a9f5a93332e29e9b0de"
+          "role_id": "201b2c3d4e5f4a6b8c7d9e0f1a2b3c4d"
         },
         "body": {
           "role": {
             "display_name": "Support staff (AU)"
           }
         }
-      },
-      "warning": "**This call currently returns `500` after the change is saved.** Read the role again to see the result."
+      }
     }
   ],
   "schemas": {

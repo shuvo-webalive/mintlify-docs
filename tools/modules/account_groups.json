@@ -6,7 +6,6 @@
   "base": "/settings/account_groups",
   "overview_description": "List, create, read, update and delete the account groups you sort accounts into.",
   "intro": "Account groups sort your accounts into sets, such as wholesale or retail customers. Here you list, create, read, update and delete them. This area has 5 endpoints, and every SDK supports all of them.",
-  "warning": "**Updating and deleting an account group currently fail.** `PATCH` and `DELETE /settings/account_groups/{account_group_id}` return `500`, even for a group just created, so a group you create cannot yet be changed or removed through the API.",
   "notes": [
     "**Each group's id starts with `ag_`.** List account groups returns each group's `id`.",
     "**`name` is required to create a group.** The new group comes back under `account_group`.",
@@ -225,9 +224,6 @@
       "responses": {
         "200": {
           "description": "The group is updated."
-        },
-        "500": {
-          "description": "Returned on every update, even for a group just created."
         }
       },
       "example_call": {
@@ -239,8 +235,7 @@
             "display_name": "Wholesale customers"
           }
         }
-      },
-      "warning": "**This call currently returns `500`.** It fails even for a group just created, so a group cannot yet be changed through the API."
+      }
     },
     {
       "key": "delete_settings_account_group",
@@ -267,17 +262,13 @@
       "responses": {
         "204": {
           "description": "The group is deleted."
-        },
-        "500": {
-          "description": "Returned on every delete, even for a group just created."
         }
       },
       "example_call": {
         "path": {
           "account_group_id": "ag_3c8e1a5b7d2f4a9c8e6b1d3f5a7c9e2b"
         }
-      },
-      "warning": "**This call currently returns `500`.** It fails even for a group just created, so a group cannot yet be removed through the API."
+      }
     }
   ],
   "schemas": {
